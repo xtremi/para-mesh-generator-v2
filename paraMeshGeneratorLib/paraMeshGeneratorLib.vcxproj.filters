@@ -54,6 +54,9 @@
     <ClInclude Include="CuboidMesher.h">
       <Filter>Meshers</Filter>
     </ClInclude>
+    <ClInclude Include="Cone3Dmesher.h">
+      <Filter>Meshers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -90,6 +93,9 @@
       <Filter>Meshers</Filter>
     </ClCompile>
     <ClCompile Include="CuboidMesher.cpp">
+      <Filter>Meshers</Filter>
+    </ClCompile>
+    <ClCompile Include="Cone3Dmesher.cpp">
       <Filter>Meshers</Filter>
     </ClCompile>
   </ItemGroup>

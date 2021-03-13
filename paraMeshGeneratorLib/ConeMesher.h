@@ -15,8 +15,7 @@ public:
 		double				height,
 		const glm::ivec2&	nnodes,
 		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr
-	);
+		glm::dmat3x3*		csys = nullptr);
 
 	static void writeNodesConeX(FEAwriter* writer, const glm::dvec3& centerPos, 
 		double radiusStart, double radiusEnd, double startAng, double endAng, double height,

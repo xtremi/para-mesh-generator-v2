@@ -8,6 +8,7 @@
 #include "ConeMesher.h"
 
 #include "CuboidMesher.h"
+#include "Cone3Dmesher.h"
 
 int lineMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
@@ -16,8 +17,10 @@ int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
 
+
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
+int cone3Dmesher(const std::string& fileName);
 
 int extruded2Drecs(const std::string& fileName);
 int extrude2Darc(const std::string& filename);
@@ -34,6 +37,7 @@ std::vector<TestDef> testFunctions({
 
 	TestDef(120, "cuboidMesher",	"basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(121, "cuboidMesherRef",	"basic meshers 3D", (testFunction)cuboidMesherRef),
+	TestDef(122, "cone3Dmesher",	"basic meshers 3D", (testFunction)cone3Dmesher),
 
 	TestDef(200, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
 	TestDef(270, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
@@ -407,15 +411,42 @@ int cuboidMesherRef(const std::string& fileName) {
 	CuboidMesher::writeNodesRef(w, pos, size, nnodesXY, nRef, false, plane::xy);
 	CuboidMesher::writeElementsRef(w, nnodesXY, nRef, false);
 
-	int elID = 1; int n[2] = { 1,0 };
-	for (int nodeID = 2; nodeID < w->getNextNodeID(); nodeID++) {
-		n[1] = nodeID;
-		writer.write2nodedBeam(elID++, n);
-	}
+
 
 	w->close();
 	return 0;
 }
+
+int cone3Dmesher(const std::string& fileName) {
+	std::ofstream file;
+	file.open(fileName);
+	if (!file.is_open()) return 1;
+
+	NastranFEAwriter writer(&file);
+	NastranFEAwriter* w = &writer;
+	glm::dvec3 pos(0.0);
+
+	glm::ivec3 nnodes(15, 4, 16);
+	//glm::ivec3 nnodes(12, 4, 4);
+	double radiusStartInner = 5.0;
+	double radiusStartOuter = 9.0;
+	double radiusEndInner = 3.0;
+	double radiusEndOuter = 5.0;
+	double height = 32.0;
+
+	Cone3Dmesher::writeNodes(w, pos, radiusStartOuter, radiusEndOuter, radiusStartInner, radiusEndInner,
+		0.0, glm::pi<double>()*1.95, height, nnodes, direction::z);
+	Cone3Dmesher::writeElements(w, nnodes, false);
+	pos.x += height;
+
+	Cone3Dmesher::writeNodes(w, pos, radiusStartOuter, radiusStartOuter, radiusStartInner, radiusStartInner,
+		-1, -1, height, nnodes, direction::z);
+	Cone3Dmesher::writeElements(w, nnodes, true);
+
+	w->close();
+	return 0;
+}
+
 
 int extruded2Drecs(const std::string& fileName)
 {

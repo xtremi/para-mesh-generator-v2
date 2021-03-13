@@ -68,9 +68,9 @@ void CuboidMesher::writeElements(
 
 	int nNodesFace12 = nnodes.x * nnodes.y;
 
-	int nEld1 = nnodes.x - 1;
+	int nEld1 = closedLoop ? nnodes.x : nnodes.x - 1;
 	int nEld2 = nnodes.y - 1;
-	int nEld3 = closedLoop ? nnodes.z : nnodes.z - 1;
+	int nEld3 = nnodes.z - 1;
 
 	for (int i3 = 0; i3 < nEld3; i3++) {
 		for (int i2 = 0; i2 < nEld2; i2++) {
@@ -85,10 +85,18 @@ void CuboidMesher::writeElements(
 				n[5] = n[1] + nNodesFace12;
 				n[6] = n[2] + nNodesFace12;
 				n[7] = n[3] + nNodesFace12;
+
+				if (closedLoop && i1 == (nEld1 - 1)) {
+					n[0] -= nnodes.x;
+					n[1] -= nnodes.x;
+					n[4] -= nnodes.x;
+					n[5] -= nnodes.x;
+				}
+
 				c++;
 				writer->write8nodedHexa(n);
 			}
-			c++;
+			if (!closedLoop) c++;
 		}
 		c += nnodes.x;
 	}
@@ -202,8 +210,7 @@ void CuboidMesher::writeElementsRef(
 		int nnodesTotal		= nnodesPlaneB + nnodesPlaneM1 + nnodesPlaneM2 + nnodesPlaneM3 + nnodesPlaneT;
 
 		//Initial nodes on planes:
-		//int firstNodePrevT	= c;
-		int firstNodeB		= c;//firstNodePrevT + nnodesPlaneB;
+		int firstNodeB		= c;
 		int firstNodeM1		= firstNodeB + nnodesPlaneB;
 		int firstNodeM2		= firstNodeM1 + nnodesPlaneM1;
 
@@ -215,18 +222,44 @@ void CuboidMesher::writeElementsRef(
 		if(r != 0){
 			Mesher::nodeID1 = firstNodeB - nnodesPlaneB;
 			CuboidMesher::writeElements(writer, glm::ivec3(currentNodes12.x, currentNodes12.y, 2), false);
-			//elID = feaWriter->writeElementsCubeXZY(glm::ivec3(currentNodesX, 2, currentNodesZ), firstNodePrevT, elID);
 		}
 
+		writeElementsRef_rows_bm1m2(writer, currentNodes12, nextNodes12, firstNodeB, firstNodeM1, firstNodeM2, closedLoop);
+		writeElementsRef_rows_m2m3t(writer, currentNodes12, nextNodes12, firstNodeM2b, firstNodeM3, firstNodeT, closedLoop);
+
+		currentNodes12 = nextNodes12;
+		c += nnodesTotal;
+	}
+}
+
+	void CuboidMesher::writeElementsRef_rows_bm1m2(
+		FEAwriter*			writer,
+		const glm::ivec2&	currentNodes12,
+		glm::ivec2&			nextNodes12,
+		int&				firstNodeBrow,
+		int&				firstNodeM1row,
+		int&				firstNodeM2row,
+		bool				closedLoop)
+	{
 		for (int i2 = 0; i2 < (currentNodes12.y - 1); i2++) {
 			for (int i1 = 0; i1 < (currentNodes12.x - 1); i1 += 4) {
 
-				//row b | m1 | m2 first nodes front:
-				int bf_0 = firstNodeB + 4 * (i1 / 4);
-				int m1f_0 = firstNodeM1 + 3 * (i1 / 4) * currentNodes12.y;
-				int m2f_0 = firstNodeM2 + 2 * (i1 / 4);
+				/*
+					m2f0/m2b0   x_______x_______x m2
+								| \     |     / |     ^ dir3
+					m1f0/m1b0   |  x___x___x/	| m1  |
+								|   |   |   |   |     |
+					bf0/bb0     x___x___x___x___x b   |---->dir1
 
-				//row b | m1 | m2 first nodes back:
+					b/m1/m2 -> node rows
+					bf0/bb0   -> first nodes bottom front/back
+					m1f0/m1b0 -> first nodes middle1 front/back
+					m2f0/m2b0 -> first nodes middle2 front/back
+				*/
+				int bf_0 = firstNodeBrow + 4 * (i1 / 4);
+				int m1f_0 = firstNodeM1row + 3 * (i1 / 4) * currentNodes12.y;
+				int m2f_0 = firstNodeM2row + 2 * (i1 / 4);
+
 				int bb_0 = bf_0 + currentNodes12.x;
 				int m1b_0 = m1f_0 + 1;
 				int m2b_0 = m2f_0 + nextNodes12.x;
@@ -239,33 +272,52 @@ void CuboidMesher::writeElementsRef(
 				int m1b[3] = { m1b_0, m1b_0 + currentNodes12.y, m1b_0 + 2 * currentNodes12.y };
 				int m2b[3] = { m2b_0, m2b_0 + 1, m2b_0 + 2 };
 
-				std::string tmp_nids = arrayToString(bf, 5) + arrayToString(m1f, 3) + arrayToString(m2f, 3);
-				tmp_nids += (arrayToString(bb, 5) + arrayToString(m1b, 3) + arrayToString(m2b, 3));
-
 				std::vector<int*> elNodes;
 				int n_el1[8] = { bf[0], bf[1], bb[1], bb[0],  m2f[0], m1f[0], m1b[0], m2b[0] }; elNodes.push_back(n_el1);
 				int n_el2[8] = { bf[1], bf[2], bb[2], bb[1],  m1f[0], m1f[1], m1b[1], m1b[0] }; elNodes.push_back(n_el2);
 				int n_el3[8] = { bf[2], bf[3], bb[3], bb[2],  m1f[1], m1f[2], m1b[2], m1b[1] }; elNodes.push_back(n_el3);
 				int n_el4[8] = { bf[3], bf[4], bb[4], bb[3],  m1f[2], m2f[2], m2b[2], m1b[2] }; elNodes.push_back(n_el4);
-
 				int n_el5[8] = { m1f[0], m1f[1], m1b[1], m1b[0],  m2f[0], m2f[1], m2b[1], m2b[0] }; elNodes.push_back(n_el5);
 				int n_el6[8] = { m1f[1], m1f[2], m1b[2], m1b[1],  m2f[1], m2f[2], m2b[2], m2b[1] }; elNodes.push_back(n_el6);
 
-				for (int i = 0; i < elNodes.size(); i++){
+				for (int i = 0; i < elNodes.size(); i++) {
 					writer->write8nodedHexa(elNodes[i]);
 				}
 			}
-			firstNodeB += currentNodes12.x;
-			firstNodeM1 += 1;
-			firstNodeM2 += nextNodes12.x;
+			firstNodeBrow += currentNodes12.x;
+			firstNodeM1row += 1;
+			firstNodeM2row += nextNodes12.x;
 		}
+	}
 
+	void CuboidMesher::writeElementsRef_rows_m2m3t(
+		FEAwriter*			writer,
+		const glm::ivec2&	currentNodes12,
+		glm::ivec2&			nextNodes12,
+		int&				firstNodeM2row,
+		int&				firstNodeM3row,
+		int&				firstNodeTrow,
+		bool				closedLoop)
+	{
 		for (int i1 = 0; i1 < (nextNodes12.x - 1); i1++) {
 			for (int i2 = 0; i2 < (currentNodes12.y - 1); i2 += 4) {
 
-				int m2f_0 = firstNodeM2b + 4 * (i2 / 4)* nextNodes12.x;
-				int m3f_0 = firstNodeM3 + 3 * (i2 / 4) * nextNodes12.x;
-				int tf_0 = firstNodeT + 2 * (i2 / 4)* nextNodes12.x;
+				/*
+					tf0/tb0     x_______x_______x t
+								| \     |     / |     ^ dir3
+					m3f0/m3b0   |  x___x___x/	| m3  |
+								|   |   |   |   |     |
+					m2f0/m2b0   x___x___x___x___x m2  |---->dir2
+
+					m2/m3/t   -> node rows
+					tf0/tb0   -> first nodes bottom front/back
+					m3f0/m3b0 -> first nodes middle3 front/back
+					m2f0/m2b0 -> first nodes middle2 front/back
+				*/
+
+				int m2f_0 = firstNodeM2row + 4 * (i2 / 4)* nextNodes12.x;
+				int m3f_0 = firstNodeM3row + 3 * (i2 / 4) * nextNodes12.x;
+				int tf_0 = firstNodeTrow + 2 * (i2 / 4)* nextNodes12.x;
 
 				int m2f[5], m3f[3], tf[3];
 				int m2b[5], m3b[3], tb[3];
@@ -279,15 +331,12 @@ void CuboidMesher::writeElementsRef(
 					tf[i] = tf_0 + i * nextNodes12.x;
 					tb[i] = tf[i] + 1;
 				}
-				std::string tmp_nids = arrayToString(m2f, 5) + arrayToString(m3f, 3) + arrayToString(tf, 3);
-				tmp_nids += (arrayToString(m2b, 5) + arrayToString(m3b, 3) + arrayToString(tb, 3));
 
 				std::vector<int*> elNodes;
 				int n_el1[8] = { m2f[0], m2f[1], m2b[1], m2b[0],  tf[0], m3f[0], m3b[0], tb[0] }; elNodes.push_back(n_el1);
 				int n_el2[8] = { m2f[1], m2f[2], m2b[2], m2b[1],  m3f[0], m3f[1], m3b[1], m3b[0] }; elNodes.push_back(n_el2);
 				int n_el3[8] = { m2f[2], m2f[3], m2b[3], m2b[2],  m3f[1], m3f[2], m3b[2], m3b[1] }; elNodes.push_back(n_el3);
 				int n_el4[8] = { m2f[3], m2f[4], m2b[4], m2b[3],  m3f[2], tf[2], tb[2], m3b[2] }; elNodes.push_back(n_el4);
-
 				int n_el5[8] = { m3f[0], m3f[1], m3b[1], m3b[0],  tf[0], tf[1], tb[1], tb[0] }; elNodes.push_back(n_el5);
 				int n_el6[8] = { m3f[1], m3f[2], m3b[2], m3b[1],  tf[1], tf[2], tb[2], tb[1] }; elNodes.push_back(n_el6);
 
@@ -296,13 +345,11 @@ void CuboidMesher::writeElementsRef(
 				}
 
 			}
-			firstNodeM2b += 1;
-			firstNodeM3 += 1;
-			firstNodeT += 1;
+			firstNodeM2row += 1;
+			firstNodeM3row += 1;
+			firstNodeTrow += 1;
 		}
 
-		currentNodes12 = nextNodes12;
-		c += nnodesTotal;
 	}
 
-}
+

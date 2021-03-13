@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArcMesher.h" />
+    <ClInclude Include="Cone3Dmesher.h" />
     <ClInclude Include="ConeMesher.h" />
     <ClInclude Include="CuboidMesher.h" />
     <ClInclude Include="FeaWrite.h" />
@@ -34,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArcMesher.cpp" />
+    <ClCompile Include="Cone3Dmesher.cpp" />
     <ClCompile Include="ConeMesher.cpp" />
     <ClCompile Include="CuboidMesher.cpp" />
     <ClCompile Include="FeaWrite.cpp" />

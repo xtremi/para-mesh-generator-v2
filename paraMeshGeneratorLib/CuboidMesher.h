@@ -47,4 +47,22 @@ public:
 		int			nRefinements,
 		bool		closedLoop);
 
+private:
+	static void writeElementsRef_rows_bm1m2(
+		FEAwriter*			writer,
+		const glm::ivec2&	currentNodes12,
+		glm::ivec2&			nextNodes12,
+		int&				firstNodeBrow,
+		int&				firstNodeM1row,
+		int&				firstNodeM2row,
+		bool				closedLoop);
+
+	static void writeElementsRef_rows_m2m3t(
+		FEAwriter*			writer,
+		const glm::ivec2&	currentNodes12,
+		glm::ivec2&			nextNodes12,
+		int&				firstNodeM2row,
+		int&				firstNodeM3row,
+		int&				firstNodeTrow,
+		bool				closedLoop);
 };
