@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1231
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "para-mesh-generator-v2", "para-mesh-generator-v2\para-mesh-generator-v2.vcxproj", "{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "paraMeshGeneratorLib", "paraMeshGeneratorLib\paraMeshGeneratorLib.vcxproj", "{82F9A287-C38C-4AAC-888E-D55F62EDECE0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test_paraMeshGeneratorLib", "Test_paraMeshGeneratorLib\Test_paraMeshGeneratorLib.vcxproj", "{C4DE38CF-44A8-4450-976D-CE03AFDF815D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}.Debug|x64.ActiveCfg = Debug|x64
+		{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}.Debug|x64.Build.0 = Debug|x64
+		{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}.Debug|x86.ActiveCfg = Debug|Win32
+		{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}.Debug|x86.Build.0 = Debug|Win32
+		{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}.Release|x64.ActiveCfg = Release|x64
+		{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}.Release|x64.Build.0 = Release|x64
+		{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}.Release|x86.ActiveCfg = Release|Win32
+		{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}.Release|x86.Build.0 = Release|Win32
+		{82F9A287-C38C-4AAC-888E-D55F62EDECE0}.Debug|x64.ActiveCfg = Debug|x64
+		{82F9A287-C38C-4AAC-888E-D55F62EDECE0}.Debug|x64.Build.0 = Debug|x64
+		{82F9A287-C38C-4AAC-888E-D55F62EDECE0}.Debug|x86.ActiveCfg = Debug|Win32
+		{82F9A287-C38C-4AAC-888E-D55F62EDECE0}.Debug|x86.Build.0 = Debug|Win32
+		{82F9A287-C38C-4AAC-888E-D55F62EDECE0}.Release|x64.ActiveCfg = Release|x64
+		{82F9A287-C38C-4AAC-888E-D55F62EDECE0}.Release|x64.Build.0 = Release|x64
+		{82F9A287-C38C-4AAC-888E-D55F62EDECE0}.Release|x86.ActiveCfg = Release|Win32
+		{82F9A287-C38C-4AAC-888E-D55F62EDECE0}.Release|x86.Build.0 = Release|Win32
+		{C4DE38CF-44A8-4450-976D-CE03AFDF815D}.Debug|x64.ActiveCfg = Debug|x64
+		{C4DE38CF-44A8-4450-976D-CE03AFDF815D}.Debug|x64.Build.0 = Debug|x64
+		{C4DE38CF-44A8-4450-976D-CE03AFDF815D}.Debug|x86.ActiveCfg = Debug|Win32
+		{C4DE38CF-44A8-4450-976D-CE03AFDF815D}.Debug|x86.Build.0 = Debug|Win32
+		{C4DE38CF-44A8-4450-976D-CE03AFDF815D}.Release|x64.ActiveCfg = Release|x64
+		{C4DE38CF-44A8-4450-976D-CE03AFDF815D}.Release|x64.Build.0 = Release|x64
+		{C4DE38CF-44A8-4450-976D-CE03AFDF815D}.Release|x86.ActiveCfg = Release|Win32
+		{C4DE38CF-44A8-4450-976D-CE03AFDF815D}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CA8AA2ED-4A04-4EDC-9F13-F3BB415155DE}
+	EndGlobalSection
+EndGlobal
