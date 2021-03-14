@@ -8,7 +8,7 @@
 	nnodes.x - along circumferance
 	nndoes.y - along height
 */
-void ConeMesher::writeNodesCone(
+void ConeMesher::writeNodes(
 	FEAwriter*			writer,
 	const glm::dvec3&	centerPos,
 	double				radiusStart,
@@ -40,20 +40,20 @@ void ConeMesher::writeNodesCone(
 	nodeID1 = firstNodeID;
 }
 
-void ConeMesher::writeNodesConeX(FEAwriter*	writer, const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
+void ConeMesher::writeNodesX(FEAwriter*	writer, const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
 	const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
-	writeNodesCone(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::x, csys);
+	writeNodes(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::x, csys);
 }
-void ConeMesher::writeNodesConeY(FEAwriter*	writer, const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
+void ConeMesher::writeNodesY(FEAwriter*	writer, const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
 	const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
-	writeNodesCone(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::y, csys);
+	writeNodes(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::y, csys);
 }
-void ConeMesher::writeNodesConeZ(FEAwriter*	writer, const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
+void ConeMesher::writeNodesZ(FEAwriter*	writer, const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
 	const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
-	writeNodesCone(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::z, csys);
+	writeNodes(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::z, csys);
 }
 
 /*
@@ -61,7 +61,7 @@ void ConeMesher::writeNodesConeZ(FEAwriter*	writer, const glm::dvec3& centerPos,
 	In the code X-dir refers to refinement direction (along height)
 	Y-dir refers to around the perimeter
 */
-void ConeMesherRef::writeNodesCone_ref(
+void ConeMesherRef::writeNodes(
 	FEAwriter*			writer,
 	const glm::dvec3&	centerPos,
 	int					nNodesEdge,
@@ -135,12 +135,12 @@ void ConeMesherRef::writeNodesCone_ref(
 	nodeID1 = firstNodeID;
 }
 
-void ConeMesher::writeElementsCone(FEAwriter* writer, glm::ivec2 nnodes, bool closedLoop)
+void ConeMesher::writeElements(FEAwriter* writer, glm::ivec2 nnodes, bool closedLoop)
 {
 	PlaneMesher::writeElementsPlane(writer, nnodes, closedLoop);
 }
 
-void ConeMesherRef::writeElementsCone_ref(FEAwriter* writer, int nNodesY, int nRefinements, bool closedLoop)
+void ConeMesherRef::writeElements(FEAwriter* writer, int nNodesY, int nRefinements, bool closedLoop)
 {
 	PlaneMesherRef::writeElementsPlane_ref(writer, nNodesY, nRefinements, closedLoop);
 }

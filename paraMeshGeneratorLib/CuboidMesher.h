@@ -2,7 +2,7 @@
 #include "Mesher.h"
 #include "FeaWrite.h"
 
-class CuboidMesher : public Mesher
+class CuboidMesher : private Mesher
 {
 public:
 	static void writeNodes(
@@ -12,18 +12,6 @@ public:
 		const glm::ivec3&	nnodes,
 		plane				pln,
 		glm::dmat3x3*		csys = nullptr);
-
-	static void writeNodesRef(
-		FEAwriter*			writer,
-		const glm::dvec3&	spos,
-		const glm::dvec3&	size,
-		const glm::ivec2&	nNodesFace,
-		int					nRefinements,
-		bool				startWithOffset,
-		plane				pln,
-		glm::dmat3x3*		csys = nullptr);
-
-
 
 	static void writeNodesQ(
 		FEAwriter*			writer,
@@ -41,14 +29,31 @@ public:
 		glm::ivec3	nnodes,
 		bool		closedLoop);
 
-	static void writeElementsRef(
+
+};
+
+
+class CuboidMesherRef : private Mesher
+{
+public:
+	static void writeNodes(
+		FEAwriter*			writer,
+		const glm::dvec3&	spos,
+		const glm::dvec3&	size,
+		const glm::ivec2&	nNodesFace,
+		int					nRefinements,
+		bool				startWithOffset,
+		plane				pln,
+		glm::dmat3x3*		csys = nullptr);
+
+	static void writeElements(
 		FEAwriter*	writer,
 		glm::ivec2	nNodesFace,
 		int			nRefinements,
 		bool		closedLoop);
 
 private:
-	static void writeElementsRef_rows_bm1m2(
+	static void writeElements_rows_bm1m2(
 		FEAwriter*			writer,
 		const glm::ivec2&	currentNodes12,
 		glm::ivec2&			nextNodes12,
@@ -57,7 +62,7 @@ private:
 		int&				firstNodeM2row,
 		bool				closedLoop);
 
-	static void writeElementsRef_rows_m2m3t(
+	static void writeElements_rows_m2m3t(
 		FEAwriter*			writer,
 		const glm::ivec2&	currentNodes12,
 		glm::ivec2&			nextNodes12,

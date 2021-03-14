@@ -104,7 +104,7 @@ void CuboidMesher::writeElements(
 
 
 
-void CuboidMesher::writeNodesRef(
+void CuboidMesherRef::writeNodes(
 	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::dvec3&	size,
@@ -180,7 +180,7 @@ void CuboidMesher::writeNodesRef(
 	Mesher::nodeID1 = firstNode;
 }
 
-void CuboidMesher::writeElementsRef(
+void CuboidMesherRef::writeElements(
 	FEAwriter*	writer,
 	glm::ivec2	nNodesFace,
 	int			nRefinements,
@@ -224,15 +224,15 @@ void CuboidMesher::writeElementsRef(
 			CuboidMesher::writeElements(writer, glm::ivec3(currentNodes12.x, currentNodes12.y, 2), false);
 		}
 
-		writeElementsRef_rows_bm1m2(writer, currentNodes12, nextNodes12, firstNodeB, firstNodeM1, firstNodeM2, closedLoop);
-		writeElementsRef_rows_m2m3t(writer, currentNodes12, nextNodes12, firstNodeM2b, firstNodeM3, firstNodeT, closedLoop);
+		writeElements_rows_bm1m2(writer, currentNodes12, nextNodes12, firstNodeB, firstNodeM1, firstNodeM2, closedLoop);
+		writeElements_rows_m2m3t(writer, currentNodes12, nextNodes12, firstNodeM2b, firstNodeM3, firstNodeT, closedLoop);
 
 		currentNodes12 = nextNodes12;
 		c += nnodesTotal;
 	}
 }
 
-	void CuboidMesher::writeElementsRef_rows_bm1m2(
+	void CuboidMesherRef::writeElements_rows_bm1m2(
 		FEAwriter*			writer,
 		const glm::ivec2&	currentNodes12,
 		glm::ivec2&			nextNodes12,
@@ -290,7 +290,7 @@ void CuboidMesher::writeElementsRef(
 		}
 	}
 
-	void CuboidMesher::writeElementsRef_rows_m2m3t(
+	void CuboidMesherRef::writeElements_rows_m2m3t(
 		FEAwriter*			writer,
 		const glm::ivec2&	currentNodes12,
 		glm::ivec2&			nextNodes12,

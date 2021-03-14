@@ -16,6 +16,12 @@
     <Filter Include="Meshers">
       <UniqueIdentifier>{09b91790-fabe-4fb3-b06f-2bce7f281378}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Meshers\header">
+      <UniqueIdentifier>{7a23281e-91bf-4943-b847-82a062b1382d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Meshers\source">
+      <UniqueIdentifier>{dbe38044-7aaf-4b33-8088-cebaadd95250}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math_utilities.h">
@@ -37,25 +43,28 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ArcMesher.h">
-      <Filter>Meshers</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesher.h">
-      <Filter>Meshers</Filter>
-    </ClInclude>
-    <ClInclude Include="LineMesher.h">
-      <Filter>Meshers</Filter>
-    </ClInclude>
-    <ClInclude Include="PlaneMesher.h">
-      <Filter>Meshers</Filter>
-    </ClInclude>
-    <ClInclude Include="ConeMesher.h">
-      <Filter>Meshers</Filter>
-    </ClInclude>
-    <ClInclude Include="CuboidMesher.h">
-      <Filter>Meshers</Filter>
+      <Filter>Meshers\header</Filter>
     </ClInclude>
     <ClInclude Include="Cone3Dmesher.h">
-      <Filter>Meshers</Filter>
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="ConeMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="CuboidMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="LineMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaneMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="DiskMesher.h">
+      <Filter>Meshers\header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -77,26 +86,29 @@
     <ClCompile Include="string_utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LineMesher.cpp">
-      <Filter>Meshers</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesher.cpp">
-      <Filter>Meshers</Filter>
-    </ClCompile>
     <ClCompile Include="ArcMesher.cpp">
-      <Filter>Meshers</Filter>
-    </ClCompile>
-    <ClCompile Include="PlaneMesher.cpp">
-      <Filter>Meshers</Filter>
-    </ClCompile>
-    <ClCompile Include="ConeMesher.cpp">
-      <Filter>Meshers</Filter>
-    </ClCompile>
-    <ClCompile Include="CuboidMesher.cpp">
-      <Filter>Meshers</Filter>
+      <Filter>Meshers\source</Filter>
     </ClCompile>
     <ClCompile Include="Cone3Dmesher.cpp">
-      <Filter>Meshers</Filter>
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="ConeMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="CuboidMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="LineMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="PlaneMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskMesher.cpp">
+      <Filter>Meshers\source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

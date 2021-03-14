@@ -2,7 +2,7 @@
 #include "Mesher.h"
 #include "FeaWrite.h"
 
-class PlaneMesher : public Mesher
+class PlaneMesher : private Mesher
 {
 public:
 	static void writeNodesPlane(
@@ -36,7 +36,7 @@ public:
 
 };
 
-class PlaneMesherRef : public Mesher {
+class PlaneMesherRef : private Mesher {
 public:
 	static void writeNodesPlane_ref(
 		FEAwriter*			writer,

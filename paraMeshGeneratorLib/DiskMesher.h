@@ -1,8 +1,8 @@
 #pragma once
-#include "Mesher.h"
 #include "FeaWrite.h"
+#include "Mesher.h"
 
-class ConeMesher : private Mesher
+class DiskMesher :	private Mesher
 {
 public:
 	static void writeNodes(
@@ -11,27 +11,26 @@ public:
 		double				radiusStart,
 		double				radiusEnd,
 		double				startAng,
-		double				endAng,
-		double				height,
+		double				endAng,		
 		const glm::ivec2&	nnodes,
 		direction			rotaxis,
 		glm::dmat3x3*		csys = nullptr);
 
-	static void writeNodesX(FEAwriter* writer, const glm::dvec3& centerPos, 
-		double radiusStart, double radiusEnd, double startAng, double endAng, double height,
+	static void writeNodesX(FEAwriter* writer, const glm::dvec3& centerPos,
+		double radiusStart, double radiusEnd, double startAng, double endAng,
 		const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesY(FEAwriter* writer, const glm::dvec3& centerPos, 
-		double radiusStart, double radiusEnd, double startAng, double endAng, double height,
+	static void writeNodesY(FEAwriter* writer, const glm::dvec3& centerPos,
+		double radiusStart, double radiusEnd, double startAng, double endAng, 
 		const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesZ(FEAwriter* writer, const glm::dvec3& centerPos, 
-		double radiusStart, double radiusEnd, double startAng, double endAng, double height,
+	static void writeNodesZ(FEAwriter* writer, const glm::dvec3& centerPos,
+		double radiusStart, double radiusEnd, double startAng, double endAng,
 		const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
 
 	static void writeElements(FEAwriter* writer, glm::ivec2 nnodes, bool closedLoop);
 
 };
 
-class ConeMesherRef : private Mesher
+class DiskMesherRef : public Mesher
 {
 public:
 	static void writeNodes(
@@ -43,7 +42,6 @@ public:
 		double				radiusEnd,
 		double				startAng,
 		double				endAng,
-		double				height,
 		direction			rotaxis,
 		glm::dmat3x3*		csys = nullptr);
 

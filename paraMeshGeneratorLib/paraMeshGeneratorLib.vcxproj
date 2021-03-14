@@ -23,6 +23,7 @@
     <ClInclude Include="Cone3Dmesher.h" />
     <ClInclude Include="ConeMesher.h" />
     <ClInclude Include="CuboidMesher.h" />
+    <ClInclude Include="DiskMesher.h" />
     <ClInclude Include="FeaWrite.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="LineMesher.h" />
@@ -38,6 +39,7 @@
     <ClCompile Include="Cone3Dmesher.cpp" />
     <ClCompile Include="ConeMesher.cpp" />
     <ClCompile Include="CuboidMesher.cpp" />
+    <ClCompile Include="DiskMesher.cpp" />
     <ClCompile Include="FeaWrite.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="LineMesher.cpp" />

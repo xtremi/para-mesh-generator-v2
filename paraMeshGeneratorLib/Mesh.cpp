@@ -73,7 +73,7 @@ void MeshRec2D::writeNodes(FEAwriter* writer) {
 		}
 		else if (extr.extrusionType == ExtrusionType::arc){
 			glm::dvec3 cpos = currentPos - glm::dvec3(0.0, 0.0, extr.radius);
-			ConeMesher::writeNodesConeY(writer, cpos, extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge);
+			ConeMesher::writeNodesY(writer, cpos, extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge);
 			//nodeID = writer->writeNodesConeY(cpos, extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge, nodeID);
 			double dx = extr.radius * glm::sin(extr.endAngle);
 			double dy = extr.radius * glm::cos(extr.endAngle);

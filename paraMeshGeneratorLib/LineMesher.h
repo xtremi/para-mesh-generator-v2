@@ -2,7 +2,7 @@
 #include "Mesher.h"
 #include "FeaWrite.h"
 
-class LineMesher : public Mesher {
+class LineMesher : private Mesher {
 public:
 	static void writeNodesLineQ(
 		FEAwriter*			writer,

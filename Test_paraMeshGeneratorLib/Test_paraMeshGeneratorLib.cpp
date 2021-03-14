@@ -6,6 +6,7 @@
 #include "ArcMesher.h"
 #include "PlaneMesher.h"
 #include "ConeMesher.h"
+#include "DiskMesher.h"
 
 #include "CuboidMesher.h"
 #include "Cone3Dmesher.h"
@@ -16,7 +17,8 @@ int planeMesher(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
-
+int diskMesher(const std::string& fileName);
+int diskMesherRef(const std::string& fileName);
 
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
@@ -34,6 +36,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(104, "planeMesherRef",	"basic meshers 2D", (testFunction)planeMesherRef),
 	TestDef(105, "coneMesher",		"basic meshers 2D", (testFunction)coneMesher),
 	TestDef(106, "coneMesherRef",	"basic meshers 2D", (testFunction)coneMesherRef),
+	TestDef(107, "diskMesher",		"basic meshers 2D", (testFunction)diskMesher),
+	TestDef(108, "diskMesherRef",	"basic meshers 2D", (testFunction)diskMesherRef),
 
 	TestDef(120, "cuboidMesher",	"basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(121, "cuboidMesherRef",	"basic meshers 3D", (testFunction)cuboidMesherRef),
@@ -261,41 +265,41 @@ int coneMesher(const std::string& fileName) {
 
 
 	//Quarter cone:	
-	ConeMesher::writeNodesCone(w, pos, radiusStart, radiusEnd, 0.0, 1.0*glm::pi<double>() / 2.0, height, nnodes, direction::x);
-	ConeMesher::writeElementsCone(w, nnodes, false);
+	ConeMesher::writeNodes(w, pos, radiusStart, radiusEnd, 0.0, 1.0*glm::pi<double>() / 2.0, height, nnodes, direction::x);
+	ConeMesher::writeElements(w, nnodes, false);
 	pos.x += 8.0;
 	//Almost full cone:
-	ConeMesher::writeNodesCone(w, pos, radiusStart, radiusEnd, 0.0, 1.99*glm::pi<double>() / 2.0, height, nnodes, direction::y);
-	ConeMesher::writeElementsCone(w, nnodes, false);
+	ConeMesher::writeNodes(w, pos, radiusStart, radiusEnd, 0.0, 1.99*glm::pi<double>() / 2.0, height, nnodes, direction::y);
+	ConeMesher::writeElements(w, nnodes, false);
 	pos.x += 8.0;
 	//Full cone:
-	ConeMesher::writeNodesCone(w, pos, radiusStart, radiusEnd, -1, -1, height, nnodes, direction::z);
-	ConeMesher::writeElementsCone(w, nnodes, true);
+	ConeMesher::writeNodes(w, pos, radiusStart, radiusEnd, -1, -1, height, nnodes, direction::z);
+	ConeMesher::writeElements(w, nnodes, true);
 
 	pos.y += 8.0;
 	pos.x = 0.0;
 	nnodes.x *= 2;
 	nnodes.y /= 2;
 	//Almost full disk:
-	ConeMesher::writeNodesCone(w, pos, radiusStart, radiusEnd, 0.0, 1.8*glm::pi<double>(), 0.0, nnodes, direction::x);
-	ConeMesher::writeElementsCone(w, nnodes, false);
+	ConeMesher::writeNodes(w, pos, radiusStart, radiusEnd, 0.0, 1.8*glm::pi<double>(), 0.0, nnodes, direction::x);
+	ConeMesher::writeElements(w, nnodes, false);
 	pos.x += 8.0;
 
 	//Full disk:
-	ConeMesher::writeNodesCone(w, pos, radiusEnd, radiusStart, -1, -1, 0.0, nnodes, direction::z);
-	ConeMesher::writeElementsCone(w, nnodes, true);
+	ConeMesher::writeNodes(w, pos, radiusEnd, radiusStart, -1, -1, 0.0, nnodes, direction::z);
+	ConeMesher::writeElements(w, nnodes, true);
 
 	pos.y += 8.0;
 	pos.x = 0.0;
 
 	//Full Cylinder:
-	ConeMesher::writeNodesCone(w, pos, radiusStart, radiusStart, -1, -1, radiusStart*2.0, nnodes, direction::x);
-	ConeMesher::writeElementsCone(w, nnodes, true);
+	ConeMesher::writeNodes(w, pos, radiusStart, radiusStart, -1, -1, radiusStart*2.0, nnodes, direction::x);
+	ConeMesher::writeElements(w, nnodes, true);
 	pos.x += 18.0;
 
 	//Half cylinder:
-	ConeMesher::writeNodesCone(w, pos, radiusStart, radiusStart, 1.2*glm::pi<double>(), 0.0, radiusStart*2.0, nnodes, direction::z);
-	ConeMesher::writeElementsCone(w, nnodes, false);
+	ConeMesher::writeNodes(w, pos, radiusStart, radiusStart, 1.2*glm::pi<double>(), 0.0, radiusStart*2.0, nnodes, direction::z);
+	ConeMesher::writeElements(w, nnodes, false);
 
 	w->close();
 	return 0;
@@ -317,44 +321,114 @@ int coneMesherRef(const std::string& fileName) {
 	int nNodesY0 = std::pow(2, nRef + 3) + 1;
 
 	//Quarter cone:	
-	ConeMesherRef::writeNodesCone_ref(w, pos, nNodesY0, nRef, radiusStart, radiusEnd, 0.0, 1.0*glm::pi<double>() / 2.0, height, direction::x);
-	ConeMesherRef::writeElementsCone_ref(w, nNodesY0, nRef, false);
+	ConeMesherRef::writeNodes(w, pos, nNodesY0, nRef, radiusStart, radiusEnd, 0.0, 1.0*glm::pi<double>() / 2.0, height, direction::x);
+	ConeMesherRef::writeElements(w, nNodesY0, nRef, false);
 	pos.x += 8.0;
 	//Almost full cone:
-	ConeMesherRef::writeNodesCone_ref(w, pos, nNodesY0, nRef, radiusStart, radiusEnd, 0.0, 1.99*glm::pi<double>() / 2.0, height, direction::y);
-	ConeMesherRef::writeElementsCone_ref(w, nNodesY0, nRef, false);
+	ConeMesherRef::writeNodes(w, pos, nNodesY0, nRef, radiusStart, radiusEnd, 0.0, 1.99*glm::pi<double>() / 2.0, height, direction::y);
+	ConeMesherRef::writeElements(w, nNodesY0, nRef, false);
 	pos.x += 8.0;
 	//Full cone:
-	ConeMesherRef::writeNodesCone_ref(w, pos, nNodesY0 - 1, nRef, radiusStart, radiusEnd, -1, -1, height, direction::z);
-	ConeMesherRef::writeElementsCone_ref(w, nNodesY0 - 1, nRef, true);
+	ConeMesherRef::writeNodes(w, pos, nNodesY0 - 1, nRef, radiusStart, radiusEnd, -1, -1, height, direction::z);
+	ConeMesherRef::writeElements(w, nNodesY0 - 1, nRef, true);
 
 	pos.y += 8.0;
 	pos.x = 0.0;
 
 	//Almost full disk:
-	ConeMesherRef::writeNodesCone_ref(w, pos, nNodesY0, nRef, radiusStart, radiusEnd, 0.0, 1.8*glm::pi<double>(), 0.0, direction::x);
-	ConeMesherRef::writeElementsCone_ref(w, nNodesY0, nRef, false);
+	ConeMesherRef::writeNodes(w, pos, nNodesY0, nRef, radiusStart, radiusEnd, 0.0, 1.8*glm::pi<double>(), 0.0, direction::x);
+	ConeMesherRef::writeElements(w, nNodesY0, nRef, false);
 	pos.x += 8.0;
 
 	//Full disk:
-	ConeMesherRef::writeNodesCone_ref(w, pos, nNodesY0 - 1, nRef, radiusEnd, radiusStart, -1, -1, 0.0, direction::z);
-	ConeMesherRef::writeElementsCone_ref(w, nNodesY0 - 1, nRef, true);
+	ConeMesherRef::writeNodes(w, pos, nNodesY0 - 1, nRef, radiusEnd, radiusStart, -1, -1, 0.0, direction::z);
+	ConeMesherRef::writeElements(w, nNodesY0 - 1, nRef, true);
 
 	pos.y += 8.0;
 	pos.x = 0.0;
 
 	//Full Cylinder:
-	ConeMesherRef::writeNodesCone_ref(w, pos, nNodesY0 - 1, nRef, radiusStart, radiusStart, -1, -1, radiusStart*2.0,  direction::x);
-	ConeMesherRef::writeElementsCone_ref(w, nNodesY0 - 1, nRef, true);
+	ConeMesherRef::writeNodes(w, pos, nNodesY0 - 1, nRef, radiusStart, radiusStart, -1, -1, radiusStart*2.0,  direction::x);
+	ConeMesherRef::writeElements(w, nNodesY0 - 1, nRef, true);
 	pos.x += 18.0;
 
 	//Half cylinder:
-	ConeMesherRef::writeNodesCone_ref(w, pos, nNodesY0, nRef, radiusStart, radiusStart, 1.2*glm::pi<double>(), 0.0, radiusStart*2.0, direction::z);
-	ConeMesherRef::writeElementsCone_ref(w, nNodesY0, nRef, false);
+	ConeMesherRef::writeNodes(w, pos, nNodesY0, nRef, radiusStart, radiusStart, 1.2*glm::pi<double>(), 0.0, radiusStart*2.0, direction::z);
+	ConeMesherRef::writeElements(w, nNodesY0, nRef, false);
 
 	w->close();
 	return 0;
 
+}
+
+int diskMesher(const std::string& fileName){
+	std::ofstream file;
+	file.open(fileName);
+	if (!file.is_open()) return 1;
+
+	NastranFEAwriter writer(&file);
+	NastranFEAwriter* w = &writer;
+	glm::dvec3 pos(0.0);
+	glm::ivec2 nnodes(13, 6);
+
+	double radStart = 2.0;
+	double radEnd	= 4.0;
+
+	DiskMesher::writeNodes(w, pos, radStart, radEnd, 0.0, 1.9*glm::pi<double>(), nnodes, direction::x);
+	DiskMesher::writeElements(w, nnodes, false);
+
+	pos.x += radEnd * 2.1;
+	DiskMesher::writeNodesX(w, pos, radStart, radEnd, 0.0, 1.0*glm::pi<double>() / 2.0, nnodes);
+	DiskMesher::writeElements(w, nnodes, false);
+
+	pos.x += radEnd * 2.1;
+	DiskMesher::writeNodesY(w, pos, radStart, radEnd, 0.0, 1.0*glm::pi<double>() / 4.0, nnodes);
+	DiskMesher::writeElements(w, nnodes, false);
+
+	pos.x += radEnd * 2.1;
+	DiskMesher::writeNodesY(w, pos, radStart, radEnd, -1, -1, nnodes);
+	DiskMesher::writeElements(w, nnodes, true);
+
+	return 0;
+}
+int diskMesherRef(const std::string& fileName) {
+	std::ofstream file;
+	file.open(fileName);
+	if (!file.is_open()) return 1;
+
+	NastranFEAwriter writer(&file);
+	NastranFEAwriter* w = &writer;
+	glm::dvec3 pos(0.0);
+	int nRef = 4;
+	int nNodesEdge = std::pow(2, nRef + 3) + 1;
+
+	double radStart = 2.0;
+	double radEnd = 4.0;
+
+	DiskMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radStart, radEnd, 0.0, 1.9*glm::pi<double>(), direction::x);
+	DiskMesherRef::writeElements(w, nNodesEdge, nRef, false);
+
+	pos.x += radEnd * 2.1;
+	DiskMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radStart, radEnd, 0.0, 1.0*glm::pi<double>() / 2.0, direction::y);
+	DiskMesherRef::writeElements(w, nNodesEdge, nRef, false);
+
+	pos.x += radEnd * 2.1;
+	DiskMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radStart, radEnd, 0.0, 1.0*glm::pi<double>() / 4.0, direction::z);
+	DiskMesherRef::writeElements(w, nNodesEdge, nRef, false);
+
+	nNodesEdge = std::pow(2, nRef + 5);
+	pos.x += radEnd * 2.1;
+	DiskMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radStart, radEnd, -1, -1, direction::z);
+	DiskMesherRef::writeElements(w, nNodesEdge, nRef, true);
+
+	pos.x += radEnd * 2.1;
+	DiskMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radEnd, radStart, -1, -1, direction::z);
+	DiskMesherRef::writeElements(w, nNodesEdge, nRef, true);
+
+	return 0;
+
+	
+	return 0;
 }
 
 
@@ -408,11 +482,9 @@ int cuboidMesherRef(const std::string& fileName) {
 	int nNodesY0 = std::pow(2, nRef+1) + 1;
 	glm::ivec2 nnodesXY(nNodesY0, nNodesY0);
 
-	CuboidMesher::writeNodesRef(w, pos, size, nnodesXY, nRef, false, plane::xy);
-	CuboidMesher::writeElementsRef(w, nnodesXY, nRef, false);
-
-
-
+	CuboidMesherRef::writeNodes(w, pos, size, nnodesXY, nRef, false, plane::xy);
+	CuboidMesherRef::writeElements(w, nnodesXY, nRef, false);
+	
 	w->close();
 	return 0;
 }
