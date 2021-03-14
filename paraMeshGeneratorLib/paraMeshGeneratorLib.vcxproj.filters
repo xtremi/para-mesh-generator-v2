@@ -66,6 +66,9 @@
     <ClInclude Include="DiskMesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
+    <ClInclude Include="CylinderMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -108,6 +111,9 @@
       <Filter>Meshers\source</Filter>
     </ClCompile>
     <ClCompile Include="DiskMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="CylinderMesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
   </ItemGroup>

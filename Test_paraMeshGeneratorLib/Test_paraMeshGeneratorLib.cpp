@@ -2,12 +2,17 @@
 #include "Mesh.h"
 #include <vector>
 
+//1d elements
 #include "LineMesher.h"
 #include "ArcMesher.h"
+
+//2d elements
 #include "PlaneMesher.h"
 #include "ConeMesher.h"
 #include "DiskMesher.h"
+#include "CylinderMesher.h"
 
+//3d elements
 #include "CuboidMesher.h"
 #include "Cone3Dmesher.h"
 
@@ -19,6 +24,8 @@ int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
 int diskMesher(const std::string& fileName);
 int diskMesherRef(const std::string& fileName);
+int cylinderMesher(const std::string& fileName);
+int cylinderMesherRef(const std::string& fileName);
 
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
@@ -30,14 +37,16 @@ int extrude2DarcMulti(const std::string& filename);
 
 std::vector<TestDef> testFunctions({
 
-	TestDef(101, "lineMesher",		"basic meshers 2D", (testFunction)lineMesher),
-	TestDef(102, "arcMesher",		"basic meshers 2D", (testFunction)arcMesher),
-	TestDef(103, "planeMesher",		"basic meshers 2D", (testFunction)planeMesher),
-	TestDef(104, "planeMesherRef",	"basic meshers 2D", (testFunction)planeMesherRef),
-	TestDef(105, "coneMesher",		"basic meshers 2D", (testFunction)coneMesher),
-	TestDef(106, "coneMesherRef",	"basic meshers 2D", (testFunction)coneMesherRef),
-	TestDef(107, "diskMesher",		"basic meshers 2D", (testFunction)diskMesher),
-	TestDef(108, "diskMesherRef",	"basic meshers 2D", (testFunction)diskMesherRef),
+	TestDef(101, "lineMesher",			"basic meshers 2D", (testFunction)lineMesher),
+	TestDef(102, "arcMesher",			"basic meshers 2D", (testFunction)arcMesher),
+	TestDef(103, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
+	TestDef(104, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
+	TestDef(105, "coneMesher",			"basic meshers 2D", (testFunction)coneMesher),
+	TestDef(106, "coneMesherRef",		"basic meshers 2D", (testFunction)coneMesherRef),
+	TestDef(107, "diskMesher",			"basic meshers 2D", (testFunction)diskMesher),
+	TestDef(108, "diskMesherRef",		"basic meshers 2D", (testFunction)diskMesherRef),
+	TestDef(109, "cylinderMesher",		"basic meshers 2D", (testFunction)cylinderMesher),
+	TestDef(110, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
 
 	TestDef(120, "cuboidMesher",	"basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(121, "cuboidMesherRef",	"basic meshers 3D", (testFunction)cuboidMesherRef),
@@ -424,13 +433,79 @@ int diskMesherRef(const std::string& fileName) {
 	pos.x += radEnd * 2.1;
 	DiskMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radEnd, radStart, -1, -1, direction::z);
 	DiskMesherRef::writeElements(w, nNodesEdge, nRef, true);
-
-	return 0;
-
-	
 	return 0;
 }
 
+
+int cylinderMesher(const std::string& fileName)
+{
+	std::ofstream file;
+	file.open(fileName);
+	if (!file.is_open()) return 1;
+
+	NastranFEAwriter writer(&file);
+	NastranFEAwriter* w = &writer;
+	glm::dvec3 pos(0.0);
+	glm::ivec2 nnodes(13, 6);
+
+	double radius = 2.0;
+	double height = 8.0;
+
+	CylinderMesher::writeNodes(w, pos, radius, height, 0.0, 1.9*glm::pi<double>(), nnodes, direction::x);
+	CylinderMesher::writeElements(w, nnodes, false);
+
+	pos.x += height * 2.1;
+	CylinderMesher::writeNodesX(w, pos, radius, height, 0.0, 1.0*glm::pi<double>() / 2.0, nnodes);
+	CylinderMesher::writeElements(w, nnodes, false);
+
+	pos.x += height * 2.1;
+	CylinderMesher::writeNodesY(w, pos, radius, height, 0.0, 1.0*glm::pi<double>() / 4.0, nnodes);
+	CylinderMesher::writeElements(w, nnodes, false);
+
+	pos.x += height * 2.1;
+	CylinderMesher::writeNodesY(w, pos, radius, height, -1, -1, nnodes);
+	CylinderMesher::writeElements(w, nnodes, true);
+
+	return 0;
+}
+
+int cylinderMesherRef(const std::string& fileName) 
+{
+	std::ofstream file;
+	file.open(fileName);
+	if (!file.is_open()) return 1;
+
+	NastranFEAwriter writer(&file);
+	NastranFEAwriter* w = &writer;
+	glm::dvec3 pos(0.0);
+	int nRef = 4;
+	int nNodesEdge = std::pow(2, nRef + 3) + 1;
+
+	double radius = 2.0;
+	double height = 4.0;
+
+	CylinderMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radius, height, 0.0, 1.9*glm::pi<double>(), direction::x);
+	CylinderMesherRef::writeElements(w, nNodesEdge, nRef, false);
+
+	pos.x += height * 1.1;
+	CylinderMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radius, height, 0.0, 1.0*glm::pi<double>() / 2.0, direction::y);
+	CylinderMesherRef::writeElements(w, nNodesEdge, nRef, false);
+
+	pos.x += height * 1.1;
+	CylinderMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radius, height, 0.0, 1.0*glm::pi<double>() / 4.0, direction::z);
+	CylinderMesherRef::writeElements(w, nNodesEdge, nRef, false);
+
+	nNodesEdge = std::pow(2, nRef + 5);
+	pos.x += height * 1.1;
+	CylinderMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radius, height, -1, -1,  direction::z);
+	CylinderMesherRef::writeElements(w, nNodesEdge, nRef, true);
+
+	pos.x += height * 1.1;
+	CylinderMesherRef::writeNodes(w, pos, nNodesEdge, nRef, radius, height, -1, -1, direction::z);
+	CylinderMesherRef::writeElements(w, nNodesEdge, nRef, true);
+	return 0;
+
+}
 
 int cuboidMesher(const std::string& fileName) {
 	std::ofstream file;
