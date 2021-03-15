@@ -1,6 +1,26 @@
 #include "ParaMeshGenCommon.h"
 #include "glm/gtc/constants.hpp"
 
+double calcArcIncrement(double startAng, double endAng, int nnodes) {
+	double dang;
+
+	bool fullCircle = false;
+	if (endAng < 0.0 && startAng < 0.0)
+		fullCircle = true;
+
+	if (startAng < 0.0)
+		startAng = 0.0;
+	if (endAng < 0.0)
+		endAng = 2.0*glm::pi<double>();
+
+	dang = (endAng - startAng);
+	if (!fullCircle)
+		dang /= (double)(nnodes - 1);
+	else
+		dang /= (double)nnodes;
+
+	return dang;
+}
 
 bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes) {
 	bool fullCircle = false;

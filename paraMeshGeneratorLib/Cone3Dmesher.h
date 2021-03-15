@@ -18,8 +18,22 @@ public:
 		const glm::ivec3&	nnodes,
 		direction			rotaxis,
 		glm::dmat3x3*		csys = nullptr);
-#ifdef TEMP_DISABLE
-	static void writeNodes_ref(
+
+
+
+	static void writeElements(
+		FEAwriter*	writer,
+		glm::ivec3	nnodes,
+		bool		closedLoop);
+
+
+
+};
+
+class Cone3DmesherRef : private Mesher
+{
+public:
+	static void writeNodes(
 		FEAwriter*			writer,
 		const glm::dvec3&	spos,
 		const glm::ivec2&	nnodes12,
@@ -33,16 +47,35 @@ public:
 		double				height,
 		direction			rotaxis,
 		glm::dmat3x3*		csys = nullptr);
-#endif
+
 	static void writeElements(
-		FEAwriter*	writer,
-		glm::ivec3	nnodes,
-		bool		closedLoop);
-#ifdef TEMP_DISABLE
-	static void writeElements_ref(
 		FEAwriter*	writer,
 		glm::ivec2	nnodes12,
 		int			nRefinements,
 		bool		closedLoop);
-#endif
+
+private:
+	static void writeNodes_refLayer_1(
+		FEAwriter*			writer,
+		const glm::dvec3&	spos,
+		const glm::ivec2&	nnodes12,
+		double				radiusInner,
+		double				radiusOuter,
+		double				startAng,
+		double				dang,
+		int					skipNth,
+		direction			rotaxis,
+		glm::dmat3x3*		csys = nullptr);
+
+	static void writeNodes_refLayer_2(
+		FEAwriter*			writer,
+		const glm::dvec3&	spos,
+		const glm::ivec2&	nnodes12,
+		double				radiusInner,
+		double				radiusOuter,
+		double				startAng,
+		double				dang,
+		int					skipNth,
+		direction			rotaxis,
+		glm::dmat3x3*		csys = nullptr);
 };

@@ -132,7 +132,7 @@ void ConeMesherRef::writeNodes(
 		coords[(size_t)rotaxis] += currentDh;
 	}
 
-	nodeID1 = firstNodeID;
+	Mesher::nodeID1 = firstNodeID;
 }
 
 void ConeMesher::writeElements(FEAwriter* writer, glm::ivec2 nnodes, bool closedLoop)

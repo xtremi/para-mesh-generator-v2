@@ -137,7 +137,7 @@ void CuboidMesherRef::writeNodes(
 		PlaneMesher::writeNodesPlaneQ(writer, coords, currentElSize12, currentNodesPerFace, pln, csys);
 		coords[(size_t)refDirection] += currentElSize3;
 
-		//row m1:  |  x--x--x  |  x--x--x  |
+		//row m1:  |  x--x--x  |  x--x--x  | //make this a function
 		for (int i = 0; i < currentNodesPerFace.x; i++) {
 			coords[(size_t)dir1] = (double)i*currentElSize12.x;
 			if (i % 4) {
@@ -156,7 +156,7 @@ void CuboidMesherRef::writeNodes(
 		PlaneMesher::writeNodesPlaneQ(writer, coords, currentElSize12, currentNodesPerFace, pln, csys);
 		coords[(size_t)refDirection] += currentElSize3;
 
-		//row m3:  |  x--x--x  |  x--x--x  |
+		//row m3:  |  x--x--x  |  x--x--x  | //make this a function
 		for (int i = 0; i < currentNodesPerFace.y; i++) {
 			coords[(size_t)dir2] = (double)i*currentElSize12.y;
 			if (i % 4){

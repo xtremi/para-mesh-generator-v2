@@ -30,6 +30,7 @@ int cylinderMesherRef(const std::string& fileName);
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
 int cone3Dmesher(const std::string& fileName);
+int cone3DmesherRef(const std::string& fileName);
 
 int extruded2Drecs(const std::string& fileName);
 int extrude2Darc(const std::string& filename);
@@ -37,20 +38,21 @@ int extrude2DarcMulti(const std::string& filename);
 
 std::vector<TestDef> testFunctions({
 
-	TestDef(101, "lineMesher",			"basic meshers 2D", (testFunction)lineMesher),
-	TestDef(102, "arcMesher",			"basic meshers 2D", (testFunction)arcMesher),
-	TestDef(103, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
-	TestDef(104, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
-	TestDef(105, "coneMesher",			"basic meshers 2D", (testFunction)coneMesher),
-	TestDef(106, "coneMesherRef",		"basic meshers 2D", (testFunction)coneMesherRef),
-	TestDef(107, "diskMesher",			"basic meshers 2D", (testFunction)diskMesher),
-	TestDef(108, "diskMesherRef",		"basic meshers 2D", (testFunction)diskMesherRef),
-	TestDef(109, "cylinderMesher",		"basic meshers 2D", (testFunction)cylinderMesher),
-	TestDef(110, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
-
-	TestDef(120, "cuboidMesher",	"basic meshers 3D", (testFunction)cuboidMesher),
-	TestDef(121, "cuboidMesherRef",	"basic meshers 3D", (testFunction)cuboidMesherRef),
-	TestDef(122, "cone3Dmesher",	"basic meshers 3D", (testFunction)cone3Dmesher),
+	//TestDef(101, "lineMesher",			"basic meshers 2D", (testFunction)lineMesher),
+	//TestDef(102, "arcMesher",			"basic meshers 2D", (testFunction)arcMesher),
+	//TestDef(103, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
+	//TestDef(104, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
+	//TestDef(105, "coneMesher",			"basic meshers 2D", (testFunction)coneMesher),
+	//TestDef(106, "coneMesherRef",		"basic meshers 2D", (testFunction)coneMesherRef),
+	//TestDef(107, "diskMesher",			"basic meshers 2D", (testFunction)diskMesher),
+	//TestDef(108, "diskMesherRef",		"basic meshers 2D", (testFunction)diskMesherRef),
+	//TestDef(109, "cylinderMesher",		"basic meshers 2D", (testFunction)cylinderMesher),
+	//TestDef(110, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
+	//
+	//TestDef(120, "cuboidMesher",	"basic meshers 3D", (testFunction)cuboidMesher),
+	//TestDef(121, "cuboidMesherRef",	"basic meshers 3D", (testFunction)cuboidMesherRef),
+	//TestDef(122, "cone3Dmesher",	"basic meshers 3D", (testFunction)cone3Dmesher),
+	TestDef(123, "cone3DmesherRef",	"basic meshers 3D", (testFunction)cone3DmesherRef),
 
 	TestDef(200, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
 	TestDef(270, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
@@ -594,6 +596,41 @@ int cone3Dmesher(const std::string& fileName) {
 	return 0;
 }
 
+int cone3DmesherRef(const std::string& fileName) {
+	std::ofstream file;
+	file.open(fileName);
+	if (!file.is_open()) return 1;
+
+	NastranFEAwriter writer(&file);
+	NastranFEAwriter* w = &writer;
+	glm::dvec3 pos(0.0);
+
+	int nRef = 3;
+	int nNodesAround = std::pow(2, nRef + 3) + 1;
+	glm::ivec2 nnodes12(nNodesAround, nNodesAround);
+
+	double radStartInner = 5.0;
+	double radStartOuter = 9.0;
+	double radEndInner = 1.5;
+	double radEndOuter = 5.5;
+	double height = 8.;
+
+	Cone3DmesherRef::writeNodes(w, pos, nnodes12, nRef, radStartOuter, radEndOuter, radStartInner, radEndInner, 
+		0.0, glm::pi<double>(), height,	direction::z);
+	Cone3DmesherRef::writeElements(w, nnodes12, nRef, false);
+
+	if(false){
+		int lastNode = w->getNextNodeID();
+		int n[2] = { 1, 0 };
+		for (int i = 2; i < lastNode; i++) {
+			n[1] = i;
+			w->write2nodedBeam(i, n);
+		}
+	}
+
+	w->close();
+	return 0;
+}
 
 int extruded2Drecs(const std::string& fileName)
 {

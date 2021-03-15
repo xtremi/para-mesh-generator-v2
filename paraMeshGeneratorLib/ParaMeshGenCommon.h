@@ -51,3 +51,4 @@ private:
 };
 
 bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes);
+double calcArcIncrement(double startAng, double endAng, int nnodes);
