@@ -50,7 +50,7 @@ std::vector<TestDef> testFunctions({
 	//TestDef(110, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
 	//
 	//TestDef(120, "cuboidMesher",	"basic meshers 3D", (testFunction)cuboidMesher),
-	//TestDef(121, "cuboidMesherRef",	"basic meshers 3D", (testFunction)cuboidMesherRef),
+	TestDef(121, "cuboidMesherRef",	"basic meshers 3D", (testFunction)cuboidMesherRef),
 	//TestDef(122, "cone3Dmesher",	"basic meshers 3D", (testFunction)cone3Dmesher),
 	TestDef(123, "cone3DmesherRef",	"basic meshers 3D", (testFunction)cone3DmesherRef),
 
@@ -605,8 +605,8 @@ int cone3DmesherRef(const std::string& fileName) {
 	NastranFEAwriter* w = &writer;
 	glm::dvec3 pos(0.0);
 
-	int nRef = 3;
-	int nNodesAround = std::pow(2, nRef + 3) + 1;
+	int nRef = 2;
+	int nNodesAround = std::pow(2, nRef + 4) + 1;
 	glm::ivec2 nnodes12(nNodesAround, nNodesAround);
 
 	double radStartInner = 5.0;
@@ -618,6 +618,13 @@ int cone3DmesherRef(const std::string& fileName) {
 	Cone3DmesherRef::writeNodes(w, pos, nnodes12, nRef, radStartOuter, radEndOuter, radStartInner, radEndInner, 
 		0.0, glm::pi<double>(), height,	direction::z);
 	Cone3DmesherRef::writeElements(w, nnodes12, nRef, false);
+	
+	pos.x += radStartOuter*2.0;
+	nnodes12.x--;
+	
+	Cone3DmesherRef::writeNodes(w, pos, nnodes12, nRef, radStartOuter, radEndOuter, radStartInner, radEndInner,
+		-1, -1, height, direction::z);
+	Cone3DmesherRef::writeElements(w, nnodes12, nRef, true);
 
 	if(false){
 		int lastNode = w->getNextNodeID();

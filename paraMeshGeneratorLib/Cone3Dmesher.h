@@ -76,6 +76,7 @@ private:
 		double				startAng,
 		double				dang,
 		int					skipNth,
+		bool				closesLoop,
 		direction			rotaxis,
 		glm::dmat3x3*		csys = nullptr);
 };

@@ -197,17 +197,29 @@ void CuboidMesherRef::writeElements(
 	for (int r = 0; r < nRefinements; r++) {
 
 		//Nnodes for next refinement:
-		nextNodes12 = (currentNodes12 - 1) / 2 + 1;
+		if(!closedLoop){
+			nextNodes12.x = (currentNodes12.x - 1) / 2 + 1;
+		}
+		else{
+			nextNodes12.x = currentNodes12.x / 2;
+		}
+		nextNodes12.y = (currentNodes12.y - 1) / 2 + 1;
 
 		//Number of nodes on each plane:
 		int nnodesPlaneB	= currentNodes12.x * currentNodes12.y;
-		int nnodesRowM1		= 3 * (currentNodes12.x - 1) / 4;
+		int nnodesPlaneT    = nextNodes12.x * nextNodes12.y;
+
+		int nElementsPerRowB = closedLoop ? currentNodes12.x : currentNodes12.x - 1;
+		int nElementsPerRowT = closedLoop ? nextNodes12.x : nextNodes12.x - 1;
+
+		int nnodesRowM1		= 3 * nElementsPerRowB / 4;
 		int nnodesPlaneM1	= nnodesRowM1 * currentNodes12.y;
 		int nnodesPlaneM2	= nextNodes12.x * currentNodes12.y;
-		int nnodesRowM3		= 3 * (currentNodes12.y - 1) / 4;
-		int nnodesPlaneM3	= nnodesRowM3 * nextNodes12.x;
-		int nnodesPlaneT	= nextNodes12.x * nextNodes12.y;
+		int nnodesRowM3		= 3 * nElementsPerRowB / 4;
+		int nnodesPlaneM3	= nnodesRowM3 * nextNodes12.x;		
 		int nnodesTotal		= nnodesPlaneB + nnodesPlaneM1 + nnodesPlaneM2 + nnodesPlaneM3 + nnodesPlaneT;
+
+		
 
 		//Initial nodes on planes:
 		int firstNodeB		= c;
@@ -221,7 +233,7 @@ void CuboidMesherRef::writeElements(
 		//elPlane B:
 		if(r != 0){
 			Mesher::nodeID1 = firstNodeB - nnodesPlaneB;
-			CuboidMesher::writeElements(writer, glm::ivec3(currentNodes12.x, currentNodes12.y, 2), false);
+			CuboidMesher::writeElements(writer, glm::ivec3(currentNodes12.x, currentNodes12.y, 2), closedLoop);
 		}
 
 		writeElements_rows_bm1m2(writer, currentNodes12, nextNodes12, firstNodeB, firstNodeM1, firstNodeM2, closedLoop);
@@ -241,8 +253,11 @@ void CuboidMesherRef::writeElements(
 		int&				firstNodeM2row,
 		bool				closedLoop)
 	{
-		for (int i2 = 0; i2 < (currentNodes12.y - 1); i2++) {
-			for (int i1 = 0; i1 < (currentNodes12.x - 1); i1 += 4) {
+
+		glm::ivec2 currentElements12(closedLoop ? currentNodes12.x : currentNodes12.x - 1, currentNodes12.y - 1);
+
+		for (int i2 = 0; i2 < currentElements12.y; i2++) {
+			for (int i1 = 0; i1 < currentElements12.x; i1 += 4) {
 
 				/*
 					m2f0/m2b0   x_______x_______x m2
@@ -256,13 +271,14 @@ void CuboidMesherRef::writeElements(
 					m1f0/m1b0 -> first nodes middle1 front/back
 					m2f0/m2b0 -> first nodes middle2 front/back
 				*/
-				int bf_0 = firstNodeBrow + 4 * (i1 / 4);
-				int m1f_0 = firstNodeM1row + 3 * (i1 / 4) * currentNodes12.y;
-				int m2f_0 = firstNodeM2row + 2 * (i1 / 4);
+				int bf_0 = firstNodeBrow   + 4 * (i1 / 4);
+				int m1f_0 = firstNodeM1row + 3 * (i1 / 4) * currentNodes12.y;			
+				int m2f_0 = firstNodeM2row + 2 * (i1 / 4);		
 
 				int bb_0 = bf_0 + currentNodes12.x;
 				int m1b_0 = m1f_0 + 1;
 				int m2b_0 = m2f_0 + nextNodes12.x;
+
 
 				int bf[5] = { bf_0, bf_0 + 1, bf_0 + 2, bf_0 + 3 , bf_0 + 4 };
 				int m1f[3] = { m1f_0, m1f_0 + currentNodes12.y, m1f_0 + 2 * currentNodes12.y };
@@ -272,6 +288,15 @@ void CuboidMesherRef::writeElements(
 				int m1b[3] = { m1b_0, m1b_0 + currentNodes12.y, m1b_0 + 2 * currentNodes12.y };
 				int m2b[3] = { m2b_0, m2b_0 + 1, m2b_0 + 2 };
 
+
+				if (closedLoop && i1 == (currentElements12.x - 4)) {
+					bf[4] -= currentNodes12.x;
+					bb[4] -= currentNodes12.x;
+					m2f[2] -= nextNodes12.x;
+					m2b[2] -= nextNodes12.x;
+				}
+
+
 				std::vector<int*> elNodes;
 				int n_el1[8] = { bf[0], bf[1], bb[1], bb[0],  m2f[0], m1f[0], m1b[0], m2b[0] }; elNodes.push_back(n_el1);
 				int n_el2[8] = { bf[1], bf[2], bb[2], bb[1],  m1f[0], m1f[1], m1b[1], m1b[0] }; elNodes.push_back(n_el2);
@@ -279,6 +304,7 @@ void CuboidMesherRef::writeElements(
 				int n_el4[8] = { bf[3], bf[4], bb[4], bb[3],  m1f[2], m2f[2], m2b[2], m1b[2] }; elNodes.push_back(n_el4);
 				int n_el5[8] = { m1f[0], m1f[1], m1b[1], m1b[0],  m2f[0], m2f[1], m2b[1], m2b[0] }; elNodes.push_back(n_el5);
 				int n_el6[8] = { m1f[1], m1f[2], m1b[2], m1b[1],  m2f[1], m2f[2], m2b[2], m2b[1] }; elNodes.push_back(n_el6);
+
 
 				for (int i = 0; i < elNodes.size(); i++) {
 					writer->write8nodedHexa(elNodes[i]);
@@ -299,8 +325,12 @@ void CuboidMesherRef::writeElements(
 		int&				firstNodeTrow,
 		bool				closedLoop)
 	{
-		for (int i1 = 0; i1 < (nextNodes12.x - 1); i1++) {
-			for (int i2 = 0; i2 < (currentNodes12.y - 1); i2 += 4) {
+
+		glm::ivec2 currentElements12(closedLoop ? currentNodes12.x : currentNodes12.x - 1, currentNodes12.y - 1);
+		glm::ivec2 nextElements12(closedLoop ? nextNodes12.x : nextNodes12.x - 1, nextNodes12.y - 1);
+
+		for (int i1 = 0; i1 < nextElements12.x; i1++) {
+			for (int i2 = 0; i2 < (currentElements12.y); i2 += 4) {
 
 				/*
 					tf0/tb0     x_______x_______x t
@@ -317,19 +347,27 @@ void CuboidMesherRef::writeElements(
 
 				int m2f_0 = firstNodeM2row + 4 * (i2 / 4)* nextNodes12.x;
 				int m3f_0 = firstNodeM3row + 3 * (i2 / 4) * nextNodes12.x;
-				int tf_0 = firstNodeTrow + 2 * (i2 / 4)* nextNodes12.x;
+				int tf_0 = firstNodeTrow +   2 * (i2 / 4)* nextNodes12.x;
 
 				int m2f[5], m3f[3], tf[3];
 				int m2b[5], m3b[3], tb[3];
 				for (int i = 0; i < 5; i++) {
 					m2f[i] = m2f_0 + i * nextNodes12.x;
 					m2b[i] = m2f[i] + 1;
+					if(closedLoop && i1 == (nextElements12.x - 1)) m2b[i] -= nextNodes12.x;
 				}
 				for (int i = 0; i < 3; i++) {
 					m3f[i] = m3f_0 + i * nextNodes12.x;
 					m3b[i] = m3f[i] + 1;
+					if (closedLoop && i1 == (nextElements12.x - 1)) m3b[i] -= nextNodes12.x;
+
 					tf[i] = tf_0 + i * nextNodes12.x;
 					tb[i] = tf[i] + 1;
+					if (closedLoop && i1 == (nextElements12.x - 1)) tb[i] -= nextNodes12.x;
+				}
+
+				if (closedLoop && i1 == (nextElements12.x - 1)) {
+					int tmp = 1;
 				}
 
 				std::vector<int*> elNodes;
@@ -341,7 +379,15 @@ void CuboidMesherRef::writeElements(
 				int n_el6[8] = { m3f[1], m3f[2], m3b[2], m3b[1],  tf[1], tf[2], tb[2], tb[1] }; elNodes.push_back(n_el6);
 
 				for (int i = 0; i < elNodes.size(); i++) {
+					//if( i != 0 && 
+					//	//i != 1 &&
+					//	i != 2 &&
+					//	i != 3 &&
+					//	i != 4 &&
+					//	i != 5)
+					//{
 					writer->write8nodedHexa(elNodes[i]);
+					//}
 				}
 
 			}
