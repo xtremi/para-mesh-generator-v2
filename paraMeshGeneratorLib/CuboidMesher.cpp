@@ -139,13 +139,13 @@ void CuboidMesherRef::writeNodes(
 
 		//row m1:  |  x--x--x  |  x--x--x  | //make this a function
 		for (int i = 0; i < currentNodesPerFace.x; i++) {
-			coords[(size_t)dir1] = (double)i*currentElSize12.x;
+			coords[(size_t)dir1] = spos[(size_t)dir1] + (double)i*currentElSize12.x;
 			if (i % 4) {
 				LineMesher::writeNodesLineQ(writer, coords, currentElSize12.y, currentNodesPerFace.y, dir2, csys);
 			}
 		}
 		coords[(size_t)refDirection] += currentElSize3;
-		coords[(size_t)dir1] = 0.0;
+		coords[(size_t)dir1] = spos[(size_t)dir1];
 
 		//Refine dir1
 		currentRefFactor1 *= 2;
@@ -164,7 +164,7 @@ void CuboidMesherRef::writeNodes(
 			}
 		}
 		coords[(size_t)refDirection] += currentElSize3;
-		coords[(size_t)dir2] = 0.0;
+		coords[(size_t)dir2] = spos[(size_t)dir2];
 
 		//Refine dir2
 		currentRefFactor2 *= 2;
@@ -209,13 +209,14 @@ void CuboidMesherRef::writeElements(
 		int nnodesPlaneB	= currentNodes12.x * currentNodes12.y;
 		int nnodesPlaneT    = nextNodes12.x * nextNodes12.y;
 
-		int nElementsPerRowB = closedLoop ? currentNodes12.x : currentNodes12.x - 1;
-		int nElementsPerRowT = closedLoop ? nextNodes12.x : nextNodes12.x - 1;
+		int nElementsPerRowBx = closedLoop ? currentNodes12.x : currentNodes12.x - 1;
+		int nElementsPerRowBy = currentNodes12.y - 1;
+		int nElementsPerRowT  = closedLoop ? nextNodes12.x : nextNodes12.x - 1;
 
-		int nnodesRowM1		= 3 * nElementsPerRowB / 4;
+		int nnodesRowM1		= 3 * nElementsPerRowBx / 4;
 		int nnodesPlaneM1	= nnodesRowM1 * currentNodes12.y;
 		int nnodesPlaneM2	= nextNodes12.x * currentNodes12.y;
-		int nnodesRowM3		= 3 * nElementsPerRowB / 4;
+		int nnodesRowM3		= 3 * nElementsPerRowBy / 4;
 		int nnodesPlaneM3	= nnodesRowM3 * nextNodes12.x;		
 		int nnodesTotal		= nnodesPlaneB + nnodesPlaneM1 + nnodesPlaneM2 + nnodesPlaneM3 + nnodesPlaneT;
 
@@ -345,9 +346,9 @@ void CuboidMesherRef::writeElements(
 					m2f0/m2b0 -> first nodes middle2 front/back
 				*/
 
-				int m2f_0 = firstNodeM2row + 4 * (i2 / 4)* nextNodes12.x;
+				int m2f_0 = firstNodeM2row + 4 * (i2 / 4) * nextNodes12.x;
 				int m3f_0 = firstNodeM3row + 3 * (i2 / 4) * nextNodes12.x;
-				int tf_0 = firstNodeTrow +   2 * (i2 / 4)* nextNodes12.x;
+				int tf_0 = firstNodeTrow +   2 * (i2 / 4) * nextNodes12.x;
 
 				int m2f[5], m3f[3], tf[3];
 				int m2b[5], m3b[3], tb[3];

@@ -555,13 +555,29 @@ int cuboidMesherRef(const std::string& fileName) {
 
 	glm::dvec3 size(20.0, 30.0, 50.0);
 	
-	int nRef = 4;
-	int nNodesY0 = std::pow(2, nRef+1) + 1;
-	glm::ivec2 nnodesXY(nNodesY0, nNodesY0);
+	int nRef = 3;
+	
+	int nNodesX0 = std::pow(2, nRef + 2) + 1;	
+	int nNodesY0 = nNodesX0;
+	glm::ivec2 nnodesXY(nNodesX0, nNodesY0);
 
 	CuboidMesherRef::writeNodes(w, pos, size, nnodesXY, nRef, false, plane::xy);
 	CuboidMesherRef::writeElements(w, nnodesXY, nRef, false);
 	
+	pos.x += size.x*1.6;
+	nnodesXY.y = std::pow(2, nRef + 1) + 1;
+	CuboidMesherRef::writeNodes(w, pos, size, nnodesXY, nRef, false, plane::xy);
+	CuboidMesherRef::writeElements(w, nnodesXY, nRef, false);
+
+	if (true) {
+		int lastNode = w->getNextNodeID();
+		int n[2] = { 1, 0 };
+		for (int i = 2; i < lastNode; i++) {
+			n[1] = i;
+			w->write2nodedBeam(i, n);
+		}
+	}
+
 	w->close();
 	return 0;
 }
@@ -621,9 +637,19 @@ int cone3DmesherRef(const std::string& fileName) {
 	
 	pos.x += radStartOuter*2.0;
 	nnodes12.x--;
-	
+	nnodes12.y = std::pow(2, nRef + 2) + 1;
 	Cone3DmesherRef::writeNodes(w, pos, nnodes12, nRef, radStartOuter, radEndOuter, radStartInner, radEndInner,
 		-1, -1, height, direction::z);
+	Cone3DmesherRef::writeElements(w, nnodes12, nRef, true);
+
+	pos.x += radStartOuter * 2.0;
+	Cone3DmesherRef::writeNodes(w, pos, nnodes12, nRef, radStartOuter, radEndOuter, radStartInner, radEndInner,
+		-1, -1, height, direction::x);
+	Cone3DmesherRef::writeElements(w, nnodes12, nRef, true);
+
+	pos.x += radStartOuter * 2.0;
+	Cone3DmesherRef::writeNodes(w, pos, nnodes12, nRef, radStartOuter, radStartOuter, radStartInner, radEndInner,
+		-1, -1, height, direction::y);
 	Cone3DmesherRef::writeElements(w, nnodes12, nRef, true);
 
 	if(false){
