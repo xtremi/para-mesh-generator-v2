@@ -29,6 +29,32 @@ public:
 
 	static void writeElements(FEAwriter* writer, glm::ivec2 nnodes, bool closedLoop);
 
+
+	static void writeNodes_nthLine(
+		FEAwriter*			writer,
+		const glm::dvec3&	spos,
+		const glm::ivec2&	nnodes,
+		double				radiusStart,
+		double				radiusEnd,
+		double				startAng,
+		double				dang,
+		double				height,
+		int					skipNth,
+		direction			rotaxis,
+		glm::dmat3x3*		csys = nullptr);
+
+	static void writeNodes_nthArc(
+		FEAwriter*			writer,
+		const glm::dvec3&	spos,
+		const glm::ivec2&	nnodes,
+		double				radiusStart,
+		double				radiusEnd,
+		double				startAng,
+		double				dang,
+		double				height,
+		int					skipNth,
+		direction			rotaxis,
+		glm::dmat3x3*		csys = nullptr);
 };
 
 class ConeMesherRef : private Mesher

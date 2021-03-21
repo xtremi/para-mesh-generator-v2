@@ -58,7 +58,31 @@ void Cone3Dmesher::writeElements(
 	CuboidMesher::writeElements(writer, nnodes, closedLoop);
 }
 
+/*
+	Draws the nodes for a cylinders structure of dimensions <size>.
+	The nodes are structured in such a way that ConeMesherRef::writeElements
+	can create the Hexagonal elements making up the cone.
 
+	The cube is refined along its local Z-axis (same as its rotation axis)
+	The number of nodes along the circumeference is set by nNodes12.x
+	The number of nodes along the radii is set by nNodes12.y
+	The number of nodes along the local Z-axis is dependent in the number of refinements.
+
+	[in] writer			  : 	
+	[in] spos			  : 
+	[in] nNodes12		  : 
+	[in] nRefinements	  : 
+	[in] radiusStartOuter : 
+	[in] radiusEndOuter	  : 
+	[in] radiusStartInner : 
+	[in] radiusEndInner	  : 
+	[in] startAng		  : 
+	[in] endAng			  : 
+	[in] height			  : 
+	[in] rotaxis		  : 
+	[in] csys			  : 
+
+*/
 void Cone3DmesherRef::writeNodes(
 	FEAwriter*			writer,
 	const glm::dvec3&	spos,
@@ -75,21 +99,21 @@ void Cone3DmesherRef::writeNodes(
 	glm::dmat3x3*		csys)
 {
 	int firstNodeID = writer->getNextNodeID();
+	glm::dvec3 coords(spos);
+
+	glm::ivec2	currentNodes12(nNodes12);	//.x around - .y outwards
 
 	bool	fullCircle = (startAng < 0.0) && (endAng < 0.0);
 	
 	double  dRi = (radiusEndInner - radiusStartInner);
 	double  dRo = (radiusEndOuter - radiusStartOuter);
-	int		nElAroundStart = fullCircle ? nNodes12.x : nNodes12.x - 1;
-	double	arcLengthInnerStart = 2.0 * glm::pi<double>() * radiusStartInner;
-	double  arcLengthOuterStart = 2.0 * glm::pi<double>() * radiusStartOuter;
+	//int	  nElAroundStart = fullCircle ? nNodes12.x : nNodes12.x - 1;
+	//double  arcLengthInnerStart = 2.0 * glm::pi<double>() * radiusStartInner;
+	//double  arcLengthOuterStart = 2.0 * glm::pi<double>() * radiusStartOuter;
 	double	coneLengthInner = std::sqrt(std::pow(dRi, 2.0) + std::pow(height, 2.0));
 	double	coneLengthOuter = std::sqrt(std::pow(dRo, 2.0) + std::pow(height, 2.0));
-	double	elSize3 = initialRefinementElementSize(coneLengthOuter, nRefinements, false); //elsize along rotdir
 
-	glm::ivec2	currentNodes12(nNodes12);	//.x around - .y outwards
-	//glm::dvec2	currentElSize12(size.x / (double)(nNodesFace.x - 1), size.y / (double)(nNodesFace.y - 1));
-	double		currentElSize3 = initialRefinementElementSize(coneLengthOuter, nRefinements, false) / 2.0; 
+	double	currentElSize3 = initialRefinementElementSize(coneLengthOuter, nRefinements, false) / 2.0; 
 
 	int		currentRefFactor1 = 1;
 	int		currentRefFactor2 = 1;
@@ -97,10 +121,8 @@ void Cone3DmesherRef::writeNodes(
 	double	currentRadiusInner = radiusStartInner;
 	double	currentRadiusOuter = radiusStartOuter;
 	double  currentConeLength  = 0.0;
-	double  currentDh = 0.0;
+	double  currentDh		   = 0.0;
 	
-
-	glm::dvec3 coords(spos);
 
 	while (currentRefinement < nRefinements) {
 		currentRefinement++;
@@ -115,8 +137,7 @@ void Cone3DmesherRef::writeNodes(
 
 		//row m1:  |  x--x--x  |  x--x--x  |
 		double dang = calcArcIncrement(startAng, endAng, currentNodes12.x);
-		writeNodes_refLayer_2(writer, coords, currentNodes12, currentRadiusInner, currentRadiusOuter, startAng < 0.0 ? 0.0 : startAng,
-			dang, 4, fullCircle, rotaxis, csys);
+		writeNodes_refLayerM1(writer, coords, currentNodes12, currentRadiusInner, currentRadiusOuter, startAng < 0.0 ? 0.0 : startAng, dang, 4, rotaxis, csys);
 		currentConeLength += currentElSize3;
 		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
 		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
@@ -142,8 +163,7 @@ void Cone3DmesherRef::writeNodes(
 
 		//row m3:  |  x--x--x  |  x--x--x  | (dir1)		
 		dang = calcArcIncrement(startAng, endAng, currentNodes12.x);
-		writeNodes_refLayer_1(writer, coords, currentNodes12, currentRadiusInner, currentRadiusOuter, 
-			startAng < 0.0 ? 0.0 : startAng, dang, 4, rotaxis, csys);
+		writeNodes_refLayerM2(writer, coords, currentNodes12, currentRadiusInner, currentRadiusOuter, startAng < 0.0 ? 0.0 : startAng, dang, 4, rotaxis, csys);
 		currentConeLength += currentElSize3;
 		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
 		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
@@ -153,10 +173,7 @@ void Cone3DmesherRef::writeNodes(
 
 		//Refine dir2
 		currentRefFactor2 *= 2;
-		//if (!fullCircle)
-			currentNodes12.y = (nNodes12.y - 1) / currentRefFactor2 + 1;
-		//else
-		//	currentNodes12.y = nNodes12.y / currentRefFactor2;
+		currentNodes12.y = (nNodes12.y - 1) / currentRefFactor2 + 1;
 
 
 		//row t:  x-----x-----x-----x-----x (dir2)
@@ -173,8 +190,8 @@ void Cone3DmesherRef::writeNodes(
 	nodeID1 = firstNodeID;
 }
 
-//possibly move to ConeMesher/DiskMesher/CylinderMesher::writeNodes_nth
-void Cone3DmesherRef::writeNodes_refLayer_1(
+
+void Cone3DmesherRef::writeNodes_refLayerM1(
 	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::ivec2&	nnodes12,
@@ -186,19 +203,10 @@ void Cone3DmesherRef::writeNodes_refLayer_1(
 	direction			rotaxis,
 	glm::dmat3x3*		csys)
 {
-	double currentRadius = radiusInner;
-	double dr = (radiusOuter - radiusInner) / (double)(nnodes12.y - 1);
-
-	for (int i = 0; i < nnodes12.y; i++) {
-		if (i % skipNth) {
-			ArcMesher::writeNodesCircularQ(writer, spos, currentRadius, startAng, dang, nnodes12.x, rotaxis, csys);
-		}
-		currentRadius += dr;
-	}
+	ConeMesher::writeNodes_nthLine(writer, spos, nnodes12, radiusInner, radiusOuter, startAng, dang, 0.0, skipNth, rotaxis, csys);
 }
 
-//possibly move to ConeMesher/DiskMesher/CylinderMesher::writeNodes_nth
-void Cone3DmesherRef::writeNodes_refLayer_2(
+void Cone3DmesherRef::writeNodes_refLayerM2(
 	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::ivec2&	nnodes12,
@@ -207,28 +215,13 @@ void Cone3DmesherRef::writeNodes_refLayer_2(
 	double				startAng,
 	double				dang,
 	int					skipNth,
-	bool				closedLoop,
 	direction			rotaxis,
 	glm::dmat3x3*		csys)
 {
-	double currentRadius = radiusInner;
-	double dR = (radiusOuter - radiusInner);
-	glm::dvec3 coordsStart, coordsEnd;
-	double currentAng = startAng;
-
-	int nElementsAround = closedLoop ? nnodes12.x : nnodes12.x - 1;
-
-	for (int i = 0; i < nnodes12.x; i++) {		
-		
-		coordsStart = coordsOnCircle(currentAng, radiusInner, rotaxis) + spos;
-		coordsEnd   = coordsOnCircle(currentAng, radiusOuter, rotaxis) + spos;
-
-		if (i % skipNth) {
-			LineMesher::writeNodesLine(writer, coordsStart, coordsEnd, nnodes12.y, csys);
-		}
-		currentAng += dang;
-	}
+	ConeMesher::writeNodes_nthArc(writer, spos, nnodes12, radiusInner, radiusOuter, startAng, dang, 0.0, skipNth, rotaxis, csys);
 }
+
+
 
 
 void Cone3DmesherRef::writeElements(

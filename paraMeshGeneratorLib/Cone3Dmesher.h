@@ -2,6 +2,62 @@
 #include "Mesher.h"
 #include "FeaWrite.h"
 
+class MesherInput {
+public:
+	glm::dvec3 pos;
+};
+
+struct NodeVec2D { 
+	int dir1, dir2;
+	int circ() { return dir1; }
+	int norm() { return dir2; }
+};
+struct NodeVec3D : public NodeVec2D { 
+	int dir3; 
+	int axis() { return dir3; }
+	int refDir() { return dir3; }
+};
+
+struct MeshSize2D {
+	NodeVec2D nodes;
+	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
+	int nElDir2(bool closedLoop = false) { return closedLoop ? nodes.dir2 - 1 : nodes.dir2; }
+	int nElCirc(bool closedLoop = false) { return nElDir1(closedLoop); }
+	int nElNorm(bool closedLoop = false) { return nElDir2(closedLoop); }
+};
+
+struct MeshSize3D {
+	NodeVec3D nodes;
+	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
+	int nElDir2(bool closedLoop = false) { return closedLoop ? nodes.dir2 - 1 : nodes.dir2; }
+	int nElDir3(bool closedLoop = false) { return closedLoop ? nodes.dir3 - 1 : nodes.dir3; }
+	int nElCirc(bool closedLoop = false) { return nElDir1(closedLoop); }
+	int nElNorm(bool closedLoop = false) { return nElDir2(closedLoop); }
+	int nElAxis(bool closedLoop = false) { return nElDir3(closedLoop); }
+	int nElRefDir(bool closedLoop = false) { return nElDir3(closedLoop); }
+};
+
+
+
+struct Pipe2Dradius {
+	double inner, outer;
+};
+struct Pipe3Dradius {
+	Pipe2Dradius start, end;
+};
+struct ArcAngles {
+	double start, end;
+};
+
+class MesherInputCone : public MesherInput {
+public:
+	MeshSize3D		meshSize;
+	Pipe3Dradius	radius;
+	ArcAngles		angle;
+	double			height;	
+	direction		axis;
+};
+
 class Cone3Dmesher : private Mesher
 {
 public:
@@ -55,7 +111,7 @@ public:
 		bool		closedLoop);
 
 private:
-	static void writeNodes_refLayer_1(
+	static void writeNodes_refLayerM1(
 		FEAwriter*			writer,
 		const glm::dvec3&	spos,
 		const glm::ivec2&	nnodes12,
@@ -67,7 +123,7 @@ private:
 		direction			rotaxis,
 		glm::dmat3x3*		csys = nullptr);
 
-	static void writeNodes_refLayer_2(
+	static void writeNodes_refLayerM2(
 		FEAwriter*			writer,
 		const glm::dvec3&	spos,
 		const glm::ivec2&	nnodes12,
@@ -76,7 +132,6 @@ private:
 		double				startAng,
 		double				dang,
 		int					skipNth,
-		bool				closesLoop,
 		direction			rotaxis,
 		glm::dmat3x3*		csys = nullptr);
 };

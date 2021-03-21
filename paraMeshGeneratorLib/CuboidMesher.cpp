@@ -103,7 +103,29 @@ void CuboidMesher::writeElements(
 }
 
 
+/*
+	Draws the nodes for a cube of dimensions <size>.
+	The nodes are structured in such a way that CuboidMesherRef::writeElements
+	can create the Hexagonal elements making up the cube.
 
+	The cube is refined along its local Z-axis. 
+	The number of nodes along the local X and Y axes (at local Z = 0.0 / bottom) are defined by <nNodesFace>
+	The number of nodes along the local Z-axis is dependent in the number of refinements.
+
+	With pln == plane::xy: [local X] = X, [local Y] = Y, [local Z] = Z, 
+	With pln == plane::xz: [local X] = X, [local Y] = Z, [local Z] = Y, 
+	With pln == plane::yz: [local X] = Y, [local Y] = Z, [local Z] = X, 
+
+	[in] writer			 :
+	[in] spos			 :
+	[in] size			 :
+	[in] nNodesFace		 :
+	[in] nRefinements	 :
+	[in] startWithOffset :
+	[in] pln			 :
+	[in] csys			 :
+
+*/
 void CuboidMesherRef::writeNodes(
 	FEAwriter*			writer,
 	const glm::dvec3&	spos,
@@ -114,9 +136,8 @@ void CuboidMesherRef::writeNodes(
 	plane				pln,
 	glm::dmat3x3*		csys)
 {
-
-	glm::dvec3 coords = spos;
-	int firstNode = writer->getNextNodeID();
+	int firstNode = writer->getNextNodeID();	
+	glm::dvec3 coords(spos);	
 
 	direction refDirection = getPlaneNormal(pln);
 	direction dir1, dir2;

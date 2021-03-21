@@ -1,12 +1,26 @@
 #include "ConeMesher.h"
 #include "PlaneMesher.h"
 #include "ArcMesher.h"
+#include "LineMesher.h"
+#include "math_utilities.h"
 #include "glm/gtc/constants.hpp"
 
 /*
 	Cone around X,Y or Z-axis
 	nnodes.x - along circumferance
 	nndoes.y - along height
+
+		     _.-""""-._
+           .'          `.
+		  /      ___     \
+		 |      /   \     |
+		 |     |     |    |
+		 |      \___/     |
+		  \              /
+		   `._        _.'
+			  `-....-'
+
+
 */
 void ConeMesher::writeNodes(
 	FEAwriter*			writer,
@@ -54,6 +68,98 @@ void ConeMesher::writeNodesZ(FEAwriter*	writer, const glm::dvec3& centerPos, dou
 	const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
 	writeNodes(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::z, csys);
+}
+
+/*
+	Writes the nodes of a cone shape, and skips certain nodes.	
+	Used for refinements node structures.
+
+	The node numbering is starting from inner radius, out to outer radius, then same again
+	for incremented angle.
+	Every <skipNth> angle increment are skipped / jumped over.
+
+	              2   4 
+			 _.-""x"-.x
+           .'     |  / `.
+		  /     1_x_x 3  \
+		 |      /   \     |
+		 |     |   5 x----x 6
+		 |      \___/     |
+		  \              /
+		   `._        _.'
+			  `-....-'
+
+*/
+void ConeMesher::writeNodes_nthLine(
+	FEAwriter*			writer,
+	const glm::dvec3&	spos,
+	const glm::ivec2&	nnodes,
+	double				radiusStart,
+	double				radiusEnd,
+	double				startAng,
+	double				dang,
+	double				height,
+	int					skipNth,
+	direction			rotaxis,
+	glm::dmat3x3*		csys)
+{
+	glm::dvec3 coordsStart, coordsEnd;
+	double currentAng = startAng;
+
+	for (int i = 0; i < nnodes.x; i++) {
+
+		coordsStart = coordsOnCircle(currentAng, radiusStart, rotaxis) + spos;
+		coordsEnd = coordsOnCircle(currentAng, radiusEnd, rotaxis) + spos;
+
+		if (i % skipNth) {
+			LineMesher::writeNodesLine(writer, coordsStart, coordsEnd, nnodes.y, csys);
+		}
+		currentAng += dang;
+	}
+}
+
+
+/*
+	Writes the nodes of a cone shape, and skips certain nodes.
+	Used for refinements node structures.
+
+	The node numbering is going along the arcs of the shape.
+	Every <skipNth> arc are skipped / jumped over.
+
+				  4   5
+			 _.-""x"-.x
+		   .'     |  / `.
+		  /     1_x_x 2  \
+		 |      /   \     |
+		 |     |   3 x----x 6
+		 |      \___/     |
+		  \              /
+		   `._        _.'
+			  `-....-'
+
+*/
+void ConeMesher::writeNodes_nthArc(
+	FEAwriter*			writer,
+	const glm::dvec3&	spos,
+	const glm::ivec2&	nnodes,
+	double				radiusStart,
+	double				radiusEnd,
+	double				startAng,
+	double				dang,
+	double				height,
+	int					skipNth,
+	direction			rotaxis,
+	glm::dmat3x3*		csys)
+{
+	double currentRadius = radiusStart;
+	double dr = (radiusEnd - radiusStart) / (double)(nnodes.y - 1);
+
+	for (int i = 0; i < nnodes.y; i++) {
+		if (i % skipNth) {
+			ArcMesher::writeNodesCircularQ(writer, spos, currentRadius, startAng, dang, nnodes.x, rotaxis, csys);
+		}
+		currentRadius += dr;
+	}
 }
 
 /*
