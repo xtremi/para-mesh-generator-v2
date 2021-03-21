@@ -50,5 +50,77 @@ private:
 
 };
 
-bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes);
-double calcArcIncrement(double startAng, double endAng, int nnodes);
+class MesherInput {
+public:
+	MesherInput() {}
+	MesherInput(const glm::dvec3& _pos) : pos{ _pos } {}
+	glm::dvec3 pos;
+};
+
+struct NodeVec2D {
+	NodeVec2D() {}
+	NodeVec2D(int _dir1, int _dir2) : dir1{ _dir1 }, dir2{ _dir2 } {}
+	int dir1, dir2;
+	int circ() { return dir1; }
+	int norm() { return dir2; }
+};
+struct NodeVec3D : public NodeVec2D {
+	NodeVec3D() {}
+	NodeVec3D(int _dir1, int _dir2, int _dir3) : NodeVec2D(_dir1, _dir2), dir3{ _dir3 } {}
+
+	int dir3;
+	int axis() { return dir3; }
+	int refDir() { return dir3; }
+};
+
+struct MeshSize2D {
+	MeshSize2D() {}
+	MeshSize2D(int _dir1, int _dir2) : nodes{ NodeVec2D(_dir1, _dir2) } {}
+	MeshSize2D(const NodeVec2D& _nodes) : nodes{ _nodes } {}
+
+	NodeVec2D nodes;
+	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
+	int nElDir2(bool closedLoop = false) { return closedLoop ? nodes.dir2 - 1 : nodes.dir2; }
+	int nElCirc(bool closedLoop = false) { return nElDir1(closedLoop); }
+	int nElNorm(bool closedLoop = false) { return nElDir2(closedLoop); }
+};
+
+struct MeshSize3D {
+	MeshSize3D() {}
+	MeshSize3D(int _dir1, int _dir2, int _dir3) : nodes{ NodeVec3D(_dir1, _dir2, _dir3) } {}
+	MeshSize3D(const NodeVec3D& _nodes) : nodes{ _nodes } {}
+
+	NodeVec3D nodes;
+	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
+	int nElDir2(bool closedLoop = false) { return closedLoop ? nodes.dir2 - 1 : nodes.dir2; }
+	int nElDir3(bool closedLoop = false) { return closedLoop ? nodes.dir3 - 1 : nodes.dir3; }
+	int nElCirc(bool closedLoop = false) { return nElDir1(closedLoop); }
+	int nElNorm(bool closedLoop = false) { return nElDir2(closedLoop); }
+	int nElAxis(bool closedLoop = false) { return nElDir3(closedLoop); }
+	int nElRefDir(bool closedLoop = false) { return nElDir3(closedLoop); }
+};
+
+struct Pipe2Dradius {
+	Pipe2Dradius() {}
+	Pipe2Dradius(double _inner, double _outer) : inner{ _inner }, outer{ _outer }{}
+
+	double inner, outer;
+	double dR() { return outer - inner; }
+};
+struct Pipe3Dradius {
+	Pipe3Dradius() {}
+	Pipe3Dradius(double startInner, double startOuter, double endInner, double endOuter)
+		: start{ Pipe2Dradius(startInner, startOuter) }, end{ Pipe2Dradius(endInner, endOuter) } {}
+
+	Pipe2Dradius start, end;
+	double dRi() { return end.inner - start.inner; }
+	double dRo() { return end.outer - start.outer; }
+};
+struct ArcAngles {
+	ArcAngles() {}
+	ArcAngles(double _start, double _end) : start{ _start }, end{ _end }{}
+	double start, end;
+	void setFullCircle() {
+		start = -1.0; end = -1.0;
+	}
+};

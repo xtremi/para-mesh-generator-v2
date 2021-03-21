@@ -8,7 +8,7 @@ public:
 		FEAwriter*			writer,
 		const glm::dvec3&	spos,
 		double				dx,
-		int					nrows,
+		int					nnodes,
 		direction			dir,
 		glm::dmat3x3*		csys = nullptr);
 
@@ -36,7 +36,7 @@ public:
 		int					skipNth,
 		glm::dmat3x3*		csys = nullptr);
 
-	static void writeNodesLine(FEAwriter* writer, const glm::dvec3& spos, double length, int nrows, direction dir, glm::dmat3x3* csys = nullptr);
+	static void writeNodesLine(FEAwriter* writer, const glm::dvec3& spos, double length, int nnodes, direction dir, glm::dmat3x3* csys = nullptr);
 	static void writeNodesLine(FEAwriter* writer, const glm::dvec3& spos, const glm::dvec3& sposEnd, int nnodes, glm::dmat3x3* csys = nullptr);
 	static void writeNodesLineXq(FEAwriter* writer, const glm::dvec3& spos, double dx, int nnodes, glm::dmat3x3* csys = nullptr);
 	static void writeNodesLineYq(FEAwriter* writer, const glm::dvec3& spos, double dx, int nnodes, glm::dmat3x3* csys = nullptr);

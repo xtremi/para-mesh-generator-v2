@@ -2,55 +2,14 @@
 #include "Mesher.h"
 #include "FeaWrite.h"
 
-class MesherInput {
+
+
+class MesherInputCone3D : public MesherInput {
 public:
-	glm::dvec3 pos;
-};
+	MesherInputCone3D(){}
+	MesherInputCone3D(const glm::dvec3& pos, const NodeVec3D& _nodes, const Pipe3Dradius& _radius, const ArcAngles& _angle, double _height, direction _axis)
+		: MesherInput(pos), meshSize{ MeshSize3D(_nodes) }, radius{_radius}, angle{_angle}, height{_height}, axis{_axis}{}
 
-struct NodeVec2D { 
-	int dir1, dir2;
-	int circ() { return dir1; }
-	int norm() { return dir2; }
-};
-struct NodeVec3D : public NodeVec2D { 
-	int dir3; 
-	int axis() { return dir3; }
-	int refDir() { return dir3; }
-};
-
-struct MeshSize2D {
-	NodeVec2D nodes;
-	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
-	int nElDir2(bool closedLoop = false) { return closedLoop ? nodes.dir2 - 1 : nodes.dir2; }
-	int nElCirc(bool closedLoop = false) { return nElDir1(closedLoop); }
-	int nElNorm(bool closedLoop = false) { return nElDir2(closedLoop); }
-};
-
-struct MeshSize3D {
-	NodeVec3D nodes;
-	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
-	int nElDir2(bool closedLoop = false) { return closedLoop ? nodes.dir2 - 1 : nodes.dir2; }
-	int nElDir3(bool closedLoop = false) { return closedLoop ? nodes.dir3 - 1 : nodes.dir3; }
-	int nElCirc(bool closedLoop = false) { return nElDir1(closedLoop); }
-	int nElNorm(bool closedLoop = false) { return nElDir2(closedLoop); }
-	int nElAxis(bool closedLoop = false) { return nElDir3(closedLoop); }
-	int nElRefDir(bool closedLoop = false) { return nElDir3(closedLoop); }
-};
-
-
-
-struct Pipe2Dradius {
-	double inner, outer;
-};
-struct Pipe3Dradius {
-	Pipe2Dradius start, end;
-};
-struct ArcAngles {
-	double start, end;
-};
-
-class MesherInputCone : public MesherInput {
-public:
 	MeshSize3D		meshSize;
 	Pipe3Dradius	radius;
 	ArcAngles		angle;
@@ -63,16 +22,7 @@ class Cone3Dmesher : private Mesher
 public:
 	static void writeNodes(
 		FEAwriter*			writer,
-		const glm::dvec3&	spos,
-		double				radiusStartOuter,
-		double				radiusEndOuter,
-		double				radiusStartInner,
-		double				radiusEndInner,
-		double				startAng,
-		double				endAng,
-		double				height,
-		const glm::ivec3&	nnodes,
-		direction			rotaxis,
+		MesherInputCone3D&	meshInp,
 		glm::dmat3x3*		csys = nullptr);
 
 

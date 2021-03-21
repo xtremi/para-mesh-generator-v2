@@ -589,24 +589,24 @@ int cone3Dmesher(const std::string& fileName) {
 
 	NastranFEAwriter writer(&file);
 	NastranFEAwriter* w = &writer;
-	glm::dvec3 pos(0.0);
 
-	glm::ivec3 nnodes(15, 4, 16);
-	//glm::ivec3 nnodes(12, 4, 4);
-	double radiusStartInner = 5.0;
-	double radiusStartOuter = 9.0;
-	double radiusEndInner = 3.0;
-	double radiusEndOuter = 5.0;
-	double height = 32.0;
+	MesherInputCone3D input(
+		glm::dvec3(0.0), 
+		NodeVec3D(15, 4, 16), 
+		Pipe3Dradius(5.0, 9.0, 3.0, 5.0), 
+		ArcAngles(0.0, glm::pi<double>()*1.95), 
+		32.0, direction::z);
 
-	Cone3Dmesher::writeNodes(w, pos, radiusStartOuter, radiusEndOuter, radiusStartInner, radiusEndInner,
-		0.0, glm::pi<double>()*1.95, height, nnodes, direction::z);
-	Cone3Dmesher::writeElements(w, nnodes, false);
-	pos.x += height;
+	Cone3Dmesher::writeNodes(w, input);
+	Cone3Dmesher::writeElements(w, glm::ivec3(input.meshSize.nodes.dir1, input.meshSize.nodes.dir2, input.meshSize.nodes.dir3), false);
+	input.pos.x += input.height;
 
-	Cone3Dmesher::writeNodes(w, pos, radiusStartOuter, radiusStartOuter, radiusStartInner, radiusStartInner,
-		-1, -1, height, nnodes, direction::z);
-	Cone3Dmesher::writeElements(w, nnodes, true);
+	input.radius.end.inner = input.radius.start.inner;
+	input.radius.end.outer = input.radius.start.outer;
+	input.angle.setFullCircle();
+
+	Cone3Dmesher::writeNodes(w, input);
+	Cone3Dmesher::writeElements(w, glm::ivec3(input.meshSize.nodes.dir1, input.meshSize.nodes.dir2, input.meshSize.nodes.dir3), true);
 
 	w->close();
 	return 0;

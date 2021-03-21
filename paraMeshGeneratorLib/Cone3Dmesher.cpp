@@ -8,41 +8,26 @@
 #include "math_utilities.h"
 
 void Cone3Dmesher::writeNodes(
-	FEAwriter*			writer,
-	const glm::dvec3&	spos,
-	double				radiusStartOuter,
-	double				radiusEndOuter,
-	double				radiusStartInner,
-	double				radiusEndInner,
-	double				startAng,
-	double				endAng,
-	double				height,
-	const glm::ivec3&	nnodes, //.x - around, .y - along rad, .z - along rotaxis
-	direction			rotaxis,
-	glm::dmat3x3*		csys)
+	FEAwriter*					writer,
+	MesherInputCone3D&			meshInp,
+	glm::dmat3x3*				csys)
 {
-
 	int firstNodeID = writer->getNextNodeID();
+	glm::dvec3  coords = meshInp.pos;
 
-	double dang = 0.0;
-	//bool fullCircle = limitArcAngles(startAng, endAng, dang, nnodes.x);
+	double dH  = meshInp.height       / (double)meshInp.meshSize.nElAxis();
+	double dRi = meshInp.radius.dRi() / (double)meshInp.meshSize.nElAxis();
+	double dRo = meshInp.radius.dRo() / (double)meshInp.meshSize.nElAxis();
 
-	double dH = height / (double)(nnodes.z - 1);
-	double dRi = (radiusEndInner - radiusStartInner) / (double)(nnodes.z - 1);
-	double dRo = (radiusEndOuter - radiusStartOuter) / (double)(nnodes.z - 1);
+	Pipe2Dradius currentRadius(meshInp.radius.start.inner, meshInp.radius.start.outer);
 
-	glm::dvec3  coords = spos;
-	double		radiusInner = radiusStartInner;
-	double		radiusOuter = radiusStartOuter;
-
-	for (int i = 0; i < nnodes.z; i++) {
-	  //DiskMesher::
-		ConeMesher::writeNodes(writer, coords, radiusInner, radiusOuter, startAng, endAng, 0.0,
-			glm::ivec2(nnodes.x, nnodes.y), rotaxis, csys);
+	for (int i = 0; i < meshInp.meshSize.nodes.axis(); i++) {
+	  DiskMesher::writeNodes(writer, coords, currentRadius.inner, currentRadius.outer, meshInp.angle.start, meshInp.angle.end,
+		  glm::ivec2(meshInp.meshSize.nodes.dir1, meshInp.meshSize.nodes.dir2), meshInp.axis, csys);
 		
-		coords[(size_t)rotaxis] += dH;
-		radiusInner += dRi;
-		radiusOuter += dRo;
+		coords[(size_t)meshInp.axis] += dH;
+		currentRadius.inner += dRi;
+		currentRadius.outer += dRo;
 	}
 
 	nodeID1 = firstNodeID;
