@@ -8,24 +8,28 @@
 #include "math_utilities.h"
 
 void Cone3Dmesher::writeNodes(
-	FEAwriter*					writer,
-	MesherInputCone3D&			meshInp,
-	glm::dmat3x3*				csys)
+	const glm::dvec3	spos,
+	MeshDensity3D&		meshSize,
+	const Pipe3Dradius&	radius,
+	const ArcAngles&	angle,
+	double				height,
+	direction			axis,
+	glm::dmat3x3*		csys)
 {
 	int firstNodeID = writer->getNextNodeID();
-	glm::dvec3  coords = meshInp.pos;
+	glm::dvec3  coords(spos);
 
-	double dH  = meshInp.height       / (double)meshInp.meshSize.nElAxis();
-	double dRi = meshInp.radius.dRi() / (double)meshInp.meshSize.nElAxis();
-	double dRo = meshInp.radius.dRo() / (double)meshInp.meshSize.nElAxis();
+	double dH  = height       / (double)meshSize.nElAxis();
+	double dRi = radius.dRi() / (double)meshSize.nElAxis();
+	double dRo = radius.dRo() / (double)meshSize.nElAxis();
 
-	Pipe2Dradius currentRadius(meshInp.radius.start.inner, meshInp.radius.start.outer);
+	Pipe2Dradius currentRadius(radius.start.inner, radius.start.outer);
 
-	for (int i = 0; i < meshInp.meshSize.nodes.axis(); i++) {
-	  DiskMesher::writeNodes(writer, coords, currentRadius.inner, currentRadius.outer, meshInp.angle.start, meshInp.angle.end,
-		  glm::ivec2(meshInp.meshSize.nodes.dir1, meshInp.meshSize.nodes.dir2), meshInp.axis, csys);
+	for (int i = 0; i < meshSize.nodes.axis(); i++) {
+	  DiskMesher::writeNodes(coords, currentRadius.inner, currentRadius.outer, angle.start, angle.end,
+		  glm::ivec2(meshSize.nodes.dir1, meshSize.nodes.dir2), axis, csys);
 		
-		coords[(size_t)meshInp.axis] += dH;
+		coords[(size_t)axis] += dH;
 		currentRadius.inner += dRi;
 		currentRadius.outer += dRo;
 	}
@@ -36,11 +40,10 @@ void Cone3Dmesher::writeNodes(
 }
 
 void Cone3Dmesher::writeElements(
-	FEAwriter*	writer,
-	glm::ivec3	nnodes,
-	bool		closedLoop)
+	MeshDensity3D&  meshSize,
+	bool			closedLoop)
 {
-	CuboidMesher::writeElements(writer, nnodes, closedLoop);
+	CuboidMesher::writeElements(glm::ivec3(meshSize.nodes.dir1, meshSize.nodes.dir2, meshSize.nodes.dir3), closedLoop);
 }
 
 /*
@@ -69,7 +72,6 @@ void Cone3Dmesher::writeElements(
 
 */
 void Cone3DmesherRef::writeNodes(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::ivec2&	nNodes12,
 	int					nRefinements,
@@ -113,7 +115,7 @@ void Cone3DmesherRef::writeNodes(
 		currentRefinement++;
 
 		//row b: x--x--x--x--x--x--x--x--x		
-		DiskMesher::writeNodes(writer, coords, currentRadiusInner, currentRadiusOuter, startAng, endAng, currentNodes12, rotaxis, csys);
+		DiskMesher::writeNodes(coords, currentRadiusInner, currentRadiusOuter, startAng, endAng, currentNodes12, rotaxis, csys);
 		currentConeLength += currentElSize3;
 		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
 		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
@@ -122,7 +124,7 @@ void Cone3DmesherRef::writeNodes(
 
 		//row m1:  |  x--x--x  |  x--x--x  |
 		double dang = calcArcIncrement(startAng, endAng, currentNodes12.x);
-		writeNodes_refLayerM1(writer, coords, currentNodes12, currentRadiusInner, currentRadiusOuter, startAng < 0.0 ? 0.0 : startAng, dang, 4, rotaxis, csys);
+		writeNodes_refLayerM1(coords, currentNodes12, currentRadiusInner, currentRadiusOuter, startAng < 0.0 ? 0.0 : startAng, dang, 4, rotaxis, csys);
 		currentConeLength += currentElSize3;
 		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
 		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
@@ -139,7 +141,7 @@ void Cone3DmesherRef::writeNodes(
 
 
 		//row m2:  x-----x-----x-----x-----x
-		DiskMesher::writeNodes(writer, coords, currentRadiusInner, currentRadiusOuter, startAng, endAng, currentNodes12, rotaxis, csys);
+		DiskMesher::writeNodes(coords, currentRadiusInner, currentRadiusOuter, startAng, endAng, currentNodes12, rotaxis, csys);
 		currentConeLength += currentElSize3;
 		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
 		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
@@ -148,7 +150,7 @@ void Cone3DmesherRef::writeNodes(
 
 		//row m3:  |  x--x--x  |  x--x--x  | (dir1)		
 		dang = calcArcIncrement(startAng, endAng, currentNodes12.x);
-		writeNodes_refLayerM2(writer, coords, currentNodes12, currentRadiusInner, currentRadiusOuter, startAng < 0.0 ? 0.0 : startAng, dang, 4, rotaxis, csys);
+		writeNodes_refLayerM2(coords, currentNodes12, currentRadiusInner, currentRadiusOuter, startAng < 0.0 ? 0.0 : startAng, dang, 4, rotaxis, csys);
 		currentConeLength += currentElSize3;
 		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
 		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
@@ -162,7 +164,7 @@ void Cone3DmesherRef::writeNodes(
 
 
 		//row t:  x-----x-----x-----x-----x (dir2)
-		DiskMesher::writeNodes(writer, coords, currentRadiusInner, currentRadiusOuter, 
+		DiskMesher::writeNodes(coords, currentRadiusInner, currentRadiusOuter, 
 			startAng, endAng, currentNodes12, rotaxis, csys);
 		currentElSize3 *= 2.0;
 		currentConeLength += currentElSize3;
@@ -177,7 +179,6 @@ void Cone3DmesherRef::writeNodes(
 
 
 void Cone3DmesherRef::writeNodes_refLayerM1(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::ivec2&	nnodes12,
 	double				radiusInner,
@@ -188,11 +189,10 @@ void Cone3DmesherRef::writeNodes_refLayerM1(
 	direction			rotaxis,
 	glm::dmat3x3*		csys)
 {
-	ConeMesher::writeNodes_nthLine(writer, spos, nnodes12, radiusInner, radiusOuter, startAng, dang, 0.0, skipNth, rotaxis, csys);
+	ConeMesher::writeNodes_nthLine(spos, nnodes12, radiusInner, radiusOuter, startAng, dang, 0.0, skipNth, rotaxis, csys);
 }
 
 void Cone3DmesherRef::writeNodes_refLayerM2(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::ivec2&	nnodes12,
 	double				radiusInner,
@@ -203,18 +203,17 @@ void Cone3DmesherRef::writeNodes_refLayerM2(
 	direction			rotaxis,
 	glm::dmat3x3*		csys)
 {
-	ConeMesher::writeNodes_nthArc(writer, spos, nnodes12, radiusInner, radiusOuter, startAng, dang, 0.0, skipNth, rotaxis, csys);
+	ConeMesher::writeNodes_nthArc(spos, nnodes12, radiusInner, radiusOuter, startAng, dang, 0.0, skipNth, rotaxis, csys);
 }
 
 
 
 
 void Cone3DmesherRef::writeElements(
-	FEAwriter*	writer,
 	glm::ivec2	nnodes12,
 	int			nRefinements,
 	bool		closedLoop) 
 {
-	CuboidMesherRef::writeElements(writer, nnodes12, nRefinements, closedLoop);
+	CuboidMesherRef::writeElements(nnodes12, nRefinements, closedLoop);
 }
 

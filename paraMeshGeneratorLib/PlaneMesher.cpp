@@ -2,7 +2,6 @@
 #include "LineMesher.h"
 
 void PlaneMesher::writeNodesPlaneQ(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::dvec2&	dp,
 	const glm::ivec2&	nnodes,
@@ -17,14 +16,13 @@ void PlaneMesher::writeNodesPlaneQ(
 
 	for (int i2 = 0; i2 < nnodes.y; i2++)
 	{
-		LineMesher::writeNodesLineQ(writer, coords, dp.x, nnodes.x, dir1, csys);
+		LineMesher::writeNodesLineQ(coords, dp.x, nnodes.x, dir1, csys);
 		coords[(size_t)dir2] += dp.y;
 	}
 	nodeID1 = firstNode;
 }
 
 void PlaneMesher::writeNodesPlane(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::dvec2&	size,
 	const glm::ivec2&	nnodes,
@@ -32,26 +30,26 @@ void PlaneMesher::writeNodesPlane(
 	glm::dmat3x3*		csys)
 {
 	glm::dvec2 dsize = glm::dvec2(size.x / (double)(nnodes.x - 1), size.y / (double)(nnodes.y - 1));
-	PlaneMesher::writeNodesPlaneQ(writer, spos, dsize, nnodes, pln, csys);
+	PlaneMesher::writeNodesPlaneQ(spos, dsize, nnodes, pln, csys);
 }
 
-void PlaneMesher::writeNodesPlaneXZq(FEAwriter*	writer, const glm::dvec3& spos, const glm::dvec2& dxz, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlaneQ(writer, spos, dxz, nnodes, plane::xz, csys);
+void PlaneMesher::writeNodesPlaneXZq(const glm::dvec3& spos, const glm::dvec2& dxz, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
+	writeNodesPlaneQ(spos, dxz, nnodes, plane::xz, csys);
 }
-void PlaneMesher::writeNodesPlaneXYq(FEAwriter*	writer, const glm::dvec3& spos, const glm::dvec2& dxy, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlaneQ(writer, spos, dxy, nnodes, plane::xy, csys);
+void PlaneMesher::writeNodesPlaneXYq(const glm::dvec3& spos, const glm::dvec2& dxy, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
+	writeNodesPlaneQ(spos, dxy, nnodes, plane::xy, csys);
 }
-void PlaneMesher::writeNodesPlaneYZq(FEAwriter*	writer, const glm::dvec3& spos, const glm::dvec2& dyz, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlaneQ(writer, spos, dyz, nnodes, plane::yz, csys);
+void PlaneMesher::writeNodesPlaneYZq(const glm::dvec3& spos, const glm::dvec2& dyz, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
+	writeNodesPlaneQ(spos, dyz, nnodes, plane::yz, csys);
 }
-void PlaneMesher::writeNodesPlaneXZ(FEAwriter*	writer, const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlane(writer, spos, size, nnodes, plane::xz, csys);
+void PlaneMesher::writeNodesPlaneXZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
+	writeNodesPlane(spos, size, nnodes, plane::xz, csys);
 }
-void PlaneMesher::writeNodesPlaneXY(FEAwriter*	writer, const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlane(writer, spos, size, nnodes, plane::xy, csys);
+void PlaneMesher::writeNodesPlaneXY(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
+	writeNodesPlane(spos, size, nnodes, plane::xy, csys);
 }
-void PlaneMesher::writeNodesPlaneYZ(FEAwriter*	writer, const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlane(writer, spos, size, nnodes, plane::yz, csys);
+void PlaneMesher::writeNodesPlaneYZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
+	writeNodesPlane(spos, size, nnodes, plane::yz, csys);
 }
 
 
@@ -84,7 +82,6 @@ void PlaneMesher::writeNodesPlaneYZ(FEAwriter*	writer, const glm::dvec3& spos, c
   5x_10x_15x___x
 */
 void PlaneMesher::writeElementsPlane(
-	FEAwriter*	writer,
 	glm::ivec2	nnodes,
 	bool		closedLoop)
 {
@@ -176,7 +173,6 @@ b0   x___x___x___x___x___x___x___x___x  row b (bot)	   -		|		  |
 
 */
 void PlaneMesherRef::writeNodesPlane_ref(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::dvec2&	size,
 	int					nNodesEdge,
@@ -207,11 +203,11 @@ void PlaneMesherRef::writeNodesPlane_ref(
 		currentRefinement++;
 
 		//row b: x--x--x--x--x--x--x--x--x
-		LineMesher::writeNodesLineQ(writer, coords, curElSize.y, currentNodesPerRow, edgeDirection);
+		LineMesher::writeNodesLineQ(coords, curElSize.y, currentNodesPerRow, edgeDirection);
 		coords[(size_t)refinementDirection] += curElSize.x;
 
 		//row m:  |  x--x--x  |  x--x--x  |
-		LineMesher::writeNodesLineQ_nth(writer, coords, curElSize.y, currentNodesPerRow, 4, edgeDirection, csys);
+		LineMesher::writeNodesLineQ_nth(coords, curElSize.y, currentNodesPerRow, 4, edgeDirection, csys);
 		coords[(size_t)refinementDirection] += curElSize.x;
 		
 		//Refine
@@ -221,7 +217,7 @@ void PlaneMesherRef::writeNodesPlane_ref(
 		curElSize.y *= 2.0;
 
 		//row t: x----x----x----x----x
-		LineMesher::writeNodesLineQ(writer, coords, curElSize.y, currentNodesPerRow, edgeDirection, csys);
+		LineMesher::writeNodesLineQ(coords, curElSize.y, currentNodesPerRow, edgeDirection, csys);
 		curElSize.x *= 2.0;
 		coords[(size_t)refinementDirection] += curElSize.x;
 	}
@@ -230,17 +226,17 @@ void PlaneMesherRef::writeNodesPlane_ref(
 }
 
 
-void PlaneMesherRef::writeNodesPlaneXY_ref(FEAwriter* writer, const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRef,	bool startWithOffset, glm::dmat3x3* csys)
+void PlaneMesherRef::writeNodesPlaneXY_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRef,	bool startWithOffset, glm::dmat3x3* csys)
 {
-	return writeNodesPlane_ref(writer, spos, size, nNodesEdge, nRef, startWithOffset, plane::xy, csys);
+	return writeNodesPlane_ref(spos, size, nNodesEdge, nRef, startWithOffset, plane::xy, csys);
 }
-void PlaneMesherRef::writeNodesPlaneXZ_ref(FEAwriter* writer, const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRef,	bool startWithOffset, glm::dmat3x3* csys)
+void PlaneMesherRef::writeNodesPlaneXZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRef,	bool startWithOffset, glm::dmat3x3* csys)
 {
-	return writeNodesPlane_ref(writer, spos, size, nNodesEdge, nRef, startWithOffset, plane::xz, csys);
+	return writeNodesPlane_ref(spos, size, nNodesEdge, nRef, startWithOffset, plane::xz, csys);
 }
-void PlaneMesherRef::writeNodesPlaneYZ_ref(FEAwriter* writer, const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRef,	bool startWithOffset, glm::dmat3x3* csys)
+void PlaneMesherRef::writeNodesPlaneYZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRef,	bool startWithOffset, glm::dmat3x3* csys)
 {
-	return writeNodesPlane_ref(writer, spos, size, nNodesEdge, nRef, startWithOffset, plane::yz, csys);
+	return writeNodesPlane_ref(spos, size, nNodesEdge, nRef, startWithOffset, plane::yz, csys);
 }
 
 
@@ -268,7 +264,6 @@ b0   x___x___x___x___x___x___x___x___x  	           -
 										elRow b		   |  1elL
 */
 void PlaneMesherRef::writeElementsPlane_ref(
-	FEAwriter*	writer,
 	int			nNodesY,
 	int			nRefinements,
 	bool		closedLoop)

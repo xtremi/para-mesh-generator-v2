@@ -2,7 +2,6 @@
 #include "ConeMesher.h"
 
 void CylinderMesher::writeNodes(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	double				radius,
 	double				height,
@@ -12,33 +11,32 @@ void CylinderMesher::writeNodes(
 	direction			rotaxis,
 	glm::dmat3x3*		csys)
 {
-	ConeMesher::writeNodes(writer, spos, radius, radius, startAng, endAng, height, nnodes, rotaxis, csys);
+	ConeMesher::writeNodes(spos, radius, radius, startAng, endAng, height, nnodes, rotaxis, csys);
 }
 
-void CylinderMesher::writeNodesX(FEAwriter* writer, const glm::dvec3& spos, double radius, double height,
+void CylinderMesher::writeNodesX(const glm::dvec3& spos, double radius, double height,
 	double startAng, double endAng, const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
-	ConeMesher::writeNodesX(writer, spos, radius, radius, startAng, endAng, height, nnodes, csys);
+	ConeMesher::writeNodesX(spos, radius, radius, startAng, endAng, height, nnodes, csys);
 }
-void CylinderMesher::writeNodesY(FEAwriter* writer, const glm::dvec3& spos, double radius, double height,
+void CylinderMesher::writeNodesY(const glm::dvec3& spos, double radius, double height,
 	double startAng, double endAng, const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
-	ConeMesher::writeNodesY(writer, spos, radius, radius, startAng, endAng, height, nnodes, csys);
+	ConeMesher::writeNodesY(spos, radius, radius, startAng, endAng, height, nnodes, csys);
 }
-void CylinderMesher::writeNodesZ(FEAwriter* writer, const glm::dvec3& spos, double radius, double height,
+void CylinderMesher::writeNodesZ(const glm::dvec3& spos, double radius, double height,
 	double startAng, double endAng, const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
-	ConeMesher::writeNodesY(writer, spos, radius, radius, startAng, endAng, height, nnodes, csys);
+	ConeMesher::writeNodesY(spos, radius, radius, startAng, endAng, height, nnodes, csys);
 }
 
-void CylinderMesher::writeElements(FEAwriter* writer, glm::ivec2 nnodes, bool closedLoop)
+void CylinderMesher::writeElements(const glm::ivec2& nnodes, bool closedLoop)
 {
-	ConeMesher::writeElements(writer, nnodes, closedLoop);
+	ConeMesher::writeElements(nnodes, closedLoop);
 }
 
 
 void CylinderMesherRef::writeNodes(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	int					nNodesEdge,
 	int					nRefinements,
@@ -49,10 +47,10 @@ void CylinderMesherRef::writeNodes(
 	direction			rotaxis,
 	glm::dmat3x3*		csys)
 {
-	ConeMesherRef::writeNodes(writer, spos, nNodesEdge, nRefinements, radius, radius, startAng, endAng, height, rotaxis, csys);
+	ConeMesherRef::writeNodes(spos, nNodesEdge, nRefinements, radius, radius, startAng, endAng, height, rotaxis, csys);
 }
 
-void CylinderMesherRef::writeElements(FEAwriter* writer, int nNodesY, int nRefinements, bool closedLoop)
+void CylinderMesherRef::writeElements(int nNodesY, int nRefinements, bool closedLoop)
 {
-	ConeMesherRef::writeElements(writer, nNodesY, nRefinements, closedLoop);
+	ConeMesherRef::writeElements(nNodesY, nRefinements, closedLoop);
 }

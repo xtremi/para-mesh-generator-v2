@@ -8,7 +8,6 @@ class CylinderMesher :	private Mesher
 {
 public:
 	static void writeNodes(
-		FEAwriter*			writer,
 		const glm::dvec3&	spos,
 		double				radius,
 		double				height,
@@ -18,21 +17,20 @@ public:
 		direction			rotaxis,
 		glm::dmat3x3*		csys = nullptr);
 
-	static void writeNodesX(FEAwriter* writer, const glm::dvec3& spos, double radius, double height,
+	static void writeNodesX(const glm::dvec3& spos, double radius, double height,
 		double startAng, double endAng, const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesY(FEAwriter* writer, const glm::dvec3& spos, double radius, double height,
+	static void writeNodesY(const glm::dvec3& spos, double radius, double height,
 		double startAng, double endAng, const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesZ(FEAwriter* writer, const glm::dvec3& spos, double radius, double height,
+	static void writeNodesZ(const glm::dvec3& spos, double radius, double height,
 		double startAng, double endAng, const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
 
-	static void writeElements(FEAwriter* writer, glm::ivec2 nnodes, bool closedLoop);
+	static void writeElements(const glm::ivec2& nnodes, bool closedLoop);
 };
 
 class CylinderMesherRef : private Mesher
 {
 public:
 	static void writeNodes(
-		FEAwriter*			writer,
 		const glm::dvec3&	spos,
 		int					nNodesEdge,
 		int					nRefinements,
@@ -43,5 +41,5 @@ public:
 		direction			rotaxis,
 		glm::dmat3x3*		csys = nullptr);
 
-	static void writeElements(FEAwriter* writer, int nNodesY, int nRefinements, bool closedLoop);
+	static void writeElements(int nNodesY, int nRefinements, bool closedLoop);
 };

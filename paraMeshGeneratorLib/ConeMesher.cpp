@@ -20,10 +20,8 @@
 		   `._        _.'
 			  `-....-'
 
-
 */
 void ConeMesher::writeNodes(
-	FEAwriter*			writer,
 	const glm::dvec3&	centerPos,
 	double				radiusStart,
 	double				radiusEnd,
@@ -46,7 +44,7 @@ void ConeMesher::writeNodes(
 	double		radius = radiusStart;
 
 	for (int i = 0; i < nnodes.y; i++) {
-		ArcMesher::writeNodesCircularQ(writer, coords, radius, startAng, dang, nnodes.x, rotaxis, csys);
+		ArcMesher::writeNodesCircularQ(coords, radius, startAng, dang, nnodes.x, rotaxis, csys);
 		coords[(size_t)rotaxis] += dH;
 		radius += dR;
 	}
@@ -54,20 +52,20 @@ void ConeMesher::writeNodes(
 	nodeID1 = firstNodeID;
 }
 
-void ConeMesher::writeNodesX(FEAwriter*	writer, const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
+void ConeMesher::writeNodesX(const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
 	const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
-	writeNodes(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::x, csys);
+	writeNodes(centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::x, csys);
 }
-void ConeMesher::writeNodesY(FEAwriter*	writer, const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
+void ConeMesher::writeNodesY(const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
 	const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
-	writeNodes(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::y, csys);
+	writeNodes(centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::y, csys);
 }
-void ConeMesher::writeNodesZ(FEAwriter*	writer, const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
+void ConeMesher::writeNodesZ(const glm::dvec3& centerPos, double radiusStart, double radiusEnd, double startAng, double endAng, double height,
 	const glm::ivec2& nnodes, glm::dmat3x3* csys)
 {
-	writeNodes(writer, centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::z, csys);
+	writeNodes(centerPos, radiusStart, radiusEnd, startAng, endAng, height, nnodes, direction::z, csys);
 }
 
 /*
@@ -91,7 +89,6 @@ void ConeMesher::writeNodesZ(FEAwriter*	writer, const glm::dvec3& centerPos, dou
 
 */
 void ConeMesher::writeNodes_nthLine(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::ivec2&	nnodes,
 	double				radiusStart,
@@ -112,7 +109,7 @@ void ConeMesher::writeNodes_nthLine(
 		coordsEnd = coordsOnCircle(currentAng, radiusEnd, rotaxis) + spos;
 
 		if (i % skipNth) {
-			LineMesher::writeNodesLine(writer, coordsStart, coordsEnd, nnodes.y, csys);
+			LineMesher::writeNodesLine(coordsStart, coordsEnd, nnodes.y, csys);
 		}
 		currentAng += dang;
 	}
@@ -139,7 +136,6 @@ void ConeMesher::writeNodes_nthLine(
 
 */
 void ConeMesher::writeNodes_nthArc(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::ivec2&	nnodes,
 	double				radiusStart,
@@ -156,7 +152,7 @@ void ConeMesher::writeNodes_nthArc(
 
 	for (int i = 0; i < nnodes.y; i++) {
 		if (i % skipNth) {
-			ArcMesher::writeNodesCircularQ(writer, spos, currentRadius, startAng, dang, nnodes.x, rotaxis, csys);
+			ArcMesher::writeNodesCircularQ(spos, currentRadius, startAng, dang, nnodes.x, rotaxis, csys);
 		}
 		currentRadius += dr;
 	}
@@ -168,7 +164,6 @@ void ConeMesher::writeNodes_nthArc(
 	Y-dir refers to around the perimeter
 */
 void ConeMesherRef::writeNodes(
-	FEAwriter*			writer,
 	const glm::dvec3&	centerPos,
 	int					nNodesEdge,
 	int					nRefinements,
@@ -206,14 +201,14 @@ void ConeMesherRef::writeNodes(
 		currentRefinement++;
 
 		//row b: x--x--x--x--x--x--x--x--x
-		ArcMesher::writeNodesCircular(writer, coords, currentRadius, startAng, endAng, currentNodesPerArc, rotaxis, csys);
+		ArcMesher::writeNodesCircular(coords, currentRadius, startAng, endAng, currentNodesPerArc, rotaxis, csys);
 		currentConeLength += curElSize.x;
 		currentRadius = radiusStart + dR * (currentConeLength / coneLength);
 		currentDh = (height / coneLength)*curElSize.x;
 		coords[(size_t)rotaxis] += currentDh;
 
 		//row m:  |  x--x--x  |  x--x--x  |
-		ArcMesher::writeNodesCircular_nth(writer, coords, currentRadius, startAng, endAng, currentNodesPerArc, 4, rotaxis, csys);
+		ArcMesher::writeNodesCircular_nth(coords, currentRadius, startAng, endAng, currentNodesPerArc, 4, rotaxis, csys);
 		currentConeLength += curElSize.x;
 		currentRadius = radiusStart + dR * (currentConeLength / coneLength);
 		currentDh = (height / coneLength)*curElSize.x;
@@ -230,7 +225,7 @@ void ConeMesherRef::writeNodes(
 		curElSize.y *= 2.0;
 
 		//row t:
-		ArcMesher::writeNodesCircular(writer, coords, currentRadius, startAng, endAng, currentNodesPerArc, rotaxis, csys);
+		ArcMesher::writeNodesCircular(coords, currentRadius, startAng, endAng, currentNodesPerArc, rotaxis, csys);
 		curElSize.x *= 2.0;
 		currentConeLength += curElSize.x;
 		currentRadius = radiusStart + dR * (currentConeLength / coneLength);
@@ -241,12 +236,12 @@ void ConeMesherRef::writeNodes(
 	Mesher::nodeID1 = firstNodeID;
 }
 
-void ConeMesher::writeElements(FEAwriter* writer, glm::ivec2 nnodes, bool closedLoop)
+void ConeMesher::writeElements(glm::ivec2 nnodes, bool closedLoop)
 {
-	PlaneMesher::writeElementsPlane(writer, nnodes, closedLoop);
+	PlaneMesher::writeElementsPlane(nnodes, closedLoop);
 }
 
-void ConeMesherRef::writeElements(FEAwriter* writer, int nNodesY, int nRefinements, bool closedLoop)
+void ConeMesherRef::writeElements(int nNodesY, int nRefinements, bool closedLoop)
 {
-	PlaneMesherRef::writeElementsPlane_ref(writer, nNodesY, nRefinements, closedLoop);
+	PlaneMesherRef::writeElementsPlane_ref(nNodesY, nRefinements, closedLoop);
 }

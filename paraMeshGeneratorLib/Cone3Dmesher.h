@@ -3,7 +3,7 @@
 #include "FeaWrite.h"
 
 
-
+#ifdef TO_BE_REMOVED_MAYBE
 class MesherInputCone3D : public MesherInput {
 public:
 	MesherInputCone3D(){}
@@ -16,31 +16,33 @@ public:
 	double			height;	
 	direction		axis;
 };
+#endif
+
+
 
 class Cone3Dmesher : private Mesher
 {
 public:
 	static void writeNodes(
-		FEAwriter*			writer,
-		MesherInputCone3D&	meshInp,
+		const glm::dvec3	spos,
+		MeshDensity3D&		meshSize,
+		const Pipe3Dradius&	radius,
+		const ArcAngles&	angle,
+		double				height,
+		direction			axis,
 		glm::dmat3x3*		csys = nullptr);
 
 
 
 	static void writeElements(
-		FEAwriter*	writer,
-		glm::ivec3	nnodes,
-		bool		closedLoop);
-
-
-
+		MeshDensity3D&		meshSize,
+		bool				closedLoop);
 };
 
 class Cone3DmesherRef : private Mesher
 {
 public:
 	static void writeNodes(
-		FEAwriter*			writer,
 		const glm::dvec3&	spos,
 		const glm::ivec2&	nnodes12,
 		int					nRefinements,
@@ -55,14 +57,12 @@ public:
 		glm::dmat3x3*		csys = nullptr);
 
 	static void writeElements(
-		FEAwriter*	writer,
 		glm::ivec2	nnodes12,
 		int			nRefinements,
 		bool		closedLoop);
 
 private:
 	static void writeNodes_refLayerM1(
-		FEAwriter*			writer,
 		const glm::dvec3&	spos,
 		const glm::ivec2&	nnodes12,
 		double				radiusInner,
@@ -74,7 +74,6 @@ private:
 		glm::dmat3x3*		csys = nullptr);
 
 	static void writeNodes_refLayerM2(
-		FEAwriter*			writer,
 		const glm::dvec3&	spos,
 		const glm::ivec2&	nnodes12,
 		double				radiusInner,

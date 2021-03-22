@@ -1,38 +1,37 @@
 #include "LineMesher.h"
 
-void LineMesher::writeNodesLineXq(FEAwriter* writer, const glm::dvec3& spos, double dx, int nnodes, glm::dmat3x3* csys) {
-	writeNodesLineQ(writer, spos, dx, nnodes, direction::x, csys);
+void LineMesher::writeNodesLineXq(const glm::dvec3& spos, double dx, int nnodes, glm::dmat3x3* csys) {
+	writeNodesLineQ(spos, dx, nnodes, direction::x, csys);
 }
-void LineMesher::writeNodesLineYq(FEAwriter* writer, const glm::dvec3& spos, double dy, int nnodes, glm::dmat3x3* csys) {
-	writeNodesLineQ(writer, spos, dy, nnodes, direction::y, csys);
+void LineMesher::writeNodesLineYq(const glm::dvec3& spos, double dy, int nnodes, glm::dmat3x3* csys) {
+	writeNodesLineQ(spos, dy, nnodes, direction::y, csys);
 }
-void LineMesher::writeNodesLineZq(FEAwriter* writer, const glm::dvec3& spos, double dz, int nnodes, glm::dmat3x3* csys) {
-	writeNodesLineQ(writer, spos, dz, nnodes, direction::z, csys);
+void LineMesher::writeNodesLineZq(const glm::dvec3& spos, double dz, int nnodes, glm::dmat3x3* csys) {
+	writeNodesLineQ(spos, dz, nnodes, direction::z, csys);
 }
-void LineMesher::writeNodesLineX(FEAwriter* writer, const glm::dvec3&	spos, double length, int nnodes, glm::dmat3x3* csys) {
-	writeNodesLine(writer, spos, length, nnodes, direction::x, csys);
+void LineMesher::writeNodesLineX(const glm::dvec3&	spos, double length, int nnodes, glm::dmat3x3* csys) {
+	writeNodesLine(spos, length, nnodes, direction::x, csys);
 }
-void LineMesher::writeNodesLineY(FEAwriter* writer, const glm::dvec3&	spos, double length, int nnodes, glm::dmat3x3* csys) {
-	writeNodesLine(writer, spos, length, nnodes, direction::y, csys);
+void LineMesher::writeNodesLineY(const glm::dvec3&	spos, double length, int nnodes, glm::dmat3x3* csys) {
+	writeNodesLine(spos, length, nnodes, direction::y, csys);
 }
-void LineMesher::writeNodesLineZ(FEAwriter* writer, const glm::dvec3&	spos, double length, int nnodes, glm::dmat3x3* csys) {
-	writeNodesLine(writer, spos, length, nnodes, direction::z, csys);
+void LineMesher::writeNodesLineZ(const glm::dvec3&	spos, double length, int nnodes, glm::dmat3x3* csys) {
+	writeNodesLine(spos, length, nnodes, direction::z, csys);
 }
 
-void LineMesher::writeNodesLine(FEAwriter* writer, const glm::dvec3& spos, double length, int nnodes, direction dir, glm::dmat3x3* csys)
+void LineMesher::writeNodesLine(const glm::dvec3& spos, double length, int nnodes, direction dir, glm::dmat3x3* csys)
 {
 	double ds = length / (double)(nnodes - 1);
-	writeNodesLineQ(writer, spos, ds, nnodes, dir, csys);
+	writeNodesLineQ(spos, ds, nnodes, dir, csys);
 }
 
-void LineMesher::writeNodesLine(FEAwriter* writer, const glm::dvec3& spos, const glm::dvec3& sposEnd, int nnodes,	glm::dmat3x3* csys)
+void LineMesher::writeNodesLine(const glm::dvec3& spos, const glm::dvec3& sposEnd, int nnodes,	glm::dmat3x3* csys)
 {
 	glm::dvec3 ds = (sposEnd - spos) / (double)(nnodes - 1);
-	writeNodesLineQ(writer, spos, ds, nnodes, csys);
+	writeNodesLineQ(spos, ds, nnodes, csys);
 }
 
 void LineMesher::writeNodesLineQ(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	double				ds,
 	int					nnodes,
@@ -49,7 +48,6 @@ void LineMesher::writeNodesLineQ(
 }
 
 void LineMesher::writeNodesLineQ(
-	FEAwriter* writer,
 	const glm::dvec3&	spos,
 	const glm::dvec3&	ds,			/*any direction*/
 	int					nnodes,
@@ -65,7 +63,6 @@ void LineMesher::writeNodesLineQ(
 }
 
 void LineMesher::writeNodesLineQ_nth(
-	FEAwriter* writer,
 	const glm::dvec3&	spos,
 	double				ds,
 	int					nnodes,
@@ -85,7 +82,6 @@ void LineMesher::writeNodesLineQ_nth(
 }
 
 void LineMesher::writeNodesLineQ_nth(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::dvec3&	ds,
 	int					nnodes,
@@ -105,7 +101,6 @@ void LineMesher::writeNodesLineQ_nth(
 
 
 void LineMesher::writeElementsLine(
-	FEAwriter*	writer,
 	int			nnodes,
 	bool		closedLoop
 )

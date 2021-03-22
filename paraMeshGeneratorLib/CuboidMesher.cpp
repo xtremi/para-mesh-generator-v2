@@ -3,7 +3,6 @@
 #include "LineMesher.h"
 
 void CuboidMesher::writeNodes(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::dvec3&	size,
 	const glm::ivec3&	nnodes,
@@ -11,11 +10,10 @@ void CuboidMesher::writeNodes(
 	glm::dmat3x3*		csys)
 {
 	glm::dvec3 dpos = size / glm::dvec3((double)nnodes.x, (double)nnodes.y, (double)nnodes.z);
-	writeNodesQ(writer, spos, dpos, nnodes, pln, csys);
+	writeNodesQ(spos, dpos, nnodes, pln, csys);
 }
 
 void CuboidMesher::writeNodesQ(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::dvec3&	dp,
 	const glm::ivec3&	nnodes,
@@ -32,17 +30,17 @@ void CuboidMesher::writeNodesQ(
 
 	for (int i3 = 0; i3 < nnodes.z; i3++)
 	{
-		PlaneMesher::writeNodesPlaneQ(writer, coords, dp12, nnodes12, pln, csys);
+		PlaneMesher::writeNodesPlaneQ(coords, dp12, nnodes12, pln, csys);
 		coords[(size_t)normal] += dp.y;
 	}
 	Mesher::nodeID1 = firstNode;
 }
 
-void CuboidMesher::writeNodesXYZq(FEAwriter* writer, const glm::dvec3& spos, const glm::dvec3& dxyz, const glm::ivec3& nnodes, glm::dmat3x3* csys){
-	writeNodesQ(writer, spos, dxyz, nnodes, plane::xy, csys);
+void CuboidMesher::writeNodesXYZq(const glm::dvec3& spos, const glm::dvec3& dxyz, const glm::ivec3& nnodes, glm::dmat3x3* csys){
+	writeNodesQ(spos, dxyz, nnodes, plane::xy, csys);
 }
-void CuboidMesher::writeNodesXYZ(FEAwriter* writer, const glm::dvec3& spos, const glm::dvec3& size, const glm::ivec3& nnodes, glm::dmat3x3* csys){
-	writeNodes(writer, spos, size, nnodes, plane::xy, csys);
+void CuboidMesher::writeNodesXYZ(const glm::dvec3& spos, const glm::dvec3& size, const glm::ivec3& nnodes, glm::dmat3x3* csys){
+	writeNodes(spos, size, nnodes, plane::xy, csys);
 }
 
 
@@ -59,7 +57,6 @@ void CuboidMesher::writeNodesXYZ(FEAwriter* writer, const glm::dvec3& spos, cons
 */
 
 void CuboidMesher::writeElements(
-	FEAwriter*	writer,
 	glm::ivec3	nnodes,
 	bool		closedLoop)
 {
@@ -127,7 +124,6 @@ void CuboidMesher::writeElements(
 
 */
 void CuboidMesherRef::writeNodes(
-	FEAwriter*			writer,
 	const glm::dvec3&	spos,
 	const glm::dvec3&	size,
 	const glm::ivec2&	nNodesFace,
@@ -155,14 +151,14 @@ void CuboidMesherRef::writeNodes(
 		currentRefinement++;
 
 		//row b: x--x--x--x--x--x--x--x--x
-		PlaneMesher::writeNodesPlaneQ(writer, coords, currentElSize12, currentNodesPerFace, pln, csys);
+		PlaneMesher::writeNodesPlaneQ(coords, currentElSize12, currentNodesPerFace, pln, csys);
 		coords[(size_t)refDirection] += currentElSize3;
 
 		//row m1:  |  x--x--x  |  x--x--x  | //make this a function
 		for (int i = 0; i < currentNodesPerFace.x; i++) {
 			coords[(size_t)dir1] = spos[(size_t)dir1] + (double)i*currentElSize12.x;
 			if (i % 4) {
-				LineMesher::writeNodesLineQ(writer, coords, currentElSize12.y, currentNodesPerFace.y, dir2, csys);
+				LineMesher::writeNodesLineQ(coords, currentElSize12.y, currentNodesPerFace.y, dir2, csys);
 			}
 		}
 		coords[(size_t)refDirection] += currentElSize3;
@@ -174,14 +170,14 @@ void CuboidMesherRef::writeNodes(
 		currentElSize12.x *= 2.0;
 
 		//row m2:  x-----x-----x-----x-----x
-		PlaneMesher::writeNodesPlaneQ(writer, coords, currentElSize12, currentNodesPerFace, pln, csys);
+		PlaneMesher::writeNodesPlaneQ(coords, currentElSize12, currentNodesPerFace, pln, csys);
 		coords[(size_t)refDirection] += currentElSize3;
 
 		//row m3:  |  x--x--x  |  x--x--x  | //make this a function
 		for (int i = 0; i < currentNodesPerFace.y; i++) {
 			coords[(size_t)dir2] = (double)i*currentElSize12.y;
 			if (i % 4){
-				LineMesher::writeNodesLineQ(writer, coords, currentElSize12.x, currentNodesPerFace.x, dir1, csys);
+				LineMesher::writeNodesLineQ(coords, currentElSize12.x, currentNodesPerFace.x, dir1, csys);
 			}
 		}
 		coords[(size_t)refDirection] += currentElSize3;
@@ -193,7 +189,7 @@ void CuboidMesherRef::writeNodes(
 		currentElSize12.y *= 2.0;
 
 		//row t:  x-----x-----x-----x-----x 
-		PlaneMesher::writeNodesPlaneQ(writer, coords, currentElSize12, currentNodesPerFace, pln, csys);
+		PlaneMesher::writeNodesPlaneQ(coords, currentElSize12, currentNodesPerFace, pln, csys);
 		currentElSize3 *= 2.0;
 		coords[(size_t)refDirection] += currentElSize3;
 	}
@@ -202,7 +198,6 @@ void CuboidMesherRef::writeNodes(
 }
 
 void CuboidMesherRef::writeElements(
-	FEAwriter*	writer,
 	glm::ivec2	nNodesFace,
 	int			nRefinements,
 	bool		closedLoop)
@@ -255,11 +250,11 @@ void CuboidMesherRef::writeElements(
 		//elPlane B:
 		if(r != 0){
 			Mesher::nodeID1 = firstNodeB - nnodesPlaneB;
-			CuboidMesher::writeElements(writer, glm::ivec3(currentNodes12.x, currentNodes12.y, 2), closedLoop);
+			CuboidMesher::writeElements(glm::ivec3(currentNodes12.x, currentNodes12.y, 2), closedLoop);
 		}
 
-		writeElements_rows_bm1m2(writer, currentNodes12, nextNodes12, firstNodeB, firstNodeM1, firstNodeM2, closedLoop);
-		writeElements_rows_m2m3t(writer, currentNodes12, nextNodes12, firstNodeM2b, firstNodeM3, firstNodeT, closedLoop);
+		writeElements_rows_bm1m2(currentNodes12, nextNodes12, firstNodeB, firstNodeM1, firstNodeM2, closedLoop);
+		writeElements_rows_m2m3t(currentNodes12, nextNodes12, firstNodeM2b, firstNodeM3, firstNodeT, closedLoop);
 
 		currentNodes12 = nextNodes12;
 		c += nnodesTotal;
@@ -267,7 +262,6 @@ void CuboidMesherRef::writeElements(
 }
 
 	void CuboidMesherRef::writeElements_rows_bm1m2(
-		FEAwriter*			writer,
 		const glm::ivec2&	currentNodes12,
 		glm::ivec2&			nextNodes12,
 		int&				firstNodeBrow,
@@ -339,7 +333,6 @@ void CuboidMesherRef::writeElements(
 	}
 
 	void CuboidMesherRef::writeElements_rows_m2m3t(
-		FEAwriter*			writer,
 		const glm::ivec2&	currentNodes12,
 		glm::ivec2&			nextNodes12,
 		int&				firstNodeM2row,

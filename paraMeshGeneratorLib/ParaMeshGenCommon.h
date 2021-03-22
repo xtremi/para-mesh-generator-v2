@@ -1,4 +1,5 @@
 #pragma once
+#include "glm/vec3.hpp"
 enum class Dim { DIM1D, DIM2D, DIM3D };
 
 enum class direction{x,y,z};
@@ -73,10 +74,10 @@ struct NodeVec3D : public NodeVec2D {
 	int refDir() { return dir3; }
 };
 
-struct MeshSize2D {
-	MeshSize2D() {}
-	MeshSize2D(int _dir1, int _dir2) : nodes{ NodeVec2D(_dir1, _dir2) } {}
-	MeshSize2D(const NodeVec2D& _nodes) : nodes{ _nodes } {}
+struct MeshDensity2D {
+	MeshDensity2D() {}
+	MeshDensity2D(int _dir1, int _dir2) : nodes{ NodeVec2D(_dir1, _dir2) } {}
+	MeshDensity2D(const NodeVec2D& _nodes) : nodes{ _nodes } {}
 
 	NodeVec2D nodes;
 	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
@@ -85,10 +86,10 @@ struct MeshSize2D {
 	int nElNorm(bool closedLoop = false) { return nElDir2(closedLoop); }
 };
 
-struct MeshSize3D {
-	MeshSize3D() {}
-	MeshSize3D(int _dir1, int _dir2, int _dir3) : nodes{ NodeVec3D(_dir1, _dir2, _dir3) } {}
-	MeshSize3D(const NodeVec3D& _nodes) : nodes{ _nodes } {}
+struct MeshDensity3D {
+	MeshDensity3D() {}
+	MeshDensity3D(int _dir1, int _dir2, int _dir3) : nodes{ NodeVec3D(_dir1, _dir2, _dir3) } {}
+	MeshDensity3D(const NodeVec3D& _nodes) : nodes{ _nodes } {}
 
 	NodeVec3D nodes;
 	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
@@ -105,7 +106,7 @@ struct Pipe2Dradius {
 	Pipe2Dradius(double _inner, double _outer) : inner{ _inner }, outer{ _outer }{}
 
 	double inner, outer;
-	double dR() { return outer - inner; }
+	double dR() const { return outer - inner; }
 };
 struct Pipe3Dradius {
 	Pipe3Dradius() {}
@@ -113,8 +114,8 @@ struct Pipe3Dradius {
 		: start{ Pipe2Dradius(startInner, startOuter) }, end{ Pipe2Dradius(endInner, endOuter) } {}
 
 	Pipe2Dradius start, end;
-	double dRi() { return end.inner - start.inner; }
-	double dRo() { return end.outer - start.outer; }
+	double dRi() const { return end.inner - start.inner; }
+	double dRo() const { return end.outer - start.outer; }
 };
 struct ArcAngles {
 	ArcAngles() {}
