@@ -91,6 +91,10 @@ double calcArcIncrement(double startAng, double endAng, int nnodes) {
 	return dang;
 }
 
+bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes) {
+	return limitArcAngles(arcAngles.start, arcAngles.end, dang, nnodes);
+}
+
 bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes) {
 	bool fullCircle = false;
 	if (endAng < 0.0 && startAng < 0.0)

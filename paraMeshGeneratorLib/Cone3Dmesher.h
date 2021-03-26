@@ -8,9 +8,9 @@ class MesherInputCone3D : public MesherInput {
 public:
 	MesherInputCone3D(){}
 	MesherInputCone3D(const glm::dvec3& pos, const NodeVec3D& _nodes, const Pipe3Dradius& _radius, const ArcAngles& _angle, double _height, direction _axis)
-		: MesherInput(pos), meshSize{ MeshSize3D(_nodes) }, radius{_radius}, angle{_angle}, height{_height}, axis{_axis}{}
+		: MesherInput(pos), meshDens{ meshDens3D(_nodes) }, radius{_radius}, angle{_angle}, height{_height}, axis{_axis}{}
 
-	MeshSize3D		meshSize;
+	meshDens3D		meshDens;
 	Pipe3Dradius	radius;
 	ArcAngles		angle;
 	double			height;	
@@ -25,7 +25,7 @@ class Cone3Dmesher : private Mesher
 public:
 	static void writeNodes(
 		const glm::dvec3	spos,
-		MeshDensity3D&		meshSize,
+		MeshDensity3D&		meshDens,
 		const Pipe3Dradius&	radius,
 		const ArcAngles&	angle,
 		double				height,
@@ -35,7 +35,7 @@ public:
 
 
 	static void writeElements(
-		MeshDensity3D&		meshSize,
+		MeshDensity3D&		meshDens,
 		bool				closedLoop);
 };
 

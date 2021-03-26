@@ -1,5 +1,6 @@
 #pragma once
-#include "glm/vec3.hpp"
+#include <glm/glm.hpp>
+
 enum class Dim { DIM1D, DIM2D, DIM3D };
 
 enum class direction{x,y,z};
@@ -50,55 +51,137 @@ private:
 	int currentIterIndex;
 
 };
-
+#ifdef TO_BE_REMOVED_MAYBE
 class MesherInput {
 public:
 	MesherInput() {}
 	MesherInput(const glm::dvec3& _pos) : pos{ _pos } {}
 	glm::dvec3 pos;
 };
+#endif
 
+/*
+	Wrapper for glm::ivec2 representing number of nodes for a "2D structured mesh"	
+*/
 struct NodeVec2D {
 	NodeVec2D() {}
-	NodeVec2D(int _dir1, int _dir2) : dir1{ _dir1 }, dir2{ _dir2 } {}
-	int dir1, dir2;
-	int circ() { return dir1; }
-	int norm() { return dir2; }
+	NodeVec2D(int _dir1, int _dir2) : nnodes{ glm::ivec2(_dir1, _dir2) }{}
+	
+	glm::ivec2& nodes() { return nnodes; }
+	int dir1() const { return nnodes.x; }
+	int dir2() const { return nnodes.y; }
+	/*
+		Circular direction, around cicumference
+	*/
+	int circ() const { return dir1(); }		
+	/*
+		Radial/normal direction, out of circle
+	*/
+	int norm() const { return dir2(); }
+
+private:
+	glm::ivec2 nnodes;
 };
-struct NodeVec3D : public NodeVec2D {
+
+/*
+	Wrapper for glm::ivec3 representing number of nodes for a "3D structured mesh"
+*/
+struct NodeVec3D {
 	NodeVec3D() {}
-	NodeVec3D(int _dir1, int _dir2, int _dir3) : NodeVec2D(_dir1, _dir2), dir3{ _dir3 } {}
+	NodeVec3D(int _dir1, int _dir2, int _dir3) : nnodes{ glm::ivec3(_dir1, _dir2, _dir3) } {}
 
-	int dir3;
-	int axis() { return dir3; }
-	int refDir() { return dir3; }
+	glm::ivec3& nodes() { return nnodes; }
+	int dir1() const { return nnodes.x; }
+	int dir2() const { return nnodes.y; }
+	int dir3() const { return nnodes.z; }
+	/*
+		Circular direction, around cicumference (for cone/cylinder)
+	*/
+	int circ() const { return dir1(); }
+	/*
+		Radial/normal direction, out of circle (for cone/cylinder)
+	*/
+	int norm() const { return dir2(); }
+	/*
+		Along axis/height of a cone/cylinder
+	*/
+	int axis()   const { return dir3(); }
+
+protected:
+	glm::ivec3 nnodes;
 };
 
-struct MeshDensity2D {
+/*
+	Mesh density for 1D structured mesh with element number function and closed loop definition
+*/
+struct MeshDensity1D {
+	MeshDensity1D(int _nnodes, bool _closedLoop = false) : nnodes{ _nnodes }, closedLoop{ _closedLoop }{}
+	int nEl() const { return closedLoop ? nnodes : nnodes - 1; }	
+	bool closedLoop;
+	int nnodes;
+};
+
+/*
+	Extends NodeVec2D with element number functions and closed loop definition
+*/
+struct MeshDensity2D : public NodeVec2D {
 	MeshDensity2D() {}
-	MeshDensity2D(int _dir1, int _dir2) : nodes{ NodeVec2D(_dir1, _dir2) } {}
-	MeshDensity2D(const NodeVec2D& _nodes) : nodes{ _nodes } {}
-
-	NodeVec2D nodes;
-	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
-	int nElDir2(bool closedLoop = false) { return closedLoop ? nodes.dir2 - 1 : nodes.dir2; }
-	int nElCirc(bool closedLoop = false) { return nElDir1(closedLoop); }
-	int nElNorm(bool closedLoop = false) { return nElDir2(closedLoop); }
+	MeshDensity2D(int _dir1, int _dir2, bool closedLoopDir1) : NodeVec2D(_dir1, _dir2), closedLoop{ closedLoop } {}
+	
+	bool closedLoop;
+	int nElDir1() const { return closedLoop ? dir1() : dir1() - 1; }
+	int nElDir2() const { return dir2() - 1; }
+	int nElCirc() const { return nElDir1(); }
+	int nElNorm() const { return nElDir2(); }
 };
 
-struct MeshDensity3D {
+/*
+	Extends NodeVec3D with element number functions and closed loop definition
+*/
+struct MeshDensity3D : public NodeVec3D {
 	MeshDensity3D() {}
-	MeshDensity3D(int _dir1, int _dir2, int _dir3) : nodes{ NodeVec3D(_dir1, _dir2, _dir3) } {}
-	MeshDensity3D(const NodeVec3D& _nodes) : nodes{ _nodes } {}
+	MeshDensity3D(int _dir1, int _dir2, int _dir3, bool closedLoopDir1) : NodeVec3D(_dir1, _dir2, _dir3), closedLoop{ closedLoop } {}
 
-	NodeVec3D nodes;
-	int nElDir1(bool closedLoop = false) { return closedLoop ? nodes.dir1 - 1 : nodes.dir1; }
-	int nElDir2(bool closedLoop = false) { return closedLoop ? nodes.dir2 - 1 : nodes.dir2; }
-	int nElDir3(bool closedLoop = false) { return closedLoop ? nodes.dir3 - 1 : nodes.dir3; }
-	int nElCirc(bool closedLoop = false) { return nElDir1(closedLoop); }
-	int nElNorm(bool closedLoop = false) { return nElDir2(closedLoop); }
-	int nElAxis(bool closedLoop = false) { return nElDir3(closedLoop); }
-	int nElRefDir(bool closedLoop = false) { return nElDir3(closedLoop); }
+	bool closedLoop;
+	int nElDir1() const { return closedLoop ? dir1() : dir1() - 1; }
+	int nElDir2() const { return dir2() - 1; }
+	int nElDir3() const { return dir3() - 1; }
+	int nElCirc() const { return nElDir1(); }
+	int nElNorm() const { return nElDir2(); }
+	int nElAxis() const { return nElDir3(); }
+};
+
+/*
+	Extends NodeVec2D with element number functions and closed loop definition,
+	for a 2D structured mesh with refinement in direction 1.
+*/
+struct MeshDensity2Dref : public NodeVec2D {
+	MeshDensity2Dref() {}
+	MeshDensity2Dref(int _nRefDir1, int _nNodesDir2, bool closedLoopDir2) : NodeVec2D(_nRefDir1, _nNodesDir2), closedLoop{ closedLoop } {}
+
+	bool closedLoop;
+	//int nElDir1() const { return dir1(); }		//depends on refinement 
+	int nRefs() const { return dir1(); }
+	int nElDir2() const { return closedLoop ? dir2() : dir2() - 1; }
+	int nElCirc() const { return nElDir2(); }
+
+	int nNodesDir2(int curRef) const { return 0; }
+	int nElDir2(int curRef) const { return 0; }
+
+	//int nElNorm() const { return nElDir1(); }		//depends on refinement 
+};
+
+/*
+	Defines a mesh position and orientation:
+	- pos : position of mesh
+	- csys: 3x3 rotation matrix (if null, not used)
+*/
+struct MeshCsys {
+	MeshCsys(){}
+	MeshCsys(const glm::dvec3& _pos, glm::dmat3x3* _csys = nullptr) : pos{ _pos }, csys{ _csys } {}
+
+	glm::dvec3		pos;
+	glm::dmat3x3*	csys = nullptr;
 };
 
 struct Pipe2Dradius {
@@ -117,11 +200,21 @@ struct Pipe3Dradius {
 	double dRi() const { return end.inner - start.inner; }
 	double dRo() const { return end.outer - start.outer; }
 };
-struct ArcAngles {
-	ArcAngles() {}
-	ArcAngles(double _start, double _end) : start{ _start }, end{ _end }{}
-	double start, end;
-	void setFullCircle() {
-		start = -1.0; end = -1.0;
+
+
+struct ArcAngles {	
+	ArcAngles(double _start, double _end) : start{ _start }, end{ _end }{
+		m_fullCircle = false;
 	}
+	ArcAngles() {
+		setFullCircle();
+	}
+	
+	double start, end;	
+	bool fullCircle() { return m_fullCircle; }
+	
+	void setFullCircle();
+	double angStep(int nnodes);
+private:
+	bool m_fullCircle;
 };

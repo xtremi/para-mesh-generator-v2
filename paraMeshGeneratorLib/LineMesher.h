@@ -5,41 +5,37 @@
 class LineMesher : private Mesher {
 public:
 	static void writeNodesLineQ(
-		const glm::dvec3&	spos,
-		double				dx,
-		int					nnodes,
-		direction			dir,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		int						nnodes,
+		double					ds,		
+		direction				dir);
 
 	static void writeNodesLineQ(
-		const glm::dvec3&	spos,
-		const glm::dvec3&	ds,
-		int					nnodes,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		int						nnodes,
+		const glm::dvec3&		ds);
 
 	static void writeNodesLineQ_nth(
-		const glm::dvec3&	spos,
-		double				dx,
-		int					nnodes,
-		int					skipNth,
-		direction			dir,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		int						nnodes,
+		double					ds,		
+		int						skipNth,
+		direction				dir);
 
 	static void writeNodesLineQ_nth(
-		const glm::dvec3&	spos,
-		const glm::dvec3&	ds,
-		int					nnodes,
-		int					skipNth,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		int						nnodes,
+		const glm::dvec3&		ds,
+		int						skipNth);
 
-	static void writeNodesLine(const glm::dvec3& spos, double length, int nnodes, direction dir, glm::dmat3x3* csys = nullptr);
-	static void writeNodesLine(const glm::dvec3& spos, const glm::dvec3& sposEnd, int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesLineXq(const glm::dvec3& spos, double dx, int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesLineYq(const glm::dvec3& spos, double dx, int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesLineZq(const glm::dvec3& spos, double dx, int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesLineX(const glm::dvec3& spos, double length, int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesLineY(const glm::dvec3& spos, double length, int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesLineZ(const glm::dvec3& spos, double length, int nnodes, glm::dmat3x3* csys = nullptr);
+	static void writeNodesLine(const MeshCsys& spos, int nnodes, double length,  direction dir);
+	static void writeNodesLine(const MeshCsys& spos, int nnodes, const glm::dvec3& sposEnd);
+	static void writeNodesLineXq(const MeshCsys& spos, int nnodes, double dx);
+	static void writeNodesLineYq(const MeshCsys& spos, int nnodes, double dy);
+	static void writeNodesLineZq(const MeshCsys& spos, int nnodes, double dz);
+	static void writeNodesLineX(const MeshCsys& spos,  int nnodes, double length);
+	static void writeNodesLineY(const MeshCsys& spos, int nnodes, double length);
+	static void writeNodesLineZ(const MeshCsys& spos, int nnodes, double length);
 
 	static void writeElementsLine(
 		int			nnodes,

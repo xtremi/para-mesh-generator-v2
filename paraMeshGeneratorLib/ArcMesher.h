@@ -6,49 +6,43 @@
 class ArcMesher : private Mesher {
 public:
 	static void writeNodesCircular(
-		const glm::dvec3&	centerPos,
-		double				radius,
-		double				startAng,
-		double				endAng,
+		const MeshCsys&		spos,
 		int					nnodes,
-		direction			rotAxis,
-		glm::dmat3x3*		csys = nullptr);
+		double				radius,
+		ArcAngles			arcAngles,		
+		direction			rotAxis);
 
 	static void writeNodesCircularQ(
-		const glm::dvec3&	centerPos,
+		const MeshCsys&		spos,
+		int					nnodes,
 		double				radius,
 		double				startAng,
-		double				dAng,
-		int					nnodes,
-		direction			rotAxis,
-		glm::dmat3x3*		csys = nullptr);
+		double				dAng,		
+		direction			rotAxis);
 
-	static void writeNodesCircularX(const glm::dvec3& centerPos, double radius, double startAng, double endAng, int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesCircularY(const glm::dvec3& centerPos, double radius, double startAng, double endAng, int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesCircularZ(const glm::dvec3& centerPos, double radius, double startAng, double endAng, int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesCircularXq(const glm::dvec3& centerPos, double radius, double startAng, double dAng,  int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesCircularYq(const glm::dvec3& centerPos, double radius, double startAng, double dAng,  int nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesCircularZq(const glm::dvec3& centerPos, double radius, double startAng, double dAng,  int nnodes, glm::dmat3x3* csys = nullptr);
+	static void writeNodesCircularX(const MeshCsys& spos, int nnodes, double radius, ArcAngles arcAngles);
+	static void writeNodesCircularY(const MeshCsys& spos, int nnodes, double radius, ArcAngles arcAngles);
+	static void writeNodesCircularZ(const MeshCsys& spos, int nnodes, double radius, ArcAngles arcAngles);
+	static void writeNodesCircularXq(const MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
+	static void writeNodesCircularYq(const MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
+	static void writeNodesCircularZq(const MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
 
 	static void writeNodesCircular_nth(
-		const glm::dvec3&	centerPos,
-		double				radius,
-		double				startAng,
-		double				endAng,
+		const MeshCsys&		spos,
 		int					nnodes,
+		double				radius,
+		ArcAngles			arcAngles,		
 		int					skipNth,
-		direction			rotAxis,
-		glm::dmat3x3*		csys = nullptr);
+		direction			rotAxis);
 
 	static void writeNodesCircularQ_nth(
-		const glm::dvec3&	centerPos,
+		const MeshCsys&		spos,
+		int					nnodes,
 		double				radius,
 		double				startAng,
 		double				dAng,
-		int					nnodes,
 		int					skipNth,
-		direction			rotAxis,
-		glm::dmat3x3*		csys = nullptr);
+		direction			rotAxis);
 
 	static void writeElementsLine(int nnodes, bool closedLoop = false);
 

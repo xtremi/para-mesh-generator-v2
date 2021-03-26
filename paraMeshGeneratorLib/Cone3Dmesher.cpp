@@ -9,7 +9,7 @@
 
 void Cone3Dmesher::writeNodes(
 	const glm::dvec3	spos,
-	MeshDensity3D&		meshSize,
+	MeshDensity3D&		meshDens,
 	const Pipe3Dradius&	radius,
 	const ArcAngles&	angle,
 	double				height,
@@ -19,15 +19,15 @@ void Cone3Dmesher::writeNodes(
 	int firstNodeID = writer->getNextNodeID();
 	glm::dvec3  coords(spos);
 
-	double dH  = height       / (double)meshSize.nElAxis();
-	double dRi = radius.dRi() / (double)meshSize.nElAxis();
-	double dRo = radius.dRo() / (double)meshSize.nElAxis();
+	double dH  = height       / (double)meshDens.nElAxis();
+	double dRi = radius.dRi() / (double)meshDens.nElAxis();
+	double dRo = radius.dRo() / (double)meshDens.nElAxis();
 
 	Pipe2Dradius currentRadius(radius.start.inner, radius.start.outer);
 
-	for (int i = 0; i < meshSize.nodes.axis(); i++) {
+	for (int i = 0; i < meshDens.nodes.axis(); i++) {
 	  DiskMesher::writeNodes(coords, currentRadius.inner, currentRadius.outer, angle.start, angle.end,
-		  glm::ivec2(meshSize.nodes.dir1, meshSize.nodes.dir2), axis, csys);
+		  glm::ivec2(meshDens.nodes.dir1, meshDens.nodes.dir2), axis, csys);
 		
 		coords[(size_t)axis] += dH;
 		currentRadius.inner += dRi;
@@ -40,10 +40,10 @@ void Cone3Dmesher::writeNodes(
 }
 
 void Cone3Dmesher::writeElements(
-	MeshDensity3D&  meshSize,
+	MeshDensity3D&  meshDens,
 	bool			closedLoop)
 {
-	CuboidMesher::writeElements(glm::ivec3(meshSize.nodes.dir1, meshSize.nodes.dir2, meshSize.nodes.dir3), closedLoop);
+	CuboidMesher::writeElements(glm::ivec3(meshDens.nodes.dir1, meshDens.nodes.dir2, meshDens.nodes.dir3), closedLoop);
 }
 
 /*

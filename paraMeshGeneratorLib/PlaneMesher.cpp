@@ -2,54 +2,51 @@
 #include "LineMesher.h"
 
 void PlaneMesher::writeNodesPlaneQ(
-	const glm::dvec3&	spos,
-	const glm::dvec2&	dp,
-	const glm::ivec2&	nnodes,
-	plane				pln,
-	glm::dmat3x3*		csys)
+	const MeshCsys&			spos,
+	const MeshDensity2D&	meshDens,
+	const glm::dvec2&		dsize,
+	plane					pln)
 {
-	glm::dvec3 coords = spos;
+	MeshCsys curPos(spos);	
 	int firstNode = writer->getNextNodeID();
 
 	direction dir1, dir2;
 	getPlaneDirections(pln, dir1, dir2);
 
-	for (int i2 = 0; i2 < nnodes.y; i2++)
-	{
-		LineMesher::writeNodesLineQ(coords, dp.x, nnodes.x, dir1, csys);
-		coords[(size_t)dir2] += dp.y;
+	for (int i2 = 0; i2 < meshDens.dir2(); i2++){
+		LineMesher::writeNodesLineQ(curPos, meshDens.dir1(), dsize.x, dir1);
+		curPos.pos[(size_t)dir2] += dsize.y;
 	}
 	nodeID1 = firstNode;
 }
 
 void PlaneMesher::writeNodesPlane(
-	const glm::dvec3&	spos,
-	const glm::dvec2&	size,
-	const glm::ivec2&	nnodes,
-	plane				pln,
-	glm::dmat3x3*		csys)
+	const MeshCsys&		 spos,
+	const MeshDensity2D& meshDens,
+	const glm::dvec2&	 size,
+	plane				 pln)
 {
-	glm::dvec2 dsize = glm::dvec2(size.x / (double)(nnodes.x - 1), size.y / (double)(nnodes.y - 1));
-	PlaneMesher::writeNodesPlaneQ(spos, dsize, nnodes, pln, csys);
+	glm::dvec2 dsize = glm::dvec2(size.x / (double)meshDens.nElDir1(), size.y / (double)meshDens.nElDir2());
+	PlaneMesher::writeNodesPlaneQ(spos, meshDens, dsize,  pln);
 }
 
-void PlaneMesher::writeNodesPlaneXZq(const glm::dvec3& spos, const glm::dvec2& dxz, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlaneQ(spos, dxz, nnodes, plane::xz, csys);
+void PlaneMesher::writeNodesPlaneXZq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxz) {
+	writeNodesPlaneQ(spos, meshDens, dxz, plane::xz);
 }
-void PlaneMesher::writeNodesPlaneXYq(const glm::dvec3& spos, const glm::dvec2& dxy, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlaneQ(spos, dxy, nnodes, plane::xy, csys);
+void PlaneMesher::writeNodesPlaneXYq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxy) {
+	writeNodesPlaneQ(spos, meshDens, dxy, plane::xy);
 }
-void PlaneMesher::writeNodesPlaneYZq(const glm::dvec3& spos, const glm::dvec2& dyz, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlaneQ(spos, dyz, nnodes, plane::yz, csys);
+void PlaneMesher::writeNodesPlaneYZq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dyz) {
+	writeNodesPlaneQ(spos, meshDens, dyz, plane::yz);
 }
-void PlaneMesher::writeNodesPlaneXZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlane(spos, size, nnodes, plane::xz, csys);
+void PlaneMesher::writeNodesPlaneXZ(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+	writeNodesPlane(spos, meshDens, size, plane::xz);
 }
-void PlaneMesher::writeNodesPlaneXY(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlane(spos, size, nnodes, plane::xy, csys);
+void PlaneMesher::writeNodesPlaneXY(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+	writeNodesPlane(spos, meshDens, size, plane::xy);
 }
-void PlaneMesher::writeNodesPlaneYZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, glm::dmat3x3* csys) {
-	writeNodesPlane(spos, size, nnodes, plane::yz, csys);
+void PlaneMesher::writeNodesPlaneYZ(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+	writeNodesPlane(spos, meshDens, size, plane::yz);
 }
 
 
@@ -81,31 +78,26 @@ void PlaneMesher::writeNodesPlaneYZ(const glm::dvec3& spos, const glm::dvec2& si
    |   |   |   |
   5x_10x_15x___x
 */
-void PlaneMesher::writeElementsPlane(
-	glm::ivec2	nnodes,
-	bool		closedLoop)
+void PlaneMesher::writeElementsPlane(const MeshDensity2D& meshDens)
 {
 	int n[4];
 	int c = nodeID1;
 
-	int nEly = nnodes.y - 1;
-	int nElx = closedLoop ? nnodes.x : nnodes.x - 1;
-
-	for (int iy = 0; iy < nEly; iy++) {
-		for (int ix = 0; ix < nElx; ix++) {
+	for (int iy = 0; iy < meshDens.nElDir2(); iy++) {
+		for (int ix = 0; ix < meshDens.nElDir1(); ix++) {
 			n[0] = c++;
 			n[1] = n[0] + 1;
-			n[2] = n[1] + nnodes.x;
+			n[2] = n[1] + meshDens.dir1();
 			n[3] = n[2] - 1;
 
-			if (closedLoop && ix == (nElx - 1)) {
-				n[1] -= nnodes.x;
-				n[2] -= nnodes.x;
+			if (meshDens.closedLoop && ix == (meshDens.nElDir1() - 1)) {
+				n[1] -= meshDens.dir1();
+				n[2] -= meshDens.dir1();
 			}
 
 			writer->write4nodedShell(n);
 		}
-		if (!closedLoop) c++;
+		if (!meshDens.closedLoop) c++;
 	}
 }
 
@@ -173,70 +165,65 @@ b0   x___x___x___x___x___x___x___x___x  row b (bot)	   -		|		  |
 
 */
 void PlaneMesherRef::writeNodesPlane_ref(
-	const glm::dvec3&	spos,
-	const glm::dvec2&	size,
-	int					nNodesEdge,
-	int					nRefinements,
-	bool				startWithOffset,
-	plane				pln,
-	glm::dmat3x3*		csys)
+	const MeshCsys&			spos,
+	const MeshDensity2Dref& meshDens,
+	const glm::dvec2&		size,
+	bool					startWithOffset,
+	plane					pln)
 {
 	int firstNode = writer->getNextNodeID();
-	glm::dvec3 coords(spos);
+	MeshCsys curPos(spos);
 
-	int		currentNodesPerRow = nNodesEdge;
+	int		currentNodesPerRow = meshDens.dir2();
 	int		currentRefFactor = 1;
 	int		currentRefinement = 0;
 
-	double elSizeX = initialRefinementElementSize(size.x, nRefinements, startWithOffset);
+	double elSizeX = initialRefinementElementSize(size.x, meshDens.nRefs(), startWithOffset);
 
-	glm::dvec2 curElSize(elSizeX, size.y / (double)(currentNodesPerRow - 1)); //start with square elements (??)
+	glm::dvec2 curElSize(elSizeX, size.y / (double)(currentNodesPerRow - 1)); //start with square elements (??)(??)
 
 	direction edgeDirection, refinementDirection;
 	getPlaneDirections(pln, refinementDirection, edgeDirection);
 
 	if (startWithOffset) {
-		coords[(size_t)refinementDirection] += curElSize.x;
+		curPos.pos[(size_t)refinementDirection] += curElSize.x;
 	}
 
-	while (currentRefinement < nRefinements) {
+	while (currentRefinement < meshDens.nRefs()) {
 		currentRefinement++;
 
 		//row b: x--x--x--x--x--x--x--x--x
-		LineMesher::writeNodesLineQ(coords, curElSize.y, currentNodesPerRow, edgeDirection);
-		coords[(size_t)refinementDirection] += curElSize.x;
+		LineMesher::writeNodesLineQ(curPos, currentNodesPerRow, curElSize.y, edgeDirection);
+		curPos.pos[(size_t)refinementDirection] += curElSize.x;
 
 		//row m:  |  x--x--x  |  x--x--x  |
-		LineMesher::writeNodesLineQ_nth(coords, curElSize.y, currentNodesPerRow, 4, edgeDirection, csys);
-		coords[(size_t)refinementDirection] += curElSize.x;
+		LineMesher::writeNodesLineQ_nth(curPos, currentNodesPerRow, curElSize.y,  4, edgeDirection);
+		curPos.pos[(size_t)refinementDirection] += curElSize.x;
 		
 		//Refine
 		// [9 nodes / 8 elements] -> [5 nodes / 4 elements] -> [3 nodes / 2 elements]
 		currentRefFactor *= 2;
-		currentNodesPerRow = (nNodesEdge - 1) / currentRefFactor + 1;
+		currentNodesPerRow = meshDens.nElDir2() / currentRefFactor + 1;
 		curElSize.y *= 2.0;
 
 		//row t: x----x----x----x----x
-		LineMesher::writeNodesLineQ(coords, curElSize.y, currentNodesPerRow, edgeDirection, csys);
+		LineMesher::writeNodesLineQ(curPos, currentNodesPerRow, curElSize.y, edgeDirection);
 		curElSize.x *= 2.0;
-		coords[(size_t)refinementDirection] += curElSize.x;
+		curPos.pos[(size_t)refinementDirection] += curElSize.x;
 	}
 
 	nodeID1 = firstNode;
 }
 
 
-void PlaneMesherRef::writeNodesPlaneXY_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRef,	bool startWithOffset, glm::dmat3x3* csys)
-{
-	return writeNodesPlane_ref(spos, size, nNodesEdge, nRef, startWithOffset, plane::xy, csys);
+void PlaneMesherRef::writeNodesPlaneXY_ref(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
+	return writeNodesPlane_ref(spos, meshDens, size, startWithOffset, plane::xy);
 }
-void PlaneMesherRef::writeNodesPlaneXZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRef,	bool startWithOffset, glm::dmat3x3* csys)
-{
-	return writeNodesPlane_ref(spos, size, nNodesEdge, nRef, startWithOffset, plane::xz, csys);
+void PlaneMesherRef::writeNodesPlaneXZ_ref(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
+	return writeNodesPlane_ref(spos, meshDens, size, startWithOffset, plane::xz);
 }
-void PlaneMesherRef::writeNodesPlaneYZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRef,	bool startWithOffset, glm::dmat3x3* csys)
-{
-	return writeNodesPlane_ref(spos, size, nNodesEdge, nRef, startWithOffset, plane::yz, csys);
+void PlaneMesherRef::writeNodesPlaneYZ_ref(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
+	return writeNodesPlane_ref(spos, meshDens, size, startWithOffset, plane::yz);
 }
 
 
@@ -263,19 +250,16 @@ t0   x_______x_______x_______x_______x             	   -
 b0   x___x___x___x___x___x___x___x___x  	           -
 										elRow b		   |  1elL
 */
-void PlaneMesherRef::writeElementsPlane_ref(
-	int			nNodesY,
-	int			nRefinements,
-	bool		closedLoop)
+void PlaneMesherRef::writeElementsPlane_ref(const MeshDensity2Dref& meshDens)
 {
-	int currentRefFactor = 1;
-	int	currentNodesPerRow = nNodesY;
-	int currentElementPerRow = closedLoop ? nNodesY : nNodesY - 1;
+	int currentRefFactor		= 1;
+	int	currentNodesPerRow		= meshDens.dir2();
+	int currentElementPerRow	= meshDens.nElDir2();
 
 	int c = nodeID1;
 	int n[4];
 
-	for (int r = 0; r < nRefinements; r++) {
+	for (int r = 0; r < meshDens.nRefs(); r++) {
 
 
 		if (r != 0) {
@@ -286,25 +270,21 @@ void PlaneMesherRef::writeElementsPlane_ref(
 				n[2] = n[1] + currentNodesPerRow;			//   |      |
 				n[3] = n[2] - 1;							//  0x------x1
 
-				if (closedLoop && i == (currentElementPerRow - 1)) {
+				if (meshDens.closedLoop && i == (currentElementPerRow - 1)) {
 					n[1] -= currentNodesPerRow;
 					n[2] -= currentNodesPerRow;
 				}
 				writer->write4nodedShell(n);
 			}
-			if (!closedLoop) c++;
+			if (!meshDens.closedLoop) c++;
 		}
 
 
 		//elRow m + t 
 		int nnodesRowM = 3 * currentElementPerRow / 4;
 		currentRefFactor *= 2;
-		int nnodesRowT;
-
-		if (!closedLoop)
-			nnodesRowT = (nNodesY - 1) / currentRefFactor + 1;
-		else
-			nnodesRowT = (nNodesY) / currentRefFactor;
+		int nnodesRowT = meshDens.nElDir2();
+		if (!meshDens.closedLoop) nnodesRowT++;
 
 		for (int i = 0; i < currentElementPerRow; i += 4) {
 
@@ -317,7 +297,7 @@ void PlaneMesherRef::writeElementsPlane_ref(
 			int t[3] = { t0, t0 + 1, t0 + 2 };
 
 
-			if (closedLoop && i == (currentElementPerRow - 4)) {
+			if (meshDens.closedLoop && i == (currentElementPerRow - 4)) {
 				b[4] -= (currentNodesPerRow);
 				t[2] -= (nnodesRowT);
 			}
@@ -339,9 +319,9 @@ void PlaneMesherRef::writeElementsPlane_ref(
 		}
 
 		currentNodesPerRow = nnodesRowT;
-		currentElementPerRow = closedLoop ? currentNodesPerRow : currentNodesPerRow - 1;
+		currentElementPerRow = meshDens.closedLoop ? currentNodesPerRow : currentNodesPerRow - 1;
 
 		c += (nnodesRowM + 1);
-		if (closedLoop) c--;
+		if (meshDens.closedLoop) c--;
 	}
 }

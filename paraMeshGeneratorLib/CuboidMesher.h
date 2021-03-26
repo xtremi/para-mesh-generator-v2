@@ -6,25 +6,21 @@ class CuboidMesher : private Mesher
 {
 public:
 	static void writeNodes(
-		const glm::dvec3&	spos,
-		const glm::dvec3&	size,
-		const glm::ivec3&	nnodes,
-		plane				pln,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		const MeshDensity3D&	meshDens,
+		const glm::dvec3&		size,		
+		plane					pln);
 
 	static void writeNodesQ(
-		const glm::dvec3&	spos,
-		const glm::dvec3&	dp,
-		const glm::ivec3&	nnodes,
-		plane				pln,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		const MeshDensity3D&	meshDens,
+		const glm::dvec3&		dp,	
+		plane					pln);
 
-	static void writeNodesXYZq(const glm::dvec3& spos, const glm::dvec3& dxz,  const glm::ivec3& nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesXYZ(const glm::dvec3& spos, const glm::dvec3& size, const glm::ivec3& nnodes, glm::dmat3x3* csys = nullptr);	
+	static void writeNodesXYZq(const MeshCsys& spos, const MeshDensity3D& meshDens,const glm::dvec3& dxz);
+	static void writeNodesXYZ(const MeshCsys& spos, const MeshDensity3D& meshDens, const glm::dvec3& size);
 
-	static void writeElements(
-		glm::ivec3	nnodes,
-		bool		closedLoop);
+	static void writeElements(const MeshDensity3D& meshDens);
 
 
 };

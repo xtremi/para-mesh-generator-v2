@@ -679,6 +679,7 @@ int extruded2Drecs(const std::string& fileName)
 	std::vector<glm::dmat3x3> csyss({ csys1, csys2, csys3, csys4 });
 
 	NastranFEAwriter writer(&file);
+	Mesher::setFEAwriter(&writer);
 	MeshRec2D mesh2D;
 	mesh2D.initRectangle(glm::dvec2(4.0, 4.0), glm::ivec2(4, 3));
 	mesh2D.extrudeYedge(1.0, 3);
@@ -711,6 +712,7 @@ int extrude2Darc(const std::string& fileName)
 	glm::dmat3x3 csys1 = makeCsysMatrix(glm::dvec3(1.0, 0.0, 0.0), glm::dvec3(0.0, 1.0, 0.0));
 
 	NastranFEAwriter writer(&file);
+	Mesher::setFEAwriter(&writer);
 	MeshRec2D mesh2D;
 	mesh2D.initRectangle(glm::dvec2(4.0, 4.0), glm::ivec2(4, 6));
 	mesh2D.extrudeYedgeArc(glm::pi<double>() / 1.0, 2.0, 22);
@@ -726,6 +728,7 @@ int extrude2DarcMulti(const std::string& filename)
 	if (!file.is_open()) return 1;
 
 	NastranFEAwriter writer(&file);
+	Mesher::setFEAwriter(&writer);
 	MeshRec2D mesh2D;
 	mesh2D.initRectangle(glm::dvec2(4.0, 4.0), glm::ivec2(4, 8));
 	mesh2D.extrudeYedgeArc(glm::pi<double>() / 2.0, 2.0, 8);
