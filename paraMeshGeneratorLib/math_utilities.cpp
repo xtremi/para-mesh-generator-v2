@@ -1,6 +1,8 @@
 #include "math_utilities.h"
 #include "glm/gtc/constants.hpp"
 
+const double GLMPI = glm::pi<double>();
+const double GLM2PI = glm::pi<double>()*2.0;
 
 glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
 

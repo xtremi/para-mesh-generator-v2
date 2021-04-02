@@ -283,7 +283,7 @@ void PlaneMesherRef::writeElementsPlane_ref(const MeshDensity2Dref& meshDens)
 		//elRow m + t 
 		int nnodesRowM = 3 * currentElementPerRow / 4;
 		currentRefFactor *= 2;
-		int nnodesRowT = meshDens.nElDir2();
+		int nnodesRowT = meshDens.nElDir2() / currentRefFactor;
 		if (!meshDens.closedLoop) nnodesRowT++;
 
 		for (int i = 0; i < currentElementPerRow; i += 4) {

@@ -73,11 +73,17 @@ struct NodeVec2D {
 	/*
 		Circular direction, around cicumference
 	*/
-	int circ() const { return dir1(); }		
+	virtual int circ() const { return dir1(); }
 	/*
 		Radial/normal direction, out of circle
 	*/
-	int norm() const { return dir2(); }
+	virtual int norm() const { return dir2(); }
+
+
+	void setDir1(int n) { nnodes.x = n; }
+	void setDir2(int n) { nnodes.y = n; }
+	virtual void setCirc(int n) { setDir1(n); }
+	virtual void setNorm(int n) { setDir2(n); }
 
 private:
 	glm::ivec2 nnodes;
@@ -107,6 +113,13 @@ struct NodeVec3D {
 	*/
 	int axis()   const { return dir3(); }
 
+	void setDir1(int n) { nnodes.x = n; }
+	void setDir2(int n) { nnodes.y = n; }
+	void setDir3(int n) { nnodes.z = n; }
+	void setCirc(int n) { setDir1(n); }
+	void setNorm(int n) { setDir2(n); }
+	void setAxis(int n) { setDir3(n); }
+
 protected:
 	glm::ivec3 nnodes;
 };
@@ -126,13 +139,17 @@ struct MeshDensity1D {
 */
 struct MeshDensity2D : public NodeVec2D {
 	MeshDensity2D() {}
-	MeshDensity2D(int _dir1, int _dir2, bool closedLoopDir1) : NodeVec2D(_dir1, _dir2), closedLoop{ closedLoop } {}
+	MeshDensity2D(int _dir1, int _dir2, bool closedLoopDir1 = false) : NodeVec2D(_dir1, _dir2), closedLoop{ closedLoopDir1 } {}
 	
 	bool closedLoop;
+	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
+
 	int nElDir1() const { return closedLoop ? dir1() : dir1() - 1; }
 	int nElDir2() const { return dir2() - 1; }
 	int nElCirc() const { return nElDir1(); }
 	int nElNorm() const { return nElDir2(); }
+
+	int nNodes() const { return dir1() * dir2(); }
 };
 
 /*
@@ -143,12 +160,17 @@ struct MeshDensity3D : public NodeVec3D {
 	MeshDensity3D(int _dir1, int _dir2, int _dir3, bool closedLoopDir1) : NodeVec3D(_dir1, _dir2, _dir3), closedLoop{ closedLoop } {}
 
 	bool closedLoop;
+	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
+
 	int nElDir1() const { return closedLoop ? dir1() : dir1() - 1; }
 	int nElDir2() const { return dir2() - 1; }
 	int nElDir3() const { return dir3() - 1; }
 	int nElCirc() const { return nElDir1(); }
 	int nElNorm() const { return nElDir2(); }
 	int nElAxis() const { return nElDir3(); }
+
+	MeshDensity2D meshDensD12() const { return MeshDensity2D(dir1(), dir2(), closedLoop); }
+	int nnodesPlaneD12() const { return dir1() * dir2(); }
 };
 
 /*
@@ -157,18 +179,52 @@ struct MeshDensity3D : public NodeVec3D {
 */
 struct MeshDensity2Dref : public NodeVec2D {
 	MeshDensity2Dref() {}
-	MeshDensity2Dref(int _nRefDir1, int _nNodesDir2, bool closedLoopDir2) : NodeVec2D(_nRefDir1, _nNodesDir2), closedLoop{ closedLoop } {}
+	MeshDensity2Dref(int _nRefDir1, int _nNodesDir2, bool closedLoopDir2) : NodeVec2D(_nRefDir1, _nNodesDir2), closedLoop{ closedLoopDir2 } {}
 
+	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
 	bool closedLoop;
 	//int nElDir1() const { return dir1(); }		//depends on refinement 
 	int nRefs() const { return dir1(); }
 	int nElDir2() const { return closedLoop ? dir2() : dir2() - 1; }
 	int nElCirc() const { return nElDir2(); }
 
-	int nNodesDir2(int curRef) const { return 0; }
-	int nElDir2(int curRef) const { return 0; }
+	//int nNodesDir2(int curRef) const { return 0; }
+	//int nElDir2(int curRef) const { return 0; }
 
 	//int nElNorm() const { return nElDir1(); }		//depends on refinement 
+	void setNrefs(int n) { setDir1(n); }
+
+	//virtual from NodeVec2D
+	void setCirc(int n) { setDir2(n); }
+	void setNorm(int n) { setDir1(n); }
+	int circ() const { return dir2(); }
+	int norm() const { return dir1(); }
+};
+
+/*
+	Extends NodeVec3D with element number functions and closed loop definition,
+	for a 3D structured mesh with refinement in direction 3
+*/
+struct MeshDensity3Dref : public NodeVec3D {
+	MeshDensity3Dref() {}
+	MeshDensity3Dref(int _nRefDir3, int _nNodesDir1, int _nNodesDir2, bool closedLoopDir1) 
+		: NodeVec3D(_nNodesDir1, _nNodesDir2, _nRefDir3), closedLoop{ closedLoop } {}
+
+	bool closedLoop;
+	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
+
+	int nRefs() const { return dir3(); }
+	int nElDir1() const { return closedLoop ? dir1() : dir1() - 1; }
+	int nElDir2() const { return dir2() - 1; }
+	int nElCirc() const { return nElDir1(); }
+
+	MeshDensity2D meshDensD12() const { return MeshDensity2D(dir1(), dir2(), closedLoop); }
+	int nnodesPlaneD12() const { return dir1() * dir2(); }
+
+	int setNrefs(int n) { setDir1(n); }
+
+	//int nNodesDir3(int curRef) const { return 0; }
+	//int nElDir3(int curRef) const { return 0; }
 };
 
 /*
@@ -186,19 +242,50 @@ struct MeshCsys {
 
 struct Pipe2Dradius {
 	Pipe2Dradius() {}
-	Pipe2Dradius(double _inner, double _outer) : inner{ _inner }, outer{ _outer }{}
+	Pipe2Dradius(double _rad1, double _rad2) : radi{ glm::dvec2(_rad1, _rad2) }{}
 
-	double inner, outer;
-	double dR() const { return outer - inner; }
+	double rad1() const { return radi.x; };
+	double rad2() const { return radi.y; };
+	double dR() const { return radi.y - radi.x; }
+	void setRad1(double r) { radi.x = r; }
+	void setRad2(double r) { radi.y = r; }
+	void incrRad1(double dr) { radi.x += dr; }
+	void incrRad2(double dr) { radi.y += dr; }
+	glm::dvec2 radi;
 };
+
+struct Disk2Dradius : public Pipe2Dradius{
+	Disk2Dradius() {}
+	Disk2Dradius(const Pipe2Dradius& pipe2drad) { radi = pipe2drad.radi; }
+	Disk2Dradius(double _inner, double _outer) : Pipe2Dradius(_inner, _outer) {}
+	double inner() const { return radi.x; }
+	double outer() const { return radi.y; }
+	void setInner(double r) { setRad1(r); }
+	void setOuter(double r) { setRad2(r); }
+	void incrInner(double dr) { incrRad1(dr); }
+	void incrOuter(double dr) { incrRad2(dr); }
+};
+
+struct Cone2Dradius : public Pipe2Dradius {
+	Cone2Dradius() {}
+	Cone2Dradius(const Pipe2Dradius& pipe2drad) { radi = pipe2drad.radi; }
+	Cone2Dradius(double _start, double _end) : Pipe2Dradius(_start, _end) {}
+	double start() const { return radi.x; }
+	double end() const { return radi.y; }
+	void setStart(double r) { setRad1(r); }
+	void setEnd(double r) { setRad2(r); }
+	void incrStart(double dr) { incrRad1(dr); }
+	void incrEnd(double dr) { incrRad2(dr); }
+};
+
 struct Pipe3Dradius {
 	Pipe3Dradius() {}
 	Pipe3Dradius(double startInner, double startOuter, double endInner, double endOuter)
-		: start{ Pipe2Dradius(startInner, startOuter) }, end{ Pipe2Dradius(endInner, endOuter) } {}
+		: start{ Disk2Dradius(startInner, startOuter) }, end{ Disk2Dradius(endInner, endOuter) } {}
 
-	Pipe2Dradius start, end;
-	double dRi() const { return end.inner - start.inner; }
-	double dRo() const { return end.outer - start.outer; }
+	Disk2Dradius start, end;
+	double dRi() const { return end.inner() - start.inner(); }
+	double dRo() const { return end.outer() - start.outer(); }
 };
 
 
@@ -211,10 +298,13 @@ struct ArcAngles {
 	}
 	
 	double start, end;	
-	bool fullCircle() { return m_fullCircle; }
+	bool fullCircle() const { return m_fullCircle; }
 	
 	void setFullCircle();
-	double angStep(int nnodes);
+	double angStep(int nnodes) const;
+
+	void setStart(double rad) { start = rad; m_fullCircle = false; }
+	void setEnd(double rad) { end = rad; m_fullCircle = false; }
 private:
 	bool m_fullCircle;
 };

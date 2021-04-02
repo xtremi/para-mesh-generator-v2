@@ -1,6 +1,6 @@
 #include "ParaMeshGenCommon.h"
 #include <glm/gtc/constants.hpp>
-
+#include "math_utilities.h"
 
 direction getPlaneNormal(plane pln) {
 	switch (pln) {
@@ -35,20 +35,20 @@ void getPlaneDirections(plane pln, direction& d1, direction& d2){
 }
 
 
-bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes) {
-	return limitArcAngles(arcAngles.start, arcAngles.end, dang, nnodes);
-}
+//bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes) {
+//	return limitArcAngles(arcAngles.start, arcAngles.end, dang, nnodes);
+//}
 
 
 void ArcAngles::setFullCircle(){
 	start = 0.0;
-	end = glm::pi<double>();
+	end = GLM2PI;
 	m_fullCircle = true;
 }
 
-double ArcAngles::angStep(int nnodes) {
+double ArcAngles::angStep(int nnodes) const {
 	double dang = (end - start);
-	if(!fullCircle)
+	if(!m_fullCircle)
 		dang /= (double)(nnodes - 1);
 	else
 		dang /= (double)nnodes;

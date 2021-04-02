@@ -6,26 +6,17 @@ class DiskMesher :	private Mesher
 {
 public:
 	static void writeNodes(
-		const glm::dvec3&	centerPos,
-		double				radiusStart,
-		double				radiusEnd,
-		double				startAng,
-		double				endAng,		
-		const glm::ivec2&	nnodes,
-		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		const MeshDensity2D&	meshDens,
+		const Cone2Dradius&		radius,
+		const ArcAngles&		angle,
+		direction				rotaxis);
 
-	static void writeNodesX(const glm::dvec3& centerPos,
-		double radiusStart, double radiusEnd, double startAng, double endAng,
-		const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesY(const glm::dvec3& centerPos,
-		double radiusStart, double radiusEnd, double startAng, double endAng, 
-		const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesZ(const glm::dvec3& centerPos,
-		double radiusStart, double radiusEnd, double startAng, double endAng,
-		const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
+	static void writeNodesX(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle);
+	static void writeNodesY(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle);
+	static void writeNodesZ(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle);
 
-	static void writeElements(glm::ivec2 nnodes, bool closedLoop);
+	static void writeElements(const MeshDensity2D& meshDens);
 
 };
 
@@ -33,15 +24,11 @@ class DiskMesherRef : public Mesher
 {
 public:
 	static void writeNodes(
-		const glm::dvec3&	centerPos,
-		int					nNodesEdge,
-		int					nRefinements,
-		double				radiusStart,
-		double				radiusEnd,
-		double				startAng,
-		double				endAng,
-		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		const MeshDensity2Dref&	meshDens,
+		const Cone2Dradius&		radius,
+		const ArcAngles&		angle,
+		direction				rotaxis);
 
-	static void writeElements(int nNodesY, int nRefinements, bool closedLoop);
+	static void writeElements(const MeshDensity2Dref& meshDens);
 };

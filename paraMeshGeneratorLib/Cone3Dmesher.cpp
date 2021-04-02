@@ -8,42 +8,34 @@
 #include "math_utilities.h"
 
 void Cone3Dmesher::writeNodes(
-	const glm::dvec3	spos,
-	MeshDensity3D&		meshDens,
-	const Pipe3Dradius&	radius,
-	const ArcAngles&	angle,
-	double				height,
-	direction			axis,
-	glm::dmat3x3*		csys)
+	const MeshCsys&			spos,
+	const MeshDensity3D&	meshDens,
+	const Pipe3Dradius&		radius,
+	const ArcAngles&		angle,
+	double					height,
+	direction				axis)
 {
-	int firstNodeID = writer->getNextNodeID();
-	glm::dvec3  coords(spos);
+MESHER_NODE_WRITE_START
 
 	double dH  = height       / (double)meshDens.nElAxis();
 	double dRi = radius.dRi() / (double)meshDens.nElAxis();
 	double dRo = radius.dRo() / (double)meshDens.nElAxis();
 
-	Pipe2Dradius currentRadius(radius.start.inner, radius.start.outer);
+	Cone2Dradius currentRadius(radius.start);
+	MeshDensity2D meshDensDisk = meshDens.meshDensD12();
 
-	for (int i = 0; i < meshDens.nodes.axis(); i++) {
-	  DiskMesher::writeNodes(coords, currentRadius.inner, currentRadius.outer, angle.start, angle.end,
-		  glm::ivec2(meshDens.nodes.dir1, meshDens.nodes.dir2), axis, csys);
-		
-		coords[(size_t)axis] += dH;
-		currentRadius.inner += dRi;
-		currentRadius.outer += dRo;
+	for (int i = 0; i < meshDens.norm(); i++) {
+		DiskMesher::writeNodes(spos, meshDensDisk, currentRadius, angle, axis);		
+		curPos.pos[(size_t)axis] += dH;
+		currentRadius.radi.x += dRi;
+		currentRadius.radi.y += dRo;
 	}
 
-	nodeID1 = firstNodeID;
-
-
+MESHER_NODE_WRITE_END
 }
 
-void Cone3Dmesher::writeElements(
-	MeshDensity3D&  meshDens,
-	bool			closedLoop)
-{
-	CuboidMesher::writeElements(glm::ivec3(meshDens.nodes.dir1, meshDens.nodes.dir2, meshDens.nodes.dir3), closedLoop);
+void Cone3Dmesher::writeElements(const MeshDensity3D& meshDens){
+	CuboidMesher::writeElements(meshDens);
 }
 
 /*
@@ -72,148 +64,125 @@ void Cone3Dmesher::writeElements(
 
 */
 void Cone3DmesherRef::writeNodes(
-	const glm::dvec3&	spos,
-	const glm::ivec2&	nNodes12,
-	int					nRefinements,
-	double				radiusStartOuter,
-	double				radiusEndOuter,
-	double				radiusStartInner,
-	double				radiusEndInner,
-	double				startAng,
-	double				endAng,
-	double				height,
-	direction			rotaxis,
-	glm::dmat3x3*		csys)
+	const MeshCsys&			spos,
+	const MeshDensity3Dref& meshDens,
+	const Pipe3Dradius&		radius,
+	const ArcAngles&		angle,
+	double					height,
+	direction				rotaxis)
 {
-	int firstNodeID = writer->getNextNodeID();
-	glm::dvec3 coords(spos);
+	MESHER_NODE_WRITE_START
 
-	glm::ivec2	currentNodes12(nNodes12);	//.x around - .y outwards
-
-	bool	fullCircle = (startAng < 0.0) && (endAng < 0.0);
+	MeshDensity2D curMeshDensD12 = meshDens.meshDensD12();
 	
-	double  dRi = (radiusEndInner - radiusStartInner);
-	double  dRo = (radiusEndOuter - radiusStartOuter);
-	//int	  nElAroundStart = fullCircle ? nNodes12.x : nNodes12.x - 1;
-	//double  arcLengthInnerStart = 2.0 * glm::pi<double>() * radiusStartInner;
-	//double  arcLengthOuterStart = 2.0 * glm::pi<double>() * radiusStartOuter;
+	double  dRi = radius.dRi();
+	double  dRo = radius.dRo();
 	double	coneLengthInner = std::sqrt(std::pow(dRi, 2.0) + std::pow(height, 2.0));
 	double	coneLengthOuter = std::sqrt(std::pow(dRo, 2.0) + std::pow(height, 2.0));
 
-	double	currentElSize3 = initialRefinementElementSize(coneLengthOuter, nRefinements, false) / 2.0; 
+	double	currentElSize3 = initialRefinementElementSize(coneLengthOuter, meshDens.nRefs(), false) / 2.0; 
 
 	int		currentRefFactor1 = 1;
 	int		currentRefFactor2 = 1;
 	int		currentRefinement = 0;
-	double	currentRadiusInner = radiusStartInner;
-	double	currentRadiusOuter = radiusStartOuter;
+	Disk2Dradius currentRadius = radius.start;
 	double  currentConeLength  = 0.0;
 	double  currentDh		   = 0.0;
 	
 
-	while (currentRefinement < nRefinements) {
+	while (currentRefinement < meshDens.nRefs()) {
 		currentRefinement++;
 
 		//row b: x--x--x--x--x--x--x--x--x		
-		DiskMesher::writeNodes(coords, currentRadiusInner, currentRadiusOuter, startAng, endAng, currentNodes12, rotaxis, csys);
+		DiskMesher::writeNodes(curPos, curMeshDensD12, currentRadius, angle, rotaxis);
 		currentConeLength += currentElSize3;
-		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
-		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
+		currentRadius.setInner(radius.start.inner() + dRi * (currentConeLength / coneLengthOuter));
+		currentRadius.setOuter(radius.start.outer() + dRo * (currentConeLength / coneLengthInner));
 		currentDh = (height / coneLengthOuter)*currentElSize3;
-		coords[(size_t)rotaxis] += currentDh;
+		curPos.pos[(size_t)rotaxis] += currentDh;
 
 		//row m1:  |  x--x--x  |  x--x--x  |
-		double dang = calcArcIncrement(startAng, endAng, currentNodes12.x);
-		writeNodes_refLayerM1(coords, currentNodes12, currentRadiusInner, currentRadiusOuter, startAng < 0.0 ? 0.0 : startAng, dang, 4, rotaxis, csys);
+		double dang = angle.angStep(curMeshDensD12.dir1());
+		writeNodes_refLayerM1(curPos, curMeshDensD12, currentRadius, angle.start, dang, 4, rotaxis);
 		currentConeLength += currentElSize3;
-		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
-		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
+		currentRadius.setInner(radius.start.inner() + dRi * (currentConeLength / coneLengthOuter));
+		currentRadius.setOuter(radius.start.outer() + dRo * (currentConeLength / coneLengthInner));
 		currentDh = (height / coneLengthOuter)*currentElSize3;
-		coords[(size_t)rotaxis] += currentDh;
+		curPos.pos[(size_t)rotaxis] += currentDh;
 
 
 		//Refine dir1
 		currentRefFactor1 *= 2;
-		if (!fullCircle)
-			currentNodes12.x = (nNodes12.x - 1) / currentRefFactor1 + 1;
-		else
-			currentNodes12.x = nNodes12.x / currentRefFactor1;
-
+		curMeshDensD12.nodes().x = meshDens.nElDir1() / currentRefFactor1;
+		if (!meshDens.closedLoop)
+			curMeshDensD12.nodes().x++;
 
 		//row m2:  x-----x-----x-----x-----x
-		DiskMesher::writeNodes(coords, currentRadiusInner, currentRadiusOuter, startAng, endAng, currentNodes12, rotaxis, csys);
+		DiskMesher::writeNodes(curPos, curMeshDensD12, currentRadius, angle, rotaxis);
 		currentConeLength += currentElSize3;
-		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
-		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
+		currentRadius.setInner(radius.start.inner() + dRi * (currentConeLength / coneLengthOuter));
+		currentRadius.setOuter(radius.start.outer() + dRo * (currentConeLength / coneLengthInner));
 		currentDh = (height / coneLengthOuter)*currentElSize3;
-		coords[(size_t)rotaxis] += currentDh;
+		curPos.pos[(size_t)rotaxis] += currentDh;
 
 		//row m3:  |  x--x--x  |  x--x--x  | (dir1)		
-		dang = calcArcIncrement(startAng, endAng, currentNodes12.x);
-		writeNodes_refLayerM2(coords, currentNodes12, currentRadiusInner, currentRadiusOuter, startAng < 0.0 ? 0.0 : startAng, dang, 4, rotaxis, csys);
+		dang = angle.angStep(curMeshDensD12.dir1());
+		writeNodes_refLayerM2(curPos, curMeshDensD12,currentRadius, angle.start, dang, 4, rotaxis);
 		currentConeLength += currentElSize3;
-		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
-		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
+		currentRadius.setInner(radius.start.inner() + dRi * (currentConeLength / coneLengthOuter));
+		currentRadius.setOuter(radius.start.outer() + dRo * (currentConeLength / coneLengthInner));
 		currentDh = (height / coneLengthOuter)*currentElSize3;
-		coords[(size_t)rotaxis] += currentDh;
+		curPos.pos[(size_t)rotaxis] += currentDh;
 
 
 		//Refine dir2
 		currentRefFactor2 *= 2;
-		currentNodes12.y = (nNodes12.y - 1) / currentRefFactor2 + 1;
+		curMeshDensD12.nodes().y = meshDens.nElDir2() / currentRefFactor2 + 1;
 
 
 		//row t:  x-----x-----x-----x-----x (dir2)
-		DiskMesher::writeNodes(coords, currentRadiusInner, currentRadiusOuter, 
-			startAng, endAng, currentNodes12, rotaxis, csys);
+		DiskMesher::writeNodes(curPos, curMeshDensD12, currentRadius, angle, rotaxis);
 		currentElSize3 *= 2.0;
 		currentConeLength += currentElSize3;
-		currentRadiusInner = radiusStartInner + dRi * (currentConeLength / coneLengthOuter);
-		currentRadiusOuter = radiusStartOuter + dRo * (currentConeLength / coneLengthInner);
+		currentRadius.setInner(radius.start.inner() + dRi * (currentConeLength / coneLengthOuter));
+		currentRadius.setOuter(radius.start.outer() + dRo * (currentConeLength / coneLengthInner));
 		currentDh = (height / coneLengthOuter)*currentElSize3;
-		coords[(size_t)rotaxis] += currentDh;
+		curPos.pos[(size_t)rotaxis] += currentDh;
 	}
 
-	nodeID1 = firstNodeID;
+	MESHER_NODE_WRITE_END
 }
 
 
 void Cone3DmesherRef::writeNodes_refLayerM1(
-	const glm::dvec3&	spos,
-	const glm::ivec2&	nnodes12,
-	double				radiusInner,
-	double				radiusOuter,
+	const MeshCsys&		spos,
+	const MeshDensity2D& meshDens,
+	Disk2Dradius&		radius,
 	double				startAng,
 	double				dang,
 	int					skipNth,
-	direction			rotaxis,
-	glm::dmat3x3*		csys)
+	direction			rotaxis)
 {
-	ConeMesher::writeNodes_nthLine(spos, nnodes12, radiusInner, radiusOuter, startAng, dang, 0.0, skipNth, rotaxis, csys);
+	ConeMesher::writeNodes_nthLine(spos, meshDens, radius, startAng, dang, 0.0, skipNth, rotaxis);
 }
 
 void Cone3DmesherRef::writeNodes_refLayerM2(
-	const glm::dvec3&	spos,
-	const glm::ivec2&	nnodes12,
-	double				radiusInner,
-	double				radiusOuter,
+	const MeshCsys&		spos,
+	const MeshDensity2D& meshDens,
+	Disk2Dradius&		radius,
 	double				startAng,
 	double				dang,
 	int					skipNth,
-	direction			rotaxis,
-	glm::dmat3x3*		csys)
+	direction			rotaxis)
 {
-	ConeMesher::writeNodes_nthArc(spos, nnodes12, radiusInner, radiusOuter, startAng, dang, 0.0, skipNth, rotaxis, csys);
+	ConeMesher::writeNodes_nthArc(spos, meshDens, radius, startAng, dang, 0.0, skipNth, rotaxis);
 }
 
 
 
 
-void Cone3DmesherRef::writeElements(
-	glm::ivec2	nnodes12,
-	int			nRefinements,
-	bool		closedLoop) 
+void Cone3DmesherRef::writeElements(const MeshDensity3Dref& meshDens)
 {
-	CuboidMesherRef::writeElements(nnodes12, nRefinements, closedLoop);
+	CuboidMesherRef::writeElements(meshDens);
 }
 

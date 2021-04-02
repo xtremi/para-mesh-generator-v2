@@ -2,59 +2,41 @@
 #include "Conemesher.h"
 
 void DiskMesher::writeNodes(
-	const glm::dvec3&	centerPos,
-	double				radiusStart,
-	double				radiusEnd,
-	double				startAng,
-	double				endAng,
-	const glm::ivec2&	nnodes,
-	direction			rotaxis,
-	glm::dmat3x3*		csys)
+	const MeshCsys&			spos,
+	const MeshDensity2D&	meshDens,
+	const Cone2Dradius&		radius,
+	const ArcAngles&		angle,
+	direction				rotaxis)
 {
-	ConeMesher::writeNodes(centerPos, radiusStart, radiusEnd, startAng, endAng, 0.0, nnodes, rotaxis, csys);
+	ConeMesher::writeNodes(spos, meshDens, radius, angle, 0.0, rotaxis);
 }
 
-void DiskMesher::writeNodesX(const glm::dvec3& centerPos,
-	double radiusStart, double radiusEnd, double startAng, double endAng,
-	const glm::ivec2& nnodes, glm::dmat3x3* csys)
-{
-	ConeMesher::writeNodesX(centerPos, radiusStart, radiusEnd, startAng, endAng, 0.0, nnodes, csys);
+void DiskMesher::writeNodesX(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle){
+	ConeMesher::writeNodesX(spos, meshDens, radius, angle, 0.0);
 }
-void DiskMesher::writeNodesY(const glm::dvec3& centerPos,
-	double radiusStart, double radiusEnd, double startAng, double endAng,
-	const glm::ivec2& nnodes, glm::dmat3x3* csys) 
-{
-	ConeMesher::writeNodesY(centerPos, radiusStart, radiusEnd, startAng, endAng, 0.0, nnodes, csys);
+void DiskMesher::writeNodesY(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle){
+	ConeMesher::writeNodesY(spos, meshDens, radius, angle, 0.0);
 }
-void DiskMesher::writeNodesZ(const glm::dvec3& centerPos,
-	double radiusStart, double radiusEnd, double startAng, double endAng,
-	const glm::ivec2& nnodes, glm::dmat3x3* csys)
-{
-	ConeMesher::writeNodesZ(centerPos, radiusStart, radiusEnd, startAng, endAng, 0.0, nnodes, csys);
+void DiskMesher::writeNodesZ(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle){
+	ConeMesher::writeNodesZ(spos, meshDens, radius, angle, 0.0);
 }
 
-void DiskMesher::writeElements(glm::ivec2 nnodes, bool closedLoop) 
-{
-	ConeMesher::writeElements(nnodes, closedLoop);
+void DiskMesher::writeElements(const MeshDensity2D& meshDens){
+	ConeMesher::writeElements(meshDens);
 }
 
 
 void DiskMesherRef::writeNodes(
-	const glm::dvec3&	centerPos,
-	int					nNodesEdge,
-	int					nRefinements,
-	double				radiusStart,
-	double				radiusEnd,
-	double				startAng,
-	double				endAng,
-	direction			rotaxis,
-	glm::dmat3x3*		csys)
+	const MeshCsys&			spos,
+	const MeshDensity2Dref&	meshDens,
+	const Cone2Dradius&		radius,
+	const ArcAngles&		angle,
+	direction				rotaxis)
 {
-	ConeMesherRef::writeNodes(centerPos, nNodesEdge, nRefinements, radiusStart, radiusEnd, startAng, endAng, 0.0,
-		rotaxis, csys);
+	ConeMesherRef::writeNodes(spos, meshDens, radius, angle, 0.0, rotaxis);
 }
 
-void DiskMesherRef::writeElements(int nNodesY, int nRefinements, bool closedLoop)
+void DiskMesherRef::writeElements(const MeshDensity2Dref& meshDens)
 {
-	ConeMesherRef::writeElements(nNodesY, nRefinements, closedLoop);
+	ConeMesherRef::writeElements(meshDens);
 }

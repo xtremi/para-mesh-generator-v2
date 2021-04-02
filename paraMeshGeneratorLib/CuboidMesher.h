@@ -17,7 +17,7 @@ public:
 		const glm::dvec3&		dp,	
 		plane					pln);
 
-	static void writeNodesXYZq(const MeshCsys& spos, const MeshDensity3D& meshDens,const glm::dvec3& dxz);
+	static void writeNodesXYZq(const MeshCsys& spos, const MeshDensity3D& meshDens,const glm::dvec3& dxyz);
 	static void writeNodesXYZ(const MeshCsys& spos, const MeshDensity3D& meshDens, const glm::dvec3& size);
 
 	static void writeElements(const MeshDensity3D& meshDens);
@@ -30,18 +30,13 @@ class CuboidMesherRef : private Mesher
 {
 public:
 	static void writeNodes(
-		const glm::dvec3&	spos,
-		const glm::dvec3&	size,
-		const glm::ivec2&	nNodesFace,
-		int					nRefinements,
-		bool				startWithOffset,
-		plane				pln,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		const MeshDensity3Dref&	meshDens,
+		const glm::dvec3&		size,		
+		bool					startWithOffset,
+		plane					pln);
 
-	static void writeElements(
-		glm::ivec2	nNodesFace,
-		int			nRefinements,
-		bool		closedLoop);
+	static void writeElements(const MeshDensity3Dref& meshDens);
 
 private:
 	static void writeElements_rows_bm1m2(

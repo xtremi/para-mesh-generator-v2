@@ -6,68 +6,51 @@ class ConeMesher : private Mesher
 {
 public:
 	static void writeNodes(
-		const glm::dvec3&	centerPos,
-		double				radiusStart,
-		double				radiusEnd,
-		double				startAng,
-		double				endAng,
-		double				height,
-		const glm::ivec2&	nnodes,
-		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,		
+		const MeshDensity2D&	meshDens,
+		const Cone2Dradius&		radius,
+		const ArcAngles&		angle,
+		double					height,
+		direction				rotaxis);
 
-	static void writeNodesX(const glm::dvec3& centerPos, 
-		double radiusStart, double radiusEnd, double startAng, double endAng, double height,
-		const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesY(const glm::dvec3& centerPos, 
-		double radiusStart, double radiusEnd, double startAng, double endAng, double height,
-		const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
-	static void writeNodesZ(const glm::dvec3& centerPos, 
-		double radiusStart, double radiusEnd, double startAng, double endAng, double height,
-		const glm::ivec2& nnodes, glm::dmat3x3* csys = nullptr);
+	static void writeNodesX(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height);
+	static void writeNodesY(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height);
+	static void writeNodesZ(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height);
 
-	static void writeElements(glm::ivec2 nnodes, bool closedLoop);
+	static void writeElements(const MeshDensity2D& meshDens);
 
 
 	static void writeNodes_nthLine(
-		const glm::dvec3&	spos,
-		const glm::ivec2&	nnodes,
-		double				radiusStart,
-		double				radiusEnd,
-		double				startAng,
-		double				dang,
-		double				height,
-		int					skipNth,
-		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&		 spos,
+		const MeshDensity2D& meshDens,
+		const Cone2Dradius&	 radius,
+		double				 startAng,
+		double				 dang,
+		double				 height,
+		int					 skipNth,
+		direction			 rotaxis);
 
 	static void writeNodes_nthArc(
-		const glm::dvec3&	spos,
-		const glm::ivec2&	nnodes,
-		double				radiusStart,
-		double				radiusEnd,
-		double				startAng,
-		double				dang,
-		double				height,
-		int					skipNth,
-		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&		 spos,
+		const MeshDensity2D& meshDens,
+		const Cone2Dradius&	 radius,
+		double				 startAng,
+		double				 dang,
+		double				 height,
+		int					 skipNth,
+		direction			 rotaxis);
 };
 
 class ConeMesherRef : private Mesher
 {
 public:
 	static void writeNodes(
-		const glm::dvec3&	centerPos,
-		int					nNodesEdge,
-		int					nRefinements,
-		double				radiusStart,
-		double				radiusEnd,
-		double				startAng,
-		double				endAng,
-		double				height,
-		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		const MeshDensity2Dref&	meshDens,
+		const Cone2Dradius&		radius,
+		const ArcAngles&		angle,
+		double					height,
+		direction				rotaxis);
 
-	static void writeElements(int nNodesY, int nRefinements, bool closedLoop);
+	static void writeElements(const MeshDensity2Dref& meshDens);
 };

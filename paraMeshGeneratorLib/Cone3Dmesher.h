@@ -24,63 +24,45 @@ class Cone3Dmesher : private Mesher
 {
 public:
 	static void writeNodes(
-		const glm::dvec3	spos,
-		MeshDensity3D&		meshDens,
-		const Pipe3Dradius&	radius,
-		const ArcAngles&	angle,
-		double				height,
-		direction			axis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		const MeshDensity3D&	meshDens,
+		const Pipe3Dradius&		radius,
+		const ArcAngles&		angle,
+		double					height,
+		direction				axis);
 
-
-
-	static void writeElements(
-		MeshDensity3D&		meshDens,
-		bool				closedLoop);
+	static void writeElements(const MeshDensity3D& meshDens);
 };
 
 class Cone3DmesherRef : private Mesher
 {
 public:
 	static void writeNodes(
-		const glm::dvec3&	spos,
-		const glm::ivec2&	nnodes12,
-		int					nRefinements,
-		double				radiusStartOuter,
-		double				radiusEndOuter,
-		double				radiusStartInner,
-		double				radiusEndInner,
-		double				startAng,
-		double				endAng,
-		double				height,
-		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&			spos,
+		const MeshDensity3Dref& meshDens,
+		const Pipe3Dradius&		radius,
+		const ArcAngles&		angle,
+		double					height,
+		direction				rotaxis);
 
-	static void writeElements(
-		glm::ivec2	nnodes12,
-		int			nRefinements,
-		bool		closedLoop);
+	static void writeElements(const MeshDensity3Dref& meshDens);
 
 private:
 	static void writeNodes_refLayerM1(
-		const glm::dvec3&	spos,
-		const glm::ivec2&	nnodes12,
-		double				radiusInner,
-		double				radiusOuter,
-		double				startAng,
-		double				dang,
-		int					skipNth,
-		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&		 spos,
+		const MeshDensity2D& meshDens,
+		Disk2Dradius&		 radius,
+		double				 startAng,
+		double				 dang,
+		int					 skipNth,
+		direction			 rotaxis);
 
 	static void writeNodes_refLayerM2(
-		const glm::dvec3&	spos,
-		const glm::ivec2&	nnodes12,
-		double				radiusInner,
-		double				radiusOuter,
-		double				startAng,
-		double				dang,
-		int					skipNth,
-		direction			rotaxis,
-		glm::dmat3x3*		csys = nullptr);
+		const MeshCsys&		 spos,
+		const MeshDensity2D& meshDens,
+		Disk2Dradius&		 radius,
+		double				 startAng,
+		double				 dang,
+		int					 skipNth,
+		direction			 rotaxis);
 };
