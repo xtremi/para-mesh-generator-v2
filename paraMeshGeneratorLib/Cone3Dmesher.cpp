@@ -24,8 +24,8 @@ MESHER_NODE_WRITE_START
 	Cone2Dradius currentRadius(radius.start);
 	MeshDensity2D meshDensDisk = meshDens.meshDensD12();
 
-	for (int i = 0; i < meshDens.norm(); i++) {
-		DiskMesher::writeNodes(spos, meshDensDisk, currentRadius, angle, axis);		
+	for (int i = 0; i < meshDens.axis(); i++) {
+		DiskMesher::writeNodes(curPos, meshDensDisk, currentRadius, angle, axis);
 		curPos.pos[(size_t)axis] += dH;
 		currentRadius.radi.x += dRi;
 		currentRadius.radi.y += dRo;

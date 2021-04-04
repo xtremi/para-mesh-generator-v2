@@ -149,7 +149,7 @@ void CuboidMesherRef::writeNodes(
 
 		//row m1:  |  x--x--x  |  x--x--x  | //make this a function
 		for (int i = 0; i < curMeshDensD12.dir1(); i++) {
-			curPos.pos[(size_t)dir1] = curPos.pos[(size_t)dir1] + (double)i*currentElSize12.x;
+			curPos.pos[(size_t)dir1] = spos.pos[(size_t)dir1] + (double)i*currentElSize12.x;
 			if (i % 4) {
 				LineMesher::writeNodesLineQ(curPos, curMeshDensD12.dir2(), currentElSize12.y, dir2);
 			}
@@ -202,8 +202,8 @@ void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)
 	for (int r = 0; r < meshDens.nRefs(); r++) {
 
 		//Nnodes for next refinement:
-		nextMeshDens12.nodes().x = curMeshDens12.nElDir1() / 2;
-		nextMeshDens12.nodes().y = curMeshDens12.nElDir2() / 2 + 1;
+		nextMeshDens12.setDir1(curMeshDens12.nElDir1() / 2);
+		nextMeshDens12.setDir2(curMeshDens12.nElDir2() / 2 + 1);
 		if (!meshDens.closedLoop)
 			nextMeshDens12.nodes().x++;
 

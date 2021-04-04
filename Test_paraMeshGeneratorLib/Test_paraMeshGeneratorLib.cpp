@@ -25,7 +25,6 @@ int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
 int diskMesher(const std::string& fileName);
-#ifdef TO_FIX
 int diskMesherRef(const std::string& fileName);
 int cylinderMesher(const std::string& fileName);
 int cylinderMesherRef(const std::string& fileName);
@@ -34,6 +33,7 @@ int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
 int cone3Dmesher(const std::string& fileName);
 int cone3DmesherRef(const std::string& fileName);
+#ifdef TO_FIX
 
 int extruded2Drecs(const std::string& fileName);
 int extrude2Darc(const std::string& filename);
@@ -42,22 +42,22 @@ int extrude2DarcMulti(const std::string& filename);
 
 std::vector<TestDef> testFunctions({
 
-	//TestDef(101, "lineMesher",			"basic meshers 2D", (testFunction)lineMesher),	
-	//TestDef(102, "arcMesher",			"basic meshers 2D", (testFunction)arcMesher),
-	//TestDef(103, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
-	//TestDef(104, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
-	//TestDef(105, "coneMesher",			"basic meshers 2D", (testFunction)coneMesher),
+	TestDef(101, "lineMesher",			"basic meshers 2D", (testFunction)lineMesher),	
+	TestDef(102, "arcMesher",			"basic meshers 2D", (testFunction)arcMesher),
+	TestDef(103, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
+	TestDef(104, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
+	TestDef(105, "coneMesher",			"basic meshers 2D", (testFunction)coneMesher),
 	TestDef(106, "coneMesherRef",		"basic meshers 2D", (testFunction)coneMesherRef),
 	TestDef(107, "diskMesher",			"basic meshers 2D", (testFunction)diskMesher),
-#ifdef TO_FIX
 	TestDef(108, "diskMesherRef",		"basic meshers 2D", (testFunction)diskMesherRef),
 	TestDef(109, "cylinderMesher",		"basic meshers 2D", (testFunction)cylinderMesher),
 	TestDef(110, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
-	
+
 	TestDef(120, "cuboidMesher",	"basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(121, "cuboidMesherRef",	"basic meshers 3D", (testFunction)cuboidMesherRef),
-	TestDef(122, "cone3Dmesher",	"basic meshers 3D", (testFunction)cone3Dmesher),
+	TestDef(122, "cone3Dmesher",	"basic meshers 3D", (testFunction)cone3Dmesher),	
 	TestDef(123, "cone3DmesherRef",	"basic meshers 3D", (testFunction)cone3DmesherRef),
+#ifdef TO_FIX
 
 	TestDef(200, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
 	TestDef(270, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
@@ -330,6 +330,7 @@ int coneMesher(const std::string& fileName) {
 	pos.pos.x += 2.1*radius.start();
 	angle.setStart(GLMPI);
 	angle.setEnd(GLM2PI);
+	meshDens.setClosedLoop(false);
 	ConeMesher::writeNodes(pos, meshDens, radius, angle, height, direction::z);
 	ConeMesher::writeElements(meshDens);
 
@@ -434,34 +435,43 @@ int diskMesher(const std::string& fileName){
 	TEST_END
 }
 
-#ifdef TO_FIX
+
 int diskMesherRef(const std::string& fileName) {
 	TEST_START
 	int nRef = 4;
 	int nNodesEdge = std::pow(2, nRef + 3) + 1;
 
-	double radStart = 2.0;
-	double radEnd = 4.0;
+	MeshDensity2Dref meshDens(nRef, nNodesEdge, false);
+	Disk2Dradius radius(2.0, 4.0);
+	ArcAngles angles(0.0, 0.99*GLM2PI);
 
-	DiskMesherRef::writeNodes(pos, nNodesEdge, nRef, radStart, radEnd, 0.0, 1.9*glm::pi<double>(), direction::x);
-	DiskMesherRef::writeElements(nNodesEdge, nRef, false);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::x);
+	DiskMesherRef::writeElements(meshDens);
 
-	pos.x += radEnd * 2.1;
-	DiskMesherRef::writeNodes(pos, nNodesEdge, nRef, radStart, radEnd, 0.0, 1.0*glm::pi<double>() / 2.0, direction::y);
-	DiskMesherRef::writeElements(nNodesEdge, nRef, false);
+	pos.pos.x += radius.outer() * 2.1;
+	angles.setEnd(GLMPI);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::y);
+	DiskMesherRef::writeElements(meshDens);
 
-	pos.x += radEnd * 2.1;
-	DiskMesherRef::writeNodes(pos, nNodesEdge, nRef, radStart, radEnd, 0.0, 1.0*glm::pi<double>() / 4.0, direction::z);
-	DiskMesherRef::writeElements(nNodesEdge, nRef, false);
+	pos.pos.x += radius.outer() * 2.1;
+	angles.setEnd(GLMPI/4.0);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::z);
+	DiskMesherRef::writeElements(meshDens);
 
+	pos.pos.x = 0.0;
+	pos.pos.y += radius.outer() * 2.1;
 	nNodesEdge = std::pow(2, nRef + 5);
-	pos.x += radEnd * 2.1;
-	DiskMesherRef::writeNodes(pos, nNodesEdge, nRef, radStart, radEnd, -1, -1, direction::z);
-	DiskMesherRef::writeElements(nNodesEdge, nRef, true);
+	angles.setFullCircle();
+	meshDens.setClosedLoop();
+	meshDens.setCirc(nNodesEdge);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::z);
+	DiskMesherRef::writeElements(meshDens);
 
-	pos.x += radEnd * 2.1;
-	DiskMesherRef::writeNodes(pos, nNodesEdge, nRef, radEnd, radStart, -1, -1, direction::z);
-	DiskMesherRef::writeElements(nNodesEdge, nRef, true);
+	pos.pos.x += radius.outer() * 2.1;
+	radius.setOuter(radius.inner() / 2.0);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::z);
+	DiskMesherRef::writeElements(meshDens);
+
 	TEST_END
 }
 
@@ -469,28 +479,34 @@ int diskMesherRef(const std::string& fileName) {
 int cylinderMesher(const std::string& fileName)
 {
 	TEST_START
-	glm::ivec2 nnodes(13, 6);
 
+	MeshDensity2D meshDens(13, 6);
+	ArcAngles angles(0.0, 0.99*GLM2PI);
 	double radius = 2.0;
 	double height = 8.0;
 
-	CylinderMesher::writeNodes(pos, radius, height, 0.0, 1.9*glm::pi<double>(), nnodes, direction::x);
-	CylinderMesher::writeElements(nnodes, false);
+	CylinderMesher::writeNodes(pos, meshDens, radius, angles, height, direction::x);
+	CylinderMesher::writeElements(meshDens);
 
-	pos.x += height * 2.1;
-	CylinderMesher::writeNodesX(pos, radius, height, 0.0, 1.0*glm::pi<double>() / 2.0, nnodes);
-	CylinderMesher::writeElements(nnodes, false);
+	pos.pos.x += height * 2.1;
+	angles.setEnd(GLMPI / 2.0);
+	CylinderMesher::writeNodesX(pos, meshDens, radius, angles, height);
+	CylinderMesher::writeElements(meshDens);
 
-	pos.x += height * 2.1;
-	CylinderMesher::writeNodesY(pos, radius, height, 0.0, 1.0*glm::pi<double>() / 4.0, nnodes);
-	CylinderMesher::writeElements(nnodes, false);
+	pos.pos.x += height * 2.1;
+	angles.setEnd(GLMPI / 4.0);
+	CylinderMesher::writeNodesY(pos, meshDens, radius, angles, height);
+	CylinderMesher::writeElements(meshDens);
 
-	pos.x += height * 2.1;
-	CylinderMesher::writeNodesY(pos, radius, height, -1, -1, nnodes);
-	CylinderMesher::writeElements(nnodes, true);
+	pos.pos.x += height * 2.1;
+	meshDens.setClosedLoop();
+	angles.setFullCircle();
+	CylinderMesher::writeNodesY(pos, meshDens, radius, angles, height);
+	CylinderMesher::writeElements(meshDens);
 
 	TEST_END
 }
+
 
 int cylinderMesherRef(const std::string& fileName) 
 {
@@ -498,29 +514,34 @@ int cylinderMesherRef(const std::string& fileName)
 
 	int nRef = 4;
 	int nNodesEdge = std::pow(2, nRef + 3) + 1;
-
+	MeshDensity2Dref meshDens(nRef, nNodesEdge, false);
+	ArcAngles angles(0.0, 0.99*GLM2PI);
 	double radius = 2.0;
-	double height = 4.0;
+	double height = 8.0;
 
-	CylinderMesherRef::writeNodes(pos, nNodesEdge, nRef, radius, height, 0.0, 1.9*glm::pi<double>(), direction::x);
-	CylinderMesherRef::writeElements(nNodesEdge, nRef, false);
+	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, direction::x);
+	CylinderMesherRef::writeElements(meshDens);
 
-	pos.x += height * 1.1;
-	CylinderMesherRef::writeNodes(pos, nNodesEdge, nRef, radius, height, 0.0, 1.0*glm::pi<double>() / 2.0, direction::y);
-	CylinderMesherRef::writeElements(nNodesEdge, nRef, false);
+	pos.pos.x += height * 1.1;
+	angles.setEnd(GLMPI / 2.0);
+	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, direction::y);
+	CylinderMesherRef::writeElements(meshDens);
 
-	pos.x += height * 1.1;
-	CylinderMesherRef::writeNodes(pos, nNodesEdge, nRef, radius, height, 0.0, 1.0*glm::pi<double>() / 4.0, direction::z);
-	CylinderMesherRef::writeElements(nNodesEdge, nRef, false);
+	pos.pos.x += height * 1.1;
+	angles.setEnd(GLMPI / 4.0);
+	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, direction::z);
+	CylinderMesherRef::writeElements(meshDens);
 
+	
+	pos.pos.x += height * 1.1;
 	nNodesEdge = std::pow(2, nRef + 5);
-	pos.x += height * 1.1;
-	CylinderMesherRef::writeNodes(pos, nNodesEdge, nRef, radius, height, -1, -1,  direction::z);
-	CylinderMesherRef::writeElements(nNodesEdge, nRef, true);
+	meshDens.setCirc(nNodesEdge);
+	meshDens.setClosedLoop();
+	angles.setFullCircle();
+	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, direction::z);
+	CylinderMesherRef::writeElements(meshDens);
 
-	pos.x += height * 1.1;
-	CylinderMesherRef::writeNodes(pos, nNodesEdge, nRef, radius, height, -1, -1, direction::z);
-	CylinderMesherRef::writeElements(nNodesEdge, nRef, true);
+
 	TEST_END
 
 }
@@ -528,49 +549,50 @@ int cylinderMesherRef(const std::string& fileName)
 int cuboidMesher(const std::string& fileName) {
 	TEST_START
 
+	MeshDensity3D meshDens(5, 5, 10);
 	glm::dvec3 size(20.0, 30.0, 100.0);
-	glm::ivec3 nnodes(5, 5, 10);
 
-	CuboidMesher::writeNodes(pos, size, nnodes, plane::xy);
-	CuboidMesher::writeElements(nnodes, false);
+	CuboidMesher::writeNodes(pos, meshDens, size, plane::xy);
+	CuboidMesher::writeElements(meshDens);
 
-	pos.x += size.x*1.1;
-	CuboidMesher::writeNodes(pos, size, nnodes, plane::xz);
-	CuboidMesher::writeElements(nnodes, false);
+	pos.pos.x += 1.1*size.x;
+	CuboidMesher::writeNodes(pos, meshDens, size, plane::xz);
+	CuboidMesher::writeElements(meshDens);
 
-	pos.x += size.x*1.1;
-	CuboidMesher::writeNodes(pos, size, nnodes, plane::yz);
-	CuboidMesher::writeElements(nnodes, false);
+	pos.pos.x += 1.1*size.x;
+	CuboidMesher::writeNodes(pos, meshDens, size, plane::yz);
+	CuboidMesher::writeElements(meshDens);
 	
-
-	pos.x = 0.0;
-	pos.y += size.y*1.1;
-	CuboidMesher::writeNodesXYZ(pos, size, nnodes);
-	CuboidMesher::writeElements(nnodes, false);
+	pos.pos.x = 0.0;
+	pos.pos.y += 1.1*size.y;
+	CuboidMesher::writeNodesXYZ(pos, meshDens, size);
+	CuboidMesher::writeElements(meshDens);
 
 	TEST_END
 }
 
+
 int cuboidMesherRef(const std::string& fileName) {
-	TEST_START
+	TEST_START			
 
-	glm::dvec3 size(20.0, 30.0, 50.0);
+	int nRef = 2;
 	
-	int nRef = 3;
-	
-	int nNodesX0 = std::pow(2, nRef + 2) + 1;	
+	int nNodesX0 = std::pow(2, nRef + 1) + 1;	
 	int nNodesY0 = nNodesX0;
-	glm::ivec2 nnodesXY(nNodesX0, nNodesY0);
+	MeshDensity3Dref meshDens(nRef, nNodesX0, nNodesY0);
+	glm::dvec3 size(20.0, 30.0, 50.0);
 
-	CuboidMesherRef::writeNodes(pos, size, nnodesXY, nRef, false, plane::xy);
-	CuboidMesherRef::writeElements(nnodesXY, nRef, false);
+	CuboidMesherRef::writeNodes(pos, meshDens, size, false, plane::xy);
+	CuboidMesherRef::writeElements(meshDens);
 	
-	pos.x += size.x*1.6;
-	nnodesXY.y = std::pow(2, nRef + 1) + 1;
-	CuboidMesherRef::writeNodes(pos, size, nnodesXY, nRef, false, plane::xy);
-	CuboidMesherRef::writeElements(nnodesXY, nRef, false);
+	pos.pos.x += 1.2*size.x;
+	nRef = 4;
+	meshDens.setDir1(std::pow(2, nRef + 1) + 1);
+	meshDens.setDir2(std::pow(2, nRef + 2) + 1);
+	CuboidMesherRef::writeNodes(pos, meshDens, size, false, plane::xy);
+	CuboidMesherRef::writeElements(meshDens);
 
-	if (true) {
+	if (false) {
 		int lastNode = writer.getNextNodeID();
 		int n[2] = { 1, 0 };
 		for (int i = 2; i < lastNode; i++) {
@@ -578,66 +600,63 @@ int cuboidMesherRef(const std::string& fileName) {
 			writer.write2nodedBeam(i, n);
 		}
 	}
-	
+
 	TEST_END
 }
 
 int cone3Dmesher(const std::string& fileName) {
 	TEST_START
 
-	glm::dvec3	  pos(0.0);
 	MeshDensity3D meshDens(15, 4, 16);
 	Pipe3Dradius  radius(5.0, 9.0, 3.0, 5.0);
-	ArcAngles	  angle(0.0, glm::pi<double>()*1.95);
+	ArcAngles	  angle(0.0, 1.95*GLM2PI);
 	double		  height = 32.0;
 
 	Cone3Dmesher::writeNodes(pos, meshDens, radius, angle, height, direction::z);
-	Cone3Dmesher::writeElements(meshDens, false);
+	Cone3Dmesher::writeElements(meshDens);
 	
-	pos.x += height;
-	radius.end.inner = radius.start.inner;
-	radius.end.outer = radius.start.outer;
+	pos.pos.x += height;
+	radius.end.setInner(radius.start.inner());
+	radius.end.setOuter(radius.start.outer());
 	angle.setFullCircle();
+	meshDens.setClosedLoop();
 
 	Cone3Dmesher::writeNodes(pos, meshDens, radius, angle, height, direction::x);
-	Cone3Dmesher::writeElements(meshDens, true);
+	Cone3Dmesher::writeElements(meshDens);
 
 	TEST_END
 }
+
 
 int cone3DmesherRef(const std::string& fileName) {
 	TEST_START
 
 	int nRef = 2;
 	int nNodesAround = std::pow(2, nRef + 4) + 1;
-	glm::ivec2 nnodes12(nNodesAround, nNodesAround);
+	MeshDensity3Dref meshDens(nRef, nNodesAround, nNodesAround);
+	Pipe3Dradius  radius(5.0, 9.0, 1.5, 5.5);
+	ArcAngles	  angle(0.0, GLMPI);
+	double		  height = 8.0;
 
-	double radStartInner = 5.0;
-	double radStartOuter = 9.0;
-	double radEndInner = 1.5;
-	double radEndOuter = 5.5;
-	double height = 8.;
-
-	Cone3DmesherRef::writeNodes(pos, nnodes12, nRef, radStartOuter, radEndOuter, radStartInner, radEndInner, 
-		0.0, glm::pi<double>(), height,	direction::z);
-	Cone3DmesherRef::writeElements(nnodes12, nRef, false);
+	Cone3DmesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::z);
+	Cone3DmesherRef::writeElements(meshDens);
 	
-	pos.x += radStartOuter*2.0;
-	nnodes12.x--;
-	nnodes12.y = std::pow(2, nRef + 2) + 1;
-	Cone3DmesherRef::writeNodes(pos, nnodes12, nRef, radStartOuter, radEndOuter, radStartInner, radEndInner,
-		-1, -1, height, direction::z);
-	Cone3DmesherRef::writeElements(nnodes12, nRef, true);
+	pos.pos.x += radius.start.outer() * 2.0;
+	meshDens.setCirc(meshDens.dir1() - 1);
+	meshDens.setNorm(std::pow(2, nRef + 2) + 1);
+	meshDens.setClosedLoop();
+	angle.setFullCircle();
+	Cone3DmesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::z);
+	Cone3DmesherRef::writeElements(meshDens);
+	
+	pos.pos.x += radius.start.outer() * 2.0;
+	Cone3DmesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::x);
+	Cone3DmesherRef::writeElements(meshDens);
 
-	pos.x += radStartOuter * 2.0;
-	Cone3DmesherRef::writeNodes(pos, nnodes12, nRef, radStartOuter, radEndOuter, radStartInner, radEndInner,
-		-1, -1, height, direction::x);
-	Cone3DmesherRef::writeElements(nnodes12, nRef, true);
-
-	pos.x += radStartOuter * 2.0;
-	Cone3DmesherRef::writeNodes(pos, nnodes12, nRef, radStartOuter, radStartOuter, radStartInner, radEndInner,
-		-1, -1, height, direction::y);
-	Cone3DmesherRef::writeElements(nnodes12, nRef, true);
+	//cylinder
+	pos.pos.x += radius.start.outer() * 2.0;
+	Cone3DmesherRef::writeNodes(pos, meshDens, Pipe3Dradius(5.0, 9.0, 5.0, 9.0), angle, height, direction::x);
+	Cone3DmesherRef::writeElements(meshDens);
 
 	if(false){
 		int lastNode = writer.getNextNodeID();
@@ -650,7 +669,7 @@ int cone3DmesherRef(const std::string& fileName) {
 
 	TEST_END
 }
-
+#ifdef TO_FIX
 int extruded2Drecs(const std::string& fileName)
 {
 	TEST_START
