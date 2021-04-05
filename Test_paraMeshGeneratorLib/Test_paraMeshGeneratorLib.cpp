@@ -36,7 +36,8 @@ int cone3DmesherRef(const std::string& fileName);
 
 int refinement2dHeight(const std::string& fileName);
 int refinement3dHeight(const std::string& fileName);
-
+int refinementCone2dHeight(const std::string& fileName);
+int refinementCone3dHeight(const std::string& fileName);
 
 #ifdef TO_FIX
 
@@ -62,9 +63,11 @@ std::vector<TestDef> testFunctions({
 	TestDef(121, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
 	TestDef(122, "cone3Dmesher",	    "basic meshers 3D", (testFunction)cone3Dmesher),	
 	TestDef(123, "cone3DmesherRef",	    "basic meshers 3D", (testFunction)cone3DmesherRef),
-	TestDef(130, "refinement2dHeight",	"basic meshers 3D", (testFunction)refinement2dHeight),
+	TestDef(130, "refinement2dHeight",	"basic meshers 2D", (testFunction)refinement2dHeight),
 #endif
 	TestDef(131, "refinement3dHeight",	"basic meshers 3D", (testFunction)refinement3dHeight),
+	TestDef(132, "refinementCone2dHeight",	"basic meshers 2D", (testFunction)refinementCone2dHeight),
+	TestDef(133, "refinementCone3dHeight",	"basic meshers 3D", (testFunction)refinementCone3dHeight),
 #ifdef TO_FIX
 
 	TestDef(200, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
@@ -681,8 +684,8 @@ int cone3DmesherRef(const std::string& fileName) {
 int refinement2dHeight(const std::string& fileName) {
 	TEST_START
 
-	double heightC1 = 10.0;
-	double heightC2 = 13.4;
+	double heightC1 = 18.05;
+	double heightC2 = 23.4;
 	int nRefC1 = 2;
 	int nRefC2 = 4;
 	int nNodesY0C1 = std::pow(2, nRefC1 + 2) + 1;
@@ -753,7 +756,7 @@ int refinement3dHeight(const std::string& fileName) {
 	glm::dvec2 sizePlateC2 = 1.2*glm::dvec2(sizeC2.x, sizeC2.y);
 
 
-	bool skipFirstRow[2] = { false, false };
+	bool skipFirstRow[2] = { false, true };
 
 	for (int i = 0; i < 2; i++) {
 
@@ -784,6 +787,120 @@ int refinement3dHeight(const std::string& fileName) {
 		pos.pos.y += sizePlateC1.y*2.0;
 		pos.pos.x = 0.0;
 	}
+	TEST_END
+}
+
+
+int refinementCone2dHeight(const std::string& fileName)
+{
+	TEST_START
+
+	double heightC1 = 10.0;
+	double heightC2 = 13.4;
+	int nRefC1 = 2;
+	int nRefC2 = 3;
+	int nNodesC1 = std::pow(2, nRefC1 + 3);
+	int nNodesC2 = std::pow(2, nRefC2 + 4);
+
+	MeshDensity2Dref meshDensC1(nRefC1, nNodesC1, true);
+	MeshDensity2Dref meshDensC2(nRefC2, nNodesC2, true);
+	Cone2Dradius radiusC1(5.00, 1.25);
+	Cone2Dradius radiusC2(5.00, 5.00);
+	
+	MeshDensity2D meshDensPlate(2, 2);
+	glm::dvec2 sizePlateC1 = 1.2*glm::dvec2(radiusC1.end());
+	glm::dvec2 sizePlateC2 = 1.2*glm::dvec2(radiusC2.end());
+
+
+	bool skipFirstRow[2] = { false, true };
+
+	for (int i = 0; i < 2; i++) {
+
+		//Cone 1:
+		ConeMesherRef::writeNodes(pos, meshDensC1, radiusC1, ArcAngles(), heightC1, direction::z);
+		ConeMesherRef::writeElements(meshDensC1);
+
+		//Lower limit Cone 1:
+		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElementsPlane(meshDensPlate);
+		//Upper limit Cone 1:
+		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElementsPlane(meshDensPlate);
+
+		pos.pos.x += 1.2*radiusC2.start()*2.0;
+		//Cone 2:
+		ConeMesherRef::writeNodes(pos, meshDensC2, radiusC2, ArcAngles(), heightC2, direction::z);
+		ConeMesherRef::writeElements(meshDensC2);
+
+		//Lower limit Cone 2:
+		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElementsPlane(meshDensPlate);
+		//Upper limit Cone 2:
+		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElementsPlane(meshDensPlate);
+
+
+		pos.pos.y += 1.2*radiusC2.start()*2.0;
+		pos.pos.x = 0.0;
+	}
+	TEST_END
+
+}
+
+int refinementCone3dHeight(const std::string& fileName)
+{
+	TEST_START
+
+	double heightC1 = 4.0;
+	double heightC2 = 6.4;
+	int nRefC1 = 2;
+	int nRefC2 = 3;
+	int nNodesC1		= std::pow(2, nRefC1 + 4);
+	int nNodesC1norm	= std::pow(2, nRefC1 + 2) + 1;
+	int nNodesC2		= std::pow(2, nRefC2 + 5);
+	int nNodesC2norm	= std::pow(2, nRefC2 + 2) + 1;
+
+	MeshDensity3Dref meshDensC1(nRefC1, nNodesC1, nNodesC1norm, true);
+	MeshDensity3Dref meshDensC2(nRefC2, nNodesC2, nNodesC2norm, true);
+	Pipe3Dradius radiusC1(5.00, 8.25, 3.0, 5.0);
+	Pipe3Dradius radiusC2(5.00, 8.00, 5.00, 8.00);
+	
+	MeshDensity2D meshDensPlate(2, 2);
+	glm::dvec2 sizePlateC1 = 1.2*glm::dvec2(radiusC1.start.outer()*2.0);
+	glm::dvec2 sizePlateC2 = 1.2*glm::dvec2(radiusC2.start.outer()*2.0);
+
+
+	bool skipFirstRow[2] = { false, true };
+
+	for (int i = 0; i < 2; i++) {
+
+		//Cone 1:
+		Cone3DmesherRef::writeNodes(pos, meshDensC1, radiusC1, ArcAngles(), heightC1, direction::z);
+		Cone3DmesherRef::writeElements(meshDensC1);
+
+		//Lower limit Cone 1:
+		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElementsPlane(meshDensPlate);
+		//Upper limit Cone 1:
+		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElementsPlane(meshDensPlate);
+
+		pos.pos.x += 1.2*radiusC2.start.outer()*2.0;
+		//Cone 2:
+		Cone3DmesherRef::writeNodes(pos, meshDensC2, radiusC2, ArcAngles(), heightC2, direction::z);
+		Cone3DmesherRef::writeElements(meshDensC2);
+
+		//Lower limit Cone 2:
+		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElementsPlane(meshDensPlate);
+		//Upper limit Cone 2:
+		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElementsPlane(meshDensPlate);
+
+
+		pos.pos.y += sizePlateC1.y*2.0;
+		pos.pos.x = 0.0;
+}
 	TEST_END
 }
 

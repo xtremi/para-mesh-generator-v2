@@ -160,6 +160,10 @@ void ConeMesherRef::writeNodes(
 	int firstNodeID = writer->getNextNodeID();
 	MeshCsys curPos(spos);
 
+	int			currentNodesPerArc = meshDens.circ();
+	int			currentRefFactor = 1;
+	int			currentRefinement = 0;
+
 	double	dR				= radius.dR();
 	int		nElAroundStart	= meshDens.nElCirc();
 	double	arcLengthStart	= 2.0 * glm::pi<double>() * radius.start(); //TODO: Is this right? this should depend on angle...
@@ -167,9 +171,7 @@ void ConeMesherRef::writeNodes(
 	double	elSizeX			= initialRefElSize2D(coneLength, meshDens.nRefs(), false);
 
 	glm::dvec2	curElSize(elSizeX, arcLengthStart / (double)(nElAroundStart));
-	int			currentNodesPerArc	= meshDens.circ();
-	int			currentRefFactor	= 1;
-	int			currentRefinement	= 0;
+	
 	double		currentRadius		= radius.start();
 	double		currentConeLength	= 0.0;
 	double		currentDh			= 0.0;

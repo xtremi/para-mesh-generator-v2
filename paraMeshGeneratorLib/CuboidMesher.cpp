@@ -135,7 +135,7 @@ void CuboidMesherRef::writeNodes(
 	MeshDensity2D curMeshDensD12 = meshDens.meshDensD12();
 	//glm::ivec2	currentNodesPerFace(meshDensD12.nodes());
 	glm::dvec2	currentElSize12(size.x / (double)curMeshDensD12.nElDir1(), size.y / (double)curMeshDensD12.nElDir2());
-	double		currentElSize3 = initialRefElSize3D(size.z, meshDens.nRefs(), startWithOffset) / 2.0; //this is not correct	
+	double		currentElSize3 = initialRefElSize3D(size.z, meshDens.nRefs(), startWithOffset); //this is not correct	
 
 	int		currentRefFactor1 = 1;
 	int		currentRefFactor2 = 1;

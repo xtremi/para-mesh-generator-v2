@@ -74,7 +74,7 @@ double initialRefElSize2D(double totalMeshLength, int nRefinements, bool skipFir
 double initialRefElSize3D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight) {
 	double denom;
 	if (!skipFirstRowHeight)
-		denom = 6.0 * std::pow(2.0, (double)(nRefinements - 1)) - 2.0;
+		denom = 10.0 * std::pow(2.0, (double)(nRefinements - 1)) - 6.0;
 	else
 		denom = 5.0 * (std::pow(2.0, (double)nRefinements) - 1.0);
 	return totalMeshLength / denom;
