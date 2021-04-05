@@ -80,7 +80,7 @@ void Cone3DmesherRef::writeNodes(
 	double	coneLengthInner = std::sqrt(std::pow(dRi, 2.0) + std::pow(height, 2.0));
 	double	coneLengthOuter = std::sqrt(std::pow(dRo, 2.0) + std::pow(height, 2.0));
 
-	double	currentElSize3 = initialRefinementElementSize(coneLengthOuter, meshDens.nRefs(), false) / 2.0; 
+	double	currentElSize3 = initialRefElSize2D(coneLengthOuter, meshDens.nRefs(), false) / 2.0; 
 
 	int		currentRefFactor1 = 1;
 	int		currentRefFactor2 = 1;

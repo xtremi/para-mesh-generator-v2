@@ -1,6 +1,7 @@
 #include "CuboidMesher.h"
 #include "PlaneMesher.h"
 #include "LineMesher.h"
+#include "math_utilities.h"
 
 void CuboidMesher::writeNodes(
 	const MeshCsys&			spos,
@@ -134,11 +135,15 @@ void CuboidMesherRef::writeNodes(
 	MeshDensity2D curMeshDensD12 = meshDens.meshDensD12();
 	//glm::ivec2	currentNodesPerFace(meshDensD12.nodes());
 	glm::dvec2	currentElSize12(size.x / (double)curMeshDensD12.nElDir1(), size.y / (double)curMeshDensD12.nElDir2());
-	double		currentElSize3 = initialRefinementElementSize(size.z, meshDens.nRefs(), startWithOffset) / 2.0; //this is not correct	
+	double		currentElSize3 = initialRefElSize3D(size.z, meshDens.nRefs(), startWithOffset) / 2.0; //this is not correct	
 
 	int		currentRefFactor1 = 1;
 	int		currentRefFactor2 = 1;
 	int		currentRefinement = 0;
+
+	if (startWithOffset) {
+		curPos.pos[(size_t)refDirection] += currentElSize3;
+	}
 
 	while (currentRefinement < meshDens.nRefs()) {
 		currentRefinement++;
@@ -168,7 +173,7 @@ void CuboidMesherRef::writeNodes(
 
 		//row m3:  |  x--x--x  |  x--x--x  | //make this a function
 		for (int i = 0; i < curMeshDensD12.dir2(); i++) {
-			curPos.pos[(size_t)dir2] = (double)i*currentElSize12.y;
+			curPos.pos[(size_t)dir2] = spos.pos[(size_t)dir2] + (double)i*currentElSize12.y;
 			if (i % 4){
 				LineMesher::writeNodesLineQ(curPos, curMeshDensD12.dir1(), currentElSize12.x, dir1);
 			}
@@ -237,8 +242,11 @@ void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)
 			CuboidMesher::writeElements(MeshDensity3D(curMeshDens12.dir1(), curMeshDens12.dir2(), 2, meshDens.closedLoop));
 		}
 
+		Mesher::writer->writeComment("Row B M1 M2");
 		writeElements_rows_bm1m2(curMeshDens12.nodes(), nextMeshDens12.nodes(), firstNodeB, firstNodeM1, firstNodeM2, meshDens.closedLoop);
+		Mesher::writer->writeComment("Row M2 M3 T");
 		writeElements_rows_m2m3t(curMeshDens12.nodes(), nextMeshDens12.nodes(), firstNodeM2b, firstNodeM3, firstNodeT, meshDens.closedLoop);
+		Mesher::writer->writeComment("Normal");
 
 		curMeshDens12 = nextMeshDens12;
 		c += nnodesTotal;
@@ -329,7 +337,7 @@ void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)
 		glm::ivec2 nextElements12(closedLoop ? nextNodes12.x : nextNodes12.x - 1, nextNodes12.y - 1);
 
 		for (int i1 = 0; i1 < nextElements12.x; i1++) {
-			for (int i2 = 0; i2 < (currentElements12.y); i2 += 4) {
+			for (int i2 = 0; i2 < currentElements12.y; i2 += 4) {
 
 				/*
 					tf0/tb0     x_______x_______x t
@@ -346,7 +354,7 @@ void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)
 
 				int m2f_0 = firstNodeM2row + 4 * (i2 / 4) * nextNodes12.x;
 				int m3f_0 = firstNodeM3row + 3 * (i2 / 4) * nextNodes12.x;
-				int tf_0 = firstNodeTrow +   2 * (i2 / 4) * nextNodes12.x;
+				int tf_0  = firstNodeTrow  + 2 * (i2 / 4) * nextNodes12.x;
 
 				int m2f[5], m3f[3], tf[3];
 				int m2b[5], m3b[3], tb[3];
@@ -392,7 +400,7 @@ void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)
 			}
 			firstNodeM2row += 1;
 			firstNodeM3row += 1;
-			firstNodeTrow += 1;
+			firstNodeTrow  += 1;
 		}
 
 	}

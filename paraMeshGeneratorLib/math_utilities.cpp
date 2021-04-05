@@ -62,7 +62,7 @@ ___________________|___________________
 					4elL
 		 x = L  v	4elL  v x = L
 */
-double initialRefinementElementSize(double totalMeshLength, int nRefinements, bool skipFirstRowHeight) {
+double initialRefElSize2D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight) {
 
 	double denom;
 	if (!skipFirstRowHeight)
@@ -71,6 +71,15 @@ double initialRefinementElementSize(double totalMeshLength, int nRefinements, bo
 		denom = 3.0 * (std::pow(2.0, (double)nRefinements) - 1.0);
 	return totalMeshLength / denom;
 }
+double initialRefElSize3D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight) {
+	double denom;
+	if (!skipFirstRowHeight)
+		denom = 6.0 * std::pow(2.0, (double)(nRefinements - 1)) - 2.0;
+	else
+		denom = 5.0 * (std::pow(2.0, (double)nRefinements) - 1.0);
+	return totalMeshLength / denom;
+}
+
 
 double calcArcIncrement(double startAng, double endAng, int nnodes) {
 	double dang;

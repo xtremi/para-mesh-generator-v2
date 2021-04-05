@@ -1,5 +1,6 @@
 #include "PlaneMesher.h"
 #include "LineMesher.h"
+#include "math_utilities.h"
 
 void PlaneMesher::writeNodesPlaneQ(
 	const MeshCsys&			spos,
@@ -178,7 +179,7 @@ void PlaneMesherRef::writeNodesPlane_ref(
 	int		currentRefFactor = 1;
 	int		currentRefinement = 0;
 
-	double elSizeX = initialRefinementElementSize(size.x, meshDens.nRefs(), startWithOffset);
+	double elSizeX = initialRefElSize2D(size.x, meshDens.nRefs(), startWithOffset);
 
 	glm::dvec2 curElSize(elSizeX, size.y / (double)(currentNodesPerRow - 1)); //start with square elements (??)(??)
 

@@ -179,7 +179,7 @@ struct MeshDensity3D : public NodeVec3D {
 */
 struct MeshDensity2Dref : public NodeVec2D {
 	MeshDensity2Dref() {}
-	MeshDensity2Dref(int _nRefDir1, int _nNodesDir2, bool closedLoopDir2) : NodeVec2D(_nRefDir1, _nNodesDir2), closedLoop{ closedLoopDir2 } {}
+	MeshDensity2Dref(int _nRefDir1, int _nNodesDir2, bool closedLoopDir2 = false) : NodeVec2D(_nRefDir1, _nNodesDir2), closedLoop{ closedLoopDir2 } {}
 
 	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
 	bool closedLoop;

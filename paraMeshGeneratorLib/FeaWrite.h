@@ -13,7 +13,6 @@ extern const glm::dvec3 X_DIR;
 extern const glm::dvec3 Y_DIR;
 extern const glm::dvec3 Z_DIR;
 
-double initialRefinementElementSize(double totalMeshLength, int nRefinements, bool skipFirstRowHeight);
 
 //typedef void(*coordTransform)(glm::dvec3*, const std::vector<double>&);
 void coordTransform1(glm::dvec3* coords, std::vector<double>*);
@@ -28,6 +27,7 @@ public:
 	~FEAwriter();
 	void close();
 	
+	virtual void writeComment(const std::string& msg);
 	void writeNode(const glm::dvec3& c, const glm::dvec3& transl, glm::dmat3x3* csys);
 	void writeNode(int nodeID, const glm::dvec3& c, const glm::dvec3& transl, glm::dmat3x3* csys);
 
@@ -110,6 +110,8 @@ public:
 	void write2nodedBeam(int elID, int n[2]);
 	void write4nodedShell(int elID, int n[4]);
 	void write8nodedHexa(int elID, int n[8]);
+
+	void writeComment(const std::string& msg);
 };
 
 class AbaqusFEAwriter : public FEAwriter {

@@ -21,6 +21,16 @@ FEAwriter::~FEAwriter() {
 	close();
 }
 
+void FEAwriter::writeComment(const std::string& msg) {
+#ifdef TO_BUFFER
+	buffer += msg + "\n";
+	processWriteBuffer();
+#else
+	*file << str;
+#endif
+}
+
+
 void FEAwriter::close() {
 	dumpBuffer();
 	file->close();
@@ -135,6 +145,10 @@ void FEAwriter::writeNode(int niD, const glm::dvec3& c, const glm::dvec3& transl
 /*********************************/
 /*    NASTRAN                    */
 /*********************************/
+void NastranFEAwriter::writeComment(const std::string& msg) {
+	FEAwriter::writeComment("$" + msg);
+}
+
 void NastranFEAwriter::writeNode(int nodeID, const glm::dvec3& c) {
 	static const std::string GRID_FMT_FORMAT = "GRID, {:d},,{:.5f},{:.5f},{:.5f}\n";
 	std::string str = fmt::format(GRID_FMT_FORMAT, nodeID, c.x, c.y, c.z);	
@@ -754,7 +768,7 @@ int FEAwriter::writeNodesPlane_ref(
 	int		currentRefFactor = 1;
 	int		currentRefinement = 0;
 
-	double elSizeX = initialRefinementElementSize(size.x, nRefinements, startWithOffset);
+	double elSizeX = initialRefElSize2D(size.x, nRefinements, startWithOffset);
 
 	glm::dvec2 curElSize(elSizeX, size.y / (double)(currentNodesPerRow - 1)); //start with square elements (??)
 
@@ -896,7 +910,7 @@ int FEAwriter::writeNodesCone_ref(
 	int		nElAroundStart	= fullCircle ? nNodesEdge : nNodesEdge - 1;
 	double	arcLengthStart	= 2.0 * glm::pi<double>() * radiusStart;
 	double	coneLength		= std::sqrt(std::pow(dR, 2.0) + std::pow(height, 2.0));
-	double	elSizeX			= initialRefinementElementSize(coneLength, nRefinements, false);
+	double	elSizeX			= initialRefElSize2D(coneLength, nRefinements, false);
 	
 	glm::dvec2	curElSize(elSizeX, arcLengthStart / (double)(nElAroundStart));
 	int			currentNodesPerArc	= nNodesEdge;
