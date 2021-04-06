@@ -4,6 +4,10 @@
 const double GLMPI = glm::pi<double>();
 const double GLM2PI = glm::pi<double>()*2.0;
 
+double pow2(double val) {
+	return std::pow(val, 2.0);
+}
+
 glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
 
 	glm::dvec3 xAxis = glm::normalize(dirX);

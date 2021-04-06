@@ -31,9 +31,10 @@ void DiskMesherRef::writeNodes(
 	const MeshDensity2Dref&	meshDens,
 	const Cone2Dradius&		radius,
 	const ArcAngles&		angle,
+	bool					startWithOffset,
 	direction				rotaxis)
 {
-	ConeMesherRef::writeNodes(spos, meshDens, radius, angle, 0.0, rotaxis);
+	ConeMesherRef::writeNodes(spos, meshDens, radius, angle, 0.0, startWithOffset, rotaxis);
 }
 
 void DiskMesherRef::writeElements(const MeshDensity2Dref& meshDens)

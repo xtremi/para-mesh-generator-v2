@@ -39,6 +39,43 @@ public:
 	static void writeElements(const MeshDensity3Dref& meshDens);
 
 private:
+
+	static void writeNodes_layerB(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDensD12,
+		const glm::dvec2&		elSize,
+		double					elSizeRefDir,
+		plane					pln,
+		direction				refDir);
+	static void writeNodes_layerM1(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDensD12,
+		const glm::dvec2&		elSize,
+		double					elSizeRefDir,
+		plane					pln,
+		direction				refDir);
+	static void writeNodes_layerM2(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDensD12,
+		glm::dvec2&				elSize,
+		double					elSizeRefDir,
+		plane					pln,
+		direction				refDir);
+	static void writeNodes_layerM3(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDensD12,
+		const glm::dvec2&		elSize,
+		double					elSizeRefDir,
+		plane					pln,
+		direction				refDir);
+	static void writeNodes_layerT(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDensD12,
+		glm::dvec2&				elSize,
+		double&					elSizeRefDir,
+		plane					pln,
+		direction				refDir);
+
 	static void writeElements_rows_bm1m2(
 		const glm::ivec2&	currentNodes12,
 		glm::ivec2&			nextNodes12,

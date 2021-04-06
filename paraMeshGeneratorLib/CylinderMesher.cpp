@@ -33,9 +33,10 @@ void CylinderMesherRef::writeNodes(
 	double					radius,
 	const ArcAngles&		angle,
 	double					height,
+	bool					startWithOffset,
 	direction				rotaxis)
 {
-	ConeMesherRef::writeNodes(spos, meshDens, Cone2Dradius(radius, radius), angle, height, rotaxis);
+	ConeMesherRef::writeNodes(spos, meshDens, Cone2Dradius(radius, radius), angle, height, startWithOffset, rotaxis);
 }
 
 void CylinderMesherRef::writeElements(const MeshDensity2Dref& meshDens){

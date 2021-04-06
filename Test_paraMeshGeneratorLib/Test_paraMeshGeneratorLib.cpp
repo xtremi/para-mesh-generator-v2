@@ -264,12 +264,12 @@ int planeMesherRef(const std::string& fileName) {
 	int nNodesDir2 = std::pow(2, nRef + 1) + 1;
 	MeshDensity2Dref meshDens(nRef, nNodesDir2, false);
 
-	PlaneMesherRef::writeNodesPlane_ref(pos, meshDens, size, true, plane::xy);
-	PlaneMesherRef::writeElementsPlane_ref(meshDens);
-	PlaneMesherRef::writeNodesPlane_ref(pos, meshDens, size, true, plane::xz);
-	PlaneMesherRef::writeElementsPlane_ref(meshDens);
-	PlaneMesherRef::writeNodesPlane_ref(pos, meshDens, size, true, plane::yz);
-	PlaneMesherRef::writeElementsPlane_ref(meshDens);
+	PlaneMesherRef::writeNodes(pos, meshDens, size, true, plane::xy);
+	PlaneMesherRef::writeElements(meshDens);
+	PlaneMesherRef::writeNodes(pos, meshDens, size, true, plane::xz);
+	PlaneMesherRef::writeElements(meshDens);
+	PlaneMesherRef::writeNodes(pos, meshDens, size, true, plane::yz);
+	PlaneMesherRef::writeElements(meshDens);
 
 	pos.pos.x += 1.2*size.x;
 
@@ -277,12 +277,12 @@ int planeMesherRef(const std::string& fileName) {
 	meshDens.setNrefs(nRef);
 	meshDens.setDir2(std::pow(2, nRef + 1) + 1);
 	size = glm::dvec2(15.0, 7.5);
-	PlaneMesherRef::writeNodesPlaneXY_ref(pos, meshDens, size, false);
-	PlaneMesherRef::writeElementsPlane_ref(meshDens);
-	PlaneMesherRef::writeNodesPlaneXZ_ref(pos, meshDens, size, false);
-	PlaneMesherRef::writeElementsPlane_ref(meshDens);
-	PlaneMesherRef::writeNodesPlaneYZ_ref(pos, meshDens, size, false);
-	PlaneMesherRef::writeElementsPlane_ref(meshDens);
+	PlaneMesherRef::writeNodesXY(pos, meshDens, size, false);
+	PlaneMesherRef::writeElements(meshDens);
+	PlaneMesherRef::writeNodesXZ(pos, meshDens, size, false);
+	PlaneMesherRef::writeElements(meshDens);
+	PlaneMesherRef::writeNodesYZ(pos, meshDens, size, false);
+	PlaneMesherRef::writeElements(meshDens);
 
 	TEST_END
 }
@@ -362,13 +362,13 @@ int coneMesherRef(const std::string& fileName) {
 	double radiusEnd = 2.0;
 
 	//Quarter cone:	
-	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::x);
+	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::x);
 	ConeMesherRef::writeElements(meshDens);
 	
 	//Almost full cone:
 	pos.pos.x += 2.1*radius.start();
 	angle.setEnd(0.99*GLMPI);
-	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::y);
+	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::y);
 	ConeMesherRef::writeElements(meshDens);
 	
 	//Full cone:
@@ -376,14 +376,14 @@ int coneMesherRef(const std::string& fileName) {
 	angle.setFullCircle();
 	meshDens.setClosedLoop();
 	meshDens.setCirc(nNodesEdge - 1);
-	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::z);
+	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::z);
 	ConeMesherRef::writeElements(meshDens);
 	
 	//Full disk:
 	pos.pos.y += 2.1*radius.start();
 	pos.pos.x = 0.0;
 	height = 0.0;
-	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::z);
+	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::z);
 	ConeMesherRef::writeElements(meshDens);
 
 	//Almost full disk:
@@ -391,7 +391,7 @@ int coneMesherRef(const std::string& fileName) {
 	angle.setEnd(0.99*GLM2PI);
 	meshDens.setClosedLoop(false);
 	meshDens.setCirc(nNodesEdge);
-	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::z);
+	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::z);
 	ConeMesherRef::writeElements(meshDens);
 	
 	//Full Cylinder:
@@ -402,7 +402,7 @@ int coneMesherRef(const std::string& fileName) {
 	meshDens.setCirc(nNodesEdge - 1);
 	radius.setEnd(radius.start());
 	height = 10.0;
-	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::z);
+	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::z);
 	ConeMesherRef::writeElements(meshDens);
 	
 	//Half cylinder:
@@ -411,7 +411,7 @@ int coneMesherRef(const std::string& fileName) {
 	meshDens.setClosedLoop(false);
 	meshDens.setCirc(nNodesEdge);
 	height = 6.0;
-	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::z);
+	ConeMesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::z);
 	ConeMesherRef::writeElements(meshDens);
 
 	TEST_END
@@ -456,17 +456,17 @@ int diskMesherRef(const std::string& fileName) {
 	Disk2Dradius radius(2.0, 4.0);
 	ArcAngles angles(0.0, 0.99*GLM2PI);
 
-	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::x);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, false, direction::x);
 	DiskMesherRef::writeElements(meshDens);
 
 	pos.pos.x += radius.outer() * 2.1;
 	angles.setEnd(GLMPI);
-	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::y);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, false, direction::y);
 	DiskMesherRef::writeElements(meshDens);
 
 	pos.pos.x += radius.outer() * 2.1;
 	angles.setEnd(GLMPI/4.0);
-	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::z);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, false, direction::z);
 	DiskMesherRef::writeElements(meshDens);
 
 	pos.pos.x = 0.0;
@@ -475,12 +475,12 @@ int diskMesherRef(const std::string& fileName) {
 	angles.setFullCircle();
 	meshDens.setClosedLoop();
 	meshDens.setCirc(nNodesEdge);
-	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::z);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, false, direction::z);
 	DiskMesherRef::writeElements(meshDens);
 
 	pos.pos.x += radius.outer() * 2.1;
 	radius.setOuter(radius.inner() / 2.0);
-	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, direction::z);
+	DiskMesherRef::writeNodes(pos, meshDens, radius, angles, false, direction::z);
 	DiskMesherRef::writeElements(meshDens);
 
 	TEST_END
@@ -530,17 +530,17 @@ int cylinderMesherRef(const std::string& fileName)
 	double radius = 2.0;
 	double height = 8.0;
 
-	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, direction::x);
+	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, false, direction::x);
 	CylinderMesherRef::writeElements(meshDens);
 
 	pos.pos.x += height * 1.1;
 	angles.setEnd(GLMPI / 2.0);
-	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, direction::y);
+	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, false, direction::y);
 	CylinderMesherRef::writeElements(meshDens);
 
 	pos.pos.x += height * 1.1;
 	angles.setEnd(GLMPI / 4.0);
-	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, direction::z);
+	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, false, direction::z);
 	CylinderMesherRef::writeElements(meshDens);
 
 	
@@ -549,7 +549,7 @@ int cylinderMesherRef(const std::string& fileName)
 	meshDens.setCirc(nNodesEdge);
 	meshDens.setClosedLoop();
 	angles.setFullCircle();
-	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, direction::z);
+	CylinderMesherRef::writeNodes(pos, meshDens, radius, angles, height, false, direction::z);
 	CylinderMesherRef::writeElements(meshDens);
 
 
@@ -649,7 +649,7 @@ int cone3DmesherRef(const std::string& fileName) {
 	ArcAngles	  angle(0.0, GLMPI);
 	double		  height = 8.0;
 
-	Cone3DmesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::z);
+	Cone3DmesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::z);
 	Cone3DmesherRef::writeElements(meshDens);
 	
 	pos.pos.x += radius.start.outer() * 2.0;
@@ -657,16 +657,16 @@ int cone3DmesherRef(const std::string& fileName) {
 	meshDens.setNorm(std::pow(2, nRef + 2) + 1);
 	meshDens.setClosedLoop();
 	angle.setFullCircle();
-	Cone3DmesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::z);
+	Cone3DmesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::z);
 	Cone3DmesherRef::writeElements(meshDens);
 	
 	pos.pos.x += radius.start.outer() * 2.0;
-	Cone3DmesherRef::writeNodes(pos, meshDens, radius, angle, height, direction::x);
+	Cone3DmesherRef::writeNodes(pos, meshDens, radius, angle, height, false, direction::x);
 	Cone3DmesherRef::writeElements(meshDens);
 
 	//cylinder
 	pos.pos.x += radius.start.outer() * 2.0;
-	Cone3DmesherRef::writeNodes(pos, meshDens, Pipe3Dradius(5.0, 9.0, 5.0, 9.0), angle, height, direction::x);
+	Cone3DmesherRef::writeNodes(pos, meshDens, Pipe3Dradius(5.0, 9.0, 5.0, 9.0), angle, height, false, direction::x);
 	Cone3DmesherRef::writeElements(meshDens);
 
 	if(false){
@@ -704,8 +704,8 @@ int refinement2dHeight(const std::string& fileName) {
 	for (int i = 0; i < 2; i++) {
 
 		//Plane 1:
-		PlaneMesherRef::writeNodesPlaneXY_ref(pos, meshDensC1, sizeC1, skipFirstRow[i]);
-		PlaneMesherRef::writeElementsPlane_ref(meshDensC1);
+		PlaneMesherRef::writeNodesXY(pos, meshDensC1, sizeC1, skipFirstRow[i]);
+		PlaneMesherRef::writeElements(meshDensC1);
 
 		//Lower limit Plane1:
 		LineMesher::writeNodesLine(pos, 2, lengthLineC1, direction::y);
@@ -716,8 +716,8 @@ int refinement2dHeight(const std::string& fileName) {
 
 		pos.pos.x += 1.2*sizeC1.x;
 		//Plane 2:
-		PlaneMesherRef::writeNodesPlaneXY_ref(pos, meshDensC2, sizeC2, skipFirstRow[i]);
-		PlaneMesherRef::writeElementsPlane_ref(meshDensC2);
+		PlaneMesherRef::writeNodesXY(pos, meshDensC2, sizeC2, skipFirstRow[i]);
+		PlaneMesherRef::writeElements(meshDensC2);
 
 		//Lower limit Plane1:
 		LineMesher::writeNodesLine(pos, 2, lengthLineC2, direction::y);
@@ -817,7 +817,7 @@ int refinementCone2dHeight(const std::string& fileName)
 	for (int i = 0; i < 2; i++) {
 
 		//Cone 1:
-		ConeMesherRef::writeNodes(pos, meshDensC1, radiusC1, ArcAngles(), heightC1, direction::z);
+		ConeMesherRef::writeNodes(pos, meshDensC1, radiusC1, ArcAngles(), heightC1, skipFirstRow[i], direction::z);
 		ConeMesherRef::writeElements(meshDensC1);
 
 		//Lower limit Cone 1:
@@ -829,7 +829,7 @@ int refinementCone2dHeight(const std::string& fileName)
 
 		pos.pos.x += 1.2*radiusC2.start()*2.0;
 		//Cone 2:
-		ConeMesherRef::writeNodes(pos, meshDensC2, radiusC2, ArcAngles(), heightC2, direction::z);
+		ConeMesherRef::writeNodes(pos, meshDensC2, radiusC2, ArcAngles(), heightC2, skipFirstRow[i], direction::z);
 		ConeMesherRef::writeElements(meshDensC2);
 
 		//Lower limit Cone 2:
@@ -875,7 +875,7 @@ int refinementCone3dHeight(const std::string& fileName)
 	for (int i = 0; i < 2; i++) {
 
 		//Cone 1:
-		Cone3DmesherRef::writeNodes(pos, meshDensC1, radiusC1, ArcAngles(), heightC1, direction::z);
+		Cone3DmesherRef::writeNodes(pos, meshDensC1, radiusC1, ArcAngles(), heightC1, skipFirstRow[i], direction::z);
 		Cone3DmesherRef::writeElements(meshDensC1);
 
 		//Lower limit Cone 1:
@@ -887,7 +887,7 @@ int refinementCone3dHeight(const std::string& fileName)
 
 		pos.pos.x += 1.2*radiusC2.start.outer()*2.0;
 		//Cone 2:
-		Cone3DmesherRef::writeNodes(pos, meshDensC2, radiusC2, ArcAngles(), heightC2, direction::z);
+		Cone3DmesherRef::writeNodes(pos, meshDensC2, radiusC2, ArcAngles(), heightC2, skipFirstRow[i], direction::z);
 		Cone3DmesherRef::writeElements(meshDensC2);
 
 		//Lower limit Cone 2:

@@ -50,7 +50,55 @@ public:
 		const Cone2Dradius&		radius,
 		const ArcAngles&		angle,
 		double					height,
+		bool					startWithOffset,
 		direction				rotaxis);
 
 	static void writeElements(const MeshDensity2Dref& meshDens);
+
+private:
+	static void incrementConeStep(
+		MeshCsys&			curPos,
+		double&				curConeLength,
+		double&				curRadius,
+		double				coneLength,
+		double				elSizeRefDir,
+		double				height,
+		const Cone2Dradius& radius,
+		direction			rotAxis);
+
+	static void writeNodes_refLayerB(
+		MeshCsys&			curPos,
+		int					nodesPerRow,
+		const glm::dvec2&	elSize,
+		const ArcAngles&	angle,
+		const Cone2Dradius& radius,
+		double				coneLength,
+		double				height,
+		double&				curRadius,
+		double&				curConeLength,
+		direction			rotAxis);
+
+	static void writeNodes_refLayerM(
+		MeshCsys&			curPos,
+		int					nodesPerRow,
+		const glm::dvec2&	elSize,
+		const ArcAngles&	angle,
+		const Cone2Dradius& radius,
+		double				coneLength,
+		double				height,
+		double&				curRadius,
+		double&				curConeLength,
+		direction			rotAxis);
+
+	static void writeNodes_refLayerT(
+		MeshCsys&			curPos,
+		int					nodesPerRow,
+		glm::dvec2&			elSize,
+		const ArcAngles&	angle,
+		const Cone2Dradius& radius,
+		double				coneLength,
+		double				height,
+		double&				curRadius,
+		double&				curConeLength,
+		direction			rotAxis);
 };

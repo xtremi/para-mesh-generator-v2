@@ -28,6 +28,7 @@ public:
 		const MeshDensity2Dref&	meshDens,
 		const Cone2Dradius&		radius,
 		const ArcAngles&		angle,
+		bool					startWithOffset,
 		direction				rotaxis);
 
 	static void writeElements(const MeshDensity2Dref& meshDens);

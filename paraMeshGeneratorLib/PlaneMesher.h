@@ -11,6 +11,14 @@ public:
 		const glm::dvec2&	 size,		
 		plane				 pln);
 
+	static void writeNodesPlaneQ_nth(
+		const MeshCsys&		 spos,
+		const MeshDensity2D& meshDens,
+		const glm::dvec2&	 dsize,
+		plane				 pln,
+		int					 skipNth,
+		bool				 skipAlongDir1);
+
 	static void writeNodesPlaneQ(
 		const MeshCsys&			spos,
 		const MeshDensity2D&	meshDens,
@@ -29,18 +37,22 @@ public:
 
 class PlaneMesherRef : private Mesher {
 public:
-	static void writeNodesPlane_ref(
+	static void writeNodes(
 		const MeshCsys&			spos,
 		const MeshDensity2Dref& meshDens,
 		const glm::dvec2&		size,
 		bool					startWithOffset,
 		plane					pln);
 
-	static void writeNodesPlaneXY_ref(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset);
-	static void writeNodesPlaneXZ_ref(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset);
-	static void writeNodesPlaneYZ_ref(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset);
+	static void writeNodesXY(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset);
+	static void writeNodesXZ(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset);
+	static void writeNodesYZ(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset);
 
-	static void writeElementsPlane_ref(const MeshDensity2Dref& meshDens);
+	static void writeElements(const MeshDensity2Dref& meshDens);
 
+private:
+	static void writeNodes_layerB(MeshCsys& curPos, int nodesPerRow, const glm::dvec2& elSize, direction refDir, direction edgeDir);
+	static void writeNodes_layerM(MeshCsys& curPos, int nodesPerRow, const glm::dvec2& elSize, direction refDir, direction edgeDir);
+	static void writeNodes_layerT(MeshCsys& curPos, int nodesPerRow, glm::dvec2& elSize, direction refDir, direction edgeDir);
 };
 

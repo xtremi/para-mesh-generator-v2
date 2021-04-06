@@ -31,6 +31,7 @@ public:
 		double					radius,
 		const ArcAngles&		angle,
 		double					height,
+		bool					startWithOffset,
 		direction				rotaxis);
 
 	static void writeElements(const MeshDensity2Dref& meshDens);

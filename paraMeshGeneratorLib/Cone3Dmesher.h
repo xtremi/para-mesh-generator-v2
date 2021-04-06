@@ -43,26 +43,82 @@ public:
 		const Pipe3Dradius&		radius,
 		const ArcAngles&		angle,
 		double					height,
+		bool					startWithOffset,
 		direction				rotaxis);
 
 	static void writeElements(const MeshDensity3Dref& meshDens);
 
 private:
-	static void writeNodes_refLayerM1(
-		const MeshCsys&		 spos,
-		const MeshDensity2D& meshDens,
-		Disk2Dradius&		 radius,
-		double				 startAng,
-		double				 dang,
-		int					 skipNth,
-		direction			 rotaxis);
+	static void incrementConeStep(
+		MeshCsys&			curPos,
+		double&				curConeLength,
+		Disk2Dradius&		curRadius,
+		double				coneLengthOuter,
+		double				coneLengthInner,
+		double				elSizeRefDir,
+		double				height,
+		const Pipe3Dradius&	radius,
+		direction			rotaxis);
 
-	static void writeNodes_refLayerM2(
-		const MeshCsys&		 spos,
-		const MeshDensity2D& meshDens,
-		Disk2Dradius&		 radius,
-		double				 startAng,
-		double				 dang,
-		int					 skipNth,
-		direction			 rotaxis);
+	static void writeNodes_layerB(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDens,
+		const Pipe3Dradius&		radius,
+		const ArcAngles&		angle,
+		double					elSizeRefDir,
+		double					coneLengthOuter,
+		double					coneLengthInner,
+		double					height,
+		Disk2Dradius&			curRadius,
+		double&					curConeLength,
+		direction				rotaxis);
+	static void writeNodes_layerM1(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDens,
+		const Pipe3Dradius&		radius,
+		const ArcAngles&		angle,
+		double					elSizeRefDir,
+		double					coneLengthOuter,
+		double					coneLengthInner,
+		double					height,
+		Disk2Dradius&			curRadius,
+		double&					curConeLength,
+		direction				rotaxis);
+
+	static void writeNodes_layerM2(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDens,
+		const Pipe3Dradius&		radius,
+		const ArcAngles&		angle,
+		double					elSizeRefDir,
+		double					coneLengthOuter,
+		double					coneLengthInner,
+		double					height,
+		Disk2Dradius&			curRadius,
+		double&					curConeLength,
+		direction				rotaxis);
+	static void writeNodes_layerM3(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDens,
+		const Pipe3Dradius&		radius,
+		const ArcAngles&		angle,
+		double					elSizeRefDir,
+		double					coneLengthOuter,
+		double					coneLengthInner,
+		double					height,
+		Disk2Dradius&			curRadius,
+		double&					curConeLength,
+		direction				rotaxis);
+	static void writeNodes_layerT(
+		MeshCsys&				curPos,
+		const MeshDensity2D&	meshDens,
+		const Pipe3Dradius&		radius,
+		const ArcAngles&		angle,
+		double&					elSizeRefDir,
+		double					coneLengthOuter,
+		double					coneLengthInner,
+		double					height,
+		Disk2Dradius&			curRadius,
+		double&					curConeLength,
+		direction				rotaxis);
 };
