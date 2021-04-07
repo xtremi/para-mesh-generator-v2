@@ -55,7 +55,7 @@ private:
 	static void writeNodes_layerM(MeshCsys& curPos, int nodesPerRow, const glm::dvec2& elSize, direction refDir, direction edgeDir);
 	static void writeNodes_layerT(MeshCsys& curPos, int nodesPerRow, glm::dvec2& elSize, direction refDir, direction edgeDir);
 
-	static void writeElements_layerB(MeshDensity2Dref& curMeshDens, int& nid1);
-	static void writeElements_layersMT(MeshDensity2Dref& curMeshDens, int& nid1);
+	static void writeElements_layerB(const MeshDensity2Dref& meshDens, int& nid1, int curRefLayer);
+	static void writeElements_layersMT(const MeshDensity2Dref& meshDens, int& nid1, int curRefLayer);
 };
 

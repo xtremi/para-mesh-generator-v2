@@ -34,10 +34,28 @@ void getPlaneDirections(plane pln, direction& d1, direction& d2){
 	}
 }
 
+glm::dvec3 coordsOnCircle(double angle, double radius, direction rotAxis) {
 
-//bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes) {
-//	return limitArcAngles(arcAngles.start, arcAngles.end, dang, nnodes);
-//}
+	switch (rotAxis)
+	{
+	case direction::x:
+		return glm::dvec3(0.0, radius * glm::sin(angle), radius * glm::cos(angle));
+		break;
+	case direction::y:
+		return glm::dvec3(radius * glm::sin(angle), 0.0, radius * glm::cos(angle));
+		break;
+	case direction::z:
+		return glm::dvec3(radius * glm::sin(angle), radius * glm::cos(angle), 0.0);;
+		break;
+	default:
+		return glm::dvec3(0.0);
+		break;
+	}
+}
+
+bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes) {
+	return limitArcAngles(arcAngles.start, arcAngles.end, dang, nnodes);
+}
 
 
 void ArcAngles::setFullCircle(){
@@ -54,3 +72,4 @@ double ArcAngles::angStep(int nnodes) const {
 		dang /= (double)nnodes;
 	return dang;
 }
+

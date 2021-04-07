@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include "math_utilities.h"
 
 enum class Dim { DIM1D, DIM2D, DIM3D };
 
@@ -8,6 +9,8 @@ enum class plane {xy, xz, yz};
 
 void getPlaneDirections(plane pln, direction& d1, direction& d2);
 direction getPlaneNormal(plane pln);
+glm::dvec3 coordsOnCircle(double angle, double radius, direction rotAxis);
+
 
 class NodeIterator {
 public:
@@ -189,13 +192,31 @@ struct MeshDensity2Dref : public NodeVec2D {
 	int nElCirc() const { return nElDir2(); }
 
 	void setNrefs(int n) { setDir1(n); }
-	void multiplyNrefs(int factor) { nnodes.x *= factor; }
 
 	//virtual from NodeVec2D
 	void setCirc(int n) { setDir2(n); }
 	void setNorm(int n) { setDir1(n); }
 	int circ() const { return dir2(); }
 	int norm() const { return dir1(); }
+
+	//First layer is refLayer = 0
+	int nElRowB(int refLayer) const {
+		return nElDir2() / std::pow(2, refLayer);
+	}
+	int nElRowT(int refLayer) const {
+		return nElRowB(refLayer + 1);
+	}
+
+	int nNodesRowB(int refLayer) const {
+		return closedLoop ? nElRowB(refLayer) : nElRowB(refLayer) + 1;
+	}
+	int nNodesRowM(int refLayer) const {
+		return 3 * nElRowB(refLayer) / 4;
+	}
+	int nNodesRowT(int refLayer) const {
+		return nNodesRowB(refLayer + 1);
+	}
+
 };
 
 /*
@@ -306,3 +327,6 @@ struct ArcAngles {
 private:
 	bool m_fullCircle;
 };
+
+
+bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes);

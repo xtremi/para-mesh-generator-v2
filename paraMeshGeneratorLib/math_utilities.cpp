@@ -28,24 +28,6 @@ glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
 
 }
 
-glm::dvec3 coordsOnCircle(double angle, double radius, direction rotAxis) {
-
-	switch (rotAxis)
-	{
-	case direction::x:
-		return glm::dvec3(0.0, radius * glm::sin(angle), radius * glm::cos(angle));
-		break;
-	case direction::y:
-		return glm::dvec3(radius * glm::sin(angle), 0.0, radius * glm::cos(angle));
-		break;
-	case direction::z:
-		return glm::dvec3(radius * glm::sin(angle), radius * glm::cos(angle), 0.0);;
-		break;
-	default:
-		return glm::dvec3(0.0);
-		break;
-	}
-}
 
 
 /*
@@ -106,9 +88,7 @@ double calcArcIncrement(double startAng, double endAng, int nnodes) {
 	return dang;
 }
 
-bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes) {
-	return limitArcAngles(arcAngles.start, arcAngles.end, dang, nnodes);
-}
+
 
 bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes) {
 	bool fullCircle = false;

@@ -330,70 +330,69 @@ b0   x___x___x___x___x___x___x___x___x  	           -
 */
 void PlaneMesherRef::writeElements(const MeshDensity2Dref& meshDens)
 {
-	MeshDensity2Dref curMeshDens(meshDens);
-	curMeshDens.setNrefs(1);
-
 	int c = nodeID1;
 	
-	for (int r = 0; r < meshDens.nRefs(); r++) {
+	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
 
-		if (r != 0) {
-			writeElements_layerB(curMeshDens, c);
+		if (refLayer != 0) {
+			writeElements_layerB(meshDens, c, refLayer);
 		}
-		writeElements_layersMT(curMeshDens, c);
+		writeElements_layersMT(meshDens, c, refLayer);
 
-		if (meshDens.closedLoop) c--;
 	}
 }
 
-void PlaneMesherRef::writeElements_layerB(MeshDensity2Dref& curMeshDens, int& nid1){
+void PlaneMesherRef::writeElements_layerB(const MeshDensity2Dref& meshDens, int& nid1, int curRefLayer){
 	int n[4];
-	for (int i = 0; i < curMeshDens.nElDir2(); i++) {
+	int nElrowB    = meshDens.nElRowB(curRefLayer);
+	int nNodesRowB = meshDens.nNodesRowB(curRefLayer);
+
+	for (int i = 0; i < nElrowB; i++) {
 		n[0] = nid1++;								//  3x------x2
 		n[1] = n[0] + 1;							//   |      |
-		n[2] = n[1] + curMeshDens.dir2();			//   |      |
+		n[2] = n[1] + nNodesRowB;			//   |      |
 		n[3] = n[2] - 1;							//  0x------x1
 
-		if (curMeshDens.closedLoop && i == (curMeshDens.nElDir2() - 1)) {
-			n[1] -= curMeshDens.dir2();
-			n[2] -= curMeshDens.dir2();
+		if (meshDens.closedLoop && i == (nElrowB - 1)) {
+			n[1] -= nNodesRowB;
+			n[2] -= nNodesRowB;
 		}
 		writer->write4nodedShell(n);
 	}
-	if (!curMeshDens.closedLoop) nid1++;
+	if (!meshDens.closedLoop) nid1++;
 
 }
-void PlaneMesherRef::writeElements_layersMT(MeshDensity2Dref& curMeshDens, int& nid1) {
+void PlaneMesherRef::writeElements_layersMT(const MeshDensity2Dref& meshDens, int& nid1, int curRefLayer) {
 
-	int nnodesRowM = 3 * curMeshDens.nElDir2() / 4;
-	curMeshDens.multiplyNrefs(2);
-	//int nnodesRowT = meshDens.nElDir2() / curMeshDens.nRefs();
-	int nnodesRowT = curMeshDens.nElDir2() / 2;
-	if (!curMeshDens.closedLoop) nnodesRowT++;
+	int nElRowB		= meshDens.nElRowB(curRefLayer);
+	int nNodesRowB	= meshDens.nNodesRowB(curRefLayer);
+	int nnodesRowM  = meshDens.nNodesRowM(curRefLayer);
+	int nnodesRowT  = meshDens.nNodesRowT(curRefLayer);
 
 	int b0, m0, t0;
 	int b[5], m[3], t[3];
-	for (int i = 0; i < curMeshDens.nElDir2(); i += 4) {
+	int* elNodes[6];
+
+	for (int i = 0; i < nElRowB; i += 4) {
 
 		b0 = nid1;
-		m0 = b0 + curMeshDens.dir2() - i / 4;
+		m0 = b0 + nNodesRowB - i / 4;
 		t0 = m0 + nnodesRowM - i / 4;
-		for (int i = 0; i < 5; i++) b[i] = b0 + i;
-		for (int i = 0; i < 3; i++) m[i] = m0 + i;
-		for (int i = 0; i < 3; i++) t[i] = t0 + i;
+		for (int j = 0; j < 5; j++) b[j] = b0 + j;
+		for (int j = 0; j < 3; j++) m[j] = m0 + j;
+		for (int j = 0; j < 3; j++) t[j] = t0 + j;
 
-		if (curMeshDens.closedLoop && i == (curMeshDens.nElDir2() - 4)) {
-			b[4] -= curMeshDens.dir2();
-			t[2] -= (nnodesRowT);
+		if (meshDens.closedLoop && i == (nElRowB - 4)) {
+			b[4] -= nNodesRowB;
+			t[2] -= nnodesRowT;
 		}
-
-		std::vector<int*> elNodes;                                      //  t0       t1     t2
-		int n1[4] = { b[0], b[1], m[0], t[0] }; elNodes.push_back(n1);  //   x_______x_______x  x_______x_______x
-		int n2[4] = { b[1], b[2], m[1], m[0] }; elNodes.push_back(n2);  //   | \    5|    6/ |  |\      |      /|
-		int n3[4] = { b[2], b[3], m[2], m[1] }; elNodes.push_back(n3);  //   | m0x_m1x___x/m2|  |  \ ___|____ / |
-		int n4[4] = { b[3], b[4], t[2], m[2] }; elNodes.push_back(n4);  //   |  1|  2|  3|  4|  |   |   |   |   |
-		int n5[4] = { m[0], m[1], t[1], t[0] }; elNodes.push_back(n5);  //   x___x___x___x___x  x___x___x___x___x
-		int n6[4] = { m[1], m[2], t[2], t[1] }; elNodes.push_back(n6);  //  b0   b1  b2  b3  b4
+																	//  t0       t1     t2
+		int n1[4] = { b[0], b[1], m[0], t[0] }; elNodes[0] = n1;    //   x_______x_______x  x_______x_______x t
+		int n2[4] = { b[1], b[2], m[1], m[0] }; elNodes[1] = n2;    //   | \    5|    6/ |  |\      |      /|
+		int n3[4] = { b[2], b[3], m[2], m[1] }; elNodes[2] = n3;    //   | m0x_m1x___x/m2|  |  \ ___|____ / | m
+		int n4[4] = { b[3], b[4], t[2], m[2] }; elNodes[3] = n4;    //   |  1|  2|  3|  4|  |   |   |   |   |
+		int n5[4] = { m[0], m[1], t[1], t[0] }; elNodes[4] = n5;    //   x___x___x___x___x  x___x___x___x___x b
+		int n6[4] = { m[1], m[2], t[2], t[1] }; elNodes[5] = n6;    //  b0   b1  b2  b3  b4
 
 
 		for (int i = 0; i < 6; i++) {
@@ -402,7 +401,8 @@ void PlaneMesherRef::writeElements_layersMT(MeshDensity2Dref& curMeshDens, int& 
 
 		nid1 += 4;
 	}
-	curMeshDens.setDir2(nnodesRowT);
 
 	nid1 += (nnodesRowM + 1);
+	if (meshDens.closedLoop) nid1--;
+
 }
