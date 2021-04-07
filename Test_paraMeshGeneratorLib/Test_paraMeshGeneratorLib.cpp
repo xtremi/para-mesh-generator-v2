@@ -47,7 +47,7 @@ int extrude2DarcMulti(const std::string& filename);
 #endif
 
 std::vector<TestDef> testFunctions({
-#ifdef SKIP
+#ifndef SKIP
 	TestDef(101, "lineMesher",			"basic meshers 2D", (testFunction)lineMesher),	
 	TestDef(102, "arcMesher",			"basic meshers 2D", (testFunction)arcMesher),
 	TestDef(103, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),

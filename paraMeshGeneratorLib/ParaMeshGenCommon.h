@@ -85,7 +85,7 @@ struct NodeVec2D {
 	virtual void setCirc(int n) { setDir1(n); }
 	virtual void setNorm(int n) { setDir2(n); }
 
-private:
+protected:
 	glm::ivec2 nnodes;
 };
 
@@ -183,16 +183,13 @@ struct MeshDensity2Dref : public NodeVec2D {
 
 	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
 	bool closedLoop;
-	//int nElDir1() const { return dir1(); }		//depends on refinement 
+	
 	int nRefs() const { return dir1(); }
 	int nElDir2() const { return closedLoop ? dir2() : dir2() - 1; }
 	int nElCirc() const { return nElDir2(); }
 
-	//int nNodesDir2(int curRef) const { return 0; }
-	//int nElDir2(int curRef) const { return 0; }
-
-	//int nElNorm() const { return nElDir1(); }		//depends on refinement 
 	void setNrefs(int n) { setDir1(n); }
+	void multiplyNrefs(int factor) { nnodes.x *= factor; }
 
 	//virtual from NodeVec2D
 	void setCirc(int n) { setDir2(n); }

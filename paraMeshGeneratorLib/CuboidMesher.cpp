@@ -281,11 +281,8 @@ void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)
 			CuboidMesher::writeElements(MeshDensity3D(curMeshDens12.dir1(), curMeshDens12.dir2(), 2, meshDens.closedLoop));
 		}
 
-		Mesher::writer->writeComment("Row B M1 M2");
 		writeElements_rows_bm1m2(curMeshDens12.nodes(), nextMeshDens12.nodes(), firstNodeB, firstNodeM1, firstNodeM2, meshDens.closedLoop);
-		Mesher::writer->writeComment("Row M2 M3 T");
 		writeElements_rows_m2m3t(curMeshDens12.nodes(), nextMeshDens12.nodes(), firstNodeM2b, firstNodeM3, firstNodeT, meshDens.closedLoop);
-		Mesher::writer->writeComment("Normal");
 
 		curMeshDens12 = nextMeshDens12;
 		c += nnodesTotal;
@@ -425,15 +422,7 @@ void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)
 				int n_el6[8] = { m3f[1], m3f[2], m3b[2], m3b[1],  tf[1], tf[2], tb[2], tb[1] }; elNodes.push_back(n_el6);
 
 				for (int i = 0; i < elNodes.size(); i++) {
-					//if( i != 0 && 
-					//	//i != 1 &&
-					//	i != 2 &&
-					//	i != 3 &&
-					//	i != 4 &&
-					//	i != 5)
-					//{
 					writer->write8nodedHexa(elNodes[i]);
-					//}
 				}
 
 			}
