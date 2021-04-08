@@ -72,19 +72,6 @@ private:
 		glm::dvec2				curElSize;
 	};
 
-/*	struct WriteRefLayerInput {
-		MeshCsys				curPos;
-		const MeshDensity2Dref* meshDens;
-		const Cone2Dradius*		radius;
-		const ArcAngles*		angle;
-		direction				rotAxis;
-		double					height;
-		double					coneLength;
-		double					curConeLength;
-		double					curRadius;
-		glm::dvec2				curElSize;
-	};*/
-
 	static void incrementConeStep(const RefShapeData& rsData, RefLayerData& rlData);
 	static void writeNodes_refLayerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
 	static void writeNodes_refLayerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);

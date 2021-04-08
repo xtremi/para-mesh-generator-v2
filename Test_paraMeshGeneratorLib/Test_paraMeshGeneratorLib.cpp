@@ -221,37 +221,37 @@ int planeMesher(const std::string& fileName) {
 	MeshDensity2D meshDens(10, 12);
 	glm::dvec2 size(20.0, 17.0);
 	
-	PlaneMesher::writeNodesPlane(pos, meshDens, size, plane::xy);
-	PlaneMesher::writeElementsPlane(meshDens);
-	PlaneMesher::writeNodesPlane(pos, meshDens, size, plane::xz);
-	PlaneMesher::writeElementsPlane(meshDens);
-	PlaneMesher::writeNodesPlane(pos, meshDens, size, plane::yz);
-	PlaneMesher::writeElementsPlane(meshDens);
+	PlaneMesher::writeNodes(pos, meshDens, size, plane::xy);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodes(pos, meshDens, size, plane::xz);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodes(pos, meshDens, size, plane::yz);
+	PlaneMesher::writeElements(meshDens);
 	
 	pos.pos.x += 1.2*size.x;
-	PlaneMesher::writeNodesPlaneXY(pos, meshDens, size);
-	PlaneMesher::writeElementsPlane(meshDens);
-	PlaneMesher::writeNodesPlaneXZ(pos, meshDens, size);
-	PlaneMesher::writeElementsPlane(meshDens);
-	PlaneMesher::writeNodesPlaneYZ(pos, meshDens, size);
-	PlaneMesher::writeElementsPlane(meshDens);
+	PlaneMesher::writeNodesXY(pos, meshDens, size);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodesXZ(pos, meshDens, size);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodesYZ(pos, meshDens, size);
+	PlaneMesher::writeElements(meshDens);
 	
 	pos.pos.x += 1.2*size.x;
 	glm::dvec2 elsize(size.x / (double)meshDens.nElDir1(), size.y / (double)meshDens.nElDir2());
-	PlaneMesher::writeNodesPlaneQ(pos, meshDens, elsize, plane::xy);
-	PlaneMesher::writeElementsPlane(meshDens);
-	PlaneMesher::writeNodesPlaneQ(pos, meshDens, elsize, plane::xz);
-	PlaneMesher::writeElementsPlane(meshDens);
-	PlaneMesher::writeNodesPlaneQ(pos, meshDens, elsize, plane::yz);
-	PlaneMesher::writeElementsPlane(meshDens);
+	PlaneMesher::writeNodesQ(pos, meshDens, elsize, plane::xy);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodesQ(pos, meshDens, elsize, plane::xz);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodesQ(pos, meshDens, elsize, plane::yz);
+	PlaneMesher::writeElements(meshDens);
 	
 	pos.pos.x += 1.2*size.x;
-	PlaneMesher::writeNodesPlaneXYq(pos, meshDens, elsize);
-	PlaneMesher::writeElementsPlane(meshDens);
-	PlaneMesher::writeNodesPlaneXZq(pos, meshDens, elsize);
-	PlaneMesher::writeElementsPlane(meshDens);
-	PlaneMesher::writeNodesPlaneYZq(pos, meshDens, elsize);
-	PlaneMesher::writeElementsPlane(meshDens);
+	PlaneMesher::writeNodesXYq(pos, meshDens, elsize);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodesXZq(pos, meshDens, elsize);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodesYZq(pos, meshDens, elsize);
+	PlaneMesher::writeElements(meshDens);
 	TEST_END
 }
 
@@ -765,11 +765,11 @@ int refinement3dHeight(const std::string& fileName) {
 		CuboidMesherRef::writeElements(meshDensC1);
 
 		//Lower limit Cube1:
-		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC1);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cube1:
-		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElements(meshDensPlate);
 
 		pos.pos.x += 1.2*sizeC1.x;
 		//Cube 2:
@@ -777,11 +777,11 @@ int refinement3dHeight(const std::string& fileName) {
 		CuboidMesherRef::writeElements(meshDensC2);
 		
 		//Lower limit Cube1:
-		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC2);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cube1:
-		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElements(meshDensPlate);
 
 
 		pos.pos.y += sizePlateC1.y*2.0;
@@ -821,11 +821,11 @@ int refinementCone2dHeight(const std::string& fileName)
 		ConeMesherRef::writeElements(meshDensC1);
 
 		//Lower limit Cone 1:
-		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC1);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cone 1:
-		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElements(meshDensPlate);
 
 		pos.pos.x += 1.2*radiusC2.start()*2.0;
 		//Cone 2:
@@ -833,11 +833,11 @@ int refinementCone2dHeight(const std::string& fileName)
 		ConeMesherRef::writeElements(meshDensC2);
 
 		//Lower limit Cone 2:
-		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC2);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cone 2:
-		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElements(meshDensPlate);
 
 
 		pos.pos.y += 1.2*radiusC2.start()*2.0;
@@ -879,11 +879,11 @@ int refinementCone3dHeight(const std::string& fileName)
 		Cone3DmesherRef::writeElements(meshDensC1);
 
 		//Lower limit Cone 1:
-		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC1);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cone 1:
-		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
+		PlaneMesher::writeElements(meshDensPlate);
 
 		pos.pos.x += 1.2*radiusC2.start.outer()*2.0;
 		//Cone 2:
@@ -891,11 +891,11 @@ int refinementCone3dHeight(const std::string& fileName)
 		Cone3DmesherRef::writeElements(meshDensC2);
 
 		//Lower limit Cone 2:
-		PlaneMesher::writeNodesPlaneXY(pos, meshDensPlate, sizePlateC2);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cone 2:
-		PlaneMesher::writeNodesPlaneXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
-		PlaneMesher::writeElementsPlane(meshDensPlate);
+		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
+		PlaneMesher::writeElements(meshDensPlate);
 
 
 		pos.pos.y += sizePlateC1.y*2.0;

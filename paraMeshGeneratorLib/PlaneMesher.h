@@ -5,13 +5,19 @@
 class PlaneMesher : private Mesher
 {
 public:
-	static void writeNodesPlane(
+	static void writeNodes(
 		const MeshCsys&		 spos,
 		const MeshDensity2D& meshDens,
 		const glm::dvec2&	 size,		
 		plane				 pln);
-
-	static void writeNodesPlaneQ_nth(
+	
+	static void writeNodesQ(
+		const MeshCsys&			spos,
+		const MeshDensity2D&	meshDens,
+		const glm::dvec2&		dsize,
+		plane					pln);
+	
+	static void writeNodesQ_nth(
 		const MeshCsys&		 spos,
 		const MeshDensity2D& meshDens,
 		const glm::dvec2&	 dsize,
@@ -19,20 +25,14 @@ public:
 		int					 skipNth,
 		bool				 skipAlongDir1);
 
-	static void writeNodesPlaneQ(
-		const MeshCsys&			spos,
-		const MeshDensity2D&	meshDens,
-		const glm::dvec2&		dsize,		
-		plane					pln);
+	static void writeNodesXZq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxz);
+	static void writeNodesXYq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxy);
+	static void writeNodesYZq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dyz);
+	static void writeNodesXZ( const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size);
+	static void writeNodesXY( const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size);
+	static void writeNodesYZ( const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size);
 
-	static void writeNodesPlaneXZq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxz);
-	static void writeNodesPlaneXYq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxy);
-	static void writeNodesPlaneYZq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dyz);
-	static void writeNodesPlaneXZ( const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size);
-	static void writeNodesPlaneXY( const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size);
-	static void writeNodesPlaneYZ( const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size);
-
-	static void writeElementsPlane(const MeshDensity2D& meshDens);
+	static void writeElements(const MeshDensity2D& meshDens);
 };
 
 class PlaneMesherRef : private Mesher {
@@ -51,9 +51,20 @@ public:
 	static void writeElements(const MeshDensity2Dref& meshDens);
 
 private:
-	static void writeNodes_layerB(MeshCsys& curPos, int nodesPerRow, const glm::dvec2& elSize, direction refDir, direction edgeDir);
-	static void writeNodes_layerM(MeshCsys& curPos, int nodesPerRow, const glm::dvec2& elSize, direction refDir, direction edgeDir);
-	static void writeNodes_layerT(MeshCsys& curPos, int nodesPerRow, glm::dvec2& elSize, direction refDir, direction edgeDir);
+
+	struct RefShapeData {
+		const MeshDensity2Dref* meshDens;
+		direction				refDir;
+		direction				edgeDir;
+	};
+	struct RefLayerData {
+		MeshCsys				curPos;
+		glm::dvec2				curElSize;
+	};
+
+	static void writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
 
 	static void writeElements_layerB(const MeshDensity2Dref& meshDens, int& nid1, int curRefLayer);
 	static void writeElements_layersMT(const MeshDensity2Dref& meshDens, int& nid1, int curRefLayer);

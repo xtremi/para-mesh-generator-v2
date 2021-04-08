@@ -626,7 +626,7 @@ int FEAwriter::writeNodesCircular_nth(
 /********************************************************
 	Nodes plane:
 ********************************************************/
-/*int FEAwriter::writeNodesPlaneQ(
+/*int FEAwriter::writeNodesQ(
 	const glm::dvec3&	spos,
 	const glm::dvec2&	dp,
 	const glm::ivec2&	nnodes,
@@ -658,7 +658,7 @@ int FEAwriter::writeNodesCircular_nth(
 	return nodeID;
 }
 
-int FEAwriter::writeNodesPlane(
+int FEAwriter::writeNodes(
 	const glm::dvec3&	spos,
 	const glm::dvec2&	size,
 	const glm::ivec2&	nnodes,
@@ -667,26 +667,26 @@ int FEAwriter::writeNodesPlane(
 	glm::dmat3x3*		csys)
 {
 	glm::dvec2 dsize = glm::dvec2(size.x / (double)(nnodes.x - 1), size.y / (double)(nnodes.y - 1));
-	return writeNodesPlaneQ(spos, dsize, nnodes, nodeIDstart, pln, csys);
+	return writeNodesQ(spos, dsize, nnodes, nodeIDstart, pln, csys);
 }
 
-int FEAwriter::writeNodesPlaneXZq(const glm::dvec3&	spos, const glm::dvec2&	dxz, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesPlaneQ(spos, dxz, nnodes, nodeIDstart, plane::xz, csys);
+int FEAwriter::writeNodesXZq(const glm::dvec3&	spos, const glm::dvec2&	dxz, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodesQ(spos, dxz, nnodes, nodeIDstart, plane::xz, csys);
 }
-int FEAwriter::writeNodesPlaneXYq(const glm::dvec3&	spos, const glm::dvec2&	dxy, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesPlaneQ(spos, dxy, nnodes, nodeIDstart, plane::xy, csys);
+int FEAwriter::writeNodesXYq(const glm::dvec3&	spos, const glm::dvec2&	dxy, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodesQ(spos, dxy, nnodes, nodeIDstart, plane::xy, csys);
 }
-int FEAwriter::writeNodesPlaneYZq(const glm::dvec3&	spos, const glm::dvec2&	dyz, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesPlaneQ(spos, dyz, nnodes, nodeIDstart, plane::yz, csys);
+int FEAwriter::writeNodesYZq(const glm::dvec3&	spos, const glm::dvec2&	dyz, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodesQ(spos, dyz, nnodes, nodeIDstart, plane::yz, csys);
 }
-int FEAwriter::writeNodesPlaneXZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesPlane(spos, size, nnodes, nodeIDstart, plane::xz, csys);
+int FEAwriter::writeNodesXZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodes(spos, size, nnodes, nodeIDstart, plane::xz, csys);
 }
-int FEAwriter::writeNodesPlaneXY(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesPlane(spos, size, nnodes, nodeIDstart, plane::xy, csys);
+int FEAwriter::writeNodesXY(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodes(spos, size, nnodes, nodeIDstart, plane::xy, csys);
 }
-int FEAwriter::writeNodesPlaneYZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesPlane(spos, size, nnodes, nodeIDstart, plane::yz, csys);
+int FEAwriter::writeNodesYZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodes(spos, size, nnodes, nodeIDstart, plane::yz, csys);
 }
 */
 /*
@@ -751,7 +751,7 @@ b0   x___x___x___x___x___x___x___x___x  row b (bot)	   -		|		  |
 
 */
 /*
-int FEAwriter::writeNodesPlane_ref(
+int FEAwriter::writeNodes_ref(
 	const glm::dvec3& spos,
 	const glm::dvec2& size,
 	int				  nNodesEdge,
@@ -809,20 +809,20 @@ int FEAwriter::writeNodesPlane_ref(
 }
 
 
-int FEAwriter::writeNodesPlaneXY_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
+int FEAwriter::writeNodesXY_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
 	int nodeIDstart, bool startWithOffset, glm::dmat3x3* csys)
 {
-	return writeNodesPlane_ref(spos, size, nNodesEdge, nRefinements, nodeIDstart, startWithOffset, plane::xy, csys);
+	return writeNodes_ref(spos, size, nNodesEdge, nRefinements, nodeIDstart, startWithOffset, plane::xy, csys);
 }
-int FEAwriter::writeNodesPlaneXZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
+int FEAwriter::writeNodesXZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
 	int nodeIDstart, bool startWithOffset, glm::dmat3x3* csys)
 {
-	return writeNodesPlane_ref(spos, size, nNodesEdge, nRefinements, nodeIDstart, startWithOffset, plane::xz, csys);
+	return writeNodes_ref(spos, size, nNodesEdge, nRefinements, nodeIDstart, startWithOffset, plane::xz, csys);
 }
-int FEAwriter::writeNodesPlaneYZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
+int FEAwriter::writeNodesYZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
 	int nodeIDstart, bool startWithOffset, glm::dmat3x3* csys)
 {
-	return writeNodesPlane_ref(spos, size, nNodesEdge, nRefinements, nodeIDstart, startWithOffset, plane::yz, csys);
+	return writeNodes_ref(spos, size, nNodesEdge, nRefinements, nodeIDstart, startWithOffset, plane::yz, csys);
 }
 */
 
@@ -997,7 +997,7 @@ int FEAwriter::writeNodesCone_ref(
   5x_10x_15x___x
 */
 /*
-int FEAwriter::writeElementsPlane(
+int FEAwriter::writeElements(
 	glm::ivec2			nnodes,
 	int					nodeID1,
 	int					elementID1,
@@ -1072,7 +1072,7 @@ t0   x_______x_______x_______x_______x             	   -
 b0   x___x___x___x___x___x___x___x___x  	           -
 										elRow b		   |  1elL
 */
-/*int FEAwriter::writeElementsPlane_ref(
+/*int FEAwriter::writeElements_ref(
 	int		nNodesY,
 	int		nRefinements,
 	int		elementID1,

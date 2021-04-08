@@ -28,7 +28,7 @@ void CuboidMesher::writeNodesQ(
 	MeshDensity2D planeMeshDens = meshDens.meshDensD12();
 
 	for (int i3 = 0; i3 < meshDens.dir3(); i3++){
-		PlaneMesher::writeNodesPlaneQ(curPos, planeMeshDens, dp12,  pln);
+		PlaneMesher::writeNodesQ(curPos, planeMeshDens, dp12,  pln);
 		curPos.pos[(size_t)normal] += dp.y;
 	}
 	Mesher::nodeID1 = firstNode;
@@ -178,7 +178,7 @@ void CuboidMesherRef::writeNodes_layerB(
 	plane					pln, 
 	direction				refDir)
 {
-	PlaneMesher::writeNodesPlaneQ(curPos, meshDensD12, elSize, pln);
+	PlaneMesher::writeNodesQ(curPos, meshDensD12, elSize, pln);
 	curPos.pos[(size_t)refDir] += elSizeRefDir;
 }
 
@@ -191,7 +191,7 @@ void CuboidMesherRef::writeNodes_layerM1(
 	plane					pln,
 	direction				refDir)
 {
-	PlaneMesher::writeNodesPlaneQ_nth(curPos, meshDensD12, elSize, pln, 4, true);
+	PlaneMesher::writeNodesQ_nth(curPos, meshDensD12, elSize, pln, 4, true);
 	curPos.pos[(size_t)refDir] += elSizeRefDir;
 }
 //row m2:  x-----x-----x-----x-----x
@@ -204,7 +204,7 @@ void CuboidMesherRef::writeNodes_layerM2(
 	direction				refDir)
 {
 	elSize.x *= 2.0;
-	PlaneMesher::writeNodesPlaneQ(curPos, meshDensD12, elSize, pln);
+	PlaneMesher::writeNodesQ(curPos, meshDensD12, elSize, pln);
 	curPos.pos[(size_t)refDir] += elSizeRefDir;
 }
 //row m3:  |  x--x--x  |  x--x--x  |
@@ -216,7 +216,7 @@ void CuboidMesherRef::writeNodes_layerM3(
 	plane					pln,
 	direction				refDir)
 {
-	PlaneMesher::writeNodesPlaneQ_nth(curPos, meshDensD12, elSize, pln, 4, false);
+	PlaneMesher::writeNodesQ_nth(curPos, meshDensD12, elSize, pln, 4, false);
 	curPos.pos[(size_t)refDir] += elSizeRefDir;
 }
 //row t:  x-----x-----x-----x-----x 
@@ -229,7 +229,7 @@ void CuboidMesherRef::writeNodes_layerT(
 	direction				refDir)
 {
 	elSize.y *= 2.0;
-	PlaneMesher::writeNodesPlaneQ(curPos, meshDensD12, elSize, pln);
+	PlaneMesher::writeNodesQ(curPos, meshDensD12, elSize, pln);
 	elSizeRefDir *= 2.0;
 	curPos.pos[(size_t)refDir] += elSizeRefDir;
 }

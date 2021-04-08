@@ -270,7 +270,7 @@ public:
 /********************************************************
 	Nodes plane:
 ********************************************************/
-/*	int writeNodesPlane(
+/*	int writeNodes(
 		const glm::dvec3&	spos,
 		const glm::dvec2&	dp,
 		const glm::ivec2&	nnodes,
@@ -278,7 +278,7 @@ public:
 		plane				pln = plane::xy,
 		glm::dmat3x3*		csys = nullptr);
 
-	int writeNodesPlaneQ(
+	int writeNodesQ(
 		const glm::dvec3&	spos,
 		const glm::dvec2&	size,
 		const glm::ivec2&	nnodes,
@@ -286,14 +286,14 @@ public:
 		plane				pln = plane::xy,
 		glm::dmat3x3*		csys = nullptr);
 
-	int writeNodesPlaneXZq(const glm::dvec3&	spos, const glm::dvec2&	dxz, const glm::ivec2& nnodes, int nodeIDstart,	glm::dmat3x3* csys = nullptr);
-	int writeNodesPlaneXYq(const glm::dvec3&	spos, const glm::dvec2&	dxy, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
-	int writeNodesPlaneYZq(const glm::dvec3&	spos, const glm::dvec2&	dyz, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
-	int writeNodesPlaneXZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
-	int writeNodesPlaneXY(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
-	int writeNodesPlaneYZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesXZq(const glm::dvec3&	spos, const glm::dvec2&	dxz, const glm::ivec2& nnodes, int nodeIDstart,	glm::dmat3x3* csys = nullptr);
+	int writeNodesXYq(const glm::dvec3&	spos, const glm::dvec2&	dxy, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesYZq(const glm::dvec3&	spos, const glm::dvec2&	dyz, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesXZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesXY(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesYZ(const glm::dvec3& spos, const glm::dvec2& size, const glm::ivec2& nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
 
-	int writeNodesPlane_ref(
+	int writeNodes_ref(
 		const glm::dvec3& spos,
 		const glm::dvec2& size,
 		int				  nNodesEdge,
@@ -303,11 +303,11 @@ public:
 		plane			  pln = plane::xy,
 		glm::dmat3x3*     csys = nullptr);
 
-	int writeNodesPlaneXY_ref(const glm::dvec3& spos,	const glm::dvec2& size,	int	nNodesEdge, int nRefinements,
+	int writeNodesXY_ref(const glm::dvec3& spos,	const glm::dvec2& size,	int	nNodesEdge, int nRefinements,
 		int nodeIDstart, bool startWithOffset, glm::dmat3x3* csys = nullptr);
-	int writeNodesPlaneXZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
+	int writeNodesXZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
 		int nodeIDstart, bool startWithOffset, glm::dmat3x3* csys = nullptr);
-	int writeNodesPlaneYZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
+	int writeNodesYZ_ref(const glm::dvec3& spos, const glm::dvec2& size, int nNodesEdge, int nRefinements,
 		int nodeIDstart, bool startWithOffset, glm::dmat3x3* csys = nullptr);
 */
 
@@ -355,14 +355,14 @@ public:
 /********************************************************
 	Elements plane:
 ********************************************************/
-/*	int writeElementsPlane(
+/*	int writeElements(
 		glm::ivec2			nnodes,
 		int					nodeID1,
 		int					elementID1,
 		bool				closedLoop = false
 	);
 
-	int writeElementsPlane_ref(
+	int writeElements_ref(
 		int					nNodesY,
 		int					nRefinements,
 		int					elementID1,

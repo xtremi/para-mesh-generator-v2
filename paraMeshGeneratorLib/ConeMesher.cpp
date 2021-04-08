@@ -200,8 +200,7 @@ void ConeMesherRef::incrementConeStep(const RefShapeData& rsData, RefLayerData& 
 }
 
 //row b: x--x--x--x--x--x--x--x--x
-void ConeMesherRef::writeNodes_refLayerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer)
-{
+void ConeMesherRef::writeNodes_refLayerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	ArcMesher::writeNodesCircular(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 }
@@ -211,8 +210,7 @@ void ConeMesherRef::writeNodes_refLayerM(const RefShapeData& rsData, RefLayerDat
 	incrementConeStep(rsData, rlData);
 }
 //row t: x----x----x----x----x
-void ConeMesherRef::writeNodes_refLayerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer)
-{
+void ConeMesherRef::writeNodes_refLayerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	rlData.curElSize.y *= 2.0;
 	ArcMesher::writeNodesCircular(rlData.curPos, rsData.meshDens->nNodesRowT(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
 	rlData.curElSize.x *= 2.0;
@@ -220,7 +218,7 @@ void ConeMesherRef::writeNodes_refLayerT(const RefShapeData& rsData, RefLayerDat
 }
 
 void ConeMesher::writeElements(const MeshDensity2D& meshDens){
-	PlaneMesher::writeElementsPlane(meshDens);
+	PlaneMesher::writeElements(meshDens);
 }
 
 void ConeMesherRef::writeElements(const MeshDensity2Dref& meshDens){
