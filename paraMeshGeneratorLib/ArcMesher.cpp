@@ -2,13 +2,13 @@
 #include "LineMesher.h"
 #include "math_utilities.h"
 
-void ArcMesher::writeNodesCircularX(const MeshCsys& spos, int nnodes, double radius, ArcAngles arcAngles){
+void ArcMesher::writeNodesCircularX(const MeshCsys& spos, int nnodes, double radius, const ArcAngles&  arcAngles){
 	writeNodesCircular(spos, nnodes, radius, arcAngles, direction::x);
 }
-void ArcMesher::writeNodesCircularY(const MeshCsys& spos, int nnodes, double radius, ArcAngles arcAngles){
+void ArcMesher::writeNodesCircularY(const MeshCsys& spos, int nnodes, double radius, const ArcAngles&  arcAngles){
 	writeNodesCircular(spos, nnodes, radius, arcAngles, direction::y);
 }
-void ArcMesher::writeNodesCircularZ(const MeshCsys& spos, int nnodes, double radius, ArcAngles arcAngles){
+void ArcMesher::writeNodesCircularZ(const MeshCsys& spos, int nnodes, double radius, const ArcAngles&  arcAngles){
 	writeNodesCircular(spos, nnodes, radius, arcAngles, direction::z);
 }
 void ArcMesher::writeNodesCircularXq(const MeshCsys& spos, int nnodes, double radius, double startAng, double dAng){
@@ -25,7 +25,7 @@ void ArcMesher::writeNodesCircular(
 	const MeshCsys&		spos,
 	int					nnodes,
 	double				radius,
-	ArcAngles			arcAngles,	
+	const ArcAngles& 	arcAngles,
 	direction			rotAxis)
 {
 	double dang = arcAngles.angStep(nnodes);	
@@ -81,7 +81,7 @@ void ArcMesher::writeNodesCircular_nth(
 	const MeshCsys&		spos,
 	int					nnodes,
 	double				radius,
-	ArcAngles			arcAngles,
+	const ArcAngles& 	arcAngles,
 	int					skipNth,
 	direction			rotAxis)
 {

@@ -37,8 +37,5 @@ public:
 	static void writeNodesLineY(const MeshCsys& spos, int nnodes, double length);
 	static void writeNodesLineZ(const MeshCsys& spos, int nnodes, double length);
 
-	static void writeElementsLine(
-		int			nnodes,
-		bool		closedLoop = false
-	);
+	static void writeElementsLine(int nnodes, bool closedLoop = false);
 };

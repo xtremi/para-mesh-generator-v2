@@ -9,7 +9,7 @@ public:
 		const MeshCsys&		spos,
 		int					nnodes,
 		double				radius,
-		ArcAngles			arcAngles,		
+		const ArcAngles& 	arcAngles,
 		direction			rotAxis);
 
 	static void writeNodesCircularQ(
@@ -20,9 +20,9 @@ public:
 		double				dAng,		
 		direction			rotAxis);
 
-	static void writeNodesCircularX(const MeshCsys& spos, int nnodes, double radius, ArcAngles arcAngles);
-	static void writeNodesCircularY(const MeshCsys& spos, int nnodes, double radius, ArcAngles arcAngles);
-	static void writeNodesCircularZ(const MeshCsys& spos, int nnodes, double radius, ArcAngles arcAngles);
+	static void writeNodesCircularX(const MeshCsys& spos, int nnodes, double radius, const ArcAngles& arcAngles);
+	static void writeNodesCircularY(const MeshCsys& spos, int nnodes, double radius, const ArcAngles& arcAngles);
+	static void writeNodesCircularZ(const MeshCsys& spos, int nnodes, double radius, const ArcAngles& arcAngles);
 	static void writeNodesCircularXq(const MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
 	static void writeNodesCircularYq(const MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
 	static void writeNodesCircularZq(const MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
@@ -31,7 +31,7 @@ public:
 		const MeshCsys&		spos,
 		int					nnodes,
 		double				radius,
-		ArcAngles			arcAngles,		
+		const ArcAngles& 	arcAngles,
 		int					skipNth,
 		direction			rotAxis);
 
@@ -45,6 +45,5 @@ public:
 		direction			rotAxis);
 
 	static void writeElementsLine(int nnodes, bool closedLoop = false);
-
 };
 

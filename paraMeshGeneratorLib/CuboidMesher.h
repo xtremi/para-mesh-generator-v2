@@ -40,6 +40,17 @@ public:
 
 private:
 
+	struct RefShapeData {
+		const MeshDensity3Dref* meshDens;
+		plane					pln;
+		direction				refDir;		
+	};
+	struct RefLayerData {
+		MeshCsys				curPos;
+		glm::dvec2				curElSize;
+		double					curElSizeRefDir;
+	};
+
 	static void writeNodes_layerB(
 		MeshCsys&				curPos,
 		const MeshDensity2D&	meshDensD12,
