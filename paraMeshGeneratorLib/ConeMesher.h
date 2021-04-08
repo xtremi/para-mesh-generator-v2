@@ -56,49 +56,37 @@ public:
 	static void writeElements(const MeshDensity2Dref& meshDens);
 
 private:
-	static void incrementConeStep(
-		MeshCsys&			curPos,
-		double&				curConeLength,
-		double&				curRadius,
-		double				coneLength,
-		double				elSizeRefDir,
-		double				height,
-		const Cone2Dradius& radius,
-		direction			rotAxis);
 
-	static void writeNodes_refLayerB(
-		MeshCsys&			curPos,
-		int					nodesPerRow,
-		const glm::dvec2&	elSize,
-		const ArcAngles&	angle,
-		const Cone2Dradius& radius,
-		double				coneLength,
-		double				height,
-		double&				curRadius,
-		double&				curConeLength,
-		direction			rotAxis);
+	struct RefShapeData{		
+		const MeshDensity2Dref* meshDens;
+		const Cone2Dradius*		radius;
+		const ArcAngles*		angle;
+		direction				rotAxis;
+		double					height;
+		double					coneLength;
+	};
+	struct RefLayerData{
+		MeshCsys				curPos;
+		double					curConeLength;
+		double					curRadius;
+		glm::dvec2				curElSize;
+	};
 
-	static void writeNodes_refLayerM(
-		MeshCsys&			curPos,
-		int					nodesPerRow,
-		const glm::dvec2&	elSize,
-		const ArcAngles&	angle,
-		const Cone2Dradius& radius,
-		double				coneLength,
-		double				height,
-		double&				curRadius,
-		double&				curConeLength,
-		direction			rotAxis);
+/*	struct WriteRefLayerInput {
+		MeshCsys				curPos;
+		const MeshDensity2Dref* meshDens;
+		const Cone2Dradius*		radius;
+		const ArcAngles*		angle;
+		direction				rotAxis;
+		double					height;
+		double					coneLength;
+		double					curConeLength;
+		double					curRadius;
+		glm::dvec2				curElSize;
+	};*/
 
-	static void writeNodes_refLayerT(
-		MeshCsys&			curPos,
-		int					nodesPerRow,
-		glm::dvec2&			elSize,
-		const ArcAngles&	angle,
-		const Cone2Dradius& radius,
-		double				coneLength,
-		double				height,
-		double&				curRadius,
-		double&				curConeLength,
-		direction			rotAxis);
+	static void incrementConeStep(const RefShapeData& rsData, RefLayerData& rlData);
+	static void writeNodes_refLayerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_refLayerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_refLayerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
 };

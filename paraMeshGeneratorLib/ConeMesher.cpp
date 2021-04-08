@@ -44,7 +44,7 @@ void ConeMesher::writeNodes(
 		curRadius += dR;
 	}
 
-	nodeID1 = firstNode;
+	Mesher::nodeID1 = firstNode;
 }
 
 void ConeMesher::writeNodesX(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height){
@@ -159,112 +159,64 @@ void ConeMesherRef::writeNodes(
 	direction				rotaxis)
 {
 	int firstNodeID = writer->getNextNodeID();
-	MeshCsys curPos(spos);
 
-	int			currentNodesPerArc = meshDens.circ();
-	int			currentRefFactor = 1;
-	int			currentRefinement = 0;
+	RefShapeData rsData;	
+	rsData.meshDens = &meshDens;
+	rsData.radius	= &radius;
+	rsData.angle	= &angle;
+	rsData.height	= height;
+	rsData.rotAxis	= rotaxis;
+	rsData.coneLength = std::sqrt(pow2(radius.dR()) + pow2(height));
 
-	double	dR			   = radius.dR();	
-	double	coneLength	   = std::sqrt(std::pow(dR, 2.0) + std::pow(height, 2.0));
+	RefLayerData rlData;
+	rlData.curPos = spos;	
+	rlData.curElSize.x = initialRefElSize2D(rsData.coneLength, meshDens.nRefs(), startWithOffset);
+	rlData.curRadius = radius.start();
+	rlData.curConeLength = 0.0;
+
 	double	arcLengthStart = angle.angleSize() * radius.start();
-	double	elSizeRefDir = initialRefElSize2D(coneLength, meshDens.nRefs(), startWithOffset);
-	glm::dvec2	curElSize(elSizeRefDir, arcLengthStart / (double)meshDens.nElCirc());
-	
-	double		curRadius       = radius.start();
-	double		curConeLength   = 0.0;
-	double		curDh			= 0.0;
+	rlData.curElSize.y = arcLengthStart / (double)meshDens.nElCirc();
 	
 	if (startWithOffset) {
 		//fix radius?
-		curPos.pos[(size_t)rotaxis] += curElSize.x;
+		rlData.curPos.pos[(size_t)rotaxis] += rlData.curElSize.x;
 	}
 
-	while (currentRefinement < meshDens.nRefs()) {
-		currentRefinement++;
-		
-		writeNodes_refLayerB(curPos, currentNodesPerArc, curElSize, angle, radius, coneLength, height, curRadius, curConeLength, rotaxis);
-		writeNodes_refLayerM(curPos, currentNodesPerArc, curElSize, angle, radius, coneLength, height, curRadius, curConeLength, rotaxis);
-
-		//Refine: [9 nodes / 8 elements] -> [5 nodes / 4 elements] -> [3 nodes / 2 elements]
-		currentRefFactor *= 2;
-		currentNodesPerArc = meshDens.nElCirc() / currentRefFactor;
-		if (!meshDens.closedLoop)
-			currentNodesPerArc++;
-		
-		writeNodes_refLayerT(curPos, currentNodesPerArc, curElSize, angle, radius, coneLength, height, curRadius, curConeLength, rotaxis);
+	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
+		writeNodes_refLayerB(rsData, rlData, refLayer);
+		writeNodes_refLayerM(rsData, rlData, refLayer);
+		writeNodes_refLayerT(rsData, rlData, refLayer);
 	}
 
 	Mesher::nodeID1 = firstNodeID;
 }
 
-void ConeMesherRef::incrementConeStep(
-	MeshCsys&			curPos,
-	double&				curConeLength,
-	double&				curRadius,
-	double				coneLength,
-	double				elSizeRefDir,
-	double				height,
-	const Cone2Dradius& radius,
-	direction			rotAxis)
+void ConeMesherRef::incrementConeStep(const RefShapeData& rsData, RefLayerData& rlData)
 {
-	curConeLength += elSizeRefDir;
-	curRadius = radius.start() + radius.dR() * (curConeLength / coneLength);
-	double curDh = (height / coneLength)*elSizeRefDir;
-	curPos.pos[(size_t)rotAxis] += curDh;
+	rlData.curConeLength += rlData.curElSize.x;
+	rlData.curRadius = rsData.radius->start() + rsData.radius->dR() * (rlData.curConeLength / rsData.coneLength);
+	double curDh = (rsData.height / rsData.coneLength)*rlData.curElSize.x;
+	rlData.curPos.pos[(size_t)rsData.rotAxis] += curDh;
 }
 
 //row b: x--x--x--x--x--x--x--x--x
-void ConeMesherRef::writeNodes_refLayerB(
-	MeshCsys&			curPos, 
-	int					nodesPerRow, 
-	const glm::dvec2&	elSize, 
-	const ArcAngles&	angle,
-	const Cone2Dradius& radius,
-	double				coneLength,
-	double				height,
-	double&				curRadius, 
-	double&				curConeLength, 
-	direction			rotAxis)
+void ConeMesherRef::writeNodes_refLayerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer)
 {
-	ArcMesher::writeNodesCircular(curPos, nodesPerRow, curRadius, angle, rotAxis);
-	incrementConeStep(curPos, curConeLength, curRadius, coneLength, elSize.x, height, radius, rotAxis);
+	ArcMesher::writeNodesCircular(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
+	incrementConeStep(rsData, rlData);
 }
 //row m:  |  x--x--x  |  x--x--x  |
-void ConeMesherRef::writeNodes_refLayerM(
-	MeshCsys&			curPos,
-	int					nodesPerRow,
-	const glm::dvec2&	elSize,
-	const ArcAngles&	angle,
-	const Cone2Dradius& radius,
-	double				coneLength,
-	double				height,
-	double&				curRadius,
-	double&				curConeLength,
-	direction			rotAxis
-) {
-	ArcMesher::writeNodesCircular_nth(curPos, nodesPerRow, curRadius, angle, 4, rotAxis);
-	incrementConeStep(curPos, curConeLength, curRadius, coneLength, elSize.x, height, radius, rotAxis);
+void ConeMesherRef::writeNodes_refLayerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+	ArcMesher::writeNodesCircular_nth(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer), rlData.curRadius, *rsData.angle, 4, rsData.rotAxis);
+	incrementConeStep(rsData, rlData);
 }
-
-
-
 //row t: x----x----x----x----x
-void ConeMesherRef::writeNodes_refLayerT(
-	MeshCsys&			curPos,
-	int					nodesPerArc,
-	glm::dvec2&			elSize,
-	const ArcAngles&	angle,
-	const Cone2Dradius& radius,
-	double				coneLength,
-	double				height,
-	double&				curRadius,
-	double&				curConeLength,
-	direction			rotAxis) {
-	elSize.y *= 2.0;
-	ArcMesher::writeNodesCircular(curPos, nodesPerArc, curRadius, angle, rotAxis);
-	elSize.x *= 2.0;
-	incrementConeStep(curPos, curConeLength, curRadius, coneLength, elSize.x, height, radius, rotAxis);
+void ConeMesherRef::writeNodes_refLayerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer)
+{
+	rlData.curElSize.y *= 2.0;
+	ArcMesher::writeNodesCircular(rlData.curPos, rsData.meshDens->nNodesRowT(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
+	rlData.curElSize.x *= 2.0;
+	incrementConeStep(rsData, rlData);
 }
 
 void ConeMesher::writeElements(const MeshDensity2D& meshDens){

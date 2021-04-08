@@ -244,11 +244,7 @@ void PlaneMesherRef::writeNodes(
 {
 	int firstNode = writer->getNextNodeID();
 	MeshCsys curPos(spos);
-
-	int		currentNodesPerRow = meshDens.circ();
-	int		currentRefFactor = 1;
-	int		currentRefinement = 0;
-
+	
 	double elSizeRefDir = initialRefElSize2D(size.x, meshDens.nRefs(), startWithOffset);
 	glm::dvec2 curElSize(elSizeRefDir, size.y / (double)meshDens.nElCirc());
 
@@ -259,17 +255,10 @@ void PlaneMesherRef::writeNodes(
 		curPos.pos[(size_t)refDir] += curElSize.x;
 	}
 
-	while (currentRefinement < meshDens.nRefs()) {
-		currentRefinement++;
-		
-		writeNodes_layerB(curPos, currentNodesPerRow, curElSize, refDir, edgeDir);
-		writeNodes_layerM(curPos, currentNodesPerRow, curElSize, refDir, edgeDir);
-		
-		//Refine: [9 nodes / 8 elements] -> [5 nodes / 4 elements] -> [3 nodes / 2 elements]
-		currentRefFactor *= 2;
-		currentNodesPerRow = meshDens.nElDir2() / currentRefFactor + 1;
-		
-		writeNodes_layerT(curPos, currentNodesPerRow, curElSize, refDir, edgeDir);
+	for(int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++){
+		writeNodes_layerB(curPos, meshDens.nNodesRowB(refLayer), curElSize, refDir, edgeDir);
+		writeNodes_layerM(curPos, meshDens.nNodesRowB(refLayer), curElSize, refDir, edgeDir);
+		writeNodes_layerT(curPos, meshDens.nNodesRowT(refLayer), curElSize, refDir, edgeDir);
 	}
 
 	Mesher::nodeID1 = firstNode;
