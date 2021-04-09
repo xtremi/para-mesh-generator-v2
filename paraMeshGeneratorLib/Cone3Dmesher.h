@@ -49,6 +49,9 @@ public:
 	static void writeElements(const MeshDensity3Dref& meshDens);
 
 private:
+
+
+
 	static void incrementConeStep(
 		MeshCsys&			curPos,
 		double&				curConeLength,

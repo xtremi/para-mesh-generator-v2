@@ -73,7 +73,7 @@ private:
 	};
 
 	static void incrementConeStep(const RefShapeData& rsData, RefLayerData& rlData);
-	static void writeNodes_refLayerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
-	static void writeNodes_refLayerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
-	static void writeNodes_refLayerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
 };

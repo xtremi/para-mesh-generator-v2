@@ -183,9 +183,9 @@ void ConeMesherRef::writeNodes(
 	}
 
 	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
-		writeNodes_refLayerB(rsData, rlData, refLayer);
-		writeNodes_refLayerM(rsData, rlData, refLayer);
-		writeNodes_refLayerT(rsData, rlData, refLayer);
+		writeNodes_layerB(rsData, rlData, refLayer);
+		writeNodes_layerM(rsData, rlData, refLayer);
+		writeNodes_layerT(rsData, rlData, refLayer);
 	}
 
 	Mesher::nodeID1 = firstNodeID;
@@ -200,17 +200,17 @@ void ConeMesherRef::incrementConeStep(const RefShapeData& rsData, RefLayerData& 
 }
 
 //row b: x--x--x--x--x--x--x--x--x
-void ConeMesherRef::writeNodes_refLayerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+void ConeMesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	ArcMesher::writeNodesCircular(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 }
 //row m:  |  x--x--x  |  x--x--x  |
-void ConeMesherRef::writeNodes_refLayerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+void ConeMesherRef::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
 	ArcMesher::writeNodesCircular_nth(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer), rlData.curRadius, *rsData.angle, 4, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 }
 //row t: x----x----x----x----x
-void ConeMesherRef::writeNodes_refLayerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+void ConeMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	rlData.curElSize.y *= 2.0;
 	ArcMesher::writeNodesCircular(rlData.curPos, rsData.meshDens->nNodesRowT(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
 	rlData.curElSize.x *= 2.0;

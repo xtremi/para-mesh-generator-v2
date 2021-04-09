@@ -621,12 +621,12 @@ int cone3Dmesher(const std::string& fileName) {
 
 	MeshDensity3D meshDens(15, 4, 16);
 	Pipe3Dradius  radius(5.0, 9.0, 3.0, 5.0);
-	ArcAngles	  angle(0.0, 1.95*GLM2PI);
+	ArcAngles	  angle(0.0, 0.95*GLM2PI);
 	double		  height = 32.0;
 
 	Cone3Dmesher::writeNodes(pos, meshDens, radius, angle, height, direction::z);
 	Cone3Dmesher::writeElements(meshDens);
-	TEST_END
+	
 	pos.pos.x += height;
 	radius.end.setInner(radius.start.inner());
 	radius.end.setOuter(radius.start.outer());
