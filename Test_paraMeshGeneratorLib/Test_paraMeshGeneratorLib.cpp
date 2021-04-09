@@ -62,9 +62,10 @@ std::vector<TestDef> testFunctions({
 	TestDef(120, "cuboidMesher",	    "basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(121, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
 	TestDef(122, "cone3Dmesher",	    "basic meshers 3D", (testFunction)cone3Dmesher),	
+#endif
 	TestDef(123, "cone3DmesherRef",	    "basic meshers 3D", (testFunction)cone3DmesherRef),
 	TestDef(130, "refinement2dHeight",	"basic meshers 2D", (testFunction)refinement2dHeight),
-#endif
+
 	TestDef(131, "refinement3dHeight",	"basic meshers 3D", (testFunction)refinement3dHeight),
 	TestDef(132, "refinementCone2dHeight",	"basic meshers 2D", (testFunction)refinementCone2dHeight),
 	TestDef(133, "refinementCone3dHeight",	"basic meshers 3D", (testFunction)refinementCone3dHeight),
@@ -595,7 +596,7 @@ int cuboidMesherRef(const std::string& fileName) {
 
 	CuboidMesherRef::writeNodes(pos, meshDens, size, false, plane::xy);
 	CuboidMesherRef::writeElements(meshDens);
-	
+	return 0;
 	pos.pos.x += 1.2*size.x;
 	nRef = 4;
 	meshDens.setDir1(std::pow(2, nRef + 1) + 1);
@@ -625,7 +626,7 @@ int cone3Dmesher(const std::string& fileName) {
 
 	Cone3Dmesher::writeNodes(pos, meshDens, radius, angle, height, direction::z);
 	Cone3Dmesher::writeElements(meshDens);
-	
+	TEST_END
 	pos.pos.x += height;
 	radius.end.setInner(radius.start.inner());
 	radius.end.setOuter(radius.start.outer());

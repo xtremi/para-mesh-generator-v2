@@ -74,7 +74,7 @@ void Cone3DmesherRef::writeNodes(
 {
 	MESHER_NODE_WRITE_START
 
-	MeshDensity2D curMeshDensD12 = meshDens.meshDensD12();
+	MeshDensity2D curMeshDensD12 = meshDens.meshDensD12B(0);
 	
 	double  dRi = radius.dRi();
 	double  dRo = radius.dRo();

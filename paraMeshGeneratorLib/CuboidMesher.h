@@ -44,6 +44,7 @@ private:
 		const MeshDensity3Dref* meshDens;
 		plane					pln;
 		direction				refDir;		
+		direction				edgeDir;
 	};
 	struct RefLayerData {
 		MeshCsys				curPos;
@@ -51,55 +52,13 @@ private:
 		double					curElSizeRefDir;
 	};
 
-	static void writeNodes_layerB(
-		MeshCsys&				curPos,
-		const MeshDensity2D&	meshDensD12,
-		const glm::dvec2&		elSize,
-		double					elSizeRefDir,
-		plane					pln,
-		direction				refDir);
-	static void writeNodes_layerM1(
-		MeshCsys&				curPos,
-		const MeshDensity2D&	meshDensD12,
-		const glm::dvec2&		elSize,
-		double					elSizeRefDir,
-		plane					pln,
-		direction				refDir);
-	static void writeNodes_layerM2(
-		MeshCsys&				curPos,
-		const MeshDensity2D&	meshDensD12,
-		glm::dvec2&				elSize,
-		double					elSizeRefDir,
-		plane					pln,
-		direction				refDir);
-	static void writeNodes_layerM3(
-		MeshCsys&				curPos,
-		const MeshDensity2D&	meshDensD12,
-		const glm::dvec2&		elSize,
-		double					elSizeRefDir,
-		plane					pln,
-		direction				refDir);
-	static void writeNodes_layerT(
-		MeshCsys&				curPos,
-		const MeshDensity2D&	meshDensD12,
-		glm::dvec2&				elSize,
-		double&					elSizeRefDir,
-		plane					pln,
-		direction				refDir);
+	static void writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerM1(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerM2(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerM3(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
 
-	static void writeElements_rows_bm1m2(
-		const glm::ivec2&	currentNodes12,
-		glm::ivec2&			nextNodes12,
-		int&				firstNodeBrow,
-		int&				firstNodeM1row,
-		int&				firstNodeM2row,
-		bool				closedLoop);
-
-	static void writeElements_rows_m2m3t(
-		const glm::ivec2&	currentNodes12,
-		glm::ivec2&			nextNodes12,
-		int&				firstNodeM2row,
-		int&				firstNodeM3row,
-		int&				firstNodeTrow,
-		bool				closedLoop);
+	static void writeElements_layerB(const MeshDensity3Dref& meshDens, int& nid1, int curRefLayer);
+	static void writeElements_layerBM1M2(const MeshDensity3Dref& meshDens, int& nid1, int curRefLayer);
+	static void writeElements_layerM2M3T(const MeshDensity3Dref& meshDens, int& nid1, int curRefLayer);
 };

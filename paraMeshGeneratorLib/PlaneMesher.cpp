@@ -70,9 +70,9 @@ void PlaneMesher::writeNodesQ_nth(
 	int					 skipNth,
 	bool				 skipAlongDir1)
 {
-	MeshCsys curPos(spos);
 	int firstNode = writer->getNextNodeID();
-
+	MeshCsys curPos(spos);
+	
 	direction dir1, dir2;
 	getPlaneDirections(pln, dir1, dir2);
 

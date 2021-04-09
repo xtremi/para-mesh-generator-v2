@@ -160,7 +160,7 @@ struct MeshDensity2D : public NodeVec2D {
 */
 struct MeshDensity3D : public NodeVec3D {
 	MeshDensity3D() {}
-	MeshDensity3D(int _dir1, int _dir2, int _dir3, bool closedLoopDir1 = false) : NodeVec3D(_dir1, _dir2, _dir3), closedLoop{ closedLoop } {}
+	MeshDensity3D(int _dir1, int _dir2, int _dir3, bool closedLoopDir1 = false) : NodeVec3D(_dir1, _dir2, _dir3), closedLoop{ closedLoopDir1 } {}
 
 	bool closedLoop;
 	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
@@ -236,13 +236,36 @@ struct MeshDensity3Dref : public NodeVec3D {
 	int nElDir2() const { return dir2() - 1; }
 	int nElCirc() const { return nElDir1(); }
 
-	MeshDensity2D meshDensD12() const { return MeshDensity2D(dir1(), dir2(), closedLoop); }
+	MeshDensity2D meshDensD12B(int refLayer) const { 
+		int n1 = nElDir1() / std::pow(2, refLayer);
+		if (!closedLoop) n1++;
+		int n2 = nElDir2() / std::pow(2, refLayer) + 1;
+		return MeshDensity2D(n1, n2, closedLoop); 
+	}
+	MeshDensity2D meshDensD12M1(int refLayer) const {
+		int n1 = 3 * (nElDir1() / std::pow(2, refLayer)) / 4;		
+		int n2 = nElDir2() / std::pow(2, refLayer) + 1;
+		return MeshDensity2D(n1, n2, closedLoop);
+	}
+	MeshDensity2D meshDensD12M2(int refLayer) const {
+		int n1 = nElDir1() / std::pow(2, refLayer + 1);
+		if (!closedLoop) n1++;
+		int n2 = nElDir2() / std::pow(2, refLayer) + 1;
+		return MeshDensity2D(n1, n2, closedLoop);
+	}
+	MeshDensity2D meshDensD12M3(int refLayer) const {
+		int n1 = nElDir1() / std::pow(2, refLayer + 1);
+		if (!closedLoop) n1++;
+		int n2 = 3 * (nElDir2() / std::pow(2, refLayer)) / 4;// +1;
+		return MeshDensity2D(n1, n2, closedLoop);
+	}
+	MeshDensity2D meshDensD12T(int refLayer) const {
+		return meshDensD12B(refLayer + 1);
+	}
 	int nnodesPlaneD12() const { return dir1() * dir2(); }
 
 	int setNrefs(int n) { setDir1(n); }
 
-	//int nNodesDir3(int curRef) const { return 0; }
-	//int nElDir3(int curRef) const { return 0; }
 };
 
 /*
