@@ -596,7 +596,7 @@ int cuboidMesherRef(const std::string& fileName) {
 
 	CuboidMesherRef::writeNodes(pos, meshDens, size, false, plane::xy);
 	CuboidMesherRef::writeElements(meshDens);
-	return 0;
+
 	pos.pos.x += 1.2*size.x;
 	nRef = 4;
 	meshDens.setDir1(std::pow(2, nRef + 1) + 1);
@@ -644,8 +644,9 @@ int cone3DmesherRef(const std::string& fileName) {
 	TEST_START
 
 	int nRef = 2;
-	int nNodesAround = std::pow(2, nRef + 4) + 1;
-	MeshDensity3Dref meshDens(nRef, nNodesAround, nNodesAround);
+	int nNodesAround = std::pow(2, nRef + 3) + 1;
+	int nNodesEdge   = std::pow(2, nRef + 2) + 1;
+	MeshDensity3Dref meshDens(nRef, nNodesAround, nNodesEdge);
 	Pipe3Dradius  radius(5.0, 9.0, 1.5, 5.5);
 	ArcAngles	  angle(0.0, GLMPI);
 	double		  height = 8.0;

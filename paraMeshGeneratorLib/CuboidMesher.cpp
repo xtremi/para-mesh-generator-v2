@@ -192,10 +192,10 @@ void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)
 
 	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
 		if(refLayer != 0){
-			writeElements_layerB(meshDens, c, refLayer);
+			writeElements_layerB(meshDens, c, refLayer); writer->writeComment("layer B finish");
 		}
-		writeElements_layerBM1M2(meshDens, c, refLayer);
-		writeElements_layerM2M3T(meshDens, c, refLayer);
+		writeElements_layerBM1M2(meshDens, c, refLayer); writer->writeComment("layer BM1M2 finish");
+		writeElements_layerM2M3T(meshDens, c, refLayer); writer->writeComment("layer M2M3T finish");
 	}
 }
 
