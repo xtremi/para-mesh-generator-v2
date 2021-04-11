@@ -287,6 +287,15 @@ struct Rectangle {
 	Rectangle(const glm::dvec2& _size): size{ _size }{}
 	Rectangle(){}
 
+	double perimeter() {
+		return 2.0 * size.x + 2.0 * size.y;
+	}
+	void elementsPerSides(int nNodesPerimeter, int& nElWidthX, int& nElHeightY) {
+		double recWfactor = size.x / perimeter();
+		nElWidthX = (int)(recWfactor * (double)nNodesPerimeter);
+		nElHeightY = (nNodesPerimeter - 2 * nElWidthX) / 2;
+	}
+
 	glm::dvec2 getCornerCoord(int corner) {
 		switch (corner)
 		{

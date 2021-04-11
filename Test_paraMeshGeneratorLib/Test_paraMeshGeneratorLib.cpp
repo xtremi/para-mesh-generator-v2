@@ -46,12 +46,16 @@ int refinement3dHeight(const std::string& fileName);
 int refinementCone2dHeight(const std::string& fileName);
 int refinementCone3dHeight(const std::string& fileName);
 
+
 #ifdef TO_FIX
 
 int extruded2Drecs(const std::string& fileName);
 int extrude2Darc(const std::string& filename);
 int extrude2DarcMulti(const std::string& filename);
 #endif
+
+void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode);
+
 
 std::vector<TestDef> testFunctions({
 #ifndef SKIP
@@ -313,7 +317,6 @@ int ellipseMesher(const std::string& fileName) {
 	LineMesher::writeElementsLine(1500, true);
 
 	TEST_END
-
 }
 
 int planeMesher(const std::string& fileName) {
@@ -660,23 +663,42 @@ int cylinderMesherRef(const std::string& fileName)
 int squareToCircleMesher(const std::string& fileName) {
 	TEST_START
 
-	MeshDensity2D meshDens(2 * 4 + 2 * 3, 8, true);
-	glm::dvec2 recSize(3.99, 3.1);
+	MeshDensity2D meshDens(128, 18, true);
+	
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(36., 36.), glm::dvec2(18., 18.), ArcAngles(), 10.0, direction::z);
+	ConeMesher::writeElements(meshDens);
 
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(8.0, 5.0), glm::dvec2(3.99, 3.1), ArcAngles(), 10.0, direction::z);
-	SquareToCircleMesher::writeElements(meshDens);
+	pos.pos.x += 85.0;
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(36., 18.), glm::dvec2(18., 9.), ArcAngles(), 10.0, direction::z);
+	ConeMesher::writeElements(meshDens);
 
-	pos.pos.z += 2.0;
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(12.0, 5.0), glm::dvec2(12.0, 5.0), ArcAngles(), 10.0, direction::z);
-	SquareToCircleMesher::writeElements(meshDens);
+	pos.pos.x += 85.0;
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(36., 36.), glm::dvec2(18., 18.), ArcAngles(), 0., direction::z);
+	ConeMesher::writeElements(meshDens);
 
-	pos.pos.z += 2.0;
+	pos.pos.x += 85.0;
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(36., 18.), glm::dvec2(18., 9.), ArcAngles(), 0., direction::z);
+	ConeMesher::writeElements(meshDens);
+
+	pos.pos.x += 85.0;
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(18., 18.), glm::dvec2(72., 72.), ArcAngles(), 0., direction::z);
+	ConeMesher::writeElements(meshDens);
+
+	pos.pos.x += 85.0;
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(18., 9.), glm::dvec2(72., 36.), ArcAngles(), 0., direction::z);
+	ConeMesher::writeElements(meshDens);
+
+	//writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
+	return 0;
+
+	pos.pos.x += 64.0;
 	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(24.0, 5.0), glm::dvec2(24.0, 5.0), ArcAngles(), 10.0, direction::z);
 	SquareToCircleMesher::writeElements(meshDens);
 
-	pos.pos.z += 2.0;
+	pos.pos.x += 64.0;
 	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(32.0, 32.0), glm::dvec2(32.0, 32.0), ArcAngles(), 10.0, direction::z);
 	SquareToCircleMesher::writeElements(meshDens);
+
 
 	TEST_END
 }
@@ -1110,3 +1132,14 @@ int extrude2DarcMulti(const std::string& filename)
 	TEST_END
 }
 #endif
+
+
+
+
+void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode) {
+	int n[2] = { firstNode, 0 };
+	for (int i = 2; i < lastNode; i++) {
+		n[1] = i;
+		w->write2nodedBeam(i, n);
+	}
+}

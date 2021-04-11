@@ -18,6 +18,8 @@ H  |           |
   X---x---x---x:::x:::x:::x:::x:::x---x---x---x:::x:::x:::x:::x:::X
   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16        nodes
 
+        
+
 */
 
 void RecEdgeMesher::writeNodes(
@@ -47,11 +49,9 @@ void RecEdgeMesher::getOrWriteCoords(
 {
 	int firstNode = writer->getNextNodeID();
 
-	double recPerimeter = 2.0 * size.x + 2.0 * size.y;
-	double recWfactor = size.x / recPerimeter;
-
-	int nElW = (int)(recWfactor * (double)nnodes);
-	int nElH = (nnodes - 2 * nElW) / 2;
+	Rectangle rec(size);
+	int nElW, nElH;
+	rec.elementsPerSides(nnodes, nElW, nElH);
 	if ((2 * nElW + 2 * nElH) != nnodes) {
 		int notMatching = 1;
 	}
@@ -64,13 +64,11 @@ void RecEdgeMesher::getOrWriteCoords(
 	glm::dvec2 curStep;
 	glm::dvec2 curCoordLocal;
 	glm::dvec3 curCoord(0.0);
-
 	double     curElSize;
 
 	direction dir1, dir2;
 	getPlaneDirections(pln, dir1, dir2);
-
-	Rectangle rec(size);
+	
 	int nindex = 0;
 	for (int edge = 0; edge < 4; edge++) {
 		curCornerCoord = glm::dvec2(rec.getCornerCoord(edge + 1));
