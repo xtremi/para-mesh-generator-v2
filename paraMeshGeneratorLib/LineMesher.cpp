@@ -113,3 +113,14 @@ void LineMesher::writeElementsLine(int nnodes, bool closedLoop)
 		writer->write2nodedBeam(n);
 	}
 }
+
+
+void LineMesher::writeNodes(const std::vector<glm::dvec2>& xycoords, double zcoord) {
+	int firstNode = writer->getNextNodeID();
+
+	for (const glm::dvec2& coords : xycoords) {
+		writer->writeNode(glm::dvec3(coords, zcoord), glm::dvec3(0.0, 0.0, zcoord), nullptr);
+	}
+	Mesher::nodeID1 = firstNode;
+
+}

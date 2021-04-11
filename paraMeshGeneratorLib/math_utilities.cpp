@@ -108,3 +108,11 @@ bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes) 
 
 	return fullCircle;
 }
+
+glm::dvec2 coordsOnEllipseXY(double angle, double rad1, double rad2) {
+	return glm::dvec2(rad1 * glm::sin(angle), rad2 * glm::cos(angle));
+}
+
+glm::dvec2 coordsOnCircleXY(double angle, double rad) {
+	return rad * glm::dvec2(glm::sin(angle), glm::cos(angle));
+}

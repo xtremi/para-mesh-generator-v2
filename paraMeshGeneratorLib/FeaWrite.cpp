@@ -97,7 +97,7 @@ void FEAwriter::writeVectorSpaceDelimeted(int* vec, int size) {
 #endif
 }
 
-void FEAwriter::write2nodedBeam(int n[4]) {
+void FEAwriter::write2nodedBeam(int n[2]) {
 	write2nodedBeam(elementID++, n);
 }
 void FEAwriter::write4nodedShell(int n[4]) {

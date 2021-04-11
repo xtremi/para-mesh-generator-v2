@@ -25,6 +25,7 @@
     <ClInclude Include="CuboidMesher.h" />
     <ClInclude Include="CylinderMesher.h" />
     <ClInclude Include="DiskMesher.h" />
+    <ClInclude Include="EllipseMesher.h" />
     <ClInclude Include="FeaWrite.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="LineMesher.h" />
@@ -33,6 +34,8 @@
     <ClInclude Include="Mesher.h" />
     <ClInclude Include="ParaMeshGenCommon.h" />
     <ClInclude Include="PlaneMesher.h" />
+    <ClInclude Include="RecEdgeMesher.h" />
+    <ClInclude Include="SquareToCircleMesher.h" />
     <ClInclude Include="string_utilities.h" />
   </ItemGroup>
   <ItemGroup>
@@ -42,6 +45,7 @@
     <ClCompile Include="CuboidMesher.cpp" />
     <ClCompile Include="CylinderMesher.cpp" />
     <ClCompile Include="DiskMesher.cpp" />
+    <ClCompile Include="EllipseMesher.cpp" />
     <ClCompile Include="FeaWrite.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="LineMesher.cpp" />
@@ -55,6 +59,8 @@
     <ClCompile Include="Mesher.cpp" />
     <ClCompile Include="ParaMeshGenCommon.cpp" />
     <ClCompile Include="PlaneMesher.cpp" />
+    <ClCompile Include="RecEdgeMesher.cpp" />
+    <ClCompile Include="SquareToCircleMesher.cpp" />
     <ClCompile Include="string_utilities.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

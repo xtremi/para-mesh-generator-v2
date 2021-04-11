@@ -69,6 +69,15 @@
     <ClInclude Include="CylinderMesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
+    <ClInclude Include="SquareToCircleMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="EllipseMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="RecEdgeMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -114,6 +123,15 @@
       <Filter>Meshers\source</Filter>
     </ClCompile>
     <ClCompile Include="CylinderMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="SquareToCircleMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EllipseMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="RecEdgeMesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
   </ItemGroup>

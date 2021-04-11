@@ -5,12 +5,15 @@
 //1d elements
 #include "LineMesher.h"
 #include "ArcMesher.h"
+#include "RecEdgeMesher.h"
+#include "EllipseMesher.h"
 
 //2d elements
 #include "PlaneMesher.h"
 #include "ConeMesher.h"
 #include "DiskMesher.h"
 #include "CylinderMesher.h"
+#include "SquareToCircleMesher.h"
 
 //3d elements
 #include "CuboidMesher.h"
@@ -20,6 +23,9 @@
 
 int lineMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
+int recEdgeMesher(const std::string& fileName);
+int ellipseMesher(const std::string& fileName);
+
 int planeMesher(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
@@ -28,6 +34,7 @@ int diskMesher(const std::string& fileName);
 int diskMesherRef(const std::string& fileName);
 int cylinderMesher(const std::string& fileName);
 int cylinderMesherRef(const std::string& fileName);
+int squareToCircleMesher(const std::string& fileName);
 
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
@@ -48,32 +55,35 @@ int extrude2DarcMulti(const std::string& filename);
 
 std::vector<TestDef> testFunctions({
 #ifndef SKIP
-	TestDef(101, "lineMesher",			"basic meshers 2D", (testFunction)lineMesher),	
-	TestDef(102, "arcMesher",			"basic meshers 2D", (testFunction)arcMesher),
-	TestDef(103, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
-	TestDef(104, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
-	TestDef(105, "coneMesher",			"basic meshers 2D", (testFunction)coneMesher),
-	TestDef(106, "coneMesherRef",		"basic meshers 2D", (testFunction)coneMesherRef),
-	TestDef(107, "diskMesher",			"basic meshers 2D", (testFunction)diskMesher),
-	TestDef(108, "diskMesherRef",		"basic meshers 2D", (testFunction)diskMesherRef),
-	TestDef(109, "cylinderMesher",		"basic meshers 2D", (testFunction)cylinderMesher),
-	TestDef(110, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
+	TestDef(101, "lineMesher",			"basic meshers 1D", (testFunction)lineMesher),	
+	TestDef(102, "arcMesher",			"basic meshers 1D", (testFunction)arcMesher),
+	TestDef(103, "recEdgeMesher",		"basic meshers 1D", (testFunction)recEdgeMesher),
+	TestDef(104, "ellipseMesher",		"basic meshers 1D", (testFunction)ellipseMesher),
 
-	TestDef(120, "cuboidMesher",	    "basic meshers 3D", (testFunction)cuboidMesher),
-	TestDef(121, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
-	TestDef(122, "cone3Dmesher",	    "basic meshers 3D", (testFunction)cone3Dmesher),	
+	TestDef(203, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
+	TestDef(204, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
+	TestDef(205, "coneMesher",			"basic meshers 2D", (testFunction)coneMesher),
+	TestDef(206, "coneMesherRef",		"basic meshers 2D", (testFunction)coneMesherRef),
+	TestDef(207, "diskMesher",			"basic meshers 2D", (testFunction)diskMesher),
+	TestDef(208, "diskMesherRef",		"basic meshers 2D", (testFunction)diskMesherRef),
+	TestDef(209, "cylinderMesher",		"basic meshers 2D", (testFunction)cylinderMesher),
+	TestDef(210, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
 #endif
-	TestDef(123, "cone3DmesherRef",	    "basic meshers 3D", (testFunction)cone3DmesherRef),
-	TestDef(130, "refinement2dHeight",	"basic meshers 2D", (testFunction)refinement2dHeight),
+	TestDef(211, "squareToCircleMesher","basic meshers 2D", (testFunction)squareToCircleMesher),
 
-	TestDef(131, "refinement3dHeight",	"basic meshers 3D", (testFunction)refinement3dHeight),
-	TestDef(132, "refinementCone2dHeight",	"basic meshers 2D", (testFunction)refinementCone2dHeight),
-	TestDef(133, "refinementCone3dHeight",	"basic meshers 3D", (testFunction)refinementCone3dHeight),
+	TestDef(320, "cuboidMesher",	    "basic meshers 3D", (testFunction)cuboidMesher),
+	TestDef(321, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
+	TestDef(322, "cone3Dmesher",	    "basic meshers 3D", (testFunction)cone3Dmesher),	
+	TestDef(323, "cone3DmesherRef",	    "basic meshers 3D", (testFunction)cone3DmesherRef),
+	TestDef(330, "refinement2dHeight",	"basic meshers 2D", (testFunction)refinement2dHeight),
+	TestDef(331, "refinement3dHeight",	"basic meshers 3D", (testFunction)refinement3dHeight),
+	TestDef(332, "refinementCone2dHeight",	"basic meshers 2D", (testFunction)refinementCone2dHeight),
+	TestDef(333, "refinementCone3dHeight",	"basic meshers 3D", (testFunction)refinementCone3dHeight),
 #ifdef TO_FIX
 
-	TestDef(200, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
-	TestDef(270, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
-	TestDef(290, "extrude2DarcMulti",	"extrusion", (testFunction)extrude2DarcMulti),
+	TestDef(400, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
+	TestDef(470, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
+	TestDef(490, "extrude2DarcMulti",	"extrusion", (testFunction)extrude2DarcMulti),
 #endif
 });
 
@@ -214,6 +224,96 @@ int arcMesher(const std::string& fileName) {
 	ArcMesher::writeElementsLine(nnodes - 1-1);
 	
 	TEST_END
+}
+
+int recEdgeMesher(const std::string& fileName) {
+	TEST_START
+
+	int nnodes = 14;
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(5.0, 5.0), plane::xy);
+	RecEdgeMesher::writeElements(nnodes);
+
+	pos.pos.z += 2.0;
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(5.0, 10.0), plane::xy);
+	RecEdgeMesher::writeElements(nnodes);
+
+	pos.pos.z += 2.0;
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
+	RecEdgeMesher::writeElements(nnodes);
+
+	pos.pos.z += 2.0;
+	nnodes = 18;
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
+	RecEdgeMesher::writeElements(nnodes);
+	
+	pos.pos.z += 2.0;
+	nnodes = 20;
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
+	RecEdgeMesher::writeElements(nnodes);
+
+	pos.pos.z += 2.0;
+	nnodes = 22;
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
+	RecEdgeMesher::writeElements(nnodes);
+
+	pos.pos.z += 2.0;
+	nnodes = 4;
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
+	RecEdgeMesher::writeElements(nnodes);
+
+	pos.pos.x = 20.0;
+	pos.pos.z = 0.0;
+	nnodes = 48;
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(10.0, 7.0), plane::xy);
+	RecEdgeMesher::writeElements(nnodes);
+
+	pos.pos.z = 0.1;
+	pos.pos.y -= 3.5;	
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(10.0, 7.0), plane::xz);
+	RecEdgeMesher::writeElements(nnodes);
+
+	pos.pos.y += 7.0;
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(10.0, 7.0), plane::xz);
+	RecEdgeMesher::writeElements(nnodes);
+
+	RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(7.0, 20.0), plane::yz);
+	RecEdgeMesher::writeElements(nnodes);
+	
+	
+	nnodes = 58;
+	std::vector<glm::dvec2> xycoords(nnodes);
+	RecEdgeMesher::getLocalCoords(xycoords, nnodes, glm::dvec2(60.0, 35.0));
+	LineMesher::writeNodes(xycoords, 10.0);
+	LineMesher::writeElementsLine(nnodes, true);
+
+	TEST_END
+}
+
+int ellipseMesher(const std::string& fileName) {
+	TEST_START
+	EllipseMesher::writeNodes(pos, 24, EllipseRadius(10.0, 5.0), ArcAngles(), direction::z);
+	EllipseMesher::writeElements(24, true);
+	EllipseMesher::writeNodes(pos, 24, EllipseRadius(10.0, 5.0), ArcAngles(), direction::x);
+	EllipseMesher::writeElements(24, true);
+	EllipseMesher::writeNodes(pos, 24, EllipseRadius(10.0, 5.0), ArcAngles(), direction::y);
+	EllipseMesher::writeElements(24, true);
+
+	pos.pos.x = 50.0;
+	int nEllipse = 10;
+	for(int i = 0; i < nEllipse; i++){
+		EllipseMesher::writeNodes(pos, 98, EllipseRadius(1.0 + 15.0*(double)i/(double)nEllipse, 5.0), ArcAngles(), direction::y);
+		EllipseMesher::writeElements(98, true);
+		pos.pos.y += 1.0;
+	}
+
+	pos.pos.x = 100.0;
+	std::vector<glm::dvec2> localCoords(1500);
+	EllipseMesher::getLocalCoords(localCoords, 1500, EllipseRadius(100.0, 50.0), ArcAngles());
+	LineMesher::writeNodes(localCoords, 4.0);
+	LineMesher::writeElementsLine(1500, true);
+
+	TEST_END
+
 }
 
 int planeMesher(const std::string& fileName) {
@@ -555,8 +655,32 @@ int cylinderMesherRef(const std::string& fileName)
 
 
 	TEST_END
-
 }
+
+int squareToCircleMesher(const std::string& fileName) {
+	TEST_START
+
+	MeshDensity2D meshDens(2 * 4 + 2 * 3, 8, true);
+	glm::dvec2 recSize(3.99, 3.1);
+
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(8.0, 5.0), glm::dvec2(3.99, 3.1), ArcAngles(), 10.0, direction::z);
+	SquareToCircleMesher::writeElements(meshDens);
+
+	pos.pos.z += 2.0;
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(12.0, 5.0), glm::dvec2(12.0, 5.0), ArcAngles(), 10.0, direction::z);
+	SquareToCircleMesher::writeElements(meshDens);
+
+	pos.pos.z += 2.0;
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(24.0, 5.0), glm::dvec2(24.0, 5.0), ArcAngles(), 10.0, direction::z);
+	SquareToCircleMesher::writeElements(meshDens);
+
+	pos.pos.z += 2.0;
+	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(32.0, 32.0), glm::dvec2(32.0, 32.0), ArcAngles(), 10.0, direction::z);
+	SquareToCircleMesher::writeElements(meshDens);
+
+	TEST_END
+}
+
 
 int cuboidMesher(const std::string& fileName) {
 	TEST_START

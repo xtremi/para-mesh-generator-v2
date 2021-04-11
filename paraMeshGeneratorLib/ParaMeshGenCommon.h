@@ -10,6 +10,8 @@ enum class plane {xy, xz, yz};
 void getPlaneDirections(plane pln, direction& d1, direction& d2);
 direction getPlaneNormal(plane pln);
 glm::dvec3 coordsOnCircle(double angle, double radius, direction rotAxis);
+glm::dvec3 coordsOnEllipse(double angle, double rad1, double rad2, direction rotAxis);
+
 
 
 class NodeIterator {
@@ -279,6 +281,42 @@ struct MeshCsys {
 
 	glm::dvec3		pos;
 	glm::dmat3x3*	csys = nullptr;
+};
+
+struct Rectangle {
+	Rectangle(const glm::dvec2& _size): size{ _size }{}
+	Rectangle(){}
+
+	glm::dvec2 getCornerCoord(int corner) {
+		switch (corner)
+		{
+		case 1: return  0.5*size * glm::dvec2(-1.0,  1.0); break;
+		case 2: return  0.5*size * glm::dvec2( 1.0,  1.0); break;
+		case 3: return  0.5*size * glm::dvec2( 1.0, -1.0); break;
+		default: return 0.5*size * glm::dvec2(-1.0, -1.0); break;
+		}
+	}
+
+	glm::dvec2 size;
+
+	static const glm::dvec2 recDirs[4];
+};
+
+
+struct EllipseRadius {
+	EllipseRadius(){}
+	EllipseRadius(double _rad1, double _rad2) : rad1{ _rad1 }, rad2{ _rad2 } {}
+	double rad1, rad2;
+
+	double perimeter() const {
+		double h = pow2(rad1 - rad2) / pow2(rad1 + rad2);
+		
+		double d = 10 + std::sqrt(4.0 - 3 * h);
+		double A = 1 + 3 * h / d;
+		
+		double per = GLMPI * (rad1 + rad2)*A;
+		return per;
+	}
 };
 
 struct Pipe2Dradius {

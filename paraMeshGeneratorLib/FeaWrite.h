@@ -31,12 +31,12 @@ public:
 	void writeNode(const glm::dvec3& c, const glm::dvec3& transl, glm::dmat3x3* csys);
 	void writeNode(int nodeID, const glm::dvec3& c, const glm::dvec3& transl, glm::dmat3x3* csys);
 
-	void write2nodedBeam(int n[4]);
+	void write2nodedBeam(int n[2]);
 	void write4nodedShell(int n[4]);
 	void write8nodedHexa(int n[8]);
 	
 	virtual void writeNode(int nodeID, const glm::dvec3& c) = 0;
-	virtual void write2nodedBeam(int elID, int n[4]) = 0;
+	virtual void write2nodedBeam(int elID, int n[2]) = 0;
 	virtual void write4nodedShell(int elID, int n[4]) = 0;
 	virtual void write8nodedHexa(int elID, int n[8]) = 0;
 	void writePreNodes(int numberOfNodes = -1){}

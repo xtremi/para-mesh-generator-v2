@@ -16,3 +16,6 @@ double pow2(double val);
 bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes);
 
 double calcArcIncrement(double startAng, double endAng, int nnodes);
+
+glm::dvec2 coordsOnEllipseXY(double angle, double rad1, double rad2);
+glm::dvec2 coordsOnCircleXY(double angle, double rad);
