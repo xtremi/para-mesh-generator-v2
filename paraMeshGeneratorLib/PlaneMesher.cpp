@@ -154,7 +154,10 @@ void PlaneMesher::writeElements(const MeshDensity2D& meshDens)
 	int n[4];
 	int c = nodeID1;
 
+	int elementProp = 1;
+
 	for (int iy = 0; iy < meshDens.nElDir2(); iy++) {
+		writer->setCurrentElementPropertyID(elementProp++);
 		for (int ix = 0; ix < meshDens.nElDir1(); ix++) {
 			n[0] = c++;
 			n[1] = n[0] + 1;
@@ -326,8 +329,10 @@ void PlaneMesherRef::writeElements(const MeshDensity2Dref& meshDens)
 	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
 
 		if (refLayer != 0) {
+			writer->setCurrentElementPropertyID(1);
 			writeElements_layerB(meshDens, c, refLayer);
 		}
+		writer->setCurrentElementPropertyID(2);
 		writeElements_layersMT(meshDens, c, refLayer);
 
 	}

@@ -174,6 +174,7 @@ void NastranFEAwriter::write2nodedBeam(int elID, int n[2]) {
 
 void NastranFEAwriter::write4nodedShell(int elID, int n[4]) {
 	std::string str = "CQUAD4," + fmt::format_int(elID).str() + ",";
+	if(currentPropertyID > 0) str += fmt::format_int(currentPropertyID).str();
 	str += vectorToString(n, 4, ',');
 	str += "\n";
 #ifdef TO_BUFFER

@@ -49,6 +49,10 @@ public:
 	void setNextNodeID(int id) { nodeID = id; }
 	void setNextElementID(int id) { elementID = id; }
 
+	void setCurrentElementPropertyID(int id) {
+		currentPropertyID = id;
+	}
+
 	void setCoordTransformer(void(*trsfFunc)(glm::dvec3*, std::vector<double>*)) {
 		currentCoordTransformer = trsfFunc;
 	}
@@ -59,9 +63,10 @@ public:
 		currentCoordTransformParams = coordTrsfParams;
 	}
 
-private:
-	int nodeID		= 1;
-	int elementID	= 1;
+protected:
+	int nodeID		      = 1;
+	int elementID	      = 1;
+	int currentPropertyID = -1;
 
 	std::vector<double> currentCoordTransformParams;
 	void(*currentCoordTransformer)(glm::dvec3*, std::vector<double>*) = nullptr;

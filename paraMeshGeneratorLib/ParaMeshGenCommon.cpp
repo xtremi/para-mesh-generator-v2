@@ -14,6 +14,17 @@ direction getPlaneNormal(plane pln) {
 	}
 }
 
+plane getPlaneFromNormal(direction normal) {
+	switch (normal)
+	{
+	case direction::x: return plane::yz; break;
+	case direction::y: return plane::xz; break;
+	case direction::z: 
+	default:
+		return plane::xy; break;
+	}
+}
+
 void getPlaneDirections(plane pln, direction& d1, direction& d2){
 	
 	switch (pln) {

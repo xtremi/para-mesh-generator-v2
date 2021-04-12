@@ -13,11 +13,12 @@
 #include "ConeMesher.h"
 #include "DiskMesher.h"
 #include "CylinderMesher.h"
-#include "SquareToCircleMesher.h"
+#include "RecToEllipseMesher.h"
 
 //3d elements
 #include "CuboidMesher.h"
 #include "Cone3Dmesher.h"
+#include "RecToEllipse3Dmesher.h"
 
 #include "math_utilities.h"
 
@@ -34,12 +35,14 @@ int diskMesher(const std::string& fileName);
 int diskMesherRef(const std::string& fileName);
 int cylinderMesher(const std::string& fileName);
 int cylinderMesherRef(const std::string& fileName);
-int squareToCircleMesher(const std::string& fileName);
+int recToEllipseMesher(const std::string& fileName);
 
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
 int cone3Dmesher(const std::string& fileName);
 int cone3DmesherRef(const std::string& fileName);
+int recToEllipse3Dmesher(const std::string& fileName);
+
 
 int refinement2dHeight(const std::string& fileName);
 int refinement3dHeight(const std::string& fileName);
@@ -73,21 +76,25 @@ std::vector<TestDef> testFunctions({
 	TestDef(209, "cylinderMesher",		"basic meshers 2D", (testFunction)cylinderMesher),
 	TestDef(210, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
 #endif
-	TestDef(211, "squareToCircleMesher","basic meshers 2D", (testFunction)squareToCircleMesher),
+	TestDef(211, "recToEllipseMesher","basic meshers 2D", (testFunction)recToEllipseMesher),
 
 	TestDef(320, "cuboidMesher",	    "basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(321, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
 	TestDef(322, "cone3Dmesher",	    "basic meshers 3D", (testFunction)cone3Dmesher),	
 	TestDef(323, "cone3DmesherRef",	    "basic meshers 3D", (testFunction)cone3DmesherRef),
-	TestDef(330, "refinement2dHeight",	"basic meshers 2D", (testFunction)refinement2dHeight),
-	TestDef(331, "refinement3dHeight",	"basic meshers 3D", (testFunction)refinement3dHeight),
-	TestDef(332, "refinementCone2dHeight",	"basic meshers 2D", (testFunction)refinementCone2dHeight),
-	TestDef(333, "refinementCone3dHeight",	"basic meshers 3D", (testFunction)refinementCone3dHeight),
+	TestDef(324, "recToEllipse3Dmesher","basic meshers 3D", (testFunction)recToEllipse3Dmesher),
+
+	TestDef(430, "refinement2dHeight",		"basic meshers 2D", (testFunction)refinement2dHeight),
+	TestDef(431, "refinement3dHeight",		"basic meshers 3D", (testFunction)refinement3dHeight),
+	TestDef(432, "refinementCone2dHeight",	"basic meshers 2D", (testFunction)refinementCone2dHeight),
+	TestDef(433, "refinementCone3dHeight",	"basic meshers 3D", (testFunction)refinementCone3dHeight),
+
+
 #ifdef TO_FIX
 
-	TestDef(400, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
-	TestDef(470, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
-	TestDef(490, "extrude2DarcMulti",	"extrusion", (testFunction)extrude2DarcMulti),
+	TestDef(500, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
+	TestDef(570, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
+	TestDef(590, "extrude2DarcMulti",	"extrusion", (testFunction)extrude2DarcMulti),
 #endif
 });
 
@@ -660,44 +667,44 @@ int cylinderMesherRef(const std::string& fileName)
 	TEST_END
 }
 
-int squareToCircleMesher(const std::string& fileName) {
+int recToEllipseMesher(const std::string& fileName) {
 	TEST_START
 
 	MeshDensity2D meshDens(128, 18, true);
 	
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(36., 36.), glm::dvec2(18., 18.), ArcAngles(), 10.0, direction::z);
-	ConeMesher::writeElements(meshDens);
+	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(36., 36.), glm::dvec2(18., 18.), ArcAngles(), 10.0, direction::x);
+	RecToEllipseMesher::writeElements(meshDens);
+	
+	pos.pos.x += 85.0;
+	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(36., 18.), glm::dvec2(18., 9.), ArcAngles(), 10.0, direction::y);
+	RecToEllipseMesher::writeElements(meshDens);
 
 	pos.pos.x += 85.0;
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(36., 18.), glm::dvec2(18., 9.), ArcAngles(), 10.0, direction::z);
-	ConeMesher::writeElements(meshDens);
+	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(36., 36.), glm::dvec2(18., 18.), ArcAngles(), 0., direction::y);
+	RecToEllipseMesher::writeElements(meshDens);
 
 	pos.pos.x += 85.0;
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(36., 36.), glm::dvec2(18., 18.), ArcAngles(), 0., direction::z);
-	ConeMesher::writeElements(meshDens);
+	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(36., 18.), glm::dvec2(18., 9.), ArcAngles(), 0., direction::x);
+	RecToEllipseMesher::writeElements(meshDens);
 
 	pos.pos.x += 85.0;
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(36., 18.), glm::dvec2(18., 9.), ArcAngles(), 0., direction::z);
-	ConeMesher::writeElements(meshDens);
+	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(18., 18.), glm::dvec2(72., 72.), ArcAngles(), 0., direction::z);
+	RecToEllipseMesher::writeElements(meshDens);
 
 	pos.pos.x += 85.0;
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(18., 18.), glm::dvec2(72., 72.), ArcAngles(), 0., direction::z);
-	ConeMesher::writeElements(meshDens);
-
-	pos.pos.x += 85.0;
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(18., 9.), glm::dvec2(72., 36.), ArcAngles(), 0., direction::z);
-	ConeMesher::writeElements(meshDens);
+	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(18., 9.), glm::dvec2(72., 36.), ArcAngles(), 0., direction::z);
+	RecToEllipseMesher::writeElements(meshDens);
 
 	//writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
 	return 0;
 
 	pos.pos.x += 64.0;
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(24.0, 5.0), glm::dvec2(24.0, 5.0), ArcAngles(), 10.0, direction::z);
-	SquareToCircleMesher::writeElements(meshDens);
+	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(24.0, 5.0), glm::dvec2(24.0, 5.0), ArcAngles(), 10.0, direction::z);
+	RecToEllipseMesher::writeElements(meshDens);
 
 	pos.pos.x += 64.0;
-	SquareToCircleMesher::writeNodes(pos, meshDens, EllipseRadius(32.0, 32.0), glm::dvec2(32.0, 32.0), ArcAngles(), 10.0, direction::z);
-	SquareToCircleMesher::writeElements(meshDens);
+	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(32.0, 32.0), glm::dvec2(32.0, 32.0), ArcAngles(), 10.0, direction::z);
+	RecToEllipseMesher::writeElements(meshDens);
 
 
 	TEST_END
@@ -828,6 +835,58 @@ int cone3DmesherRef(const std::string& fileName) {
 
 	TEST_END
 }
+
+int recToEllipse3Dmesher(const std::string& fileName) {
+TEST_START
+	
+	MeshDensity3D meshDens(64, 18, 4, true);
+	
+	EllipseRadius radS(36., 36.);
+	EllipseRadius radE(36., 36.);
+	glm::dvec2 recS(18., 18.);
+	glm::dvec2 recE(18., 18.);
+	ArcAngles ang;
+
+	pos.pos.x = -400.;
+	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radS, EllipseRadius(radS.rad1, radS.rad2*2.0), recS, recS*2.0, ang, 50.0, direction::z);
+	RecToEllipse3Dmesher::writeElements(meshDens);
+	
+	pos.pos.x += 100.;
+	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radS, radE, recS, recE, ang, 10.0, direction::z);
+	RecToEllipse3Dmesher::writeElements(meshDens);
+
+	pos.pos.x += 100.;
+	radE = EllipseRadius(48., 48.);
+	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radS, radE, recS, recE, ang, 10.0, direction::z);
+	RecToEllipse3Dmesher::writeElements(meshDens);
+
+	pos.pos.x += 100.;
+	pos.pos.z = -25.0;
+	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radS, radS, recS, recE, ang, 50.0, direction::z);
+	RecToEllipse3Dmesher::writeElements(meshDens);
+
+	pos.pos.z = 25.0 + 1.0;
+	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radS, radE, recS, recE, ang, 20.0, direction::z);
+	RecToEllipse3Dmesher::writeElements(meshDens);
+
+	pos.pos.z = -25.0 - 1.0 - 20.0;
+	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radE, radS, recS, recE, ang, 20.0, direction::z);
+	RecToEllipse3Dmesher::writeElements(meshDens);
+
+	pos.pos.x += 100.;
+	recE /= 2.0;
+	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radS, radS, recS, recE, ang, 20.0, direction::z);
+	RecToEllipse3Dmesher::writeElements(meshDens);
+
+	pos.pos.x += 100.;
+	recE.x = recS.x;
+	meshDens.setAxis(18);
+	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radS, radS, recS, recE, ang, 20.0, direction::z);
+	RecToEllipse3Dmesher::writeElements(meshDens);
+
+TEST_END
+}
+
 
 int refinement2dHeight(const std::string& fileName) {
 	TEST_START

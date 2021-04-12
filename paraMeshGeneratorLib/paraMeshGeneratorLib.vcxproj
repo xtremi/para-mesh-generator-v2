@@ -35,7 +35,8 @@
     <ClInclude Include="ParaMeshGenCommon.h" />
     <ClInclude Include="PlaneMesher.h" />
     <ClInclude Include="RecEdgeMesher.h" />
-    <ClInclude Include="SquareToCircleMesher.h" />
+    <ClInclude Include="RecToEllipse3Dmesher.h" />
+    <ClInclude Include="RecToEllipseMesher.h" />
     <ClInclude Include="string_utilities.h" />
   </ItemGroup>
   <ItemGroup>
@@ -60,7 +61,8 @@
     <ClCompile Include="ParaMeshGenCommon.cpp" />
     <ClCompile Include="PlaneMesher.cpp" />
     <ClCompile Include="RecEdgeMesher.cpp" />
-    <ClCompile Include="SquareToCircleMesher.cpp" />
+    <ClCompile Include="RecToEllipse3Dmesher.cpp" />
+    <ClCompile Include="RecToEllipseMesher.cpp" />
     <ClCompile Include="string_utilities.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

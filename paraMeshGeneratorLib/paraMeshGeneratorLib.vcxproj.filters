@@ -69,13 +69,16 @@
     <ClInclude Include="CylinderMesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
-    <ClInclude Include="SquareToCircleMesher.h">
-      <Filter>Meshers\header</Filter>
-    </ClInclude>
     <ClInclude Include="EllipseMesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
     <ClInclude Include="RecEdgeMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="RecToEllipseMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="RecToEllipse3Dmesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -125,13 +128,16 @@
     <ClCompile Include="CylinderMesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
-    <ClCompile Include="SquareToCircleMesher.cpp">
-      <Filter>Meshers\source</Filter>
-    </ClCompile>
     <ClCompile Include="EllipseMesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
     <ClCompile Include="RecEdgeMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="RecToEllipseMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="RecToEllipse3Dmesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
   </ItemGroup>
