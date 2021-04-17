@@ -81,6 +81,9 @@
     <ClInclude Include="RecToEllipse3Dmesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
+    <ClInclude Include="RecTubeMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -131,13 +134,16 @@
     <ClCompile Include="EllipseMesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
-    <ClCompile Include="RecEdgeMesher.cpp">
-      <Filter>Meshers\source</Filter>
-    </ClCompile>
     <ClCompile Include="RecToEllipseMesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
     <ClCompile Include="RecToEllipse3Dmesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="RecEdgeMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="RecTubeMesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
   </ItemGroup>

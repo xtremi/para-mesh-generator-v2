@@ -399,5 +399,12 @@ private:
 	bool m_fullCircle;
 };
 
+struct RecTubeSize {
+	RecTubeSize(){}
+	RecTubeSize(const glm::dvec2& _inner, const glm::dvec2& _outer) : inner{ _inner }, outer{ _outer } {}
+
+	glm::dvec2 inner;
+	glm::dvec2 outer;
+};
 
 bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes);

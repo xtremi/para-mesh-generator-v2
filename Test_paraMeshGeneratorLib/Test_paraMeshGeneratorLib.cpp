@@ -14,6 +14,7 @@
 #include "DiskMesher.h"
 #include "CylinderMesher.h"
 #include "RecToEllipseMesher.h"
+#include "RecTubeMesher.h"
 
 //3d elements
 #include "CuboidMesher.h"
@@ -36,6 +37,8 @@ int diskMesherRef(const std::string& fileName);
 int cylinderMesher(const std::string& fileName);
 int cylinderMesherRef(const std::string& fileName);
 int recToEllipseMesher(const std::string& fileName);
+int recToEllipseMesherRef(const std::string& fileName);
+int recTubeMesher(const std::string& fileName);
 
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
@@ -76,7 +79,9 @@ std::vector<TestDef> testFunctions({
 	TestDef(209, "cylinderMesher",		"basic meshers 2D", (testFunction)cylinderMesher),
 	TestDef(210, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
 #endif
-	TestDef(211, "recToEllipseMesher","basic meshers 2D", (testFunction)recToEllipseMesher),
+	TestDef(211, "recToEllipseMesher",		"basic meshers 2D", (testFunction)recToEllipseMesher),
+	TestDef(211, "recToEllipseMesherRef",	"basic meshers 2D", (testFunction)recToEllipseMesherRef),
+	TestDef(211, "recTubeMesher",			"basic meshers 2D", (testFunction)recTubeMesher),
 
 	TestDef(320, "cuboidMesher",	    "basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(321, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
@@ -291,6 +296,86 @@ int recEdgeMesher(const std::string& fileName) {
 	RecEdgeMesher::writeElements(nnodes);
 	
 	
+	pos.pos = glm::dvec3(0.0);
+	double elSize = 0.0;
+	double recWidthStart = 10.0;
+	double recWidth		 = recWidthStart;
+	for(int i = 1; i < 6; i++){		
+		pos.pos.y += 40.0;
+		nnodes = i*4*8;
+		elSize = recWidth / (double)(nnodes / 4);
+		
+		//L1/L2/L3 | L1/L2/L3 | L1/L2/L3 | 
+
+		int nRefs = 3;
+		for (int refs = 0; refs < nRefs; refs++) {
+			//L1
+			RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
+			RecEdgeMesher::writeElements(nnodes);
+			nnodes += 8;				//corner nodes
+			recWidth += 1.8*elSize;		//increase rec size
+
+			//L2
+			RecEdgeMesher::writeNodes_nth(pos, nnodes, glm::dvec2(recWidth, recWidth), 4, plane::xy);
+			RecEdgeMesher::writeElements(3 * nnodes / 4);
+			nnodes += 8;								//corner nodes
+			recWidth += 1.8*elSize;						//increase rec size
+			nnodes /= 2;								//fewer elements			
+			elSize = recWidth / (double)(nnodes / 4);	//larger elements
+
+			//L3
+			RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
+			RecEdgeMesher::writeElements(nnodes);
+			nnodes += 8;								//corner nodes
+			recWidth += 1.8*elSize;						//increase rec size
+			//elSize = recWidth / (double)(nnodes / 4);
+
+		}
+		recWidth = recWidthStart;
+		/*
+		//Layer 1: normal
+		RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
+		RecEdgeMesher::writeElements(nnodes);
+		nnodes += 8;
+		recWidth += 2.0*elSize;
+
+		//Layer 2: nth
+		RecEdgeMesher::writeNodes_nth(pos, nnodes, glm::dvec2(recWidth, recWidth), 4, plane::xy);
+		RecEdgeMesher::writeElements(3* nnodes / 4);
+		nnodes += 8;
+		nnodes /= 2;
+		recWidth += 2.0*elSize;
+		elSize = recWidth / (double)(nnodes / 4);
+
+		//Layer 3: normal
+		RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
+		RecEdgeMesher::writeElements(nnodes);
+		nnodes += 8;
+		recWidth += 2.0*elSize;
+		elSize = recWidth / (double)(nnodes / 4);
+
+		//Layer 4: normal
+		RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
+		RecEdgeMesher::writeElements(nnodes);
+		nnodes += 8;
+		recWidth += 2.0*elSize;
+
+		//Layer 5: nth
+		RecEdgeMesher::writeNodes_nth(pos, nnodes, glm::dvec2(recWidth, recWidth), 4, plane::xy);
+		RecEdgeMesher::writeElements(3 * nnodes / 4);
+		nnodes += 8;
+		nnodes /= 2;
+		recWidth += 2.0*elSize;
+		elSize = recWidth / (double)(nnodes / 4);
+
+		//Layer 6: normal
+		RecEdgeMesher::writeNodes(pos, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
+		RecEdgeMesher::writeElements(nnodes);
+
+
+		recWidth = recWidthStart;*/
+	}
+
 	nnodes = 58;
 	std::vector<glm::dvec2> xycoords(nnodes);
 	RecEdgeMesher::getLocalCoords(xycoords, nnodes, glm::dvec2(60.0, 35.0));
@@ -675,6 +760,7 @@ int recToEllipseMesher(const std::string& fileName) {
 	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(36., 36.), glm::dvec2(18., 18.), ArcAngles(), 10.0, direction::x);
 	RecToEllipseMesher::writeElements(meshDens);
 	
+
 	pos.pos.x += 85.0;
 	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(36., 18.), glm::dvec2(18., 9.), ArcAngles(), 10.0, direction::y);
 	RecToEllipseMesher::writeElements(meshDens);
@@ -690,13 +776,22 @@ int recToEllipseMesher(const std::string& fileName) {
 	pos.pos.x += 85.0;
 	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(18., 18.), glm::dvec2(72., 72.), ArcAngles(), 0., direction::z);
 	RecToEllipseMesher::writeElements(meshDens);
+	DiskMesherRef::writeNodes(pos, MeshDensity2Dref(3, 128, true), Disk2Dradius(17.8, 9.), ArcAngles(), false, direction::z);
+	DiskMesherRef::writeElements(MeshDensity2Dref(3, 128, true));
+
+	pos.pos.y += 85.0;
+	RecToEllipseMesher::writeNodes(pos, MeshDensity2D(32, 8, true), EllipseRadius(18., 18.), glm::dvec2(72., 72.), ArcAngles(), 0., direction::z);
+	RecToEllipseMesher::writeElements(MeshDensity2D(32, 8, true));
+	DiskMesherRef::writeNodes(pos, MeshDensity2Dref(2, 128, true), Disk2Dradius(9., 17.8), ArcAngles(), false, direction::z);
+	DiskMesherRef::writeElements(MeshDensity2Dref(2, 128, true));
+	RecToEllipseMesher::writeNodes(pos, MeshDensity2D(128, 12, true), EllipseRadius(8.9, 8.9), glm::dvec2(2., 2.), ArcAngles(), 0., direction::z);
+	RecToEllipseMesher::writeElements(MeshDensity2D(128, 12, true));
+	pos.pos.y -= 85.0;
+	return 0;
 
 	pos.pos.x += 85.0;
 	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(18., 9.), glm::dvec2(72., 36.), ArcAngles(), 0., direction::z);
 	RecToEllipseMesher::writeElements(meshDens);
-
-	//writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
-	return 0;
 
 	pos.pos.x += 64.0;
 	RecToEllipseMesher::writeNodes(pos, meshDens, EllipseRadius(24.0, 5.0), glm::dvec2(24.0, 5.0), ArcAngles(), 10.0, direction::z);
@@ -710,6 +805,43 @@ int recToEllipseMesher(const std::string& fileName) {
 	TEST_END
 }
 
+int recToEllipseMesherRef (const std::string& fileName) {
+	TEST_START
+
+	MeshDensity2Dref meshDens(5, 64, true);
+	
+	RecToEllipseMesherRef::writeNodes(pos, meshDens, EllipseRadius(36., 36.), glm::dvec2(18., 18.), ArcAngles(), 10.0, false, direction::z);
+	RecToEllipseMesherRef::writeElements(meshDens);
+
+
+	TEST_END
+}
+
+int recTubeMesher(const std::string& fileName) {
+	TEST_START
+
+	int nNodesEdge = 8;
+	int nnodesInner = nNodesEdge * 4 * 1;
+	int nLayers = 4;
+	glm::dvec2 sizeInner(10.0, 10.0);
+	RecTubeSize size(sizeInner, sizeInner + 2.*(double)(nLayers - 1)*sizeInner /(double)nNodesEdge); 
+	//glm::dvec2(10. + (double)(nLayers - 1)*2.*10. / 8.));
+
+	RecTubeMesher::writeNodes(pos, nnodesInner, nLayers, size, plane::xy);
+	writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
+
+	nLayers = 5;
+	pos.pos.x += 25.0;
+	RecTubeMesher::writeNodes2(pos, nnodesInner, nLayers, size, plane::xy);
+	PlaneMesher::writeElements(MeshDensity2D(nnodesInner, nLayers, true));
+
+	nLayers = 14;
+	pos.pos.x += 25.0;
+	RecTubeMesher::writeNodes2(pos, nnodesInner*3, nLayers, RecTubeSize(glm::dvec2(5.0, 5.0), glm::dvec2(15.0, 15.0)), plane::xy);
+	PlaneMesher::writeElements(MeshDensity2D(nnodesInner * 3, nLayers, true));
+
+	TEST_END
+}
 
 int cuboidMesher(const std::string& fileName) {
 	TEST_START
@@ -848,7 +980,7 @@ TEST_START
 	ArcAngles ang;
 
 	pos.pos.x = -400.;
-	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radS, EllipseRadius(radS.rad1, radS.rad2*2.0), recS, recS*2.0, ang, 50.0, direction::z);
+	RecToEllipse3Dmesher::writeNodes(pos, meshDens, radS, EllipseRadius(radS.rad1, radS.rad2*2.0), recS, recS*2.0, ang, 50.0, direction::y);
 	RecToEllipse3Dmesher::writeElements(meshDens);
 	
 	pos.pos.x += 100.;
