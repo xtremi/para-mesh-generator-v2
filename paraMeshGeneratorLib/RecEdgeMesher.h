@@ -33,7 +33,7 @@ public:
 
 	static void writeElements(int nnodes, bool closedLoop = true);
 
-private:
+public:
 	static void getOrWriteCoords_nth(
 		MesherMode					mode,
 		const MeshCsys&				spos,

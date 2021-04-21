@@ -158,6 +158,80 @@ struct MeshDensity2D : public NodeVec2D {
 	int nNodes() const { return dir1() * dir2(); }
 };
 
+
+struct Rectangle {
+	Rectangle(const glm::dvec2& _size) : size{ _size } {}
+	Rectangle() {}
+
+	double perimeter() {
+		return 2.0 * size.x + 2.0 * size.y;
+	}
+	void elementsPerSides(int nNodesPerimeter, int& nElWidthX, int& nElHeightY) {
+		double recWfactor = size.x / perimeter();
+		nElWidthX = (int)(recWfactor * (double)nNodesPerimeter);
+		nElHeightY = (nNodesPerimeter - 2 * nElWidthX) / 2;
+	}
+
+	glm::dvec2 getCornerCoord(int corner) {
+		switch (corner)
+		{
+		case 1: return  0.5*size * glm::dvec2(-1.0, 1.0); break;
+		case 2: return  0.5*size * glm::dvec2(1.0, 1.0); break;
+		case 3: return  0.5*size * glm::dvec2(1.0, -1.0); break;
+		default: return 0.5*size * glm::dvec2(-1.0, -1.0); break;
+		}
+	}
+
+	glm::dvec2 size;
+
+	static const glm::dvec2 recDirs[4];
+};
+
+
+struct MeshDensity2DrecTube : public MeshDensity2D {
+	MeshDensity2DrecTube(){}
+	MeshDensity2DrecTube(int nNodePerimeterInner, int nNodeLayers, const glm::dvec2& sizeInner) 
+		: MeshDensity2D(nNodePerimeterInner, nNodeLayers, true)
+	{
+		setNodesInner(nNodePerimeterInner, sizeInner);
+	}
+	MeshDensity2DrecTube(int nNodesWidth, int nNodesHeight, int nNodeLayers) 
+		: MeshDensity2D(2*(nNodesWidth + nNodesHeight), nNodeLayers, true){}
+
+	void setNodesInner(int nNodePerimeterInner, const glm::dvec2& sizeInner) {
+		setCirc(nNodePerimeterInner);
+		Rectangle rec(sizeInner);
+		rec.elementsPerSides(nNodePerimeterInner, nNodesW, nNodesH);		
+	}
+	void setNodesInner(int nNodesWidth, int nNodesHeight) {
+		nNodesW = nNodesWidth;
+		nNodesH = nNodesHeight;
+		setCirc(2 * (nNodesWidth + nNodesHeight));
+	}
+	void setNodesLayer(int nLayers) {
+		setNorm(nLayers);
+	}
+
+	int nNodePerimeter(int layer) const { return circ() + 8 * layer; }
+
+	int nNodesWidth(int layer) const {
+		return nNodesW + 2 * layer;
+	}
+	int nNodesHeight(int layer) const {
+		return nNodesH + 2 * layer;
+	}
+	void cornerNodes(int n[4], int layer) const {
+		n[0] = 0;
+		n[1] = nNodesWidth(layer);
+		n[2] = n[1] + nNodesHeight(layer);
+		n[3] = n[2] + nNodesWidth(layer);
+	}
+
+
+private:
+	int nNodesW, nNodesH;
+};
+
 /*
 	Extends NodeVec3D with element number functions and closed loop definition
 */
@@ -284,33 +358,6 @@ struct MeshCsys {
 	glm::dmat3x3*	csys = nullptr;
 };
 
-struct Rectangle {
-	Rectangle(const glm::dvec2& _size): size{ _size }{}
-	Rectangle(){}
-
-	double perimeter() {
-		return 2.0 * size.x + 2.0 * size.y;
-	}
-	void elementsPerSides(int nNodesPerimeter, int& nElWidthX, int& nElHeightY) {
-		double recWfactor = size.x / perimeter();
-		nElWidthX = (int)(recWfactor * (double)nNodesPerimeter);
-		nElHeightY = (nNodesPerimeter - 2 * nElWidthX) / 2;
-	}
-
-	glm::dvec2 getCornerCoord(int corner) {
-		switch (corner)
-		{
-		case 1: return  0.5*size * glm::dvec2(-1.0,  1.0); break;
-		case 2: return  0.5*size * glm::dvec2( 1.0,  1.0); break;
-		case 3: return  0.5*size * glm::dvec2( 1.0, -1.0); break;
-		default: return 0.5*size * glm::dvec2(-1.0, -1.0); break;
-		}
-	}
-
-	glm::dvec2 size;
-
-	static const glm::dvec2 recDirs[4];
-};
 
 
 struct EllipseRadius {
@@ -401,10 +448,26 @@ private:
 
 struct RecTubeSize {
 	RecTubeSize(){}
-	RecTubeSize(const glm::dvec2& _inner, const glm::dvec2& _outer) : inner{ _inner }, outer{ _outer } {}
+	RecTubeSize(const glm::dvec2& _inner, const glm::dvec2& _outer = glm::dvec2()) : inner{ _inner }, outer{ _outer } {}
 
 	glm::dvec2 inner;
 	glm::dvec2 outer;
+
+	glm::dvec2 calculateOuterSize(int nNodesEdge, int nPerimeterNodeLayers) {		
+		return inner + 2.* (double)(nPerimeterNodeLayers - 1)*inner / (double)nNodesEdge;		
+	}
+	glm::dvec2 calculateOuterSize(int nNodesWidth, int nNodesHeight, int nPerimeterNodeLayers) {
+		glm::dvec2 outerSize;
+		outerSize.x = inner.x + 2.* (double)(nPerimeterNodeLayers - 1)*inner.x / (double)nNodesWidth;
+		outerSize.y = inner.y + 2.* (double)(nPerimeterNodeLayers - 1)*inner.y / (double)nNodesHeight;
+		return outerSize;
+	}
+	void setOuterSize(int nNodesEdge, int nPerimeterNodeLayers) {
+		outer = calculateOuterSize(nNodesEdge, nPerimeterNodeLayers);
+	}
+	void setOuterSize(int nNodesWidth, int nNodesHeight, int nPerimeterNodeLayers) {
+		outer = calculateOuterSize(nNodesWidth, nNodesHeight, nPerimeterNodeLayers);
+	}
 };
 
 bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes);

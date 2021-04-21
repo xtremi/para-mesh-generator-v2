@@ -39,6 +39,7 @@ int cylinderMesherRef(const std::string& fileName);
 int recToEllipseMesher(const std::string& fileName);
 int recToEllipseMesherRef(const std::string& fileName);
 int recTubeMesher(const std::string& fileName);
+int recTubeMesherRef(const std::string& fileName);
 
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
@@ -80,9 +81,10 @@ std::vector<TestDef> testFunctions({
 	TestDef(210, "cylinderMesherRef",	"basic meshers 2D", (testFunction)cylinderMesherRef),
 #endif
 	TestDef(211, "recToEllipseMesher",		"basic meshers 2D", (testFunction)recToEllipseMesher),
-	TestDef(211, "recToEllipseMesherRef",	"basic meshers 2D", (testFunction)recToEllipseMesherRef),
-	TestDef(211, "recTubeMesher",			"basic meshers 2D", (testFunction)recTubeMesher),
-
+	TestDef(212, "recToEllipseMesherRef",	"basic meshers 2D", (testFunction)recToEllipseMesherRef),
+	TestDef(213, "recTubeMesher",			"basic meshers 2D", (testFunction)recTubeMesher),
+	TestDef(214, "recTubeMesherRef",		"basic meshers 2D", (testFunction)recTubeMesherRef),
+	
 	TestDef(320, "cuboidMesher",	    "basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(321, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
 	TestDef(322, "cone3Dmesher",	    "basic meshers 3D", (testFunction)cone3Dmesher),	
@@ -820,25 +822,143 @@ int recToEllipseMesherRef (const std::string& fileName) {
 int recTubeMesher(const std::string& fileName) {
 	TEST_START
 
+	//RecTubes with increasing nodes per layer, for rec structure:
+
+	//Structured QUAD1
 	int nNodesEdge = 8;
-	int nnodesInner = nNodesEdge * 4 * 1;
 	int nLayers = 4;
 	glm::dvec2 sizeInner(10.0, 10.0);
-	RecTubeSize size(sizeInner, sizeInner + 2.*(double)(nLayers - 1)*sizeInner /(double)nNodesEdge); 
-	//glm::dvec2(10. + (double)(nLayers - 1)*2.*10. / 8.));
+	RecTubeSize size(sizeInner);
+	size.setOuterSize(nNodesEdge, nLayers);
+	MeshDensity2DrecTube meshDens(nNodesEdge * 4, nLayers, sizeInner);
+	RecTubeMesher::writeNodes(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements(meshDens);
 
-	RecTubeMesher::writeNodes(pos, nnodesInner, nLayers, size, plane::xy);
-	writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
+	//Structured QUAD2 
+	pos.pos.x += 25.0;
+	nNodesEdge = 16;
+	nLayers    = 6;
+	size.setOuterSize(nNodesEdge, nLayers);
+	meshDens.setNodesInner(nNodesEdge * 4, size.inner);
+	meshDens.setNodesLayer(nLayers);	
+	RecTubeMesher::writeNodes(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements(meshDens);
 
+	//Structured QUAD3
+	pos.pos.x += 25.0;		
+	size.inner = glm::dvec2(4.0);
+	nNodesEdge = 16;
+	nLayers = 22;
+	size.setOuterSize(nNodesEdge, nLayers);
+	meshDens.setNodesInner(nNodesEdge * 4, size.inner);
+	meshDens.setNodesLayer(nLayers);	
+	RecTubeMesher::writeNodes(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements(meshDens);
+
+	//Structured QUAD4
+	pos.pos.x += 25.0;
+	size.inner = glm::dvec2(5.0);
+	nNodesEdge = 4;
+	nLayers = 8;
+	size.setOuterSize(nNodesEdge, nLayers);
+	meshDens.setNodesInner(nNodesEdge * 4, size.inner);
+	meshDens.setNodesLayer(nLayers);
+	RecTubeMesher::writeNodes(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements(meshDens);
+
+	//Structured REC1
+	pos.pos.x = 0.0;
+	pos.pos.y += 25.0;
+	size.inner = glm::dvec2(5.0, 2.5);	
+	meshDens.setNodesInner(64, size.inner);
+	nLayers = 8;	
+	size.setOuterSize(meshDens.nNodesWidth(0), meshDens.nNodesHeight(0), nLayers);	
+	RecTubeMesher::writeNodes(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements(meshDens);
+
+	//Structured REC2
+	pos.pos.x += 25.0;
+	size.inner = glm::dvec2(5.0,  2.5);
+	size.outer = glm::dvec2(8.23, 7.1);
+	meshDens.setNodesInner(40, size.inner);
+	nLayers = 8;
+	RecTubeMesher::writeNodes(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements(meshDens);
+
+
+	//RecTubes with same node density per layer:
+	//QUAD1
+	pos.pos.x = 0.0;
+	pos.pos.y += 25.0;
 	nLayers = 5;
-	pos.pos.x += 25.0;
-	RecTubeMesher::writeNodes2(pos, nnodesInner, nLayers, size, plane::xy);
-	PlaneMesher::writeElements(MeshDensity2D(nnodesInner, nLayers, true));
+	size.inner = glm::dvec2(5.0, 5.0);
+	size.outer = 2.*size.inner;
+	meshDens.setNodesInner(24, size.inner);
+	meshDens.setNorm(nLayers);
+	RecTubeMesher::writeNodes2(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements2(meshDens);
 
-	nLayers = 14;
+	//QUAD2
 	pos.pos.x += 25.0;
-	RecTubeMesher::writeNodes2(pos, nnodesInner*3, nLayers, RecTubeSize(glm::dvec2(5.0, 5.0), glm::dvec2(15.0, 15.0)), plane::xy);
-	PlaneMesher::writeElements(MeshDensity2D(nnodesInner * 3, nLayers, true));
+	nLayers = 14;
+	meshDens.setNodesInner(40, size.inner);
+	meshDens.setNorm(nLayers);
+	size.inner = glm::dvec2(10.0, 6.2);
+	size.outer = 2.*size.inner;
+	RecTubeMesher::writeNodes2(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements2(meshDens);
+
+	//Mix: RecTube type2 as outer | RecTube type1 as middle | RecTube type2 as inner
+	//Middle QUAD
+	pos.pos.x = 0.0;
+	pos.pos.y += 25.0;
+	nLayers = 4;
+	nNodesEdge = 8;
+	size.inner = glm::dvec2(10.0);
+	size.setOuterSize(nNodesEdge, nLayers);
+	meshDens.setNodesInner(nNodesEdge * 4, size.inner);
+	meshDens.setNodesLayer(nLayers);
+	RecTubeMesher::writeNodes(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements(meshDens);
+
+	//Outer QUAD
+	size.inner = size.outer;
+	size.outer = 2.*size.inner;
+	meshDens.setNodesInner(meshDens.nNodePerimeter(3), size.inner);
+	meshDens.setNorm(8);
+	RecTubeMesher::writeNodes2(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements2(meshDens);
+	
+	//Inner QUAD
+	size.outer = glm::dvec2(10.0);
+	size.inner = size.outer*0.75;
+	meshDens.setNodesInner(meshDens.nNodePerimeter(0), size.inner);
+	meshDens.setNorm(3);	
+	RecTubeMesher::writeNodes2(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeElements2(meshDens);
+
+	TEST_END
+}
+
+int recTubeMesherRef(const std::string& fileName) {
+	TEST_START
+
+	int nNodesEdge = 8 * 6;
+	int nnodesInner = nNodesEdge * 4;
+	int nRefs = 3;
+	glm::dvec2 sizeInner(10.0, 10.0);
+	glm::dvec2 sizeOuter(15.0, 15.0);
+	
+
+	RecTubeMesherRef::writeNodes2(pos, MeshDensity2Dref(nRefs, nnodesInner, true), RecTubeSize(sizeInner, sizeOuter), plane::xy);
+	//writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
+	PlaneMesherRef::writeElements(MeshDensity2Dref(nRefs, nnodesInner, true));
+
+	//RecTubeMesher::writeNodes2(pos, MeshDensity2D(nnodesInner, 8, true), RecTubeSize(0.8*sizeInner, sizeInner), plane::xy);
+	//PlaneMesher::writeElements(MeshDensity2D(nnodesInner, 8, true));
+	//
+	//RecTubeMesher::writeNodes2(pos, MeshDensity2D(6*4, 4, true), RecTubeSize(1.5*sizeOuter, sizeOuter), plane::xy);
+	//PlaneMesher::writeElements(MeshDensity2D(6 * 4, 4, true));
 
 	TEST_END
 }
