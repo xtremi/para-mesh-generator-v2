@@ -44,6 +44,17 @@ void RecEdgeMesher::writeNodes(
 
 void RecEdgeMesher::writeNodes_nth(
 	const MeshCsys&		spos,
+	int					nNodesWidth,
+	int					nNodesHeight,
+	const glm::dvec2&	size,
+	int					skipNth,
+	plane				pln)
+{
+	getOrWriteCoords_nth(MesherMode::write, spos, default_empty_coord_vec, nNodesWidth, nNodesHeight, size, skipNth, true, pln);
+}
+
+void RecEdgeMesher::writeNodes_nth(
+	const MeshCsys&		spos,
 	int					nnodes,
 	const glm::dvec2&	size,
 	int					skipNth,

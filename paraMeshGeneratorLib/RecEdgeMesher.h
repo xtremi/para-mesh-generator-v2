@@ -26,6 +26,14 @@ public:
 		int					skipNth,
 		plane				pln);
 
+	static void writeNodes_nth(
+		const MeshCsys&		spos,
+		int					nNodesWidth,
+		int					nNodesHeight,
+		const glm::dvec2&	size,
+		int					skipNth,
+		plane				pln);
+
 	static void getLocalCoords(
 		std::vector<glm::dvec2>& coords, 
 		int						 nnodes,

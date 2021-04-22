@@ -173,12 +173,52 @@ void RecTubeMesher::writeElements(const MeshDensity2DrecTube& meshDens){
 
 
 void RecTubeMesherRef::writeNodes(
-	const MeshCsys&		spos,
-	const MeshDensity2Dref&	meshDens,
-	int					nRefs,
-	const RecTubeSize&	size,
-	plane				pln)
-{}
+	const MeshCsys&			spos,
+	const glm::ivec2&		nNodesWH,
+	int						nRefs,
+	const glm::dvec2&		recSizeInner,
+	plane					pln)
+{
+	int firstNode = writer->getNextNodeID();
+
+	RefShapeData rsData;
+	rsData.pln = pln;
+
+	RefLayerData rlData;
+	rlData.curRecSize = recSizeInner;
+	rlData.curElSizeWH = rlData.curRecSize / glm::dvec2((double)nNodesWH.x, (double)nNodesWH.y);
+	rlData.curPos = MeshCsys(spos);
+	rlData.curNodesWH = nNodesWH;
+
+
+	for (int curRef = 0; curRef < nRefs; curRef++) {
+		writeNodes_layerB(rsData, rlData, curRef);
+		writeNodes_layerM(rsData, rlData, curRef);
+		writeNodes_layerT(rsData, rlData, curRef);
+	}
+
+	Mesher::nodeID1 = firstNode;
+}
+
+void RecTubeMesherRef::incrementStep(const RefShapeData& rsData, RefLayerData& rlData){
+	rlData.curRecSize += 2.*rlData.curElSizeWH;
+	rlData.curNodesWH += 2;
+}
+void RecTubeMesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+	RecEdgeMesher::writeNodes(rlData.curPos, rlData.curNodesWH.x, rlData.curNodesWH.y, rlData.curRecSize, rsData.pln);
+	incrementStep(rsData, rlData);
+}
+void RecTubeMesherRef::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+	RecEdgeMesher::writeNodes_nth(rlData.curPos, rlData.curNodesWH.x, rlData.curNodesWH.y, rlData.curRecSize, 4, rsData.pln);
+	incrementStep(rsData, rlData);
+
+	rlData.curNodesWH /= 2;
+	rlData.curElSizeWH = rlData.curRecSize / glm::dvec2((double)rlData.curNodesWH.x, (double)rlData.curNodesWH.y);
+}
+void RecTubeMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+	RecEdgeMesher::writeNodes(rlData.curPos, rlData.curNodesWH.x, rlData.curNodesWH.y, rlData.curRecSize, rsData.pln);
+	incrementStep(rsData, rlData);
+}
 
 void RecTubeMesherRef::writeNodes2(
 	const MeshCsys&		spos,
@@ -189,10 +229,6 @@ void RecTubeMesherRef::writeNodes2(
 	Rectangle rec(size.inner);
 	int nElW, nElH;
 	rec.elementsPerSides(meshDens.circ(), nElW, nElH);
-	if ((2 * nElW + 2 * nElH) != meshDens.circ()) {
-		int notMatching = 1;
-	}
-
 	writeNodes2(spos, meshDens, nElW, nElH, size, pln);
 }
 
@@ -206,14 +242,14 @@ void RecTubeMesherRef::writeNodes2(
 {
 	int firstNode = writer->getNextNodeID();
 
-	RefShapeData rsData;
+	RefShapeData2 rsData;
 	rsData.meshDens = &meshDens;
 	rsData.size = &size;
 	//rsData.height = height;
 	rsData.pln = pln;
 	rsData.length = 0.5*(size.outer.x - size.inner.x); //std::sqrt(pow2(radius.dR()) + pow2(height));
 
-	RefLayerData rlData;
+	RefLayerData2 rlData;
 	rlData.curPos = spos;
 	rlData.curElSize.x = initialRefElSize2D(rsData.length, meshDens.nRefs(), false);
 	rlData.curSize = size.inner;
@@ -223,9 +259,9 @@ void RecTubeMesherRef::writeNodes2(
 	//rlData.curElSize.y = arcLengthStart / (double)meshDens.nElCirc();
 
 	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
-		writeNodes_layerB(rsData, rlData, refLayer);
-		writeNodes_layerM(rsData, rlData, refLayer);
-		writeNodes_layerT(rsData, rlData, refLayer);
+		writeNodes2_layerB(rsData, rlData, refLayer);
+		writeNodes2_layerM(rsData, rlData, refLayer);
+		writeNodes2_layerT(rsData, rlData, refLayer);
 	}
 
 
@@ -233,22 +269,27 @@ void RecTubeMesherRef::writeNodes2(
 
 }
 
-void RecTubeMesherRef::incrementConeStep(const RefShapeData& rsData, RefLayerData& rlData){
+void RecTubeMesherRef::incrementStep2(const RefShapeData2& rsData, RefLayerData2& rlData){
 	rlData.curLength += rlData.curElSize.x;
 	rlData.curSize += 2.*glm::dvec2(rlData.curElSize.x);
 }
-void RecTubeMesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+void RecTubeMesherRef::writeNodes2_layerB(const RefShapeData2& rsData, RefLayerData2& rlData, int refLayer){
 	RecEdgeMesher::writeNodes(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer), rlData.curSize, rsData.pln);
-	incrementConeStep(rsData, rlData);
+	incrementStep2(rsData, rlData);
 }
-void RecTubeMesherRef::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+void RecTubeMesherRef::writeNodes2_layerM(const RefShapeData2& rsData, RefLayerData2& rlData, int refLayer){
 	RecEdgeMesher::getOrWriteCoords_nth(MesherMode::write, rlData.curPos, RecEdgeMesher::default_empty_coord_vec, 
 		rsData.meshDens->nNodesRowB(refLayer), rlData.curSize, 4, false, rsData.pln);
-	incrementConeStep(rsData, rlData);
+	incrementStep2(rsData, rlData);
 }
-void RecTubeMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+void RecTubeMesherRef::writeNodes2_layerT(const RefShapeData2& rsData, RefLayerData2& rlData, int refLayer){
 	//rlData.curElSize.y *= 2.0;
 	RecEdgeMesher::writeNodes(rlData.curPos, rsData.meshDens->nNodesRowT(refLayer), rlData.curSize, rsData.pln);
 	rlData.curElSize.x *= 2.0;
-	incrementConeStep(rsData, rlData);
+	incrementStep2(rsData, rlData);
+}
+
+void RecTubeMesherRef::writeElements2(const MeshDensity2Dref& meshDens){
+	PlaneMesherRef::writeElements(meshDens);
+
 }
