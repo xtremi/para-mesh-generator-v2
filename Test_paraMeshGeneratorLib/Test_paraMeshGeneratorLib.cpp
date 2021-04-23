@@ -904,21 +904,28 @@ int recTubeMesher(const std::string& fileName) {
 int recTubeMesherRef(const std::string& fileName) {
 	TEST_START
 
-	int nNodesEdge = 8 * 4;
+	int nNodesEdge = 8 * 3;
+	int nNodesEdge2 = 8 * 4;
 	int nnodesInner = nNodesEdge * 4;
-	int nRefs = 2;
+	int nRefs = 3;
 	glm::dvec2 sizeInner(10.0, 10.0);
 	glm::dvec2 sizeOuter(15.0, 15.0);	
 
-	RecTubeMesherRef::writeNodes2(pos, MeshDensity2Dref(nRefs, nnodesInner, true), RecTubeSize(sizeInner, sizeOuter), plane::xy);
-	RecTubeMesherRef::writeElements2(MeshDensity2Dref(nRefs, nnodesInner, true));
-
-	pos.pos.x += 25.0;
-	RecTubeMesherRef::writeNodes(pos, glm::ivec2(8*4), 2, sizeInner, plane::xy);
+	RecTubeMesherRef::writeNodes(pos, glm::ivec2(nNodesEdge, nNodesEdge), nRefs, sizeInner, plane::xy);
+	RecTubeMesherRef::writeElements1(glm::ivec2(nNodesEdge, nNodesEdge), nRefs);
 	
 	pos.pos.x += 25.0;
-	RecTubeMesherRef::writeNodes(pos, glm::ivec2(8*4, 8*3), 2, glm::dvec2(8.0, 5.0), plane::xy);
-	writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
+	RecTubeMesherRef::writeNodes(pos, glm::ivec2(nNodesEdge2, nNodesEdge), 2, glm::dvec2(8.0, 5.0), plane::xy);
+	RecTubeMesherRef::writeElements1(glm::ivec2(nNodesEdge2, nNodesEdge), 2);
+	
+	pos.pos.y += 25.0;
+	pos.pos.x = 0.;
+	nnodesInner = nNodesEdge2 * 4;
+	MeshDensity2Dref meshDens(nRefs, nnodesInner, true);
+	RecTubeMesherRef::writeNodes2(pos, meshDens, RecTubeSize(sizeInner, sizeOuter), plane::xy);
+	RecTubeMesherRef::writeElements2(meshDens);
+	
+
 
 	//PlaneMesherRef::writeElements(MeshDensity2Dref(nRefs, nnodesInner, true));
 

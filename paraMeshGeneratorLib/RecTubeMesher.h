@@ -53,6 +53,7 @@ public:
 		const RecTubeSize&	size,
 		plane				pln);
 
+	static void writeElements1(const glm::ivec2& nNodesWidthHeight, int	nRefs);
 	static void writeElements2(const MeshDensity2Dref&	meshDens);
 
 private:
@@ -88,4 +89,7 @@ private:
 	static void writeNodes2_layerB(const RefShapeData2& rsData, RefLayerData2& rlData, int refLayer);
 	static void writeNodes2_layerM(const RefShapeData2& rsData, RefLayerData2& rlData, int refLayer);
 	static void writeNodes2_layerT(const RefShapeData2& rsData, RefLayerData2& rlData, int refLayer);
+
+	static void writeElements_layerB(const glm::ivec2& nNodesWidthHeight, int& nid1, int curRefLayer);
+	static void writeElements_layersMT(const glm::ivec2& nNodesWidthHeight, int& nid1, int curRefLayer);
 };

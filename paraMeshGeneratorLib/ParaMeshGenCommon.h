@@ -196,7 +196,10 @@ struct MeshDensity2DrecTube : public MeshDensity2D {
 		setNodesInner(nNodePerimeterInner, sizeInner);
 	}
 	MeshDensity2DrecTube(int nNodesWidth, int nNodesHeight, int nNodeLayers) 
-		: MeshDensity2D(2*(nNodesWidth + nNodesHeight), nNodeLayers, true){}
+		: MeshDensity2D(0, nNodeLayers, true)
+	{
+		setNodesInner(nNodesWidth, nNodesHeight);
+	}
 
 	void setNodesInner(int nNodePerimeterInner, const glm::dvec2& sizeInner) {
 		setCirc(nNodePerimeterInner);
