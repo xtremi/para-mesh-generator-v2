@@ -194,7 +194,8 @@ void ConeMesherRef::writeNodes(
 void ConeMesherRef::incrementConeStep(const RefShapeData& rsData, RefLayerData& rlData)
 {
 	rlData.curConeLength += rlData.curElSize.x;
-	rlData.curRadius = rsData.radius->start() + rsData.radius->dR() * (rlData.curConeLength / rsData.coneLength);
+	rlData.curRadius = 
+		rsData.radius->start() + rsData.radius->dR() * (rlData.curConeLength / rsData.coneLength);
 	double curDh = (rsData.height / rsData.coneLength)*rlData.curElSize.x;
 	rlData.curPos.pos[(size_t)rsData.rotAxis] += curDh;
 }

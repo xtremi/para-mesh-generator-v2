@@ -456,6 +456,8 @@ struct RecTubeSize {
 	glm::dvec2 inner;
 	glm::dvec2 outer;
 
+	glm::dvec2 dsize() const { return outer - inner; }
+
 	glm::dvec2 calculateOuterSize(int nNodesEdge, int nPerimeterNodeLayers) {		
 		return inner + 2.* (double)(nPerimeterNodeLayers - 1)*inner / (double)nNodesEdge;		
 	}

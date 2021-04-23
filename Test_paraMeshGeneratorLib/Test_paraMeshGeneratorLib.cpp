@@ -856,7 +856,7 @@ int recTubeMesher(const std::string& fileName) {
 	size.outer = 2.*size.inner;
 	meshDens.setNodesInner(24, size.inner);
 	meshDens.setNorm(nLayers);
-	RecTubeMesher::writeNodes2(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeNodes2(pos, meshDens, size, 0.0, plane::xy);
 	RecTubeMesher::writeElements2(meshDens);
 
 	//QUAD2
@@ -866,7 +866,19 @@ int recTubeMesher(const std::string& fileName) {
 	meshDens.setNorm(nLayers);
 	size.inner = glm::dvec2(10.0, 6.2);
 	size.outer = 2.*size.inner;
-	RecTubeMesher::writeNodes2(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeNodes2(pos, meshDens, size, 0.0, plane::xy);
+	RecTubeMesher::writeElements2(meshDens);
+
+	//QUAD3 - with height
+	pos.pos.x += 25.0;
+	RecTubeMesher::writeNodes2(pos, meshDens, size, 10.0, plane::xy);
+	RecTubeMesher::writeElements2(meshDens);
+
+	//QUAD4 - with height
+	pos.pos.x += 25.0;
+	size.inner = glm::dvec2(10.0, 3.2);
+	size.outer = size.inner;
+	RecTubeMesher::writeNodes2(pos, meshDens, size, 10.0, plane::xy);
 	RecTubeMesher::writeElements2(meshDens);
 
 	//Mix: RecTube type2 as outer | RecTube type1 as middle | RecTube type2 as inner
@@ -887,7 +899,7 @@ int recTubeMesher(const std::string& fileName) {
 	size.outer = 2.*size.inner;
 	meshDens.setNodesInner(meshDens.nNodePerimeter(3), size.inner);
 	meshDens.setNorm(8);
-	RecTubeMesher::writeNodes2(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeNodes2(pos, meshDens, size, 0.0, plane::xy);
 	RecTubeMesher::writeElements2(meshDens);
 	
 	//Inner QUAD
@@ -895,7 +907,7 @@ int recTubeMesher(const std::string& fileName) {
 	size.inner = size.outer*0.75;
 	meshDens.setNodesInner(meshDens.nNodePerimeter(0), size.inner);
 	meshDens.setNorm(3);	
-	RecTubeMesher::writeNodes2(pos, meshDens, size, plane::xy);
+	RecTubeMesher::writeNodes2(pos, meshDens, size, 0.0, plane::xy);
 	RecTubeMesher::writeElements2(meshDens);
 
 	TEST_END
@@ -922,10 +934,16 @@ int recTubeMesherRef(const std::string& fileName) {
 	pos.pos.x = 0.;
 	nnodesInner = nNodesEdge2 * 4;
 	MeshDensity2Dref meshDens(nRefs, nnodesInner, true);
-	RecTubeMesherRef::writeNodes2(pos, meshDens, RecTubeSize(sizeInner, sizeOuter), plane::xy);
+	RecTubeMesherRef::writeNodes2(pos, meshDens, RecTubeSize(sizeInner, sizeOuter), 0.0, plane::xy);
 	RecTubeMesherRef::writeElements2(meshDens);
 	
+	pos.pos.x += 25.0;
+	RecTubeMesherRef::writeNodes2(pos, meshDens, RecTubeSize(sizeInner, sizeOuter), 10.0, plane::xy);
+	RecTubeMesherRef::writeElements2(meshDens);
 
+	pos.pos.x += 25.0;
+	RecTubeMesherRef::writeNodes2(pos, meshDens, RecTubeSize(sizeInner, sizeInner), 10.0, plane::xy);
+	RecTubeMesherRef::writeElements2(meshDens);
 
 	//PlaneMesherRef::writeElements(MeshDensity2Dref(nRefs, nnodesInner, true));
 

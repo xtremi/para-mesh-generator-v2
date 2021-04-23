@@ -68,47 +68,28 @@ void RecTubeMesher::writeNodes2(
 	const MeshCsys&				spos,
 	const MeshDensity2DrecTube& meshDens,
 	const RecTubeSize&			size,
+	double						height,
 	plane						pln) 
 {
-	/*Rectangle rec(size.inner);
-	int nElW, nElH;
-	rec.elementsPerSides(meshDens.circ(), nElW, nElH);
-	writeNodes2(spos, nElW, nElH, meshDens.norm(), size, pln);*/
-
 	int firstNode = writer->getNextNodeID();
+	MeshCsys curPos(spos);
+
+	direction heightAxis = getPlaneNormal(pln);
 
 	glm::dvec2 curSize = size.inner;
 	glm::dvec2 dSize = (size.outer - size.inner) / (double)meshDens.nElNorm();
+	double dH = height / (double)meshDens.nElNorm();
 
 	for (int i2 = 0; i2 < meshDens.norm(); i2++) {
-		RecEdgeMesher::writeNodes(spos, meshDens.nNodesWidth(0), meshDens.nNodesHeight(0), curSize, pln);
+		RecEdgeMesher::writeNodes(curPos, meshDens.nNodesWidth(0), meshDens.nNodesHeight(0), curSize, pln);
+		curPos.pos[(size_t)heightAxis] += dH;
 		curSize += dSize;
 	}
 
 	Mesher::nodeID1 = firstNode;
 
 }
-/*
-void RecTubeMesher::writeNodes2(
-	const MeshCsys&		spos,
-	int					nNodesWidth,
-	int					nNodesHeight,
-	int					nLayers,
-	const RecTubeSize&	size,
-	plane				pln) 
-{
-	int firstNode = writer->getNextNodeID();
 
-	glm::dvec2 curSize = size.inner;
-	glm::dvec2 dSize   = (size.outer - size.inner) / (double)(nLayers - 1);
-	
-	for (int i2 = 0; i2 < nLayers; i2++) {
-		RecEdgeMesher::writeNodes(spos, nNodesWidth, nNodesHeight, curSize, pln);
-		curSize += dSize;
-	}
-
-	Mesher::nodeID1 = firstNode;
-}*/
 
 void RecTubeMesher::writeElements2(const MeshDensity2DrecTube& meshDens) {
 	PlaneMesher::writeElements(meshDens);
@@ -221,33 +202,35 @@ void RecTubeMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerDat
 }
 
 void RecTubeMesherRef::writeNodes2(
-	const MeshCsys&		spos,
+	const MeshCsys&			spos,
 	const MeshDensity2Dref&	meshDens,
-	const RecTubeSize&	size,
-	plane				pln)
+	const RecTubeSize&		size,
+	double					height,
+	plane					pln)
 {
 	Rectangle rec(size.inner);
 	int nElW, nElH;
 	rec.elementsPerSides(meshDens.circ(), nElW, nElH);
-	writeNodes2(spos, meshDens, nElW, nElH, size, pln);
+	writeNodes2(spos, meshDens, glm::ivec2(nElW, nElH), size, height, pln);
 }
 
 void RecTubeMesherRef::writeNodes2(
 	const MeshCsys&			spos,
 	const MeshDensity2Dref&	meshDens,
-	int						nNodesWidth,
-	int						nNodesHeight,
+	const glm::ivec2&		nNodesWidthHeight,
 	const RecTubeSize&		size,
+	double					height,
 	plane					pln)
 {
 	int firstNode = writer->getNextNodeID();
 
 	RefShapeData2 rsData;
 	rsData.meshDens = &meshDens;
-	rsData.size = &size;
-	//rsData.height = height;
-	rsData.pln = pln;
-	rsData.length = 0.5*(size.outer.x - size.inner.x); //std::sqrt(pow2(radius.dR()) + pow2(height));
+	rsData.size		= &size;
+	rsData.height	= height;
+	rsData.pln		= pln;
+	rsData.upAxis	= getPlaneNormal(pln);
+	rsData.length	= std::sqrt(pow2(0.5*(size.outer.x - size.inner.x)) + pow2(height)); //std::sqrt(pow2(radius.dR()) + pow2(height));
 
 	RefLayerData2 rlData;
 	rlData.curPos = spos;
@@ -271,6 +254,11 @@ void RecTubeMesherRef::writeNodes2(
 void RecTubeMesherRef::incrementStep2(const RefShapeData2& rsData, RefLayerData2& rlData){
 	rlData.curLength += rlData.curElSize.x;
 	rlData.curSize += 2.*glm::dvec2(rlData.curElSize.x);
+
+	rlData.curSize = rsData.size->inner + rsData.size->dsize() * (rlData.curLength / rsData.length);
+
+	double curDh = (rsData.height / rsData.length) * rlData.curElSize.x;
+	rlData.curPos.pos[(size_t)rsData.upAxis] += curDh;
 }
 void RecTubeMesherRef::writeNodes2_layerB(const RefShapeData2& rsData, RefLayerData2& rlData, int refLayer){
 	RecEdgeMesher::writeNodes(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer), rlData.curSize, rsData.pln);

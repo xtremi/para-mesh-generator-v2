@@ -15,15 +15,8 @@ public:
 		const MeshCsys&				spos,
 		const MeshDensity2DrecTube& meshDens,
 		const RecTubeSize&			size,
+		double						height,
 		plane						pln);
-
-	//static void writeNodes2(
-	//	const MeshCsys&		spos,
-	//	int					nNodesWidth,
-	//	int					nNodesHeight,
-	//	int					nLayers,
-	//	const RecTubeSize&	size,
-	//	plane				pln);
 
 	static void writeElements(const MeshDensity2DrecTube& meshDens);
 	static void writeElements2(const MeshDensity2DrecTube& meshDens);
@@ -40,18 +33,19 @@ public:
 		plane					pln);
 
 	static void writeNodes2(
-		const MeshCsys&		spos,
+		const MeshCsys&			spos,
 		const MeshDensity2Dref&	meshDens,
-		const RecTubeSize&	size,
-		plane				pln);
+		const RecTubeSize&		size,
+		double					height,
+		plane					pln);
 
 	static void writeNodes2(
-		const MeshCsys&		spos,
+		const MeshCsys&			spos,
 		const MeshDensity2Dref&	meshDens,
-		int					nNodesWidth,
-		int					nNodesHeight,
-		const RecTubeSize&	size,
-		plane				pln);
+		const glm::ivec2&		nNodesWidthHeight,
+		const RecTubeSize&		size,
+		double					height,
+		plane					pln);
 
 	static void writeElements1(const glm::ivec2& nNodesWidthHeight, int	nRefs);
 	static void writeElements2(const MeshDensity2Dref&	meshDens);
@@ -70,6 +64,7 @@ private:
 		const MeshDensity2Dref* meshDens;
 		const RecTubeSize*		size;
 		plane					pln;
+		direction				upAxis;
 		double					height;
 		double					length;
 	};
