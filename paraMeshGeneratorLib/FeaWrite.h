@@ -9,11 +9,6 @@
 
 #define TO_BUFFER
 
-extern const glm::dvec3 X_DIR;
-extern const glm::dvec3 Y_DIR;
-extern const glm::dvec3 Z_DIR;
-
-
 //typedef void(*coordTransform)(glm::dvec3*, const std::vector<double>&);
 void coordTransform1(glm::dvec3* coords, std::vector<double>*);
 
@@ -28,7 +23,7 @@ public:
 	void close();
 	
 	virtual void writeComment(const std::string& msg);
-	void writeNode(const glm::dvec3& c, const glm::dvec3& transl, glm::dmat3x3* csys);
+	void writeNode(const glm::dvec3& c, const glm::dvec3& transl, glm::dmat3x3* csys, const MeshCsys* meshCSYS = nullptr);
 	void writeNode(int nodeID, const glm::dvec3& c, const glm::dvec3& transl, glm::dmat3x3* csys);
 
 	void write2nodedBeam(int n[2]);
@@ -46,8 +41,8 @@ public:
 
 	int getNextElementID() { return elementID; }
 	int getNextNodeID() { return nodeID; }
-	void setNextNodeID(int id) { nodeID = id; }
-	void setNextElementID(int id) { elementID = id; }
+	//void setNextNodeID(int id) { nodeID = id; }
+	//void setNextElementID(int id) { elementID = id; }
 
 	void setCurrentElementPropertyID(int id) {
 		currentPropertyID = id;
@@ -92,11 +87,6 @@ public:
 /********************************************************
 	Elements row:
 ********************************************************/
-	int writeElementRow(
-		NodeIterator* nodesSide1,
-		NodeIterator* nodesSide2,
-		int elementID1
-	);
 
 	int writeElementRow(
 		const std::vector<int>& bl,

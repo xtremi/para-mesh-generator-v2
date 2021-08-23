@@ -19,7 +19,7 @@
 				  W
 */
 void RecToEllipse3Dmesher::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity3D&	meshDens,
 	const EllipseRadius&	radiusStart,
 	const EllipseRadius&	radiusEnd,
@@ -71,3 +71,40 @@ void RecToEllipse3Dmesher::writeNodes(
 void RecToEllipse3Dmesher::writeElements(const MeshDensity3D& meshDens) {
 	Cone3Dmesher::writeElements(meshDens);
 }
+
+
+void RecToEllipse3DmesherRef::writeNodes(
+	MeshCsys&			spos,
+	const MeshDensity3Dref&	meshDens,
+	const EllipseRadius&	radiusStart,
+	const EllipseRadius&	radiusEnd,
+	const glm::dvec2&		recSizeStart,
+	const glm::dvec2&		recSizeEnd,
+	const ArcAngles&		angle,
+	double					height,
+	direction				rotaxis)
+{
+
+}
+
+void RecToEllipse3DmesherRef::writeElements(const MeshDensity3Dref& meshDens)
+{
+
+}
+
+void RecToEllipse3DmesherRef::incrementConeStep(const RefShapeData& rsData, RefLayerData& rlData){
+
+}
+void RecToEllipse3DmesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+
+}
+void RecToEllipse3DmesherRef::writeNodes_layerM1(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+
+}
+void RecToEllipse3DmesherRef::writeNodes_layerM2(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+
+}
+void RecToEllipse3DmesherRef::writeNodes_layerM3(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+
+}
+void RecToEllipse3DmesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {}

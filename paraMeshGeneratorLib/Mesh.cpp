@@ -45,35 +45,36 @@ void MeshRec2D::extrudeYedge(double length, int nElements) {
 
 
 */
-void MeshRec2D::writeNodes(FEAwriter* writer) {
-
-	int nodeID    = nodeID1;
-	glm::dvec3 currentPos = pos;
-
-	double spacingY = lengthY / (double)(nNodesY - 1);
-
+void MeshRec2D::writeNodes() {
 	bool firstExtrusion = true;
+	
+	glm::dvec3	currentPos = csys.pos;
+	double		spacingY = lengthY / (double)(nNodesY - 1);
+	
+	//Updates the node iterators for this mesh writing:
+	for (int i = 0; i < extrusionsXdir.size(); i++) {
+		extrusionsXdir[i].setNodeOffset(Mesher::getWriter()->getNextNodeID());
+	}
+
 	for (MeshExtrusion& extr : extrusionsXdir) {
 
-		glm::dvec2 dxy(extr.spacing(), spacingY);
-
-		double startSpace = 0.0;
-
-		int nNodesEdgeX = extr.nNodes();
+		glm::dvec2	dxy(extr.spacing(), spacingY);
+		double		startSpace	= 0.0;
+		int			nNodesEdgeX = extr.nNodes();
+		
 		if (!firstExtrusion)
 			startSpace = extr.spacing();
 
-		glm::ivec2 nodesPerEdge(nNodesEdgeX, nNodesY);
-		
 		if(extr.extrusionType == ExtrusionType::line){
-			glm::dvec3 cpos = currentPos + glm::dvec3(startSpace, 0.0, 0.0);
-			PlaneMesher::writeNodesXYq(cpos, dxy, nodesPerEdge, csys);
-			//nodeID = writer->writeNodesXY(currentPos + glm::dvec3(startSpace, 0.0, 0.0), dxy, nodesPerEdge, nodeID, csys);
-			currentPos.x += (extr.length);
+			glm::dvec3 cpos = currentPos + csys.dirX()*startSpace;
+			MeshCsys csys(cpos, csys.csys);
+			PlaneMesher::writeNodesXYq(csys, MeshDensity2D(nNodesEdgeX, nNodesY), dxy);
+			currentPos += csys.dirX() * extr.length;
 		}
 		else if (extr.extrusionType == ExtrusionType::arc){
 			glm::dvec3 cpos = currentPos - glm::dvec3(0.0, 0.0, extr.radius);
-			ConeMesher::writeNodesY(cpos, extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge);
+			//ConeMesher::writeNodesY(cpos, extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge);
+			//ConeMesher::writeNodesY(MeshCsys(cpos), extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge);
 			//nodeID = writer->writeNodesConeY(cpos, extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge, nodeID);
 			double dx = extr.radius * glm::sin(extr.endAngle);
 			double dy = extr.radius * glm::cos(extr.endAngle);
@@ -110,25 +111,21 @@ void MeshRec2D::writeNodes(FEAwriter* writer) {
  nodeID1_side2 = x22
 
 */
-void MeshRec2D::writeElements(FEAwriter* writer) {
-
-	int elID = elementID1;
-	int nodeID = nodeID1;
+void MeshRec2D::writeElements() {
 
 	MeshEdgeExtrusion* extr = nullptr, *prevExtr = nullptr;
-
+	MeshDensity2D meshDens(0, nNodesY);
+	
 	for (int i = 0; i < extrusionsXdir.size(); i++) {
 		extr = &extrusionsXdir[i];
-		extr->setNodeOffset(nodeID1);
+		//extr->setNodeOffset(nodeID1);
 		
 		if (!extr->isStart){
-			elID = writer->writeElementRow(&prevExtr->edges[2].nodeIter, &extr->edges[0].nodeIter, elID);
-
+			RowMesher2D::writeElements(&prevExtr->edges[2].nodeIter, &extr->edges[0].nodeIter);
 		}
-		nodeID = extr->edges[0].nodeIter.first();
-		PlaneMesher::writeElements(glm::ivec2(extr->nNodes(), nNodesY), nodeID);
-		elID = writer->getNextElementID();
-		//elID = writer->writeElements(glm::ivec2(extr->nNodes(), nNodesY), nodeID, elID);
+		Mesher::setNodeID1(extr->edges[0].nodeIter.first());
+		meshDens.setDir1(extr->nNodes());
+		PlaneMesher::writeElements(meshDens);
 		
 		prevExtr = extr;
 	}

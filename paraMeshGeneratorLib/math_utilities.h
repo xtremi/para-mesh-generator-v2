@@ -3,9 +3,17 @@
 
 extern const double GLMPI;
 extern const double GLM2PI;
+extern const glm::dvec3 X_DIR;
+extern const glm::dvec3 Y_DIR;
+extern const glm::dvec3 Z_DIR;
+extern const glm::dvec3 NULL_DIR;
+extern const glm::dvec3 NULL_POS;
+extern const glm::mat3x3 UNIT_MAT_3x3;
+
 
 
 glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY);
+glm::dmat3x3 makeCsysMatrix(const glm::dvec3& rotAxis, double angle);
 
 
 double initialRefElSize2D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight);

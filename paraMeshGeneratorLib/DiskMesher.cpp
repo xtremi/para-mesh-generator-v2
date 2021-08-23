@@ -2,7 +2,7 @@
 #include "Conemesher.h"
 
 void DiskMesher::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2D&	meshDens,
 	const Cone2Dradius&		radius,
 	const ArcAngles&		angle,
@@ -11,13 +11,13 @@ void DiskMesher::writeNodes(
 	ConeMesher::writeNodes(spos, meshDens, radius, angle, 0.0, rotaxis);
 }
 
-void DiskMesher::writeNodesX(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle){
+void DiskMesher::writeNodesX(MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle){
 	ConeMesher::writeNodesX(spos, meshDens, radius, angle, 0.0);
 }
-void DiskMesher::writeNodesY(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle){
+void DiskMesher::writeNodesY(MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle){
 	ConeMesher::writeNodesY(spos, meshDens, radius, angle, 0.0);
 }
-void DiskMesher::writeNodesZ(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle){
+void DiskMesher::writeNodesZ(MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle){
 	ConeMesher::writeNodesZ(spos, meshDens, radius, angle, 0.0);
 }
 
@@ -27,7 +27,7 @@ void DiskMesher::writeElements(const MeshDensity2D& meshDens){
 
 
 void DiskMesherRef::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2Dref&	meshDens,
 	const Cone2Dradius&		radius,
 	const ArcAngles&		angle,

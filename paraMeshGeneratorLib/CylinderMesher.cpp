@@ -2,7 +2,7 @@
 #include "ConeMesher.h"
 
 void CylinderMesher::writeNodes(
-	const MeshCsys&		 spos,
+	MeshCsys&		 spos,
 	const MeshDensity2D& meshDens,
 	double				 radius,
 	const ArcAngles&	 angle,
@@ -12,13 +12,13 @@ void CylinderMesher::writeNodes(
 	ConeMesher::writeNodes(spos, meshDens, Cone2Dradius(radius, radius), angle, height, rotaxis);
 }
 
-void CylinderMesher::writeNodesX(const MeshCsys& spos, const MeshDensity2D& meshDens, double radius, const ArcAngles& angle, double height){
+void CylinderMesher::writeNodesX(MeshCsys& spos, const MeshDensity2D& meshDens, double radius, const ArcAngles& angle, double height){
 	ConeMesher::writeNodesX(spos, meshDens, Cone2Dradius(radius, radius), angle, height);
 }
-void CylinderMesher::writeNodesY(const MeshCsys& spos, const MeshDensity2D& meshDens, double radius, const ArcAngles& angle, double height){
+void CylinderMesher::writeNodesY(MeshCsys& spos, const MeshDensity2D& meshDens, double radius, const ArcAngles& angle, double height){
 	ConeMesher::writeNodesY(spos, meshDens, Cone2Dradius(radius, radius), angle, height);
 }
-void CylinderMesher::writeNodesZ(const MeshCsys& spos, const MeshDensity2D& meshDens, double radius, const ArcAngles& angle, double height){
+void CylinderMesher::writeNodesZ(MeshCsys& spos, const MeshDensity2D& meshDens, double radius, const ArcAngles& angle, double height){
 	ConeMesher::writeNodesY(spos, meshDens, Cone2Dradius(radius, radius), angle, height);
 }
 
@@ -28,7 +28,7 @@ void CylinderMesher::writeElements(const MeshDensity2D& meshDens){
 
 
 void CylinderMesherRef::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2Dref&	meshDens,
 	double					radius,
 	const ArcAngles&		angle,

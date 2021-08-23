@@ -22,7 +22,7 @@
 
 */
 void ConeMesher::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2D&	meshDens,
 	const Cone2Dradius&		radius,
 	const ArcAngles&		angle,
@@ -47,13 +47,13 @@ void ConeMesher::writeNodes(
 	Mesher::nodeID1 = firstNode;
 }
 
-void ConeMesher::writeNodesX(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height){
+void ConeMesher::writeNodesX(MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height){
 	writeNodes(spos, meshDens, radius, angle, height, direction::x);
 }
-void ConeMesher::writeNodesY(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height){
+void ConeMesher::writeNodesY(MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height){
 	writeNodes(spos, meshDens, radius, angle, height, direction::y);
 }
-void ConeMesher::writeNodesZ(const MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height){
+void ConeMesher::writeNodesZ(MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height){
 	writeNodes(spos, meshDens, radius, angle, height, direction::z);
 }
 
@@ -78,7 +78,7 @@ void ConeMesher::writeNodesZ(const MeshCsys& spos, const MeshDensity2D& meshDens
 
 */
 void ConeMesher::writeNodes_nthLine(
-	const MeshCsys&		 spos,
+	MeshCsys&		 spos,
 	const MeshDensity2D& meshDens,
 	const Cone2Dradius&	 radius,
 	double				 startAng,
@@ -124,7 +124,7 @@ void ConeMesher::writeNodes_nthLine(
 
 */
 void ConeMesher::writeNodes_nthArc(
-	const MeshCsys&		 spos,
+	MeshCsys&		 spos,
 	const MeshDensity2D& meshDens,
 	const Cone2Dradius&	 radius,
 	double				 startAng,
@@ -150,7 +150,7 @@ void ConeMesher::writeNodes_nthArc(
 	Y-dir refers to around the perimeter
 */
 void ConeMesherRef::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2Dref&	meshDens,
 	const Cone2Dradius&		radius,
 	const ArcAngles&		angle,

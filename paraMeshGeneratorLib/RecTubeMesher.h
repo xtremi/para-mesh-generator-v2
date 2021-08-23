@@ -6,13 +6,13 @@ class RecTubeMesher: public Mesher
 {
 public:
 	static void writeNodes(
-		const MeshCsys&				spos,
+		MeshCsys&				spos,
 		const MeshDensity2DrecTube& meshDens,
 		const RecTubeSize&			size,
 		plane						pln);
 
 	static void writeNodes2(
-		const MeshCsys&				spos,
+		MeshCsys&				spos,
 		const MeshDensity2DrecTube& meshDens,
 		const RecTubeSize&			size,
 		double						height,
@@ -26,21 +26,21 @@ class RecTubeMesherRef : public Mesher
 {
 public:
 	static void writeNodes(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		const glm::ivec2&		nNodesWidthHeight,
 		int						nRefs,
 		const glm::dvec2&		recSizeInner,
 		plane					pln);
 
 	static void writeNodes2(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		const MeshDensity2Dref&	meshDens,
 		const RecTubeSize&		size,
 		double					height,
 		plane					pln);
 
 	static void writeNodes2(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		const MeshDensity2Dref&	meshDens,
 		const glm::ivec2&		nNodesWidthHeight,
 		const RecTubeSize&		size,

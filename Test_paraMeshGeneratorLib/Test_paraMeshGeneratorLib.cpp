@@ -1,6 +1,7 @@
 #include "TestDef.h"
 //#include "Mesh.h"
 #include <vector>
+#include <set>
 
 //1d elements
 #include "LineMesher.h"
@@ -21,12 +22,23 @@
 #include "Cone3Dmesher.h"
 #include "RecToEllipse3Dmesher.h"
 
+//Mesh extruder and meshes : to be fixed (2021.08.14)
+#include "Mesh.h"
+
 #include "math_utilities.h"
+
+
+int speedTestAddition(const std::string& fileName);
+int speedTestMultiplication(const std::string& fileName);
+int speedTestVec3addition(const std::string& fileName);
+int speedTestMat3Vec3multiplicaiton(const std::string& fileName);
 
 int lineMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
 int recEdgeMesher(const std::string& fileName);
 int ellipseMesher(const std::string& fileName);
+
+int meshCsys(const std::string& fileName);
 
 int planeMesher(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
@@ -54,22 +66,27 @@ int refinementCone2dHeight(const std::string& fileName);
 int refinementCone3dHeight(const std::string& fileName);
 
 
-#ifdef TO_FIX
-
 int extruded2Drecs(const std::string& fileName);
+#ifdef TO_FIX
 int extrude2Darc(const std::string& filename);
 int extrude2DarcMulti(const std::string& filename);
 #endif
 
 void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode);
 
-
 std::vector<TestDef> testFunctions({
 #ifndef SKIP
+	TestDef(10, "speedTestAddition",				"speed test", (testFunction)speedTestAddition),
+	TestDef(11, "speedTestMultiplication",			"speed test", (testFunction)speedTestMultiplication),
+	TestDef(12, "speedTestVec3addition",			"speed test", (testFunction)speedTestVec3addition),
+	TestDef(13, "speedTestMat3Vec3multiplicaiton",	"speed test", (testFunction)speedTestMat3Vec3multiplicaiton),
+
 	TestDef(101, "lineMesher",			"basic meshers 1D", (testFunction)lineMesher),	
 	TestDef(102, "arcMesher",			"basic meshers 1D", (testFunction)arcMesher),
 	TestDef(103, "recEdgeMesher",		"basic meshers 1D", (testFunction)recEdgeMesher),
 	TestDef(104, "ellipseMesher",		"basic meshers 1D", (testFunction)ellipseMesher),
+
+	TestDef(150, "meshCsys",			"transformations",  (testFunction)meshCsys),
 
 	TestDef(203, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
 	TestDef(204, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
@@ -96,20 +113,27 @@ std::vector<TestDef> testFunctions({
 	TestDef(432, "refinementCone2dHeight",	"basic meshers 2D", (testFunction)refinementCone2dHeight),
 	TestDef(433, "refinementCone3dHeight",	"basic meshers 3D", (testFunction)refinementCone3dHeight),
 
-
-#ifdef TO_FIX
-
 	TestDef(500, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
+#ifdef TO_FIX
 	TestDef(570, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
 	TestDef(590, "extrude2DarcMulti",	"extrusion", (testFunction)extrude2DarcMulti),
 #endif
+
+	
 });
 
 
 int main(int argc, char* argv[]) {
 
+	std::set<int> testsToRun;
+	if (argc > 2 && !strcmp(argv[1], "-only")) {
+		testsToRun.insert(std::stoi(argv[2]));
+	}
+
 	for (TestDef& testDef : testFunctions) {
-		testDef.run();
+		if (testsToRun.empty() || (testsToRun.find(testDef.id) != testsToRun.end())) {
+			testDef.run();
+		}
 	}
 	return 0;
 }
@@ -129,6 +153,166 @@ int main(int argc, char* argv[]) {
 #define TEST_END writer.close(); \
 				 return 0;
 /*************************************************************************/
+#ifdef _DEBUG
+#define SPEED_TEST_AMOUNT 1e5
+#else
+#define SPEED_TEST_AMOUNT 1e8
+#endif
+
+int speedTestAddition(const std::string& fileName) {
+	double numbers[10] = { 1, 2., 232.,2342., 1231., 434., 345345., 234., 454., 4. };
+
+	int index = 0;
+	double res = 0.;
+	for (int i = 0; i < SPEED_TEST_AMOUNT; i++) {
+		if (index == 9) index = 0;
+		res = numbers[index] + numbers[index + 1];
+		index++;
+	}
+	return 0;
+}
+int speedTestMultiplication(const std::string& fileName) {
+	double numbers[10] = { 1, 2., 232.,2342., 1231., 434., 345345., 234., 454., 4. };
+
+	int index = 0;
+	double res = 0.;
+	for (int i = 0; i < SPEED_TEST_AMOUNT; i++) {
+		if (index == 9) index = 0;
+		res = numbers[index] * numbers[index + 1];
+		index++;
+	}
+	return 0;
+}
+int speedTestVec3addition(const std::string& fileName) {
+	glm::dvec3 vecs[10] = { 
+		glm::dvec3(223.,311.,345.), glm::dvec3(24.,3343.,523423.), glm::dvec3(2334.,2343.,576.), 
+		glm::dvec3(2133.,3.,5434.), glm::dvec3(2342.,3776.,56.),	glm::dvec3(2.,3.,5.),
+		glm::dvec3(25.,38.,58888.),	glm::dvec3(1112.,322.,511.), glm::dvec3(22342.,376.,5777.), 
+		glm::dvec3(23.,33.,35.)
+	};
+
+	int index = 0;
+	glm::dvec3 res(0.0);
+	for (int i = 0; i < SPEED_TEST_AMOUNT; i++) {
+		if (index == 9) index = 0;
+		res = vecs[index] + vecs[index + 1];
+		index++;
+	}
+	return 0;
+}
+int speedTestMat3Vec3multiplicaiton(const std::string& fileName) {
+	glm::dvec3 vecs[10] = {
+		glm::dvec3(223.,311.,345.), glm::dvec3(24.,3343.,523423.), glm::dvec3(2334.,2343.,576.),
+		glm::dvec3(2133.,3.,5434.), glm::dvec3(2342.,3776.,56.),	glm::dvec3(2.,3.,5.),
+		glm::dvec3(25.,38.,58888.),	glm::dvec3(1112.,322.,511.), glm::dvec3(22342.,376.,5777.),
+		glm::dvec3(23.,33.,35.)
+	};
+	glm::dmat3x3 mats[10] = {
+		makeCsysMatrix(vecs[1], GLM2PI*0.1), makeCsysMatrix(vecs[7], GLM2PI*0.1),
+		makeCsysMatrix(vecs[0], GLM2PI*3.1), makeCsysMatrix(vecs[8], GLM2PI*2.1),
+		makeCsysMatrix(vecs[4], GLM2PI*56.1), makeCsysMatrix(vecs[3], GLM2PI*0.21),
+		makeCsysMatrix(vecs[2], GLM2PI*2.1), makeCsysMatrix(vecs[5], GLM2PI*0.11),
+		makeCsysMatrix(vecs[0], GLM2PI*1.1), makeCsysMatrix(vecs[9], GLM2PI*0.91)
+	};
+
+	int index = 0;
+	glm::dvec3 res(0.0);
+	for (int i = 0; i < SPEED_TEST_AMOUNT; i++) {
+		if (index == 9) index = 0;
+		res = mats[index + 1] * vecs[index];
+		index++;
+	}
+	return 0;
+
+}
+
+void writeXYZlines(MeshCsys& csys, double length, int nNodes) {
+	LineMesher::writeNodesLineX(csys, nNodes, length);
+	LineMesher::writeElementsLine(nNodes);
+	LineMesher::writeNodesLineY(csys, nNodes, length);
+	LineMesher::writeElementsLine(nNodes);
+	LineMesher::writeNodesLineZ(csys, nNodes, length);
+	LineMesher::writeElementsLine(nNodes);
+}
+
+void writeXYZplanes(MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+	PlaneMesher::writeNodesXY(csys, meshDens, size);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodesXZ(csys, meshDens, size);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodes(csys, meshDens, size, plane::yz);
+	PlaneMesher::writeElements(meshDens);
+}
+
+int meshCsys(const std::string& fileName) {
+	TEST_START
+	MeshCsys globalCsys;
+	MeshCsys csysa1(4.0*X_DIR);
+	MeshCsys csysa2(4.0*Y_DIR);
+	MeshCsys csysa3(4.0*Z_DIR);
+
+	csysa1.setParentCsys(&globalCsys);	
+	csysa2.setParentCsys(&csysa1);
+	csysa3.setParentCsys(&csysa2);
+	//csys in (4.0,4.0,4.0)
+	writeXYZlines(csysa3, 4.0, 11);
+
+	glm::dmat3x3 rotMb = makeCsysMatrix(Z_DIR, GLMPI / 4.0);
+	MeshCsys csysb1(NULL_POS, &rotMb);
+	csysb1.setParentCsys(&csysa1);
+	//csys in (4.0,0.0,0.0) rotated 45deg along Z-axis
+	writeXYZlines(csysb1, 2.0, 5);
+
+	MeshCsys csysb2(4.0*X_DIR);
+	csysb2.setParentCsys(&csysb1);
+	//csys in (4.0,0.0,0.0) + 2.0 in X-dir in 45deg rotated csys
+	writeXYZlines(csysb2, 2.0, 5);
+
+	MeshCsys csysb3(4.0*Y_DIR);
+	csysb3.setParentCsys(&csysb1);
+	//csys in (4.0,0.0,0.0) + 2.0 in Y-dir in 45deg rotated csys
+	writeXYZlines(csysb3, 2.0, 5);
+
+	glm::dmat3x3 rotMc = makeCsysMatrix(Z_DIR, GLMPI / 4.0);
+	MeshCsys csysc1(NULL_POS, &rotMc);
+	//10 x cys 
+	for (int i = 0; i < 10; i++) {
+		rotMc = makeCsysMatrix(glm::dvec3(1.0, 1.0, 0.0), GLMPI * (double)i/10.0);
+		csysc1.pos.x = 3.0 * (double)i / 10.0;
+		csysc1.setParentCsys(&csysb3);
+		writeXYZlines(csysc1, 1.0, 8);
+	}
+
+	MeshCsys csysD1;
+	writeXYZplanes(csysD1, MeshDensity2D(6,6), glm::dvec2(1.0, 2.0));
+	glm::dmat3x3 rotMd2 = makeCsysMatrix(Z_DIR, -GLMPI / 2.0);
+	MeshCsys csysD2(3.1 * X_DIR, &rotMd2);
+	writeXYZplanes(csysD2, MeshDensity2D(6, 6), glm::dvec2(1.0, 2.0));
+
+	int nnodes = 64;
+	MeshCsys csysE1(-10.*Y_DIR);
+	ArcMesher::writeNodesCircular(csysE1, nnodes, 4.0, ArcAngles(), direction::z);
+	ArcMesher::writeElementsLine(nnodes, true);
+
+	glm::dmat3x3 rotME2;
+	MeshCsys csysE2(10.0*X_DIR, &rotME2);
+	MeshCsys csysE3(-10.0*X_DIR);
+	csysE2.setParentCsys(&csysE1);
+	csysE3.setParentCsys(&csysE2);
+
+	for (int i = 0; i < 50; i++) {
+		double ang = GLMPI * (double)i / 50.;
+		rotME2 = makeCsysMatrix(Y_DIR, ang);
+		csysE1.pos.y += 0.25;
+		csysE3.updateParents();
+		ArcMesher::writeNodesCircular(csysE3, nnodes, 4.0, ArcAngles(), direction::z);
+		ArcMesher::writeElementsLine(nnodes, true);
+	}
+
+
+	TEST_END
+}
+
 
 int lineMesher(const std::string& fileName) {
 	TEST_START
@@ -176,10 +360,12 @@ int lineMesher(const std::string& fileName) {
 	int nLines = 8;
 	double dang = GLM2PI / (double)nLines;
 	glm::dvec3 posStart, posEnd;
+	
 	for (int i = 0; i < 8; i++) {
 		posStart = coordsOnCircle(ang, rad1, direction::z) + pos.pos;
 		posEnd = coordsOnCircle(ang, rad2, direction::z) + pos.pos + glm::dvec3(0, 0, 1.0);
-		LineMesher::writeNodesLine(MeshCsys(posStart), nnodes, posEnd);
+		MeshCsys csys(posStart);
+		LineMesher::writeNodesLine(csys, nnodes, posEnd);
 		LineMesher::writeElementsLine(nnodes);
 		ang += dang;
 	}
@@ -377,6 +563,7 @@ int ellipseMesher(const std::string& fileName) {
 int planeMesher(const std::string& fileName) {
 	TEST_START
 
+
 	MeshDensity2D meshDens(10, 12);
 	glm::dvec2 size(20.0, 17.0);
 	
@@ -395,6 +582,9 @@ int planeMesher(const std::string& fileName) {
 	PlaneMesher::writeNodesYZ(pos, meshDens, size);
 	PlaneMesher::writeElements(meshDens);
 	
+	glm::dmat3x3 csys = makeCsysMatrix(glm::dvec3(1.0, 0.4, 0.0), glm::dvec3(-0.3, 1.0, 0.0));
+	pos.csys = &csys;
+
 	pos.pos.x += 1.2*size.x;
 	glm::dvec2 elsize(size.x / (double)meshDens.nElDir1(), size.y / (double)meshDens.nElDir2());
 	PlaneMesher::writeNodesQ(pos, meshDens, elsize, plane::xy);
@@ -774,8 +964,8 @@ int recToEllipseMesherRef (const std::string& fileName) {
 	MeshDensity2Dref meshDens(5, 64, true);
 	
 	RecToEllipseMesherRef::writeNodes(pos, meshDens, EllipseRadius(36., 36.), glm::dvec2(18., 18.), ArcAngles(), 10.0, false, direction::z);
-	RecToEllipseMesherRef::writeElements(meshDens);
-
+	//RecToEllipseMesherRef::writeElements(meshDens);
+	writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
 
 	TEST_END
 }
@@ -1163,7 +1353,8 @@ int refinement2dHeight(const std::string& fileName) {
 		LineMesher::writeNodesLine(pos, 2, lengthLineC1, direction::y);
 		LineMesher::writeElementsLine(2);
 		//Upper limit Plane1:
-		LineMesher::writeNodesLine(MeshCsys(pos.pos + glm::dvec3(heightC1, 0., 0.)), 2, lengthLineC1, direction::y);
+		MeshCsys csys(pos.pos + glm::dvec3(heightC1, 0., 0.));
+		LineMesher::writeNodesLine(csys, 2, lengthLineC1, direction::y);
 		LineMesher::writeElementsLine(2);
 
 		pos.pos.x += 1.2*sizeC1.x;
@@ -1175,7 +1366,8 @@ int refinement2dHeight(const std::string& fileName) {
 		LineMesher::writeNodesLine(pos, 2, lengthLineC2, direction::y);
 		LineMesher::writeElementsLine(2);
 		//Upper limit Plane1:
-		LineMesher::writeNodesLine(MeshCsys(pos.pos + glm::dvec3(heightC2, 0., 0.)), 2, lengthLineC2, direction::y);
+		csys = MeshCsys(pos.pos + glm::dvec3(heightC2, 0., 0.));
+		LineMesher::writeNodesLine(csys, 2, lengthLineC2, direction::y);
 		LineMesher::writeElementsLine(2);
 
 		pos.pos.z += 10.0;
@@ -1220,7 +1412,8 @@ int refinement3dHeight(const std::string& fileName) {
 		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC1);
 		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cube1:
-		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
+		MeshCsys csys(pos.pos + glm::dvec3(0., 0., heightC1));
+		PlaneMesher::writeNodesXY(csys, meshDensPlate, sizePlateC1);
 		PlaneMesher::writeElements(meshDensPlate);
 
 		pos.pos.x += 1.2*sizeC1.x;
@@ -1232,7 +1425,8 @@ int refinement3dHeight(const std::string& fileName) {
 		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC2);
 		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cube1:
-		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
+		csys = MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2));
+		PlaneMesher::writeNodesXY(csys, meshDensPlate, sizePlateC2);
 		PlaneMesher::writeElements(meshDensPlate);
 
 
@@ -1276,7 +1470,8 @@ int refinementCone2dHeight(const std::string& fileName)
 		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC1);
 		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cone 1:
-		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
+		MeshCsys csys(pos.pos + glm::dvec3(0., 0., heightC1));
+		PlaneMesher::writeNodesXY(csys, meshDensPlate, sizePlateC1);
 		PlaneMesher::writeElements(meshDensPlate);
 
 		pos.pos.x += 1.2*radiusC2.start()*2.0;
@@ -1288,7 +1483,8 @@ int refinementCone2dHeight(const std::string& fileName)
 		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC2);
 		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cone 2:
-		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
+		csys = MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2));
+		PlaneMesher::writeNodesXY(csys, meshDensPlate, sizePlateC2);
 		PlaneMesher::writeElements(meshDensPlate);
 
 
@@ -1334,7 +1530,8 @@ int refinementCone3dHeight(const std::string& fileName)
 		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC1);
 		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cone 1:
-		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC1)), meshDensPlate, sizePlateC1);
+		 MeshCsys csys(pos.pos + glm::dvec3(0., 0., heightC1));
+		PlaneMesher::writeNodesXY(csys, meshDensPlate, sizePlateC1);
 		PlaneMesher::writeElements(meshDensPlate);
 
 		pos.pos.x += 1.2*radiusC2.start.outer()*2.0;
@@ -1346,7 +1543,8 @@ int refinementCone3dHeight(const std::string& fileName)
 		PlaneMesher::writeNodesXY(pos, meshDensPlate, sizePlateC2);
 		PlaneMesher::writeElements(meshDensPlate);
 		//Upper limit Cone 2:
-		PlaneMesher::writeNodesXY(MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2)), meshDensPlate, sizePlateC2);
+		csys = MeshCsys(pos.pos + glm::dvec3(0., 0., heightC2));
+		PlaneMesher::writeNodesXY(csys, meshDensPlate, sizePlateC2);
 		PlaneMesher::writeElements(meshDensPlate);
 
 
@@ -1356,42 +1554,55 @@ int refinementCone3dHeight(const std::string& fileName)
 	TEST_END
 }
 
-#ifdef TO_FIX
+
 int extruded2Drecs(const std::string& fileName)
 {
 	TEST_START
+	glm::dmat3x3 rotM1 = makeCsysMatrix(glm::dvec3(1.0, 0.0, 0.0), glm::dvec3(0.0, 1.0, 0.0));
+	glm::dmat3x3 rotM2 = makeCsysMatrix(glm::dvec3(0.0, 1.0, 0.0), glm::dvec3(1.0, 0.0, 0.0));
+	glm::dmat3x3 rotM3 = makeCsysMatrix(glm::dvec3(0.0, 0.0, 1.0), glm::dvec3(1.0, 0.0, 0.0));
+	glm::dmat3x3 rotM4 = makeCsysMatrix(glm::dvec3(0.8, 1.0, 0.0), glm::dvec3(1.0, 1.0, 0.5));
 
-	glm::dmat3x3 csys1 = makeCsysMatrix(glm::dvec3(1.0, 0.0, 0.0), glm::dvec3(0.0, 1.0, 0.0));
-	glm::dmat3x3 csys2 = makeCsysMatrix(glm::dvec3(0.0, 1.0, 0.0), glm::dvec3(1.0, 0.0, 0.0));
-	glm::dmat3x3 csys3 = makeCsysMatrix(glm::dvec3(0.0, 0.0, 1.0), glm::dvec3(1.0, 0.0, 0.0));
-	glm::dmat3x3 csys4 = makeCsysMatrix(glm::dvec3(0.8, 1.0, 0.0), glm::dvec3(1.0, 1.0, 0.5));
+	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), nullptr);
+	MeshCsys csys2(glm::dvec3(0.0, 0.0, 2.0), &rotM2);
+	MeshCsys csys3(glm::dvec3(0.0, 0.0, 5.0), &rotM2);
+	MeshCsys csys4(glm::dvec3(0.0, 0.0, 8.0), &rotM2);
 
-	std::vector<glm::dmat3x3> csyss({ csys1, csys2, csys3, csys4 });
+	std::vector<MeshCsys> csyss({ csys1, csys2, csys3, csys4 });
 
-	NastranFEAwriter writer(&file);
-	Mesher::setFEAwriter(&writer);
+	//NastranFEAwriter writer(&file);
+	//Mesher::setFEAwriter(&writer);
 	MeshRec2D mesh2D;
-	mesh2D.initRectangle(glm::dvec2(4.0, 4.0), glm::ivec2(4, 3));
-	mesh2D.extrudeYedge(1.0, 3);
-	mesh2D.extrudeYedge(10.0, 2);
-	mesh2D.extrudeYedge(1.0, 3);
-	mesh2D.extrudeYedge(10.0, 2);
+	mesh2D.initRectangle(glm::dvec2(4.0, 4.0), glm::ivec2(4, 3));	//0.0 - 4.0
+	mesh2D.extrudeYedge(1.0, 3);									//4.0 - 5.0
+	mesh2D.extrudeYedge(10.0, 2);									//5.0 - 15.0
+	mesh2D.extrudeYedge(1.0, 3);									//15.0 - 16.0
+	mesh2D.extrudeYedge(10.0, 2);									//16.0 - 26.0
+
+	for(int i = 0; i < 4; i++){
+		MeshEdge edge = mesh2D.getEdge(0, i);
+		std::cout << std::endl;
+		for (int nid = edge.nodeIter.first(); nid; nid = edge.nodeIter.next()) {
+			std::cout << nid << " ";
+		}
+	}
 
 	int firstNodeID = 1, firstElementID = 1;
 	for (int i = 0; i < 4; i++) {
-		mesh2D.setRotationMatrix(&csyss[i]);
-		mesh2D.setFirstElementID(firstElementID);
-		mesh2D.setFirstNodeID(firstNodeID);
-		mesh2D.writeNodes(&writer);
-		mesh2D.writeElements(&writer);
 
-		firstNodeID += mesh2D.numberOfNodes();
-		firstElementID += mesh2D.numberOfElements();
+		mesh2D.setCsys(csyss[i]);
+		//mesh2D.setFirstElementID(firstElementID);
+		//mesh2D.setFirstNodeID(firstNodeID);
+		mesh2D.writeNodes();
+		mesh2D.writeElements();
+
+		//firstNodeID += mesh2D.numberOfNodes();
+		//firstElementID += mesh2D.numberOfElements();
 	}
 
 	TEST_END
 }
-
+#ifdef TO_FIX
 int extrude2Darc(const std::string& fileName)
 {
 	TEST_START

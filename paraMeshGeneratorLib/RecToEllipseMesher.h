@@ -6,7 +6,7 @@ class RecToEllipseMesher : public Mesher
 {
 public:
 	static void writeNodes(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		const MeshDensity2D&	meshDens,
 		const EllipseRadius&	radius,
 		const glm::dvec2&		recSize,
@@ -17,7 +17,7 @@ public:
 	static void writeElements(const MeshDensity2D& meshDens);
 
 	static void writeNodes(
-		const MeshCsys&			       spos,
+		MeshCsys&			       spos,
 		const MeshDensity2D&		   meshDens,
 		const std::vector<glm::dvec2>& startCoords,
 		const std::vector<glm::dvec3>& directions,
@@ -26,7 +26,7 @@ public:
 		direction					   rotaxis);
 
 	static void writeNodesPerimeter_nth(
-		const MeshCsys&			       spos,
+		MeshCsys&			       spos,
 		int							   nnodes,
 		const std::vector<glm::dvec2>& startCoords,
 		const std::vector<glm::dvec3>& directions,
@@ -50,7 +50,7 @@ class RecToEllipseMesherRef : private Mesher
 {
 public:
 	static void writeNodes(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		const MeshDensity2Dref&	meshDens,
 		const EllipseRadius&	radius,
 		const glm::dvec2&		recSize,

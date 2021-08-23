@@ -20,7 +20,7 @@
 		          W
 */
 void RecToEllipseMesher::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2D&	meshDens,
 	const EllipseRadius&	radius,
 	const glm::dvec2&		recSize,
@@ -56,7 +56,7 @@ void RecToEllipseMesher::calculateRecToEllipseDirections(
 	int iEllipse_start = meshDens.circ() - nElRecW / 2;	//ellipse first node start at top center of rec
 	int iEllipse = iEllipse_start;
 
-	for (int i = 0; i < meshDens.dir1(); i++) {
+	for (int i = 0; i < meshDens.circ(); i++) {
 		dirRtoL = glm::dvec3(ellipseCoords[iEllipse++], height) - glm::dvec3(recCoords[i], 0.0);
 		recToEllipseDist[i] = glm::length(dirRtoL);
 		recToEllipseDirs[i] = glm::normalize(dirRtoL);
@@ -68,7 +68,7 @@ void RecToEllipseMesher::calculateRecToEllipseDirections(
 
 
 void RecToEllipseMesher::writeNodes(
-	const MeshCsys&			       spos,
+	MeshCsys&			       spos,
 	const MeshDensity2D&		   meshDens,
 	const std::vector<glm::dvec2>& startCoords,
 	const std::vector<glm::dvec3>& directions,
@@ -91,7 +91,7 @@ void RecToEllipseMesher::writeNodes(
 }
 
 void RecToEllipseMesher::writeNodesPerimeter_nth(
-	const MeshCsys&			       spos,
+	MeshCsys&			       spos,
 	int							   nnodes,
 	const std::vector<glm::dvec2>& startCoords,
 	const std::vector<glm::dvec3>& directions,
@@ -126,7 +126,7 @@ void RecToEllipseMesher::writeElements(const MeshDensity2D& meshDens) {
 }
 
 void RecToEllipseMesherRef::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2Dref&	meshDens,
 	const EllipseRadius&	radius,
 	const glm::dvec2&		recSize,
@@ -143,6 +143,9 @@ void RecToEllipseMesherRef::writeNodes(
 	std::vector<double> recToEllipseDist(meshDens.circ());
 	RecEdgeMesher::getLocalCoords(coordsSquare, meshDens.circ(), recSize);
 	EllipseMesher::getLocalCoords(coordsElipse, meshDens.circ(), radius, angle);
+	MeshDensity2D meshDensNoRef(meshDens.circ(), -1, true);
+	RecToEllipseMesher::calculateRecToEllipseDirections(meshDensNoRef, recSize, height, coordsSquare, coordsElipse, recToEllipseDirs, recToEllipseDist);
+
 
 	RefShapeData rsData;
 	rsData.meshDens = &meshDens;

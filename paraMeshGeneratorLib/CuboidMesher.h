@@ -6,19 +6,19 @@ class CuboidMesher : private Mesher
 {
 public:
 	static void writeNodes(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		const MeshDensity3D&	meshDens,
 		const glm::dvec3&		size,		
 		plane					pln);
 
 	static void writeNodesQ(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		const MeshDensity3D&	meshDens,
 		const glm::dvec3&		dp,	
 		plane					pln);
 
-	static void writeNodesXYZq(const MeshCsys& spos, const MeshDensity3D& meshDens,const glm::dvec3& dxyz);
-	static void writeNodesXYZ(const MeshCsys& spos, const MeshDensity3D& meshDens, const glm::dvec3& size);
+	static void writeNodesXYZq(MeshCsys& spos, const MeshDensity3D& meshDens,const glm::dvec3& dxyz);
+	static void writeNodesXYZ(MeshCsys& spos, const MeshDensity3D& meshDens, const glm::dvec3& size);
 
 	static void writeElements(const MeshDensity3D& meshDens);
 
@@ -30,7 +30,7 @@ class CuboidMesherRef : private Mesher
 {
 public:
 	static void writeNodes(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		const MeshDensity3Dref&	meshDens,
 		const glm::dvec3&		size,		
 		bool					startWithOffset,

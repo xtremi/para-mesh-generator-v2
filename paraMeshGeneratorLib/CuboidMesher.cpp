@@ -4,7 +4,7 @@
 #include "math_utilities.h"
 
 void CuboidMesher::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity3D&	meshDens,
 	const glm::dvec3&		size,
 	plane					pln)
@@ -14,7 +14,7 @@ void CuboidMesher::writeNodes(
 }
 
 void CuboidMesher::writeNodesQ(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity3D&	meshDens,
 	const glm::dvec3&		dp,
 	plane					pln)
@@ -34,10 +34,10 @@ void CuboidMesher::writeNodesQ(
 	Mesher::nodeID1 = firstNode;
 }
 
-void CuboidMesher::writeNodesXYZq(const MeshCsys& spos, const MeshDensity3D& meshDens, const glm::dvec3& dxyz){
+void CuboidMesher::writeNodesXYZq(MeshCsys& spos, const MeshDensity3D& meshDens, const glm::dvec3& dxyz){
 	writeNodesQ(spos, meshDens, dxyz, plane::xy);
 }
-void CuboidMesher::writeNodesXYZ(const MeshCsys& spos, const MeshDensity3D& meshDens, const glm::dvec3& size){
+void CuboidMesher::writeNodesXYZ(MeshCsys& spos, const MeshDensity3D& meshDens, const glm::dvec3& size){
 	writeNodes(spos, meshDens, size, plane::xy);
 }
 
@@ -119,7 +119,7 @@ void CuboidMesher::writeElements(const MeshDensity3D& meshDens)
 
 */
 void CuboidMesherRef::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity3Dref&	meshDens,
 	const glm::dvec3&		size,
 	bool					startWithOffset,

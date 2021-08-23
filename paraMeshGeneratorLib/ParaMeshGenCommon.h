@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "math_utilities.h"
+#include <vector>
 
 enum class Dim { DIM1D, DIM2D, DIM3D };
 
@@ -39,7 +40,7 @@ protected:
 class NodeIterator1D : public NodeIterator {
 public:
 	NodeIterator1D(){}
-	NodeIterator1D(int _firstNode, int _nNodes, int _nodeIncr) {
+	NodeIterator1D(int _firstNode, int _nNodes, int _nodeIncr = 1) {
 		firstNodeID = _firstNode; nNodes = _nNodes; nodeIncr = _nodeIncr;
 	}
 	int next() {
@@ -354,11 +355,88 @@ struct MeshDensity3Dref : public NodeVec3D {
 	- csys: 3x3 rotation matrix (if null, not used)
 */
 struct MeshCsys {
-	MeshCsys(){}
-	MeshCsys(const glm::dvec3& _pos, glm::dmat3x3* _csys = nullptr) : pos{ _pos }, csys{ _csys } {}
-
+	MeshCsys() : pos{ glm::dvec3(0.0) } {
+		reset();
+	}
+	MeshCsys(const glm::dvec3& _pos, glm::dmat3x3* _csys = nullptr) : pos{ _pos }, csys{ _csys } {
+		reset();
+	}
+	void reset() {
+		hasRotToGlobal = csys ? true : false;
+		local2globalT = pos; //csys ? (*csys) * pos : pos;
+		local2globalR = csys ? (*csys) : glm::dmat3x3(1.0);		
+	}	
 	glm::dvec3		pos;
 	glm::dmat3x3*	csys = nullptr;
+
+	glm::dvec3		local2globalT;
+	glm::dmat3x3	local2globalR;
+	bool			hasRotToGlobal = false;
+
+	glm::dvec3		dirX() const { return csys ? (*csys)[0] : X_DIR; }
+	glm::dvec3		dirY() const { return csys ? (*csys)[1] : Y_DIR; }
+	glm::dvec3		dirZ() const { return csys ? (*csys)[2] : Z_DIR; }
+
+	glm::dvec3		dirXg() const { return local2globalR[0]; }
+	glm::dvec3		dirYg() const { return local2globalR[1]; }
+	glm::dvec3		dirZg() const { return local2globalR[2]; }
+
+	glm::dvec3 getGlobalCoords(const glm::dvec3& localCoords) const {
+		glm::dvec3 glcoords(localCoords);
+		glcoords = local2globalR * glcoords;
+		glcoords += local2globalT;
+		return glcoords;
+	}
+
+	/*
+		Go through parentCsys up to the last and inserts them in a std::vector
+		last parent (global csys) is the first item in the vector
+		(includes it self!)
+	*/
+	std::vector<MeshCsys*> getAllParentCsys() {
+		std::vector<MeshCsys*> parents;
+		MeshCsys* curCsys = this;
+		while (curCsys) {
+			parents.insert(parents.begin(), curCsys);
+			curCsys = curCsys->parentCsys;
+		}
+		return parents;
+	}
+
+	void updateParents() {
+		std::vector<MeshCsys*> parents = getAllParentCsys();
+		parents[0]->reset();
+		for (size_t i = 0; i < parents.size() - 1; i++) {
+			parents[i + 1]->setParentCsys(parents[i]);
+		}
+	}
+
+	void setParentCsys(MeshCsys* _parentCsys) {
+		parentCsys = _parentCsys;
+		if (parentCsys->hasRotToGlobal) {
+			hasRotToGlobal = true;
+		}
+
+		if (csys && parentCsys->hasRotToGlobal) {
+			local2globalR = _parentCsys->local2globalR * (*csys);
+		}
+		else if (!csys && parentCsys->hasRotToGlobal) {
+			local2globalR = _parentCsys->local2globalR;
+		}
+		else if (csys) {
+			local2globalR = *csys;
+		}
+		
+		if (parentCsys->hasRotToGlobal) {
+			local2globalT = _parentCsys->local2globalT + _parentCsys->local2globalR*pos;
+		}
+		else{
+			local2globalT = _parentCsys->local2globalT + pos;
+		}
+	}
+
+private:
+	MeshCsys* parentCsys = nullptr;
 };
 
 

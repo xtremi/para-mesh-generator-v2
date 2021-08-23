@@ -7,27 +7,27 @@ class RecEdgeMesher : public Mesher
 
 public:
 	static void writeNodes(
-		const MeshCsys&		spos,
+		MeshCsys&		spos,
 		int					nNodesWidth,
 		int					nNodesHeight,
 		const glm::dvec2&	size,
 		plane				pln);
 
 	static void writeNodes(
-		const MeshCsys&		spos,
+		MeshCsys&		spos,
 		int					nnodes,
 		const glm::dvec2&	size,
 		plane				pln);
 
 	static void writeNodes_nth(
-		const MeshCsys&		spos,
+		MeshCsys&		spos,
 		int					nnodes,
 		const glm::dvec2&	size,
 		int					skipNth,
 		plane				pln);
 
 	static void writeNodes_nth(
-		const MeshCsys&		spos,
+		MeshCsys&		spos,
 		int					nNodesWidth,
 		int					nNodesHeight,
 		const glm::dvec2&	size,
@@ -44,7 +44,7 @@ public:
 public:
 	static void getOrWriteCoords_nth(
 		MesherMode					mode,
-		const MeshCsys&				spos,
+		MeshCsys&				spos,
 		std::vector<glm::dvec2>&	coords,
 		int							nnodes,
 		const glm::dvec2&			size,
@@ -54,7 +54,7 @@ public:
 
 	static void getOrWriteCoords_nth(
 		MesherMode					mode,
-		const MeshCsys&				spos,
+		MeshCsys&				spos,
 		std::vector<glm::dvec2>&	coords,
 		int							nNodesWidth,
 		int							nNodesHeight,

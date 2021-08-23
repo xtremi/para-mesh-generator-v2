@@ -8,7 +8,7 @@
 #include "math_utilities.h"
 
 void Cone3Dmesher::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity3D&	meshDens,
 	const Pipe3Dradius&		radius,
 	const ArcAngles&		angle,
@@ -64,7 +64,7 @@ void Cone3Dmesher::writeElements(const MeshDensity3D& meshDens){
 
 */
 void Cone3DmesherRef::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity3Dref& meshDens,
 	const Pipe3Dradius&		radius,
 	const ArcAngles&		angle,

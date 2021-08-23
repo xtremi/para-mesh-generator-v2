@@ -5,7 +5,7 @@ std::vector<glm::dvec2> EllipseMesher::default_empty_coord_vec = std::vector<glm
 
 
 void EllipseMesher::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	int						nnodes,
 	const EllipseRadius&	radius,
 	const ArcAngles& 		arcAngles,
@@ -15,7 +15,7 @@ void EllipseMesher::writeNodes(
 }
 
 void EllipseMesher::writeNodesQ(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	int						nnodes,
 	const EllipseRadius&	radius,
 	double					startAng,
@@ -32,7 +32,8 @@ void EllipseMesher::getLocalCoords(
 	const EllipseRadius&	 radius,
 	const ArcAngles& 		 arcAngles)
 {
-	getOrWriteCoords(MesherMode::get, MeshCsys(), coords, nnodes, radius, arcAngles, direction::z);
+	MeshCsys csys;
+	getOrWriteCoords(MesherMode::get, csys, coords, nnodes, radius, arcAngles, direction::z);
 }
 
 void EllipseMesher::getLocalCoordsQ(
@@ -42,12 +43,13 @@ void EllipseMesher::getLocalCoordsQ(
 	double					 startAng,
 	double					 dAng)
 {
-	getOrWriteCoordsQ(MesherMode::get, MeshCsys(), coords, nnodes, radius, startAng, dAng, direction::z);
+	MeshCsys csys;
+	getOrWriteCoordsQ(MesherMode::get, csys, coords, nnodes, radius, startAng, dAng, direction::z);
 }
 
 void EllipseMesher::getOrWriteCoords(
 	MesherMode				 mode,
-	const MeshCsys&			 spos,
+	MeshCsys&			 spos,
 	std::vector<glm::dvec2>& coords,
 	int						 nnodes,
 	const EllipseRadius&	 radius,
@@ -60,7 +62,7 @@ void EllipseMesher::getOrWriteCoords(
 
 void EllipseMesher::getOrWriteCoordsQ(
 	MesherMode				 mode,
-	const MeshCsys&			 spos,
+	MeshCsys&			 spos,
 	std::vector<glm::dvec2>& coords,
 	int						 nnodes,
 	const EllipseRadius&	 radius,

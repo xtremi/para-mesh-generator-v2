@@ -227,35 +227,34 @@ class MeshFaceExtrusion : public MeshExtrusion {
 class Mesh {
 public:
 	Mesh() {
-		pos = glm::dvec3(0.0);
-		csys = nullptr;
+		csys.pos = glm::dvec3(0.0);
 	}
 public:
-	virtual void writeNodes(FEAwriter* writer) = 0;
-	virtual void writeElements(FEAwriter* writer) = 0;
+	virtual void writeNodes() = 0;
+	virtual void writeElements() = 0;
 	int numberOfNodes() { return nNodes; }
 	int numberOfElements() { return nElements; }
 
-	void setFirstNodeID(int id) { 
-		nodeID1 = id; 
-	}
-	int firstNodeID() { return nodeID1; };
-	void setFirstElementID(int id) { elementID1 = id; }
-	int firstElementID() { return elementID1; };
+	//void setFirstNodeID(int id) { 
+	//	nodeID1 = id; 
+	//}
+	//int firstNodeID() { return nodeID1; };
+	//void setFirstElementID(int id) { elementID1 = id; }
+	//int firstElementID() { return elementID1; };
 
-	void setPosition(const glm::dvec3& _pos) { pos = _pos; }
-	void setRotationMatrix(glm::dmat3x3* _rotMat) { csys = _rotMat; }
+	void setPosition(const glm::dvec3& _pos) { csys.pos = _pos; }
+	void setRotationMatrix(glm::dmat3x3* _rotMat) { csys.csys = _rotMat; }
+	void setCsys(MeshCsys& _csys) { csys = _csys; }
 
 protected:
 	virtual void calculateNumberOfNodes() = 0;
 	virtual void calculateNumberOfElements() = 0;
 
 	Dim elementDim;
-	glm::dvec3 pos;
-	glm::dmat3x3* csys;
+	MeshCsys csys;
 
-	int nodeID1 = 1;
-	int elementID1 = 1;
+	//int nodeID1 = 1;
+	//int elementID1 = 1;
 
 	int nNodes;
 	int nElements;
@@ -281,9 +280,16 @@ public:
 	void extrudeYedge(double length, int nElements);
 	void extrudeYedgeArc(double endAng, double radius, int nElements);
 
-	virtual void writeNodes(FEAwriter* writer);
-	virtual void writeElements(FEAwriter* writer);
+	virtual void writeNodes();
+	virtual void writeElements();
 
+
+	MeshEdge getEdge(int section, int edgeIndex) {
+		if (section < extrusionsXdir.size() && edgeIndex < 4) {
+			return extrusionsXdir[section].edges[edgeIndex];
+		}
+		return MeshEdge();
+	}
 
 protected:
 	std::vector<MeshEdgeExtrusion> extrusionsXdir;
@@ -295,7 +301,6 @@ protected:
 	double lengthY;
 	int	   nNodesY;
 	int	   nNodesX;
-
 };
 
 

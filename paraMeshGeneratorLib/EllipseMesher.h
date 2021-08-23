@@ -6,14 +6,14 @@ class EllipseMesher :	public Mesher
 {
 public:
 	static void writeNodes(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		int						nnodes,
 		const EllipseRadius&	radius,
 		const ArcAngles& 		arcAngles,
 		direction				rotAxis);
 	
 	static void writeNodesQ(
-		const MeshCsys&			spos,
+		MeshCsys&			spos,
 		int						nnodes,
 		const EllipseRadius&	radius,
 		double					startAng,
@@ -38,7 +38,7 @@ public:
 private:
 	static void getOrWriteCoords(
 		MesherMode				 mode,
-		const MeshCsys&			 spos,
+		MeshCsys&			 spos,
 		std::vector<glm::dvec2>& coords,
 		int						 nnodes,
 		const EllipseRadius&	 radius,
@@ -47,7 +47,7 @@ private:
 
 	static void getOrWriteCoordsQ(
 		MesherMode				 mode,
-		const MeshCsys&			 spos,
+		MeshCsys&			 spos,
 		std::vector<glm::dvec2>& coords,
 		int						 nnodes,
 		const EllipseRadius&	 radius,

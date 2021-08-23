@@ -4,9 +4,7 @@
 #include "fmt/core.h"
 #include "fmt/format.h"
 
-const glm::dvec3 X_DIR = glm::dvec3(1.0, 0.0, 0.0);
-const glm::dvec3 Y_DIR = glm::dvec3(0.0, 1.0, 0.0);
-const glm::dvec3 Z_DIR = glm::dvec3(0.0, 0.0, 1.0);
+
 
 void coordTransform1(glm::dvec3* coords, const std::vector<double>& params) {
 	coords->z = coords->x*coords->x;
@@ -107,20 +105,27 @@ void FEAwriter::write8nodedHexa(int n[8]) {
 	write8nodedHexa(elementID++, n);
 }
 
-void FEAwriter::writeNode(const glm::dvec3& c, const glm::dvec3& transl, glm::dmat3x3* csys) {
+void FEAwriter::writeNode(const glm::dvec3& c, const glm::dvec3& transl, glm::dmat3x3* csys, const MeshCsys* meshCSYS) {
 	
 	glm::dvec3 newCoords = c;	
 	
 	//Local transform:
-	if (currentCoordTransformer)
+	if (currentCoordTransformer){
 		currentCoordTransformer(&newCoords, &currentCoordTransformParams);
+	}
 	
 	//Local rotation:
-	if (csys)
+	if (csys){
 		newCoords = newCoords * (*csys);
+	}
 
 	//Translate:
+	//newCoords += csys ? transl *(*csys) : transl;
 	newCoords += transl;
+
+	if(meshCSYS){
+		newCoords = meshCSYS->getGlobalCoords(newCoords);
+	}
 	
 	writeNode(nodeID++, newCoords);
 }
@@ -318,7 +323,7 @@ int FEAwriter::writeElementRow(
 	}
 	return id;
 }
-
+/*
 int FEAwriter::writeElementRow(
 	NodeIterator* nodesSide1,
 	NodeIterator* nodesSide2,
@@ -345,6 +350,7 @@ int FEAwriter::writeElementRow(
 	}
 	return elID;
 }
+*/
 
 
 /********************************************************

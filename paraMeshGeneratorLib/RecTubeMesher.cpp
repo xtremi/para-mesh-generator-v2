@@ -41,7 +41,7 @@ Example with nNodesInner = 32, nLayers = 8 (MeshDens = MeshDensity2D(32, 8))
 
 */
 void RecTubeMesher::writeNodes(
-	const MeshCsys&				spos,
+	MeshCsys&				spos,
 	const MeshDensity2DrecTube& meshDens,
 	const RecTubeSize&			size,
 	plane						pln)
@@ -65,7 +65,7 @@ void RecTubeMesher::writeNodes(
 }
 
 void RecTubeMesher::writeNodes2(
-	const MeshCsys&				spos,
+	MeshCsys&				spos,
 	const MeshDensity2DrecTube& meshDens,
 	const RecTubeSize&			size,
 	double						height,
@@ -154,7 +154,7 @@ void RecTubeMesher::writeElements(const MeshDensity2DrecTube& meshDens){
 
 
 void RecTubeMesherRef::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const glm::ivec2&		nNodesWH,
 	int						nRefs,
 	const glm::dvec2&		recSizeInner,
@@ -202,7 +202,7 @@ void RecTubeMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerDat
 }
 
 void RecTubeMesherRef::writeNodes2(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2Dref&	meshDens,
 	const RecTubeSize&		size,
 	double					height,
@@ -215,7 +215,7 @@ void RecTubeMesherRef::writeNodes2(
 }
 
 void RecTubeMesherRef::writeNodes2(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2Dref&	meshDens,
 	const glm::ivec2&		nNodesWidthHeight,
 	const RecTubeSize&		size,

@@ -3,12 +3,15 @@
 #include "math_utilities.h"
 
 void PlaneMesher::writeNodesQ(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2D&	meshDens,
 	const glm::dvec2&		dsize,
 	plane					pln)
 {
-	MeshCsys curPos(spos);	
+	//MeshCsys curPos(spos);	
+	MeshCsys curPos;	
+	curPos.setParentCsys(&spos);
+
 	int firstNode = writer->getNextNodeID();
 
 	direction dir1, dir2;
@@ -17,6 +20,7 @@ void PlaneMesher::writeNodesQ(
 	for (int i2 = 0; i2 < meshDens.dir2(); i2++){
 		LineMesher::writeNodesLineQ(curPos, meshDens.dir1(), dsize.x, dir1);
 		curPos.pos[(size_t)dir2] += dsize.y;
+		curPos.setParentCsys(&spos);
 	}
 	Mesher::nodeID1 = firstNode;
 }
@@ -63,7 +67,7 @@ void PlaneMesher::writeNodesQ(
 
 */
 void PlaneMesher::writeNodesQ_nth(
-	const MeshCsys&		 spos,
+	MeshCsys&		 spos,
 	const MeshDensity2D& meshDens,
 	const glm::dvec2&	 dsize,
 	plane				 pln,
@@ -92,7 +96,7 @@ void PlaneMesher::writeNodesQ_nth(
 }
 
 void PlaneMesher::writeNodes(
-	const MeshCsys&		 spos,
+	MeshCsys&		 spos,
 	const MeshDensity2D& meshDens,
 	const glm::dvec2&	 size,
 	plane				 pln)
@@ -101,22 +105,22 @@ void PlaneMesher::writeNodes(
 	PlaneMesher::writeNodesQ(spos, meshDens, dsize,  pln);
 }
 
-void PlaneMesher::writeNodesXZq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxz) {
+void PlaneMesher::writeNodesXZq(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxz) {
 	writeNodesQ(spos, meshDens, dxz, plane::xz);
 }
-void PlaneMesher::writeNodesXYq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxy) {
+void PlaneMesher::writeNodesXYq(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxy) {
 	writeNodesQ(spos, meshDens, dxy, plane::xy);
 }
-void PlaneMesher::writeNodesYZq(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dyz) {
+void PlaneMesher::writeNodesYZq(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dyz) {
 	writeNodesQ(spos, meshDens, dyz, plane::yz);
 }
-void PlaneMesher::writeNodesXZ(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+void PlaneMesher::writeNodesXZ(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
 	writeNodes(spos, meshDens, size, plane::xz);
 }
-void PlaneMesher::writeNodesXY(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+void PlaneMesher::writeNodesXY(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
 	writeNodes(spos, meshDens, size, plane::xy);
 }
-void PlaneMesher::writeNodesYZ(const MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+void PlaneMesher::writeNodesYZ(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
 	writeNodes(spos, meshDens, size, plane::yz);
 }
 
@@ -239,7 +243,7 @@ b0   x___x___x___x___x___x___x___x___x  row b (bot)	   -		|		  |
 
 */
 void PlaneMesherRef::writeNodes(
-	const MeshCsys&			spos,
+	MeshCsys&			spos,
 	const MeshDensity2Dref& meshDens,
 	const glm::dvec2&		size,
 	bool					startWithOffset,
@@ -288,13 +292,13 @@ void PlaneMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData&
 }
 
 
-void PlaneMesherRef::writeNodesXY(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
+void PlaneMesherRef::writeNodesXY(MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
 	return writeNodes(spos, meshDens, size, startWithOffset, plane::xy);
 }
-void PlaneMesherRef::writeNodesXZ(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
+void PlaneMesherRef::writeNodesXZ(MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
 	return writeNodes(spos, meshDens, size, startWithOffset, plane::xz);
 }
-void PlaneMesherRef::writeNodesYZ(const MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
+void PlaneMesherRef::writeNodesYZ(MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
 	return writeNodes(spos, meshDens, size, startWithOffset, plane::yz);
 }
 

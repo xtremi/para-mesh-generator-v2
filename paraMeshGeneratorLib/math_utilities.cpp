@@ -3,9 +3,40 @@
 
 const double GLMPI = glm::pi<double>();
 const double GLM2PI = glm::pi<double>()*2.0;
+const glm::dvec3 X_DIR = glm::dvec3(1.0, 0.0, 0.0);
+const glm::dvec3 Y_DIR = glm::dvec3(0.0, 1.0, 0.0);
+const glm::dvec3 Z_DIR = glm::dvec3(0.0, 0.0, 1.0);
+const glm::dvec3 NULL_DIR = glm::dvec3(0.0, 0.0, 0.0);
+const glm::dvec3 NULL_POS = NULL_DIR;
+const glm::mat3x3 UNIT_MAT_3x3 = glm::dmat3x3(1.0);
 
 double pow2(double val) {
 	return std::pow(val, 2.0);
+}
+
+//https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+glm::dmat3x3 makeCsysMatrix(const glm::dvec3& _rotAxis, double angle) {
+
+	glm::dvec3 rotAxis = glm::normalize(_rotAxis);
+	
+	double cosA = glm::cos(angle);
+	double sinA = glm::sin(angle);
+	double rx = rotAxis.x;
+	double ry = rotAxis.y;
+	double rz = rotAxis.z;
+	double rxx = rx * rx;
+	double ryy = ry * ry;
+	double rzz = rz * rz;
+	double rxy = rx * ry;
+	double rxz = rx * rz;
+	double ryz = ry * rz;
+
+	glm::mat3x3 rotMat(
+		cosA + rxx * (1. - cosA),			rxy * (1. - cosA) - rz * sinA,		rxz * (1. - cosA) + ry * sinA,
+		rxy * (1. - cosA) + rz * sinA,		cosA + ryy * (1. - cosA),			ryz*(1. - cosA) - rx * sinA,
+		rxz * (1. - cosA) - ry * sinA,		ryz*(1. - cosA) + rx * sinA,		cosA + rzz * (1. - cosA)
+	);
+	return rotMat;
 }
 
 glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {

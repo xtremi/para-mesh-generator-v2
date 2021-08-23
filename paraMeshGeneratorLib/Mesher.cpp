@@ -1,3 +1,25 @@
 #include "Mesher.h"
 int Mesher::nodeID1 = 1;
 FEAwriter* Mesher::writer = nullptr;
+
+
+void RowMesher2D::writeElements(NodeIterator1D* nodeIt1, NodeIterator1D* nodeIt2)
+{
+	int n[4];
+	n[0] = nodeIt1->first();
+	n[1] = nodeIt2->first();
+	n[2] = nodeIt2->next();
+	n[3] = nodeIt1->next();
+
+
+	while (n[1] > 0 && n[2] > 0) {		
+		//	0-------1 
+		//	|       |
+		//	3-------2
+		Mesher::writer->write4nodedShell(n);		
+		n[0] = n[3];
+		n[1] = n[2];
+		n[3] = nodeIt1->next();
+		n[2] = nodeIt2->next();
+	}
+}
