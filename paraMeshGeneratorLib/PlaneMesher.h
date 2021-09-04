@@ -6,16 +6,17 @@ class PlaneMesher : private Mesher
 {
 public:
 	static void writeNodes(
-		MeshCsys&		 spos,
+		MeshCsys&			 spos,
 		const MeshDensity2D& meshDens,
 		const glm::dvec2&	 size,		
 		plane				 pln);
 	
 	static void writeNodesQ(
-		MeshCsys&			spos,
+		MeshCsys&				csys,
 		const MeshDensity2D&	meshDens,
 		const glm::dvec2&		dsize,
-		plane					pln);
+		plane					pln,
+		const glm::dvec3&		pos = glm::dvec3(0.0));
 	
 	static void writeNodesQ_nth(
 		MeshCsys&		 spos,

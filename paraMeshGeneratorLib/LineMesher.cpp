@@ -55,7 +55,7 @@ void LineMesher::writeNodesLineQ(
 
 	glm::dvec3 coords(0.0);
 	for (int i = 0; i < nnodes; i++) {
-		writer->writeNode(coords, spos.pos, spos.csys);
+		writer->writeNode(coords, glm::dvec3(0.), nullptr, &spos);
 		coords += ds;
 	}
 }
@@ -72,7 +72,7 @@ void LineMesher::writeNodesLineQ_nth(
 	glm::dvec3 coords(0.0);
 	for (int i = 0; i < nnodes; i++) {		
 		if (i%skipNth) {
-			writer->writeNode(coords, spos.pos, spos.csys);
+			writer->writeNode(coords, glm::dvec3(0.), nullptr, &spos);
 		}
 		coords[(size_t)dir] += ds;
 	}
@@ -89,7 +89,7 @@ void LineMesher::writeNodesLineQ_nth(
 	glm::dvec3 coords(0.0);
 	for (int i = 0; i < nnodes; i++) {
 		if (i%skipNth) {
-			writer->writeNode(coords, spos.pos, spos.csys);
+			writer->writeNode(coords, glm::dvec3(0.), nullptr, &spos);
 		}
 		coords += ds;
 	}

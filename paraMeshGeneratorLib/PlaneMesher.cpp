@@ -3,10 +3,11 @@
 #include "math_utilities.h"
 
 void PlaneMesher::writeNodesQ(
-	MeshCsys&			spos,
+	MeshCsys&				spos,
 	const MeshDensity2D&	meshDens,
 	const glm::dvec2&		dsize,
-	plane					pln)
+	plane					pln,
+	const glm::dvec3&		pos)
 {
 	//MeshCsys curPos(spos);	
 	MeshCsys curPos;	
@@ -20,7 +21,7 @@ void PlaneMesher::writeNodesQ(
 	for (int i2 = 0; i2 < meshDens.dir2(); i2++){
 		LineMesher::writeNodesLineQ(curPos, meshDens.dir1(), dsize.x, dir1);
 		curPos.pos[(size_t)dir2] += dsize.y;
-		curPos.setParentCsys(&spos);
+		curPos.update();
 	}
 	Mesher::nodeID1 = firstNode;
 }
@@ -75,7 +76,7 @@ void PlaneMesher::writeNodesQ_nth(
 	bool				 skipAlongDir1)
 {
 	int firstNode = writer->getNextNodeID();
-	MeshCsys curPos(spos);
+	MeshCsys curPos(&spos);
 	
 	direction dir1, dir2;
 	getPlaneDirections(pln, dir1, dir2);
@@ -88,6 +89,7 @@ void PlaneMesher::writeNodesQ_nth(
 
 	for (int i = 0; i < nRowSkip; i++) {
 		curPos.pos[(size_t)skipDir] = spos.pos[(size_t)skipDir] + (double)i*dsize[(size_t)skipDir];
+		curPos.update();
 		if (i % 4) {
 			LineMesher::writeNodesLineQ(curPos, nRowNotSkip, dsize[(size_t)nonSkipDir], nonSkipDir);
 		}

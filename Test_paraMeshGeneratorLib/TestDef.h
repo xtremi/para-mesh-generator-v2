@@ -38,8 +38,5 @@ private:
 	void		startTimer();
 	int			durationMS();
 	std::string durationString(int ms);
-
-
 	void createGMSHbatScript();
-
 };

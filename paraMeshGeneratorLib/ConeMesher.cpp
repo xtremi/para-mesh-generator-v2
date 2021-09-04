@@ -30,8 +30,9 @@ void ConeMesher::writeNodes(
 	direction				rotaxis)
 {
 	int firstNode = writer->getNextNodeID();
-	MeshCsys curPos(spos);
-	
+	MeshCsys curPos;
+	curPos.setParentCsys(&spos);
+
 	double dang = angle.angStep(meshDens.circ());
 	double dH = height / (double)meshDens.nElNorm();
 	double dR = radius.dR() / (double)meshDens.nElNorm();
@@ -41,6 +42,7 @@ void ConeMesher::writeNodes(
 	for (int i = 0; i < meshDens.norm(); i++) {
 		ArcMesher::writeNodesCircularQ(curPos, meshDens.dir1(), curRadius, angle.start, dang, rotaxis);
 		curPos.pos[(size_t)rotaxis] += dH;
+		curPos.update();
 		curRadius += dR;
 	}
 

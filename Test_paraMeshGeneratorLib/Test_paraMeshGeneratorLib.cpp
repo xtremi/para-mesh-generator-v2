@@ -31,14 +31,18 @@
 int speedTestAddition(const std::string& fileName);
 int speedTestMultiplication(const std::string& fileName);
 int speedTestVec3addition(const std::string& fileName);
-int speedTestMat3Vec3multiplicaiton(const std::string& fileName);
+int speedTestMat3Vec3multiplication(const std::string& fileName);
+int speedTestWriteCubes(const std::string& fileName);
+int speedTestWriteRotatedCubes(const std::string& fileName);
+int speedTestWriteNodesAndElements(const std::string& fileName);
 
 int lineMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
 int recEdgeMesher(const std::string& fileName);
 int ellipseMesher(const std::string& fileName);
 
-int meshCsys(const std::string& fileName);
+int meshCsys1(const std::string& fileName);
+int meshCsys2(const std::string& fileName);
 
 int planeMesher(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
@@ -79,14 +83,18 @@ std::vector<TestDef> testFunctions({
 	TestDef(10, "speedTestAddition",				"speed test", (testFunction)speedTestAddition),
 	TestDef(11, "speedTestMultiplication",			"speed test", (testFunction)speedTestMultiplication),
 	TestDef(12, "speedTestVec3addition",			"speed test", (testFunction)speedTestVec3addition),
-	TestDef(13, "speedTestMat3Vec3multiplicaiton",	"speed test", (testFunction)speedTestMat3Vec3multiplicaiton),
+	TestDef(13, "speedTestMat3Vec3multiplication",	"speed test", (testFunction)speedTestMat3Vec3multiplication),
+	TestDef(14, "speedTestWriteCubes",				"speed test", (testFunction)speedTestWriteCubes),
+	TestDef(15, "speedTestWriteRotatedCubes",		"speed test", (testFunction)speedTestWriteRotatedCubes),
+	TestDef(16, "speedTestWriteNodesAndElements",	"speed test", (testFunction)speedTestWriteNodesAndElements),
 
 	TestDef(101, "lineMesher",			"basic meshers 1D", (testFunction)lineMesher),	
 	TestDef(102, "arcMesher",			"basic meshers 1D", (testFunction)arcMesher),
 	TestDef(103, "recEdgeMesher",		"basic meshers 1D", (testFunction)recEdgeMesher),
 	TestDef(104, "ellipseMesher",		"basic meshers 1D", (testFunction)ellipseMesher),
 
-	TestDef(150, "meshCsys",			"transformations",  (testFunction)meshCsys),
+	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
+	TestDef(151, "meshCsys2",			"transformations",  (testFunction)meshCsys2),
 
 	TestDef(203, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
 	TestDef(204, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
@@ -200,7 +208,7 @@ int speedTestVec3addition(const std::string& fileName) {
 	}
 	return 0;
 }
-int speedTestMat3Vec3multiplicaiton(const std::string& fileName) {
+int speedTestMat3Vec3multiplication(const std::string& fileName) {
 	glm::dvec3 vecs[10] = {
 		glm::dvec3(223.,311.,345.), glm::dvec3(24.,3343.,523423.), glm::dvec3(2334.,2343.,576.),
 		glm::dvec3(2133.,3.,5434.), glm::dvec3(2342.,3776.,56.),	glm::dvec3(2.,3.,5.),
@@ -244,7 +252,70 @@ void writeXYZplanes(MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dv
 	PlaneMesher::writeElements(meshDens);
 }
 
-int meshCsys(const std::string& fileName) {
+static const int nCubesSpeedTest = 100;
+static const int nNodesCubeSpeedTest = 50;
+int speedTestWriteCubes(const std::string& fileName) {
+	TEST_START
+
+	int n = nNodesCubeSpeedTest;
+
+	for (int i = 0; i < nCubesSpeedTest; i++) {
+		CuboidMesher::writeNodes(pos, MeshDensity3D(n,n,n), glm::dvec3(0.5, 0.5, 2.0), plane::xy);
+		CuboidMesher::writeElements(MeshDensity3D(n, n, n));
+	}
+
+	TEST_END
+}
+int speedTestWriteRotatedCubes(const std::string& fileName) {
+	TEST_START
+
+	double R = 5.;
+	glm::dvec3 v(1., 1., 1.);
+	v = glm::normalize(v);
+
+	glm::dmat3x3 rotMF2 = makeCsysMatrix(v, 0.);
+
+	MeshCsys csysF0(10.*Z_DIR);
+	MeshCsys csysF1(R*Z_DIR, &rotMF2);
+	MeshCsys csysF2(-R * Z_DIR);
+	csysF1.setParentCsys(&csysF0);
+	csysF2.setParentCsys(&csysF1);
+
+	writeXYZlines(csysF0, 2.0, 5);
+	writeXYZlines(csysF1, 2.0, 5);
+	writeXYZlines(csysF2, 2.0, 5);
+
+	int n = nNodesCubeSpeedTest;
+
+	for (int i = 0; i < nCubesSpeedTest; i++) {
+		double ang = GLMPI * (double)i / 20.;
+		rotMF2 = makeCsysMatrix(v, ang);
+		csysF1.pos += 1.45*v;
+		csysF2.updateParents();
+
+		CuboidMesher::writeNodes(pos, MeshDensity3D(n, n, n), glm::dvec3(0.5, 0.5, 2.0), plane::xy);
+		CuboidMesher::writeElements(MeshDensity3D(n, n, n));
+	}
+
+	TEST_END
+}
+
+int speedTestWriteNodesAndElements(const std::string& fileName) {
+	TEST_START
+	int nNodes = nNodesCubeSpeedTest * nNodesCubeSpeedTest * nNodesCubeSpeedTest * nCubesSpeedTest;
+	int nElements = (nNodesCubeSpeedTest -1) * (nNodesCubeSpeedTest - 1)* (nNodesCubeSpeedTest - 1)* nCubesSpeedTest;
+	
+	for(int i = 0; i < nNodes; i++){
+		writer.writeNode(i + 1, glm::dvec3(12.23, 23.2, 6.));
+	}
+	int nodeIDs[4] = { 1,2,3,4 };
+	for (int i = 0; i < nElements; i++) {
+		writer.write4nodedShell(i + 1, nodeIDs);
+	}
+	TEST_END
+}
+
+int meshCsys1(const std::string& fileName) {
 	TEST_START
 	MeshCsys globalCsys;
 	MeshCsys csysa1(4.0*X_DIR);
@@ -307,12 +378,94 @@ int meshCsys(const std::string& fileName) {
 		csysE3.updateParents();
 		ArcMesher::writeNodesCircular(csysE3, nnodes, 4.0, ArcAngles(), direction::z);
 		ArcMesher::writeElementsLine(nnodes, true);
+
+		DiskMesher::writeNodes(csysE3, MeshDensity2D(24, 6), Cone2Dradius(1.0, 3.25), ArcAngles(), direction::z);
+		DiskMesher::writeElements(MeshDensity2D(24, 6, true));
+
+	}
+
+	double R = 5.;
+	glm::dvec3 v(1., 1., 1.);
+	v = glm::normalize(v);
+
+	glm::dmat3x3 rotMF2 = makeCsysMatrix(v, 0.);
+
+	MeshCsys csysF0(10.*Z_DIR);
+	MeshCsys csysF1(R*Z_DIR, &rotMF2);
+	MeshCsys csysF2(-R*Z_DIR);
+	csysF1.setParentCsys(&csysF0);
+	csysF2.setParentCsys(&csysF1);
+	
+	writeXYZlines(csysF0, 2.0, 5);
+	writeXYZlines(csysF1, 2.0, 5);
+	writeXYZlines(csysF2, 2.0, 5);
+
+
+	for (int i = 0; i < 40; i++) {
+		double ang = GLMPI * (double)i / 20.;
+		rotMF2 = makeCsysMatrix(v, ang);
+		csysF1.pos += 1.45*v;
+		csysF2.updateParents();
+
+		writeXYZlines(csysF1, 2.0, 5);
+		writeXYZlines(csysF2, 2.0, 5);
+
+		CuboidMesher::writeNodes(csysF2, MeshDensity3D(4, 4, 4), glm::dvec3(0.5, 0.5, 2.0), plane::xy);
+		CuboidMesher::writeElements(MeshDensity3D(4, 4, 4));
 	}
 
 
 	TEST_END
 }
 
+int meshCsys2(const std::string& fileName) {
+	TEST_START
+
+	std::vector<glm::dvec3> dirs({
+		glm::normalize(glm::dvec3(-1,-1,0)),
+		glm::normalize(glm::dvec3(1,-1,0)),
+		glm::normalize(glm::dvec3(1,1,0)),
+		glm::normalize(glm::dvec3(-1,1,0))
+	});
+
+
+	MeshDensity2D meshDens2D(20, 5);
+	MeshDensity3Dref meshDens3Dcuboid(2, 8 * 3 + 1, 8 * 3 + 1);
+	Cone2Dradius radius(1.0, 0.2);
+
+	MeshCsys glcsys;
+	CuboidMesherRef::writeNodes(glcsys, meshDens3Dcuboid, glm::dvec3(1.5,1.5,3.0), false, plane::xy);
+	CuboidMesherRef::writeElements(meshDens3Dcuboid);
+
+	std::vector<glm::dmat3x3> rotMs(4);
+
+	for (int i = 0; i < 4; i++) {
+
+		MeshCsys csys0(4.0 * dirs[i]);
+		MeshCsys csys1(&csys0, 20.*dirs[i], &rotMs[i]);
+		MeshCsys csys2(&csys1, -20.*dirs[i]);
+		
+		MeshCsys csys2b(&csys2, 3.*Z_DIR);
+		MeshCsys csys2c(&csys2b, 3.*Z_DIR);
+
+		for (int j = 0; j < 8; j++) {
+
+			rotMs[i] = makeCsysMatrix(glm::cross(dirs[i], Z_DIR), GLM2PI * (double)j / 10.);
+			csys2c.updateParents();
+
+			ConeMesher::writeNodes(csys2, meshDens2D, radius, ArcAngles(), 3.0, direction::z);
+			ConeMesher::writeElements(meshDens2D);
+
+			CylinderMesher::writeNodes(csys2b, meshDens2D, 0.2, ArcAngles(), 2.0, direction::z);
+			CylinderMesher::writeElements(meshDens2D);
+
+			CuboidMesherRef::writeNodes(csys2c, meshDens3Dcuboid, glm::dvec3(1.5, 1.5, 3.0), false, plane::xy);
+			CuboidMesherRef::writeElements(meshDens3Dcuboid);
+		}
+	}
+
+	TEST_END
+}
 
 int lineMesher(const std::string& fileName) {
 	TEST_START

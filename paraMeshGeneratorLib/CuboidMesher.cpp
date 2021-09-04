@@ -19,7 +19,8 @@ void CuboidMesher::writeNodesQ(
 	const glm::dvec3&		dp,
 	plane					pln)
 {
-	MeshCsys curPos(spos);
+	MeshCsys curPos;
+	curPos.setParentCsys(&spos);
 	int firstNode = writer->getNextNodeID();
 	
 	direction normal = getPlaneNormal(pln);
@@ -29,7 +30,8 @@ void CuboidMesher::writeNodesQ(
 
 	for (int i3 = 0; i3 < meshDens.dir3(); i3++){
 		PlaneMesher::writeNodesQ(curPos, planeMeshDens, dp12,  pln);
-		curPos.pos[(size_t)normal] += dp.y;
+		curPos.pos[(size_t)normal] += dp.z;
+		curPos.update();
 	}
 	Mesher::nodeID1 = firstNode;
 }
@@ -119,7 +121,7 @@ void CuboidMesher::writeElements(const MeshDensity3D& meshDens)
 
 */
 void CuboidMesherRef::writeNodes(
-	MeshCsys&			spos,
+	MeshCsys&				spos,
 	const MeshDensity3Dref&	meshDens,
 	const glm::dvec3&		size,
 	bool					startWithOffset,
@@ -133,12 +135,14 @@ void CuboidMesherRef::writeNodes(
 	rsData.refDir   = getPlaneNormal(pln);
 	
 	RefLayerData rlData;
-	rlData.curPos			= spos;
+	//rlData.curPos			= spos;
+	rlData.curPos.setParentCsys(&spos);
 	rlData.curElSize		= glm::dvec2(size.x / (double)meshDens.nElDir1(), size.y / (double)meshDens.nElDir2());
 	rlData.curElSizeRefDir  = initialRefElSize3D(size.z, meshDens.nRefs(), startWithOffset);
 	
 	if (startWithOffset) {
 		rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSizeRefDir;
+		rlData.curPos.update();
 	}
 
 	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
@@ -152,26 +156,31 @@ void CuboidMesherRef::writeNodes(
 	Mesher::nodeID1 = firstNode;
 }
 
+//row b:  x-----x-----x-----x-----x
 void CuboidMesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	PlaneMesher::writeNodesQ(rlData.curPos, rsData.meshDens->meshDensD12B(refLayer), rlData.curElSize, rsData.pln);
 	rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSizeRefDir;
+	rlData.curPos.update();
 }
 
 //row m1:  |  x--x--x  |  x--x--x  | 
 void CuboidMesherRef::writeNodes_layerM1(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	PlaneMesher::writeNodesQ_nth(rlData.curPos, rsData.meshDens->meshDensD12B(refLayer), rlData.curElSize, rsData.pln, 4, true);
 	rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSizeRefDir;
+	rlData.curPos.update();
 }
 //row m2:  x-----x-----x-----x-----x
 void CuboidMesherRef::writeNodes_layerM2(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	rlData.curElSize.x *= 2.0;
 	PlaneMesher::writeNodesQ(rlData.curPos, rsData.meshDens->meshDensD12M2(refLayer), rlData.curElSize, rsData.pln);
 	rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSizeRefDir;
+	rlData.curPos.update();
 }
 //row m3:  |  x--x--x  |  x--x--x  |
 void CuboidMesherRef::writeNodes_layerM3(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	PlaneMesher::writeNodesQ_nth(rlData.curPos, rsData.meshDens->meshDensD12M2(refLayer), rlData.curElSize, rsData.pln, 4, false);
 	rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSizeRefDir;
+	rlData.curPos.update();
 }
 //row t:  x-----x-----x-----x-----x 
 void CuboidMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
@@ -179,6 +188,7 @@ void CuboidMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData
 	PlaneMesher::writeNodesQ(rlData.curPos, rsData.meshDens->meshDensD12T(refLayer), rlData.curElSize, rsData.pln);
 	rlData.curElSizeRefDir *= 2.0;
 	rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSizeRefDir;
+	rlData.curPos.update();
 }
 
 void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)

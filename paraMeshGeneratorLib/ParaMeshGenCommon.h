@@ -361,6 +361,11 @@ struct MeshCsys {
 	MeshCsys(const glm::dvec3& _pos, glm::dmat3x3* _csys = nullptr) : pos{ _pos }, csys{ _csys } {
 		reset();
 	}
+	MeshCsys(MeshCsys* parent, const glm::dvec3& _pos = glm::dvec3(0.0), glm::dmat3x3* _csys = nullptr) 
+		: MeshCsys(_pos, _csys) {
+		setParentCsys(parent);
+	}
+
 	void reset() {
 		hasRotToGlobal = csys ? true : false;
 		local2globalT = pos; //csys ? (*csys) * pos : pos;
@@ -409,6 +414,10 @@ struct MeshCsys {
 		for (size_t i = 0; i < parents.size() - 1; i++) {
 			parents[i + 1]->setParentCsys(parents[i]);
 		}
+	}
+
+	void update() {
+		if(parentCsys) setParentCsys(parentCsys);
 	}
 
 	void setParentCsys(MeshCsys* _parentCsys) {
