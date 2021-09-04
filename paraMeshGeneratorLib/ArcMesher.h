@@ -6,29 +6,32 @@
 class ArcMesher : private Mesher {
 public:
 	static void writeNodesCircular(
-		MeshCsys&		spos,
+		const glm::dvec3&	pos,
+		MeshCsys&			spos,
 		int					nnodes,
 		double				radius,
 		const ArcAngles& 	arcAngles,
 		direction			rotAxis);
 
 	static void writeNodesCircularQ(
-		MeshCsys&		spos,
+		const glm::dvec3&	pos,
+		MeshCsys&			spos,
 		int					nnodes,
 		double				radius,
 		double				startAng,
 		double				dAng,		
 		direction			rotAxis);
 
-	static void writeNodesCircularX(MeshCsys& spos, int nnodes, double radius, const ArcAngles& arcAngles);
-	static void writeNodesCircularY(MeshCsys& spos, int nnodes, double radius, const ArcAngles& arcAngles);
-	static void writeNodesCircularZ(MeshCsys& spos, int nnodes, double radius, const ArcAngles& arcAngles);
-	static void writeNodesCircularXq(MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
-	static void writeNodesCircularYq(MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
-	static void writeNodesCircularZq(MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
+	static void writeNodesCircularX(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, const ArcAngles& arcAngles);
+	static void writeNodesCircularY(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, const ArcAngles& arcAngles);
+	static void writeNodesCircularZ(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, const ArcAngles& arcAngles);
+	static void writeNodesCircularXq(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
+	static void writeNodesCircularYq(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
+	static void writeNodesCircularZq(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, double startAng, double dAng);
 
 	static void writeNodesCircular_nth(
-		MeshCsys&		spos,
+		const glm::dvec3&	pos,
+		MeshCsys&			spos,
 		int					nnodes,
 		double				radius,
 		const ArcAngles& 	arcAngles,
@@ -36,7 +39,8 @@ public:
 		direction			rotAxis);
 
 	static void writeNodesCircularQ_nth(
-		MeshCsys&		spos,
+		const glm::dvec3&	pos,
+		MeshCsys&			spos,
 		int					nnodes,
 		double				radius,
 		double				startAng,

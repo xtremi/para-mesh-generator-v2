@@ -9,9 +9,7 @@ void PlaneMesher::writeNodesQ(
 	plane					pln,
 	const glm::dvec3&		pos)
 {
-	//MeshCsys curPos(spos);	
-	MeshCsys curPos;	
-	curPos.setParentCsys(&spos);
+	glm::dvec3 curPos(pos);
 
 	int firstNode = writer->getNextNodeID();
 
@@ -19,9 +17,8 @@ void PlaneMesher::writeNodesQ(
 	getPlaneDirections(pln, dir1, dir2);
 
 	for (int i2 = 0; i2 < meshDens.dir2(); i2++){
-		LineMesher::writeNodesLineQ(curPos, meshDens.dir1(), dsize.x, dir1);
-		curPos.pos[(size_t)dir2] += dsize.y;
-		curPos.update();
+		LineMesher::writeNodesLineQ(spos, meshDens.dir1(), dsize.x, dir1, curPos);
+		curPos[(size_t)dir2] += dsize.y;
 	}
 	Mesher::nodeID1 = firstNode;
 }

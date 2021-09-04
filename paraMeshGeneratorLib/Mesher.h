@@ -1,7 +1,7 @@
 #pragma once
 #include "FeaWrite.h"
 
-#define MESHER_NODE_WRITE_START int firstNode = writer->getNextNodeID(); MeshCsys curPos(spos);
+#define MESHER_NODE_WRITE_START int firstNode = writer->getNextNodeID(); glm::dvec3 curPos(pos);
 #define MESHER_NODE_WRITE_END Mesher::nodeID1 = firstNode;
 
 enum class MesherMode {write, get};

@@ -2,38 +2,40 @@
 #include "LineMesher.h"
 #include "math_utilities.h"
 
-void ArcMesher::writeNodesCircularX(MeshCsys& spos, int nnodes, double radius, const ArcAngles&  arcAngles){
-	writeNodesCircular(spos, nnodes, radius, arcAngles, direction::x);
+void ArcMesher::writeNodesCircularX(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, const ArcAngles&  arcAngles){
+	writeNodesCircular(pos, spos, nnodes, radius, arcAngles, direction::x);
 }
-void ArcMesher::writeNodesCircularY(MeshCsys& spos, int nnodes, double radius, const ArcAngles&  arcAngles){
-	writeNodesCircular(spos, nnodes, radius, arcAngles, direction::y);
+void ArcMesher::writeNodesCircularY(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, const ArcAngles&  arcAngles){
+	writeNodesCircular(pos, spos, nnodes, radius, arcAngles, direction::y);
 }
-void ArcMesher::writeNodesCircularZ(MeshCsys& spos, int nnodes, double radius, const ArcAngles&  arcAngles){
-	writeNodesCircular(spos, nnodes, radius, arcAngles, direction::z);
+void ArcMesher::writeNodesCircularZ(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, const ArcAngles&  arcAngles){
+	writeNodesCircular(pos, spos, nnodes, radius, arcAngles, direction::z);
 }
-void ArcMesher::writeNodesCircularXq(MeshCsys& spos, int nnodes, double radius, double startAng, double dAng){
-	writeNodesCircularQ(spos, nnodes, radius, startAng, dAng, direction::x);
+void ArcMesher::writeNodesCircularXq(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, double startAng, double dAng){
+	writeNodesCircularQ(pos, spos, nnodes, radius, startAng, dAng, direction::x);
 }
-void ArcMesher::writeNodesCircularYq(MeshCsys& spos, int nnodes, double radius, double startAng, double dAng){
-	writeNodesCircularQ(spos, nnodes, radius, startAng, dAng, direction::y);
+void ArcMesher::writeNodesCircularYq(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, double startAng, double dAng){
+	writeNodesCircularQ(pos, spos, nnodes, radius, startAng, dAng, direction::y);
 }
-void ArcMesher::writeNodesCircularZq(MeshCsys& spos, int nnodes, double radius, double startAng, double dAng){
-	writeNodesCircularQ(spos, nnodes, radius, startAng, dAng, direction::z);
+void ArcMesher::writeNodesCircularZq(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double radius, double startAng, double dAng){
+	writeNodesCircularQ(pos, spos, nnodes, radius, startAng, dAng, direction::z);
 }
 
 void ArcMesher::writeNodesCircular(
-	MeshCsys&		spos,
+	const glm::dvec3&	pos,
+	MeshCsys&			spos,
 	int					nnodes,
 	double				radius,
 	const ArcAngles& 	arcAngles,
 	direction			rotAxis)
 {
 	double dang = arcAngles.angStep(nnodes);	
-	writeNodesCircularQ(spos, nnodes, radius, arcAngles.start, dang,  rotAxis);
+	writeNodesCircularQ(pos, spos, nnodes, radius, arcAngles.start, dang,  rotAxis);
 }
 
 void ArcMesher::writeNodesCircularQ(
-	MeshCsys&		spos,
+	const glm::dvec3&	pos,
+	MeshCsys&			spos,
 	int					nnodes,
 	double				radius,
 	double				startAng,
@@ -57,7 +59,8 @@ void ArcMesher::writeNodesCircularQ(
 	but is confusing.
 */
 void ArcMesher::writeNodesCircularQ_nth(
-	MeshCsys&		spos,
+	const glm::dvec3&	pos,
+	MeshCsys&			spos,
 	int					nnodes,
 	double				radius,
 	double				startAng,
@@ -78,7 +81,8 @@ void ArcMesher::writeNodesCircularQ_nth(
 }
 
 void ArcMesher::writeNodesCircular_nth(
-	MeshCsys&		spos,
+	const glm::dvec3&	pos,
+	MeshCsys&			spos,
 	int					nnodes,
 	double				radius,
 	const ArcAngles& 	arcAngles,
@@ -86,7 +90,7 @@ void ArcMesher::writeNodesCircular_nth(
 	direction			rotAxis)
 {
 	double dang = arcAngles.angStep(nnodes);
-	writeNodesCircularQ_nth(spos, nnodes, radius, arcAngles.start, dang, skipNth, rotAxis);
+	writeNodesCircularQ_nth(pos, spos, nnodes, radius, arcAngles.start, dang, skipNth, rotAxis);
 }
 
 

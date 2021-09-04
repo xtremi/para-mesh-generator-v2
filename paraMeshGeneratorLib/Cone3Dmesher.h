@@ -24,7 +24,8 @@ class Cone3Dmesher : private Mesher
 {
 public:
 	static void writeNodes(
-		MeshCsys&			spos,
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
 		const MeshDensity3D&	meshDens,
 		const Pipe3Dradius&		radius,
 		const ArcAngles&		angle,
@@ -38,7 +39,8 @@ class Cone3DmesherRef : private Mesher
 {
 public:
 	static void writeNodes(
-		MeshCsys&			spos,
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
 		const MeshDensity3Dref& meshDens,
 		const Pipe3Dradius&		radius,
 		const ArcAngles&		angle,

@@ -8,7 +8,8 @@
 #include "math_utilities.h"
 
 void Cone3Dmesher::writeNodes(
-	MeshCsys&			spos,
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
 	const MeshDensity3D&	meshDens,
 	const Pipe3Dradius&		radius,
 	const ArcAngles&		angle,
@@ -25,8 +26,8 @@ MESHER_NODE_WRITE_START
 	MeshDensity2D meshDensDisk = meshDens.meshDensD12();
 
 	for (int i = 0; i < meshDens.axis(); i++) {
-		DiskMesher::writeNodes(curPos, meshDensDisk, currentRadius, angle, axis);
-		curPos.pos[(size_t)axis] += dH;
+		DiskMesher::writeNodes(curPos, csys, meshDensDisk, currentRadius, angle, axis);
+		curPos[(size_t)axis] += dH;
 		currentRadius.radi.x += dRi;
 		currentRadius.radi.y += dRo;
 	}
@@ -64,7 +65,8 @@ void Cone3Dmesher::writeElements(const MeshDensity3D& meshDens){
 
 */
 void Cone3DmesherRef::writeNodes(
-	MeshCsys&			spos,
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
 	const MeshDensity3Dref& meshDens,
 	const Pipe3Dradius&		radius,
 	const ArcAngles&		angle,

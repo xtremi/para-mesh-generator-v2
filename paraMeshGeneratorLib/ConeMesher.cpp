@@ -22,16 +22,15 @@
 
 */
 void ConeMesher::writeNodes(
-	MeshCsys&			spos,
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
 	const MeshDensity2D&	meshDens,
 	const Cone2Dradius&		radius,
 	const ArcAngles&		angle,
 	double					height,
 	direction				rotaxis)
 {
-	int firstNode = writer->getNextNodeID();
-	MeshCsys curPos;
-	curPos.setParentCsys(&spos);
+MESHER_NODE_WRITE_START
 
 	double dang = angle.angStep(meshDens.circ());
 	double dH = height / (double)meshDens.nElNorm();
@@ -41,12 +40,11 @@ void ConeMesher::writeNodes(
 
 	for (int i = 0; i < meshDens.norm(); i++) {
 		ArcMesher::writeNodesCircularQ(curPos, meshDens.dir1(), curRadius, angle.start, dang, rotaxis);
-		curPos.pos[(size_t)rotaxis] += dH;
-		curPos.update();
+		curPos[(size_t)rotaxis] += dH;
 		curRadius += dR;
 	}
 
-	Mesher::nodeID1 = firstNode;
+MESHER_NODE_WRITE_END
 }
 
 void ConeMesher::writeNodesX(MeshCsys& spos, const MeshDensity2D& meshDens, const Cone2Dradius& radius, const ArcAngles& angle, double height){

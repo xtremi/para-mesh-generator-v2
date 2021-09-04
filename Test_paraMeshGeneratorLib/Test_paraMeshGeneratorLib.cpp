@@ -43,6 +43,7 @@ int ellipseMesher(const std::string& fileName);
 
 int meshCsys1(const std::string& fileName);
 int meshCsys2(const std::string& fileName);
+int meshCsys3(const std::string& fileName);
 
 int planeMesher(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
@@ -95,6 +96,7 @@ std::vector<TestDef> testFunctions({
 
 	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
 	TestDef(151, "meshCsys2",			"transformations",  (testFunction)meshCsys2),
+	TestDef(152, "meshCsys3",			"transformations",  (testFunction)meshCsys3),
 
 	TestDef(203, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
 	TestDef(204, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
@@ -462,6 +464,38 @@ int meshCsys2(const std::string& fileName) {
 			CuboidMesherRef::writeNodes(csys2c, meshDens3Dcuboid, glm::dvec3(1.5, 1.5, 3.0), false, plane::xy);
 			CuboidMesherRef::writeElements(meshDens3Dcuboid);
 		}
+	}
+
+	TEST_END
+}
+
+int meshCsys3(const std::string& fileName) {
+	TEST_START
+
+	
+	glm::dmat3x3 rotM0;
+	glm::dmat3x3 rotM1;
+	MeshCsys csysGlobal;
+	MeshCsys csys0(&csysGlobal, glm::dvec3(0.), &rotM0);
+	MeshCsys csys1(&csys0, glm::dvec3(5.,.0,.0));
+	MeshCsys csys2(&csys1, glm::dvec3(0.), &rotM1);
+
+	MeshDensity2D meshDens(5, 5);
+	PlaneMesher::writeNodesQ(csysGlobal, meshDens, glm::dvec2(.2), plane::xy, glm::dvec3(1.0, 0.0, 0.0));
+	PlaneMesher::writeElements(meshDens);
+
+
+	for(int i = 0; i < 10; i++){
+
+		rotM0 = makeCsysMatrix(glm::dvec3(0.0, 0.0, 1.0), GLMPI * (double)i / 10.);
+
+		for(int j = 0; j < 10; j++){
+			rotM1 = makeCsysMatrix(glm::dvec3(1.0, 0.0, 0.0), GLMPI * (double)j/10.);
+			csys2.updateParents();
+			PlaneMesher::writeNodesQ(csys2, meshDens, glm::dvec2(.2), plane::xy, glm::dvec3((double)i/1.,0.0,0.0));
+			PlaneMesher::writeElements(meshDens);
+		}
+
 	}
 
 	TEST_END
