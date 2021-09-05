@@ -20,7 +20,8 @@
 		          W
 */
 void RecToEllipseMesher::writeNodes(
-	MeshCsys&			spos,
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
 	const MeshDensity2D&	meshDens,
 	const EllipseRadius&	radius,
 	const glm::dvec2&		recSize,
@@ -36,7 +37,7 @@ void RecToEllipseMesher::writeNodes(
 	EllipseMesher::getLocalCoords(coordsElipse, meshDens.dir1(), radius, angle);
 	
 	calculateRecToEllipseDirections(meshDens, recSize, height, coordsSquare, coordsElipse, recToEllipseDirs, recToEllipseDist);
-	writeNodes(spos, meshDens, coordsSquare, recToEllipseDirs, recToEllipseDist, height, rotaxis);
+	writeNodes(pos, csys, meshDens, coordsSquare, recToEllipseDirs, recToEllipseDist, height, rotaxis);
 }
 
 void RecToEllipseMesher::calculateRecToEllipseDirections(
@@ -68,7 +69,8 @@ void RecToEllipseMesher::calculateRecToEllipseDirections(
 
 
 void RecToEllipseMesher::writeNodes(
-	MeshCsys&			       spos,
+	const glm::dvec3&			   pos,
+	MeshCsys&					   csys,
 	const MeshDensity2D&		   meshDens,
 	const std::vector<glm::dvec2>& startCoords,
 	const std::vector<glm::dvec3>& directions,
@@ -76,8 +78,7 @@ void RecToEllipseMesher::writeNodes(
 	double						   height,
 	direction					   rotaxis)
 {
-	int firstNode = writer->getNextNodeID();
-	MeshCsys curPos(spos);
+MESHER_NODE_WRITE_START
 
 	double currentHeight = 0.0;
 	double dH = height / (double)meshDens.nElNorm();
@@ -85,13 +86,14 @@ void RecToEllipseMesher::writeNodes(
 
 	for (int i2 = 0; i2 < meshDens.norm(); i2++) {
 		curFactor = (double)i2 / (double)meshDens.nElNorm();
-		writeNodesPerimeter_nth(curPos, meshDens.circ(), startCoords, directions, distances, curFactor, 0, rotaxis);
+		writeNodesPerimeter_nth(curPos, csys, meshDens.circ(), startCoords, directions, distances, curFactor, 0, rotaxis);
 	}
-	Mesher::nodeID1 = firstNode;
+MESHER_NODE_WRITE_END
 }
 
 void RecToEllipseMesher::writeNodesPerimeter_nth(
-	MeshCsys&			       spos,
+	const glm::dvec3&			   pos,
+	MeshCsys&					   csys,
 	int							   nnodes,
 	const std::vector<glm::dvec2>& startCoords,
 	const std::vector<glm::dvec3>& directions,
@@ -116,7 +118,7 @@ void RecToEllipseMesher::writeNodesPerimeter_nth(
 			mCurCoord[(size_t)dir1] = curCoord.x;
 			mCurCoord[(size_t)dir2] = curCoord.y;
 			mCurCoord[(size_t)rotaxis] = curCoord.z;
-			Mesher::writer->writeNode(mCurCoord, spos.pos, spos.csys);
+			Mesher::writer->writeNode(mCurCoord + pos, glm::dvec3(0.), nullptr, &csys);
 		}
 	}
 }
@@ -126,7 +128,8 @@ void RecToEllipseMesher::writeElements(const MeshDensity2D& meshDens) {
 }
 
 void RecToEllipseMesherRef::writeNodes(
-	MeshCsys&			spos,
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
 	const MeshDensity2Dref&	meshDens,
 	const EllipseRadius&	radius,
 	const glm::dvec2&		recSize,
@@ -148,6 +151,7 @@ void RecToEllipseMesherRef::writeNodes(
 
 
 	RefShapeData rsData;
+	rsData.csys		= &csys;
 	rsData.meshDens = &meshDens;
 	rsData.radius	= &radius;
 	rsData.recSize	= recSize;
@@ -163,7 +167,7 @@ void RecToEllipseMesherRef::writeNodes(
 	rsData.maxLength = std::sqrt(pow2(maxElRad - maxRecV/2.0) + pow2(height));
 
 	RefLayerData rlData;
-	rlData.curPos = spos;
+	rlData.curPos = pos;
 	rlData.curElSize.x = initialRefElSize2D(rsData.maxLength, meshDens.nRefs(), startWithOffset);
 	rlData.curElSize.y = radius.perimeter() / (double)meshDens.nElCirc();
 	rlData.curRadius = radius;
@@ -172,7 +176,7 @@ void RecToEllipseMesherRef::writeNodes(
 
 	if (startWithOffset) {
 		//fix radius?
-		rlData.curPos.pos[(size_t)rotaxis] += rlData.curElSize.x;
+		rlData.curPos[(size_t)rotaxis] += rlData.curElSize.x;
 	}
 
 	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
@@ -195,20 +199,20 @@ void RecToEllipseMesherRef::incrementConeStep(const RefShapeData& rsData, RefLay
 
 //row b: x--x--x--x--x--x--x--x--x
 void RecToEllipseMesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
-	RecToEllipseMesher::writeNodesPerimeter_nth(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer),
+	RecToEllipseMesher::writeNodesPerimeter_nth(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer),
 		*rsData.coordsSquare, *rsData.recToEllipseDirs, *rsData.recToEllipseDist, rlData.curFactor, 0, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 }
 //row m:  |  x--x--x  |  x--x--x  |
 void RecToEllipseMesherRef::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
-	RecToEllipseMesher::writeNodesPerimeter_nth(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer),
+	RecToEllipseMesher::writeNodesPerimeter_nth(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer),
 		*rsData.coordsSquare, *rsData.recToEllipseDirs, *rsData.recToEllipseDist, rlData.curFactor, 4, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 }
 //row t: x----x----x----x----x
 void RecToEllipseMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
 	rlData.curElSize.y *= 2.0;
-	RecToEllipseMesher::writeNodesPerimeter_nth(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer),
+	RecToEllipseMesher::writeNodesPerimeter_nth(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer),
 		*rsData.coordsSquare, *rsData.recToEllipseDirs, *rsData.recToEllipseDist, rlData.curFactor, 0, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 	rlData.curElSize.x *= 2.0;

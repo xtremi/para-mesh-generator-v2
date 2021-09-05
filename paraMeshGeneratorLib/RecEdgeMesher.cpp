@@ -23,44 +23,48 @@ H  |           |
 */
 
 void RecEdgeMesher::writeNodes(
-	MeshCsys&		spos,
+	const glm::dvec3&	pos,
+	MeshCsys&			csys,
 	int					nnodes,
 	const glm::dvec2&	size,
 	plane				pln)
 {
-	getOrWriteCoords_nth(MesherMode::write, spos, default_empty_coord_vec, nnodes, size, 0, false, pln);
+	getOrWriteCoords_nth(MesherMode::write, pos, csys, default_empty_coord_vec, nnodes, size, 0, false, pln);
 }
 
 void RecEdgeMesher::writeNodes(
-	MeshCsys&		spos,
+	const glm::dvec3&	pos,
+	MeshCsys&			csys,
 	int					nNodesWidth,
 	int					nNodesHeight,
 	const glm::dvec2&	size,
 	plane				pln)
 {
-	getOrWriteCoords_nth(MesherMode::write, spos, default_empty_coord_vec, nNodesWidth, nNodesHeight, size, 0, false, pln);
+	getOrWriteCoords_nth(MesherMode::write, pos, csys, default_empty_coord_vec, nNodesWidth, nNodesHeight, size, 0, false, pln);
 
 }
 
 void RecEdgeMesher::writeNodes_nth(
-	MeshCsys&		spos,
+	const glm::dvec3&	pos,
+	MeshCsys&			csys,
 	int					nNodesWidth,
 	int					nNodesHeight,
 	const glm::dvec2&	size,
 	int					skipNth,
 	plane				pln)
 {
-	getOrWriteCoords_nth(MesherMode::write, spos, default_empty_coord_vec, nNodesWidth, nNodesHeight, size, skipNth, true, pln);
+	getOrWriteCoords_nth(MesherMode::write, pos, csys, default_empty_coord_vec, nNodesWidth, nNodesHeight, size, skipNth, true, pln);
 }
 
 void RecEdgeMesher::writeNodes_nth(
-	MeshCsys&		spos,
+	const glm::dvec3&	pos,
+	MeshCsys&			csys,
 	int					nnodes,
 	const glm::dvec2&	size,
 	int					skipNth,
 	plane				pln)
 {
-	getOrWriteCoords_nth(MesherMode::write, spos, default_empty_coord_vec, nnodes, size, skipNth, true, pln);
+	getOrWriteCoords_nth(MesherMode::write, pos, csys, default_empty_coord_vec, nnodes, size, skipNth, true, pln);
 }
 
 void RecEdgeMesher::getLocalCoords(
@@ -69,14 +73,15 @@ void RecEdgeMesher::getLocalCoords(
 	const glm::dvec2&		 size)
 {
 	MeshCsys csys;
-	getOrWriteCoords_nth(MesherMode::get, csys, coords, nnodes, size, 0, false, plane::xy);
+	getOrWriteCoords_nth(MesherMode::get, glm::dvec3(0.), csys, coords, nnodes, size, 0, false, plane::xy);
 }
 
 
 
 void RecEdgeMesher::getOrWriteCoords_nth(
 	MesherMode					mode,
-	MeshCsys&				spos,
+	const glm::dvec3&			pos,
+	MeshCsys&					csys,
 	std::vector<glm::dvec2>&	coords,
 	int							nnodes,
 	const glm::dvec2&			size,
@@ -91,12 +96,13 @@ void RecEdgeMesher::getOrWriteCoords_nth(
 		int notMatching = 1;
 	}
 
-	getOrWriteCoords_nth(mode, spos, coords, nElW, nElH, size, skipNth, skipCorners, pln);
+	getOrWriteCoords_nth(mode, pos, csys, coords, nElW, nElH, size, skipNth, skipCorners, pln);
 }
 
 void RecEdgeMesher::getOrWriteCoords_nth(
 	MesherMode					mode,
-	MeshCsys&				spos,
+	const glm::dvec3&			pos,
+	MeshCsys&					csys,
 	std::vector<glm::dvec2>&	coords,
 	int							nNodesWidth,
 	int							nNodesHeight,
@@ -137,7 +143,7 @@ void RecEdgeMesher::getOrWriteCoords_nth(
 					if (mode == MesherMode::write) {
 						curCoord[(size_t)dir1] = curCoordLocal.x;
 						curCoord[(size_t)dir2] = curCoordLocal.y;
-						writer->writeNode(curCoord, spos.pos, spos.csys);
+						writer->writeNode(curCoord + pos, glm::dvec3(0.), nullptr, &csys);
 					}
 					else {
 						coords[nindex] = curCoordLocal;

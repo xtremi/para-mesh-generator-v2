@@ -6,7 +6,8 @@ class RecToEllipseMesher : public Mesher
 {
 public:
 	static void writeNodes(
-		MeshCsys&				spos,
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
 		const MeshDensity2D&	meshDens,
 		const EllipseRadius&	radius,
 		const glm::dvec2&		recSize,
@@ -17,7 +18,8 @@ public:
 	static void writeElements(const MeshDensity2D& meshDens);
 
 	static void writeNodes(
-		MeshCsys&			       spos,
+		const glm::dvec3&			   pos,
+		MeshCsys&					   csys,
 		const MeshDensity2D&		   meshDens,
 		const std::vector<glm::dvec2>& startCoords,
 		const std::vector<glm::dvec3>& directions,
@@ -26,7 +28,8 @@ public:
 		direction					   rotaxis);
 
 	static void writeNodesPerimeter_nth(
-		MeshCsys&					   spos,
+		const glm::dvec3&			   pos,
+		MeshCsys&					   csys,
 		int							   nnodes,
 		const std::vector<glm::dvec2>& startCoords,
 		const std::vector<glm::dvec3>& directions,
@@ -50,7 +53,8 @@ class RecToEllipseMesherRef : private Mesher
 {
 public:
 	static void writeNodes(
-		MeshCsys&			spos,
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
 		const MeshDensity2Dref&	meshDens,
 		const EllipseRadius&	radius,
 		const glm::dvec2&		recSize,
@@ -64,19 +68,20 @@ public:
 private:
 
 	struct RefShapeData {
-		const MeshDensity2Dref* meshDens;
-		const EllipseRadius*	radius;
-		glm::dvec2				recSize;
-		const ArcAngles*		angle;
-		direction				rotAxis;
-		double					height;
-		double					maxLength;
+		MeshCsys*				 csys;
+		const MeshDensity2Dref*  meshDens;
+		const EllipseRadius*	 radius;
+		glm::dvec2				 recSize;
+		const ArcAngles*		 angle;
+		direction				 rotAxis;
+		double					 height;
+		double					 maxLength;
 		std::vector<glm::dvec2>* coordsSquare;
 		std::vector<glm::dvec3>* recToEllipseDirs;
 		std::vector<double>*	 recToEllipseDist;
 	};
 	struct RefLayerData {
-		MeshCsys				curPos;
+		glm::dvec3				curPos;
 		double					curLength;
 		double					curFactor;
 		EllipseRadius			curRadius;

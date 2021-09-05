@@ -62,6 +62,7 @@ public:
 private:
 
 	struct RefShapeData{		
+		MeshCsys*			    csys;
 		const MeshDensity2Dref* meshDens;
 		const Cone2Dradius*		radius;
 		const ArcAngles*		angle;
@@ -70,7 +71,7 @@ private:
 		double					coneLength;
 	};
 	struct RefLayerData{
-		MeshCsys				curPos;
+		glm::dvec3				curPos;
 		double					curConeLength;
 		double					curRadius;
 		glm::dvec2				curElSize;

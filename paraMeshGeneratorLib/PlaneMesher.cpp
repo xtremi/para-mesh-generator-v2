@@ -3,24 +3,22 @@
 #include "math_utilities.h"
 
 void PlaneMesher::writeNodesQ(
-	MeshCsys&				spos,
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
 	const MeshDensity2D&	meshDens,
 	const glm::dvec2&		dsize,
-	plane					pln,
-	const glm::dvec3&		pos)
+	plane					pln)
 {
-	glm::dvec3 curPos(pos);
-
-	int firstNode = writer->getNextNodeID();
+MESHER_NODE_WRITE_START
 
 	direction dir1, dir2;
 	getPlaneDirections(pln, dir1, dir2);
 
 	for (int i2 = 0; i2 < meshDens.dir2(); i2++){
-		LineMesher::writeNodesLineQ(spos, meshDens.dir1(), dsize.x, dir1, curPos);
+		LineMesher::writeNodesLineQ(curPos, csys, meshDens.dir1(), dsize.x, dir1);
 		curPos[(size_t)dir2] += dsize.y;
 	}
-	Mesher::nodeID1 = firstNode;
+MESHER_NODE_WRITE_END
 }
 
 /*
@@ -65,15 +63,15 @@ void PlaneMesher::writeNodesQ(
 
 */
 void PlaneMesher::writeNodesQ_nth(
-	MeshCsys&		 spos,
-	const MeshDensity2D& meshDens,
-	const glm::dvec2&	 dsize,
-	plane				 pln,
-	int					 skipNth,
-	bool				 skipAlongDir1)
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
+	const MeshDensity2D&	meshDens,
+	const glm::dvec2&		dsize,
+	plane					pln,
+	int						skipNth,
+	bool					skipAlongDir1)
 {
-	int firstNode = writer->getNextNodeID();
-	MeshCsys curPos(&spos);
+MESHER_NODE_WRITE_START
 	
 	direction dir1, dir2;
 	getPlaneDirections(pln, dir1, dir2);
@@ -85,42 +83,42 @@ void PlaneMesher::writeNodesQ_nth(
 	
 
 	for (int i = 0; i < nRowSkip; i++) {
-		curPos.pos[(size_t)skipDir] = spos.pos[(size_t)skipDir] + (double)i*dsize[(size_t)skipDir];
-		curPos.update();
+		curPos[(size_t)skipDir] = pos[(size_t)skipDir] + (double)i*dsize[(size_t)skipDir];
 		if (i % 4) {
-			LineMesher::writeNodesLineQ(curPos, nRowNotSkip, dsize[(size_t)nonSkipDir], nonSkipDir);
+			LineMesher::writeNodesLineQ(curPos, csys, nRowNotSkip, dsize[(size_t)nonSkipDir], nonSkipDir);
 		}
 	}
-	Mesher::nodeID1 = firstNode;
+MESHER_NODE_WRITE_END
 }
 
 void PlaneMesher::writeNodes(
-	MeshCsys&		 spos,
-	const MeshDensity2D& meshDens,
-	const glm::dvec2&	 size,
-	plane				 pln)
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
+	const MeshDensity2D&	meshDens,
+	const glm::dvec2&		size,
+	plane					pln)
 {
 	glm::dvec2 dsize = glm::dvec2(size.x / (double)meshDens.nElDir1(), size.y / (double)meshDens.nElDir2());
-	PlaneMesher::writeNodesQ(spos, meshDens, dsize,  pln);
+	PlaneMesher::writeNodesQ(pos, csys, meshDens, dsize,  pln);
 }
 
-void PlaneMesher::writeNodesXZq(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxz) {
-	writeNodesQ(spos, meshDens, dxz, plane::xz);
+void PlaneMesher::writeNodesXZq(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& dxz) {
+	writeNodesQ(pos, csys, meshDens, dxz, plane::xz);
 }
-void PlaneMesher::writeNodesXYq(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dxy) {
-	writeNodesQ(spos, meshDens, dxy, plane::xy);
+void PlaneMesher::writeNodesXYq(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& dxy) {
+	writeNodesQ(pos, csys, meshDens, dxy, plane::xy);
 }
-void PlaneMesher::writeNodesYZq(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& dyz) {
-	writeNodesQ(spos, meshDens, dyz, plane::yz);
+void PlaneMesher::writeNodesYZq(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& dyz) {
+	writeNodesQ(pos, csys, meshDens, dyz, plane::yz);
 }
-void PlaneMesher::writeNodesXZ(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
-	writeNodes(spos, meshDens, size, plane::xz);
+void PlaneMesher::writeNodesXZ(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+	writeNodes(pos, csys, meshDens, size, plane::xz);
 }
-void PlaneMesher::writeNodesXY(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
-	writeNodes(spos, meshDens, size, plane::xy);
+void PlaneMesher::writeNodesXY(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+	writeNodes(pos, csys, meshDens, size, plane::xy);
 }
-void PlaneMesher::writeNodesYZ(MeshCsys& spos, const MeshDensity2D& meshDens, const glm::dvec2& size) {
-	writeNodes(spos, meshDens, size, plane::yz);
+void PlaneMesher::writeNodesYZ(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& size) {
+	writeNodes(pos, csys, meshDens, size, plane::yz);
 }
 
 
@@ -242,7 +240,8 @@ b0   x___x___x___x___x___x___x___x___x  row b (bot)	   -		|		  |
 
 */
 void PlaneMesherRef::writeNodes(
-	MeshCsys&			spos,
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
 	const MeshDensity2Dref& meshDens,
 	const glm::dvec2&		size,
 	bool					startWithOffset,
@@ -252,15 +251,16 @@ void PlaneMesherRef::writeNodes(
 
 	RefShapeData rsData;
 	rsData.meshDens = &meshDens;
+	rsData.csys = &csys;
 	getPlaneDirections(pln, rsData.refDir, rsData.edgeDir);
 	
 	RefLayerData rlData;
-	rlData.curPos = spos;	
+	rlData.curPos = pos;	
 	double elSizeRefDir = initialRefElSize2D(size.x, meshDens.nRefs(), startWithOffset);
 	rlData.curElSize = glm::dvec2(elSizeRefDir, size.y / (double)meshDens.nElCirc());
 
 	if (startWithOffset) {
-		rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSize.x;
+		rlData.curPos[(size_t)rsData.refDir] += rlData.curElSize.x;
 	}
 
 	for(int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++){
@@ -274,31 +274,31 @@ void PlaneMesherRef::writeNodes(
 
 //row b: x--x--x--x--x--x--x--x--x
 void PlaneMesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
-	LineMesher::writeNodesLineQ(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer), rlData.curElSize.y, rsData.edgeDir);
-	rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSize.x;
+	LineMesher::writeNodesLineQ(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curElSize.y, rsData.edgeDir);
+	rlData.curPos[(size_t)rsData.refDir] += rlData.curElSize.x;
 }
 //row m:  |  x--x--x  |  x--x--x  |
 void PlaneMesherRef::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
-	LineMesher::writeNodesLineQ_nth(rlData.curPos, rsData.meshDens->nNodesRowB(refLayer), rlData.curElSize.y, 4, rsData.edgeDir);
-	rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSize.x;
+	LineMesher::writeNodesLineQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curElSize.y, 4, rsData.edgeDir);
+	rlData.curPos[(size_t)rsData.refDir] += rlData.curElSize.x;
 }
 //row t: x----x----x----x----x
 void PlaneMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
 	rlData.curElSize.y *= 2.0;
-	LineMesher::writeNodesLineQ(rlData.curPos, rsData.meshDens->nNodesRowT(refLayer), rlData.curElSize.y, rsData.edgeDir);
+	LineMesher::writeNodesLineQ(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowT(refLayer), rlData.curElSize.y, rsData.edgeDir);
 	rlData.curElSize.x *= 2.0;
-	rlData.curPos.pos[(size_t)rsData.refDir] += rlData.curElSize.x;
+	rlData.curPos[(size_t)rsData.refDir] += rlData.curElSize.x;
 }
 
 
-void PlaneMesherRef::writeNodesXY(MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
-	return writeNodes(spos, meshDens, size, startWithOffset, plane::xy);
+void PlaneMesherRef::writeNodesXY(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
+	return writeNodes(pos, csys, meshDens, size, startWithOffset, plane::xy);
 }
-void PlaneMesherRef::writeNodesXZ(MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
-	return writeNodes(spos, meshDens, size, startWithOffset, plane::xz);
+void PlaneMesherRef::writeNodesXZ(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
+	return writeNodes(pos, csys, meshDens, size, startWithOffset, plane::xz);
 }
-void PlaneMesherRef::writeNodesYZ(MeshCsys& spos, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
-	return writeNodes(spos, meshDens, size, startWithOffset, plane::yz);
+void PlaneMesherRef::writeNodesYZ(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2Dref& meshDens, const glm::dvec2& size, bool startWithOffset){
+	return writeNodes(pos, csys, meshDens, size, startWithOffset, plane::yz);
 }
 
 

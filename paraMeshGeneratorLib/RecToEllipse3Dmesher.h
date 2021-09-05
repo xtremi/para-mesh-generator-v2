@@ -6,7 +6,8 @@ class RecToEllipse3Dmesher : public Mesher
 {
 public:
 	static void writeNodes(
-		MeshCsys&			spos,
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
 		const MeshDensity3D&	meshDens,
 		const EllipseRadius&	radiusStart,
 		const EllipseRadius&	radiusEnd,
@@ -23,7 +24,8 @@ class RecToEllipse3DmesherRef : public Mesher
 {
 public:
 	static void writeNodes(
-		MeshCsys&			spos,
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
 		const MeshDensity3Dref&	meshDens,
 		const EllipseRadius&	radiusStart,
 		const EllipseRadius&	radiusEnd,

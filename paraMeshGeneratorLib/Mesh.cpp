@@ -68,7 +68,7 @@ void MeshRec2D::writeNodes() {
 		if(extr.extrusionType == ExtrusionType::line){
 			glm::dvec3 cpos = currentPos + csys.dirX()*startSpace;
 			MeshCsys csys(cpos, csys.csys);
-			PlaneMesher::writeNodesXYq(csys, MeshDensity2D(nNodesEdgeX, nNodesY), dxy);
+			PlaneMesher::writeNodesXYq(glm::dvec3(0.), csys, MeshDensity2D(nNodesEdgeX, nNodesY), dxy);
 			currentPos += csys.dirX() * extr.length;
 		}
 		else if (extr.extrusionType == ExtrusionType::arc){

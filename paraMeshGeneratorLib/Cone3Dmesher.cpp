@@ -79,6 +79,7 @@ void Cone3DmesherRef::writeNodes(
 	MeshDensity2D curMeshDensD12 = meshDens.meshDensD12B(0);
 	
 	RefShapeData rsData;
+	rsData.csys = &csys;
 	rsData.meshDens = &meshDens;
 	rsData.radius = &radius;
 	rsData.angle = &angle;
@@ -88,7 +89,7 @@ void Cone3DmesherRef::writeNodes(
 	rsData.coneLengthOuter = std::sqrt(pow2(radius.dRo()) + pow2(height));
 
 	RefLayerData rlData;
-	rlData.curPos = spos;
+	rlData.curPos = pos;
 	rlData.curElSizeRefDir = initialRefElSize3D(rsData.coneLengthOuter, meshDens.nRefs(), startWithOffset);
 	rlData.curRadius = radius.start;
 	rlData.curConeLength = 0.0;
@@ -96,7 +97,7 @@ void Cone3DmesherRef::writeNodes(
 	
 	if (startWithOffset) {
 		//fix radius?
-		rlData.curPos.pos[(size_t)rotaxis] += rlData.curElSizeRefDir;
+		rlData.curPos[(size_t)rotaxis] += rlData.curElSizeRefDir;
 	}
 
 	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
@@ -116,13 +117,13 @@ void Cone3DmesherRef::incrementConeStep(const RefShapeData& rsData, RefLayerData
 	rlData.curRadius.setInner(rsData.radius->start.inner() + rsData.radius->dRi() * (rlData.curConeLength / rsData.coneLengthOuter));
 	rlData.curRadius.setOuter(rsData.radius->start.outer() + rsData.radius->dRo() * (rlData.curConeLength / rsData.coneLengthInner));
 	double currentDh = (rsData.height / rsData.coneLengthOuter)*rlData.curElSizeRefDir;
-	rlData.curPos.pos[(size_t)rsData.rotAxis] += currentDh;
+	rlData.curPos[(size_t)rsData.rotAxis] += currentDh;
 }
 
 //row b: x--x--x--x--x--x--x--x--x	
 void Cone3DmesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer)
 {
-	DiskMesher::writeNodes(rlData.curPos, rsData.meshDens->meshDensD12B(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
+	DiskMesher::writeNodes(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12B(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 }
 
@@ -131,14 +132,14 @@ void Cone3DmesherRef::writeNodes_layerM1(const RefShapeData& rsData, RefLayerDat
 {
 	MeshDensity2D meshDensB = rsData.meshDens->meshDensD12B(refLayer);
 	double dang = rsData.angle->angStep(meshDensB.dir1());
-	ConeMesher::writeNodes_nthLine(rlData.curPos, meshDensB, rlData.curRadius, rsData.angle->start, dang, 0.0, 4, rsData.rotAxis);
+	ConeMesher::writeNodes_nthLine(rlData.curPos, *rsData.csys, meshDensB, rlData.curRadius, rsData.angle->start, dang, 0.0, 4, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 }
 
 //row m2:  x-----x-----x-----x-----x
 void Cone3DmesherRef::writeNodes_layerM2(const RefShapeData& rsData, RefLayerData& rlData, int refLayer)
 {
-	DiskMesher::writeNodes(rlData.curPos, rsData.meshDens->meshDensD12M2(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
+	DiskMesher::writeNodes(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12M2(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 	
 }
@@ -147,14 +148,14 @@ void Cone3DmesherRef::writeNodes_layerM3(const RefShapeData& rsData, RefLayerDat
 {
 	MeshDensity2D meshDensM2 = rsData.meshDens->meshDensD12M2(refLayer);
 	double dang = rsData.angle->angStep(meshDensM2.circ());
-	ConeMesher::writeNodes_nthArc(rlData.curPos, meshDensM2, rlData.curRadius, rsData.angle->start, dang, 0.0, 4, rsData.rotAxis);
+	ConeMesher::writeNodes_nthArc(rlData.curPos, *rsData.csys, meshDensM2, rlData.curRadius, rsData.angle->start, dang, 0.0, 4, rsData.rotAxis);
 	incrementConeStep(rsData, rlData);
 }
 
 //row t:  x-----x-----x-----x-----x (dir2)
 void Cone3DmesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer)
 {	
-	DiskMesher::writeNodes(rlData.curPos, rsData.meshDens->meshDensD12T(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
+	DiskMesher::writeNodes(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12T(refLayer), rlData.curRadius, *rsData.angle, rsData.rotAxis);
 	rlData.curElSizeRefDir *= 2.0;
 	incrementConeStep(rsData, rlData);
 }

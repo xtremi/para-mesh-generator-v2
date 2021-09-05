@@ -44,13 +44,14 @@ public:
 private:
 
 	struct RefShapeData {
+		MeshCsys*				csys;
 		const MeshDensity3Dref* meshDens;
 		plane					pln;
 		direction				refDir;		
 		direction				edgeDir;
 	};
 	struct RefLayerData {
-		MeshCsys				curPos;
+		glm::dvec3				curPos;
 		glm::dvec2				curElSize;
 		double					curElSizeRefDir;
 	};

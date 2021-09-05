@@ -59,9 +59,10 @@ private:
 		double					height;
 		double					coneLengthOuter;
 		double					coneLengthInner;
+		MeshCsys*				csys;
 	};
 	struct RefLayerData {
-		MeshCsys				curPos;
+		glm::dvec3				curPos;
 		double					curConeLength;
 		Disk2Dradius			curRadius;
 		double					curElSizeRefDir;

@@ -6,13 +6,15 @@ class RecTubeMesher: public Mesher
 {
 public:
 	static void writeNodes(
-		MeshCsys&				spos,
+		const glm::dvec3&			pos,
+		MeshCsys&					csys,
 		const MeshDensity2DrecTube& meshDens,
 		const RecTubeSize&			size,
 		plane						pln);
 
 	static void writeNodes2(
-		MeshCsys&				spos,
+		const glm::dvec3&			pos,
+		MeshCsys&					csys,
 		const MeshDensity2DrecTube& meshDens,
 		const RecTubeSize&			size,
 		double						height,
@@ -26,21 +28,24 @@ class RecTubeMesherRef : public Mesher
 {
 public:
 	static void writeNodes(
-		MeshCsys&			spos,
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
 		const glm::ivec2&		nNodesWidthHeight,
 		int						nRefs,
 		const glm::dvec2&		recSizeInner,
 		plane					pln);
 
 	static void writeNodes2(
-		MeshCsys&			spos,
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
 		const MeshDensity2Dref&	meshDens,
 		const RecTubeSize&		size,
 		double					height,
 		plane					pln);
 
 	static void writeNodes2(
-		MeshCsys&			spos,
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
 		const MeshDensity2Dref&	meshDens,
 		const glm::ivec2&		nNodesWidthHeight,
 		const RecTubeSize&		size,
@@ -52,15 +57,17 @@ public:
 
 private:
 	struct RefShapeData {
-		plane					pln;
+		MeshCsys*	csys;
+		plane		pln;
 	};
 	struct RefLayerData {
-		MeshCsys				curPos;
-		glm::dvec2				curRecSize;
-		glm::dvec2				curElSizeWH;
-		glm::ivec2				curNodesWH;
+		glm::dvec3 curPos;
+		glm::dvec2 curRecSize;
+		glm::dvec2 curElSizeWH;
+		glm::ivec2 curNodesWH;
 	};
 	struct RefShapeData2 {
+		MeshCsys*				csys;
 		const MeshDensity2Dref* meshDens;
 		const RecTubeSize*		size;
 		plane					pln;
@@ -69,7 +76,7 @@ private:
 		double					length;
 	};
 	struct RefLayerData2 {
-		MeshCsys				curPos;
+		glm::dvec3				curPos;
 		double					curLength;
 		glm::dvec2				curSize;
 		glm::dvec2				curElSize;

@@ -19,7 +19,8 @@
 				  W
 */
 void RecToEllipse3Dmesher::writeNodes(
-	MeshCsys&			spos,
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
 	const MeshDensity3D&	meshDens,
 	const EllipseRadius&	radiusStart,
 	const EllipseRadius&	radiusEnd,
@@ -29,8 +30,7 @@ void RecToEllipse3Dmesher::writeNodes(
 	double					height,
 	direction				rotaxis)
 {
-	int firstNode = writer->getNextNodeID();
-	MeshCsys curPos(spos);
+MESHER_NODE_WRITE_START
 
 	std::vector<glm::dvec2> coordsSquare(meshDens.circ());
 	std::vector<glm::dvec2> coordsElipse(meshDens.circ());
@@ -54,15 +54,15 @@ void RecToEllipse3Dmesher::writeNodes(
 		EllipseMesher::getLocalCoords(coordsElipse, meshDens.circ(), curEllipseRad, angle);
 
 		RecToEllipseMesher::calculateRecToEllipseDirections(meshDensD12, curRecSize, 0.0 /*flat*/, coordsSquare, coordsElipse, recToEllipseDirs, recToEllipseDist);
-		RecToEllipseMesher::writeNodes(curPos, meshDensD12, coordsSquare, recToEllipseDirs, recToEllipseDist, 0.0 /*flat*/, rotaxis);
+		RecToEllipseMesher::writeNodes(curPos, csys, meshDensD12, coordsSquare, recToEllipseDirs, recToEllipseDist, 0.0 /*flat*/, rotaxis);
 
 		curEllipseRad.rad1 += dr1;
 		curEllipseRad.rad2 += dr2;
 		curRecSize += glm::dvec2(dwidth, dheight);
-		curPos.pos[(size_t)rotaxis] += elSizeD3;
+		curPos[(size_t)rotaxis] += elSizeD3;
 	}
 
-	Mesher::nodeID1 = firstNode;
+MESHER_NODE_WRITE_END
 }
 
 
@@ -74,7 +74,8 @@ void RecToEllipse3Dmesher::writeElements(const MeshDensity3D& meshDens) {
 
 
 void RecToEllipse3DmesherRef::writeNodes(
-	MeshCsys&			spos,
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
 	const MeshDensity3Dref&	meshDens,
 	const EllipseRadius&	radiusStart,
 	const EllipseRadius&	radiusEnd,
