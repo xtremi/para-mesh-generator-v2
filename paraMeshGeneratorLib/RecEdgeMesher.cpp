@@ -143,7 +143,7 @@ void RecEdgeMesher::getOrWriteCoords_nth(
 					if (mode == MesherMode::write) {
 						curCoord[(size_t)dir1] = curCoordLocal.x;
 						curCoord[(size_t)dir2] = curCoordLocal.y;
-						writer->writeNode(curCoord + pos, glm::dvec3(0.), nullptr, &csys);
+						writer->writeNode(curCoord, pos, nullptr, &csys);
 					}
 					else {
 						coords[nindex] = curCoordLocal;

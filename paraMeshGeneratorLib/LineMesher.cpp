@@ -1,34 +1,34 @@
 #include "LineMesher.h"
 
-void LineMesher::writeNodesLineXq(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double dx) {
-	writeNodesLineQ(pos, spos, nnodes, dx, direction::x);
+void LineMesher::writeNodesLineXq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dx) {
+	writeNodesLineQ(pos, csys, nnodes, dx, direction::x);
 }
-void LineMesher::writeNodesLineYq(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double dy) {
-	writeNodesLineQ(pos, spos, nnodes, dy, direction::y);
+void LineMesher::writeNodesLineYq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dy) {
+	writeNodesLineQ(pos, csys, nnodes, dy, direction::y);
 }
-void LineMesher::writeNodesLineZq(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double dz) {
-	writeNodesLineQ(pos, spos, nnodes, dz, direction::z);
+void LineMesher::writeNodesLineZq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dz) {
+	writeNodesLineQ(pos, csys, nnodes, dz, direction::z);
 }
-void LineMesher::writeNodesLineX(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double length) {
-	writeNodesLine(pos, spos, nnodes, length, direction::x);
+void LineMesher::writeNodesLineX(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length) {
+	writeNodesLine(pos, csys, nnodes, length, direction::x);
 }
-void LineMesher::writeNodesLineY(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double length) {
-	writeNodesLine(pos, spos, nnodes, length, direction::y);
+void LineMesher::writeNodesLineY(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length) {
+	writeNodesLine(pos, csys, nnodes, length, direction::y);
 }
-void LineMesher::writeNodesLineZ(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double length) {
-	writeNodesLine(pos, spos, nnodes, length, direction::z);
+void LineMesher::writeNodesLineZ(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length) {
+	writeNodesLine(pos, csys, nnodes, length, direction::z);
 }
 
-void LineMesher::writeNodesLine(const glm::dvec3& pos, MeshCsys& spos, int nnodes, double length, direction dir)
+void LineMesher::writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, direction dir)
 {
 	double ds = length / (double)(nnodes - 1);
-	writeNodesLineQ(pos, spos, nnodes, ds, dir);
+	writeNodesLineQ(pos, csys, nnodes, ds, dir);
 }
 
-void LineMesher::writeNodesLine(const glm::dvec3& pos, MeshCsys& spos, int nnodes, const glm::dvec3& sposEnd)
+void LineMesher::writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, const glm::dvec3& sposEnd)
 {
-	glm::dvec3 ds = (sposEnd - spos.pos) / (double)(nnodes - 1);
-	writeNodesLineQ(pos, spos, nnodes, ds);
+	glm::dvec3 ds = (sposEnd - pos) / (double)(nnodes - 1);
+	writeNodesLineQ(pos, csys, nnodes, ds);
 }
 
 void LineMesher::writeNodesLineQ(
@@ -38,28 +38,26 @@ void LineMesher::writeNodesLineQ(
 	double			  ds,	
 	direction		  dir)
 {
-	nodeID1 = writer->getNextNodeID();
-
-	glm::dvec3 coords(pos);
+MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {
-		writer->writeNode(coords, glm::dvec3(0.), nullptr, &spos);
-		coords[(size_t)dir] += ds;
+		writer->writeNode(curPos, glm::dvec3(0.), nullptr, &spos);
+		curPos[(size_t)dir] += ds;
 	}
+MESHER_NODE_WRITE_END
 }
 
 void LineMesher::writeNodesLineQ(
 	const glm::dvec3&	pos,
-	MeshCsys&			spos,
+	MeshCsys&			csys,
 	int					nnodes,
 	const glm::dvec3&	ds)			/*any direction*/
 {
-	nodeID1 = writer->getNextNodeID();
-
-	glm::dvec3 coords(0.0);
+MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {
-		writer->writeNode(coords, glm::dvec3(0.), nullptr, &spos);
-		coords += ds;
+		writer->writeNode(curPos, glm::dvec3(0.), nullptr, &csys);
+		curPos += ds;
 	}
+MESHER_NODE_WRITE_END
 }
 
 void LineMesher::writeNodesLineQ_nth(
@@ -70,15 +68,14 @@ void LineMesher::writeNodesLineQ_nth(
 	int					skipNth,
 	direction			dir)
 {
-	nodeID1 = writer->getNextNodeID();
-
-	glm::dvec3 coords(0.0);
+MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {		
 		if (i%skipNth) {
-			writer->writeNode(coords, glm::dvec3(0.), nullptr, &spos);
+			writer->writeNode(curPos, glm::dvec3(0.), nullptr, &spos);
 		}
-		coords[(size_t)dir] += ds;
+		curPos[(size_t)dir] += ds;
 	}
+MESHER_NODE_WRITE_END
 }
 
 void LineMesher::writeNodesLineQ_nth(
@@ -88,15 +85,14 @@ void LineMesher::writeNodesLineQ_nth(
 	const glm::dvec3&	ds,	
 	int					skipNth)
 {
-	nodeID1 = writer->getNextNodeID();
-
-	glm::dvec3 coords(0.0);
+MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {
 		if (i%skipNth) {
-			writer->writeNode(coords, glm::dvec3(0.), nullptr, &spos);
+			writer->writeNode(curPos, glm::dvec3(0.), nullptr, &spos);
 		}
-		coords += ds;
+		curPos += ds;
 	}
+MESHER_NODE_WRITE_END
 }
 
 

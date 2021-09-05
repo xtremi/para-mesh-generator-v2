@@ -160,6 +160,14 @@ int main(int argc, char* argv[]) {
 				   Mesher::setFEAwriter(&writer); \
 				   MeshCsys pos(glm::dvec3(0.0));
 
+#define TEST_START2 std::ofstream file; \
+				   file.open(fileName); \
+				   if (!file.is_open()) return 1; \
+				   NastranFEAwriter writer(&file); \
+				   Mesher::setFEAwriter(&writer); \
+				   MeshCsys glCsys(glm::dvec3(0.0)); \
+				   glm::dvec3 pos(NULL_POS);
+
 #define TEST_END writer.close(); \
 				 return 0;
 /*************************************************************************/
@@ -502,46 +510,46 @@ int meshCsys3(const std::string& fileName) {
 }
 
 int lineMesher(const std::string& fileName) {
-	TEST_START
+	TEST_START2
 
 	int		nnodes = 20;
 	double  length = 10.0;
 
-	LineMesher::writeNodesLine(NULL_POS, pos, nnodes, length, direction::x);
+	LineMesher::writeNodesLine(pos, glCsys, nnodes, length, direction::x);
 	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLine(NULL_POS, pos, nnodes, length, direction::y);
+	LineMesher::writeNodesLine(pos, glCsys, nnodes, length, direction::y);
 	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLine(NULL_POS, pos, nnodes, length, direction::z);
+	LineMesher::writeNodesLine(pos, glCsys, nnodes, length, direction::z);
 	LineMesher::writeElementsLine(nnodes);
 
-	pos.pos.x += 1.2*length;
-	LineMesher::writeNodesLineX(NULL_POS, pos, nnodes, length);
+	pos.x += 1.2*length;
+	LineMesher::writeNodesLineX(pos, glCsys, nnodes, length);
 	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLineY(NULL_POS, pos, nnodes, length);
+	LineMesher::writeNodesLineY(pos, glCsys, nnodes, length);
 	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLineZ(NULL_POS, pos, nnodes, length);
+	LineMesher::writeNodesLineZ(pos, glCsys, nnodes, length);
 	LineMesher::writeElementsLine(nnodes);
 	
 	nnodes = 10;	
 	glm::dvec3 dsvec = glm::dvec3(1.0, 0.35, 0.15);
 
-	pos.pos.y += 1.2*length;
-	LineMesher::writeNodesLineQ(NULL_POS, pos, nnodes, dsvec);
+	pos.y += 1.2*length;
+	LineMesher::writeNodesLineQ(pos, glCsys, nnodes, dsvec);
 	LineMesher::writeElementsLine(nnodes);
-
+	
 	double ds = 0.746;
 
-	pos.pos.x = 0.0;
-	pos.pos.y += 1.2*length;
-	LineMesher::writeNodesLineXq(NULL_POS, pos, nnodes, ds);
+	pos.x = 0.0;
+	pos.y += 1.2*length;
+	LineMesher::writeNodesLineXq(pos, glCsys, nnodes, ds);
 	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLineYq(NULL_POS, pos, nnodes, ds);
+	LineMesher::writeNodesLineYq(pos, glCsys, nnodes, ds);
 	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLineZq(NULL_POS, pos, nnodes, ds);
+	LineMesher::writeNodesLineZq(pos, glCsys, nnodes, ds);
 	LineMesher::writeElementsLine(nnodes);
 
 	
-	pos.pos.y += 1.2*length;
+	pos.y += 1.2*length;
 	double rad1 = 10.0, rad2 = 15.0;
 	double ang = 0.0;
 	int nLines = 8;
@@ -549,10 +557,10 @@ int lineMesher(const std::string& fileName) {
 	glm::dvec3 posStart, posEnd;
 	
 	for (int i = 0; i < 8; i++) {
-		posStart = coordsOnCircle(ang, rad1, direction::z) + pos.pos;
-		posEnd = coordsOnCircle(ang, rad2, direction::z) + pos.pos + glm::dvec3(0, 0, 1.0);
-		MeshCsys csys(posStart);
-		LineMesher::writeNodesLine(NULL_POS, csys, nnodes, posEnd);
+		posStart = coordsOnCircle(ang, rad1, direction::z) + pos;
+		posEnd = coordsOnCircle(ang, rad2, direction::z) + pos + glm::dvec3(0, 0, 1.0);
+		
+		LineMesher::writeNodesLine(posStart, glCsys, nnodes, posEnd);
 		LineMesher::writeElementsLine(nnodes);
 		ang += dang;
 	}
@@ -563,117 +571,117 @@ int lineMesher(const std::string& fileName) {
 
 
 int arcMesher(const std::string& fileName) {
-	TEST_START
+	TEST_START2
 
 	int nnodes = 11;
 	double radius = 5.0;
 
-	ArcMesher::writeNodesCircular(NULL_POS, pos, nnodes, radius, ArcAngles(0.0, GLMPI), direction::x);
+	ArcMesher::writeNodesCircular(pos, glCsys, nnodes, radius, ArcAngles(0.0, GLMPI), direction::x);
 	ArcMesher::writeElementsLine(nnodes);
-	ArcMesher::writeNodesCircular(NULL_POS, pos, nnodes, radius, ArcAngles(GLMPI, 0.0), direction::y);
+	ArcMesher::writeNodesCircular(pos, glCsys, nnodes, radius, ArcAngles(GLMPI, 0.0), direction::y);
 	ArcMesher::writeElementsLine(nnodes);
-	ArcMesher::writeNodesCircular(NULL_POS, pos, nnodes, radius, ArcAngles(), direction::z);
+	ArcMesher::writeNodesCircular(pos, glCsys, nnodes, radius, ArcAngles(), direction::z);
+	ArcMesher::writeElementsLine(nnodes, true);
+
+	pos.x += radius*2.5;
+	ArcMesher::writeNodesCircularX(pos, glCsys, nnodes, radius, ArcAngles(0.0, 3.0*GLM2PI/4.0));
+	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeNodesCircularY(pos, glCsys, nnodes, radius, ArcAngles(0.0, GLM2PI/3.0));
+	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeNodesCircularZ(pos, glCsys, nnodes, radius, ArcAngles(0.0, GLM2PI*0.95));
 	ArcMesher::writeElementsLine(nnodes);
 
-	pos.pos.x += radius*2.5;
-	ArcMesher::writeNodesCircularX(NULL_POS, pos, nnodes, radius, ArcAngles(0.0, 3.0*GLM2PI/4.0));
-	ArcMesher::writeElementsLine(nnodes);
-	ArcMesher::writeNodesCircularY(NULL_POS, pos, nnodes, radius, ArcAngles(0.0, GLM2PI/3.0));
-	ArcMesher::writeElementsLine(nnodes);
-	ArcMesher::writeNodesCircularZ(NULL_POS, pos, nnodes, radius, ArcAngles(0.0, GLM2PI*0.95));
-	ArcMesher::writeElementsLine(nnodes);
-
-	pos.pos.x += radius * 2.5;
+	pos.x += radius * 2.5;
 	double dang = 0.7*GLM2PI / nnodes;
-	ArcMesher::writeNodesCircularQ(NULL_POS, pos, nnodes, radius, 0.0, dang, direction::x);
+	ArcMesher::writeNodesCircularQ(pos, glCsys, nnodes, radius, 0.0, dang, direction::x);
 	ArcMesher::writeElementsLine(nnodes);
-	ArcMesher::writeNodesCircularQ(NULL_POS, pos, nnodes, radius, 0.0, -dang, direction::y);
+	ArcMesher::writeNodesCircularQ(pos, glCsys, nnodes, radius, 0.0, -dang, direction::y);
 	ArcMesher::writeElementsLine(nnodes);
-	ArcMesher::writeNodesCircularQ(NULL_POS, pos, nnodes, radius, GLMPI, 0.6*dang, direction::z);
-	ArcMesher::writeElementsLine(nnodes);
-
-	pos.pos.x = 0.0;
-	pos.pos.y += radius * 2.5;
-	ArcMesher::writeNodesCircularXq(NULL_POS, pos, nnodes, radius, GLMPI/2.0, dang);
-	ArcMesher::writeElementsLine(nnodes);
-	ArcMesher::writeNodesCircularYq(NULL_POS, pos, nnodes, radius, GLMPI, dang);
-	ArcMesher::writeElementsLine(nnodes);
-	ArcMesher::writeNodesCircularZq(NULL_POS, pos, nnodes, radius, GLMPI, -dang);
+	ArcMesher::writeNodesCircularQ(pos, glCsys, nnodes, radius, GLMPI, 0.6*dang, direction::z);
 	ArcMesher::writeElementsLine(nnodes);
 
+	pos.x = 0.0;
+	pos.y += radius * 2.5;
+	ArcMesher::writeNodesCircularXq(pos, glCsys, nnodes, radius, GLMPI/2.0, dang);
+	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeNodesCircularYq(pos, glCsys, nnodes, radius, GLMPI, dang);
+	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeNodesCircularZq(pos, glCsys, nnodes, radius, GLMPI, -dang);
+	ArcMesher::writeElementsLine(nnodes);
 
-	pos.pos.x += radius * 2.5;
-	ArcMesher::writeNodesCircular_nth(NULL_POS, pos, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 5, direction::x);
+
+	pos.x += radius * 2.5;
+	ArcMesher::writeNodesCircular_nth(pos, glCsys, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 5, direction::x);
 	ArcMesher::writeElementsLine(nnodes - 2-1);
 
-	pos.pos.x += radius * 2.5;
-	ArcMesher::writeNodesCircular_nth(NULL_POS, pos, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 3, direction::x);
+	pos.x += radius * 2.5;
+	ArcMesher::writeNodesCircular_nth(pos, glCsys, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 3, direction::x);
 	ArcMesher::writeElementsLine(nnodes - 3-1);
 
-	pos.pos.x += radius * 2.5;
-	ArcMesher::writeNodesCircular_nth(NULL_POS, pos, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 7, direction::x);
+	pos.x += radius * 2.5;
+	ArcMesher::writeNodesCircular_nth(pos, glCsys, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 7, direction::x);
 	ArcMesher::writeElementsLine(nnodes - 1-1);
 	
 	TEST_END
 }
 
 int recEdgeMesher(const std::string& fileName) {
-	TEST_START
+	TEST_START2
 
 	int nnodes = 14;
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(5.0, 5.0), plane::xy);
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(5.0, 5.0), plane::xy);
+	RecEdgeMesher::writeElements(nnodes);
+	
+	pos.z += 2.0;
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(5.0, 10.0), plane::xy);
 	RecEdgeMesher::writeElements(nnodes);
 
-	pos.pos.z += 2.0;
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(5.0, 10.0), plane::xy);
+	pos.z += 2.0;
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
 	RecEdgeMesher::writeElements(nnodes);
 
-	pos.pos.z += 2.0;
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
-	RecEdgeMesher::writeElements(nnodes);
-
-	pos.pos.z += 2.0;
+	pos.z += 2.0;
 	nnodes = 18;
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
 	RecEdgeMesher::writeElements(nnodes);
 	
-	pos.pos.z += 2.0;
+	pos.z += 2.0;
 	nnodes = 20;
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
 	RecEdgeMesher::writeElements(nnodes);
 
-	pos.pos.z += 2.0;
+	pos.z += 2.0;
 	nnodes = 22;
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
 	RecEdgeMesher::writeElements(nnodes);
 
-	pos.pos.z += 2.0;
+	pos.z += 2.0;
 	nnodes = 4;
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(2.0, 12.0), plane::xy);
 	RecEdgeMesher::writeElements(nnodes);
 
-	pos.pos.x = 20.0;
-	pos.pos.z = 0.0;
+	pos.x = 20.0;
+	pos.z = 0.0;
 	nnodes = 48;
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(10.0, 7.0), plane::xy);
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(10.0, 7.0), plane::xy);
 	RecEdgeMesher::writeElements(nnodes);
 
-	pos.pos.z = 0.1;
-	pos.pos.y -= 3.5;	
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(10.0, 7.0), plane::xz);
+	pos.z = 0.1;
+	pos.y -= 3.5;	
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(10.0, 7.0), plane::xz);
 	RecEdgeMesher::writeElements(nnodes);
 
-	pos.pos.y += 7.0;
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(10.0, 7.0), plane::xz);
+	pos.y += 7.0;
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(10.0, 7.0), plane::xz);
 	RecEdgeMesher::writeElements(nnodes);
 
-	RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(7.0, 20.0), plane::yz);
+	RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(7.0, 20.0), plane::yz);
 	RecEdgeMesher::writeElements(nnodes);
 	
 	
 	
-	pos.pos = glm::dvec3(0.0);
-	pos.pos.y += 40.0;
+	pos = glm::dvec3(0.0);
+	pos.y += 40.0;
 	double elSize = 0.0;
 	double recWidthStart = 10.0;
 	double recWidth		 = recWidthStart;
@@ -687,13 +695,13 @@ int recEdgeMesher(const std::string& fileName) {
 		int nRefs = 3;
 		for (int refs = 0; refs < nRefs; refs++) {
 			//L1
-			RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
+			RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
 			RecEdgeMesher::writeElements(nnodes);
 			nnodes += 8;				//corner nodes
 			recWidth += 1.8*elSize;		//increase rec size
 
 			//L2
-			RecEdgeMesher::writeNodes_nth(NULL_POS, pos, nnodes, glm::dvec2(recWidth, recWidth), 4, plane::xy);
+			RecEdgeMesher::writeNodes_nth(pos, glCsys, nnodes, glm::dvec2(recWidth, recWidth), 4, plane::xy);
 			RecEdgeMesher::writeElements(3 * nnodes / 4);
 			nnodes += 8;								//corner nodes
 			recWidth += 1.8*elSize;						//increase rec size
@@ -701,7 +709,7 @@ int recEdgeMesher(const std::string& fileName) {
 			elSize = recWidth / (double)(nnodes / 4);	//larger elements
 
 			//L3
-			RecEdgeMesher::writeNodes(NULL_POS, pos, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
+			RecEdgeMesher::writeNodes(pos, glCsys, nnodes, glm::dvec2(recWidth, recWidth), plane::xy);
 			RecEdgeMesher::writeElements(nnodes);
 			nnodes += 8;								//corner nodes
 			recWidth += 1.8*elSize;						//increase rec size
@@ -709,7 +717,7 @@ int recEdgeMesher(const std::string& fileName) {
 
 		}
 		recWidth = recWidthStart;
-		pos.pos.x += 40.0;
+		pos.x += 40.0;
 	}
 
 	nnodes = 58;
@@ -722,23 +730,23 @@ int recEdgeMesher(const std::string& fileName) {
 }
 
 int ellipseMesher(const std::string& fileName) {
-	TEST_START
-	EllipseMesher::writeNodes(NULL_POS, pos, 24, EllipseRadius(10.0, 5.0), ArcAngles(), direction::z);
+	TEST_START2
+	EllipseMesher::writeNodes(pos, glCsys, 24, EllipseRadius(10.0, 5.0), ArcAngles(), direction::z);
 	EllipseMesher::writeElements(24, true);
-	EllipseMesher::writeNodes(NULL_POS, pos, 24, EllipseRadius(10.0, 5.0), ArcAngles(), direction::x);
+	EllipseMesher::writeNodes(pos, glCsys, 24, EllipseRadius(10.0, 5.0), ArcAngles(), direction::x);
 	EllipseMesher::writeElements(24, true);
-	EllipseMesher::writeNodes(NULL_POS, pos, 24, EllipseRadius(10.0, 5.0), ArcAngles(), direction::y);
+	EllipseMesher::writeNodes(pos, glCsys, 24, EllipseRadius(10.0, 5.0), ArcAngles(), direction::y);
 	EllipseMesher::writeElements(24, true);
 
-	pos.pos.x = 50.0;
+	pos.x = 50.0;
 	int nEllipse = 10;
 	for(int i = 0; i < nEllipse; i++){
-		EllipseMesher::writeNodes(NULL_POS, pos, 98, EllipseRadius(1.0 + 15.0*(double)i/(double)nEllipse, 5.0), ArcAngles(), direction::y);
+		EllipseMesher::writeNodes(pos, glCsys, 98, EllipseRadius(1.0 + 15.0*(double)i/(double)nEllipse, 5.0), ArcAngles(), direction::y);
 		EllipseMesher::writeElements(98, true);
-		pos.pos.y += 1.0;
+		pos.y += 1.0;
 	}
 
-	pos.pos.x = 100.0;
+	pos.x = 100.0;
 	std::vector<glm::dvec2> localCoords(1500);
 	EllipseMesher::getLocalCoords(localCoords, 1500, EllipseRadius(100.0, 50.0), ArcAngles());
 	LineMesher::writeNodes(localCoords, 4.0);
@@ -748,45 +756,42 @@ int ellipseMesher(const std::string& fileName) {
 }
 
 int planeMesher(const std::string& fileName) {
-	TEST_START
-
+	TEST_START2
 
 	MeshDensity2D meshDens(10, 12);
 	glm::dvec2 size(20.0, 17.0);
 	
-	PlaneMesher::writeNodes(NULL_POS, pos, meshDens, size, plane::xy);
+	PlaneMesher::writeNodes(pos, glCsys, meshDens, size, plane::xy);
 	PlaneMesher::writeElements(meshDens);
-	PlaneMesher::writeNodes(NULL_POS, pos, meshDens, size, plane::xz);
+	PlaneMesher::writeNodes(pos, glCsys, meshDens, size, plane::xz);
 	PlaneMesher::writeElements(meshDens);
-	PlaneMesher::writeNodes(NULL_POS, pos, meshDens, size, plane::yz);
-	PlaneMesher::writeElements(meshDens);
-	
-	pos.pos.x += 1.2*size.x;
-	PlaneMesher::writeNodesXY(NULL_POS, pos, meshDens, size);
-	PlaneMesher::writeElements(meshDens);
-	PlaneMesher::writeNodesXZ(NULL_POS, pos, meshDens, size);
-	PlaneMesher::writeElements(meshDens);
-	PlaneMesher::writeNodesYZ(NULL_POS, pos, meshDens, size);
+	PlaneMesher::writeNodes(pos, glCsys, meshDens, size, plane::yz);
 	PlaneMesher::writeElements(meshDens);
 	
-	glm::dmat3x3 csys = makeCsysMatrix(glm::dvec3(1.0, 0.4, 0.0), glm::dvec3(-0.3, 1.0, 0.0));
-	pos.csys = &csys;
+	pos.x += 1.2*size.x;
+	PlaneMesher::writeNodesXY(pos, glCsys, meshDens, size);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodesXZ(pos, glCsys, meshDens, size);
+	PlaneMesher::writeElements(meshDens);
+	PlaneMesher::writeNodesYZ(pos, glCsys, meshDens, size);
+	PlaneMesher::writeElements(meshDens);
+	
 
-	pos.pos.x += 1.2*size.x;
+	pos.x += 1.2*size.x;
 	glm::dvec2 elsize(size.x / (double)meshDens.nElDir1(), size.y / (double)meshDens.nElDir2());
-	PlaneMesher::writeNodesQ(NULL_POS, pos, meshDens, elsize, plane::xy);
+	PlaneMesher::writeNodesQ(pos, glCsys, meshDens, elsize, plane::xy);
 	PlaneMesher::writeElements(meshDens);
-	PlaneMesher::writeNodesQ(NULL_POS, pos, meshDens, elsize, plane::xz);
+	PlaneMesher::writeNodesQ(pos, glCsys, meshDens, elsize, plane::xz);
 	PlaneMesher::writeElements(meshDens);
-	PlaneMesher::writeNodesQ(NULL_POS, pos, meshDens, elsize, plane::yz);
+	PlaneMesher::writeNodesQ(pos, glCsys, meshDens, elsize, plane::yz);
 	PlaneMesher::writeElements(meshDens);
 	
-	pos.pos.x += 1.2*size.x;
-	PlaneMesher::writeNodesXYq(NULL_POS, pos, meshDens, elsize);
+	pos.x += 1.2*size.x;
+	PlaneMesher::writeNodesXYq(pos, glCsys, meshDens, elsize);
 	PlaneMesher::writeElements(meshDens);
-	PlaneMesher::writeNodesXZq(NULL_POS, pos, meshDens, elsize);
+	PlaneMesher::writeNodesXZq(pos, glCsys, meshDens, elsize);
 	PlaneMesher::writeElements(meshDens);
-	PlaneMesher::writeNodesYZq(NULL_POS, pos, meshDens, elsize);
+	PlaneMesher::writeNodesYZq(pos, glCsys, meshDens, elsize);
 	PlaneMesher::writeElements(meshDens);
 	TEST_END
 }
