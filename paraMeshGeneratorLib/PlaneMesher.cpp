@@ -250,8 +250,8 @@ void PlaneMesherRef::writeNodes(
 	int firstNode = writer->getNextNodeID();
 
 	RefShapeData rsData;
-	rsData.meshDens = &meshDens;
 	rsData.csys = &csys;
+	rsData.meshDens = &meshDens;
 	getPlaneDirections(pln, rsData.refDir, rsData.edgeDir);
 	
 	RefLayerData rlData;
