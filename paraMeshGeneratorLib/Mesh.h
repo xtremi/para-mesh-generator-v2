@@ -184,9 +184,9 @@ nNodes    = 3
 
 		/*					EdgeID			  firstNodeID						nNodes      nodeIncr    */
 		edges[0] = MeshEdge(0, NodeIterator1D(0,								nnodeEdge1, nnodesExtr));
-		edges[1] = MeshEdge(1, NodeIterator1D(0,								nnodeEdge1, 1));
+		edges[1] = MeshEdge(1, NodeIterator1D(0,								nnodesExtr, 1));
 		edges[2] = MeshEdge(2, NodeIterator1D(nnodesExtr - 1,					nnodeEdge1, nnodesExtr));
-		edges[3] = MeshEdge(3, NodeIterator1D(((nnodesExtr - 1) * nnodeEdge1),	nnodeEdge1, 1));
+		edges[3] = MeshEdge(3, NodeIterator1D(((nnodeEdge1 - 1) * nnodesExtr),	nnodesExtr, 1));
 		addToFirstNodeID(firstNodeID);
 
 	//extrusionsXdir[0].edges[0] = MeshEdge(0, NodeIterator1D(0, nNodesY, _nNodesXY.x));
@@ -235,13 +235,6 @@ public:
 	int numberOfNodes() { return nNodes; }
 	int numberOfElements() { return nElements; }
 
-	//void setFirstNodeID(int id) { 
-	//	nodeID1 = id; 
-	//}
-	//int firstNodeID() { return nodeID1; };
-	//void setFirstElementID(int id) { elementID1 = id; }
-	//int firstElementID() { return elementID1; };
-
 	void setPosition(const glm::dvec3& _pos) { csys.pos = _pos; }
 	void setRotationMatrix(glm::dmat3x3* _rotMat) { csys.csys = _rotMat; }
 	void setCsys(MeshCsys& _csys) { csys = _csys; }
@@ -252,9 +245,6 @@ protected:
 
 	Dim elementDim;
 	MeshCsys csys;
-
-	//int nodeID1 = 1;
-	//int elementID1 = 1;
 
 	int nNodes;
 	int nElements;

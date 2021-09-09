@@ -126,5 +126,5 @@ void LineMesher::writeNodes(const std::vector<glm::dvec2>& xycoords, double zcoo
 }
 
 NodeIterator1D LineMesher::nodeIterator(int nnodes) {
-	return NodeIterator1D();
+	return NodeIterator1D(Mesher::nodeID1, nnodes);
 }

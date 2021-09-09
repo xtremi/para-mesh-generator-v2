@@ -1802,16 +1802,16 @@ int refinementCone3dHeight(const std::string& fileName)
 */
 int extruded2Drecs(const std::string& fileName)
 {
-	TEST_START
-	glm::dmat3x3 rotM1 = makeCsysMatrix(glm::dvec3(1.0, 0.0, 0.0), glm::dvec3(0.0, 1.0, 0.0));
-	glm::dmat3x3 rotM2 = makeCsysMatrix(glm::dvec3(0.0, 1.0, 0.0), glm::dvec3(1.0, 0.0, 0.0));
-	glm::dmat3x3 rotM3 = makeCsysMatrix(glm::dvec3(0.0, 0.0, 1.0), glm::dvec3(1.0, 0.0, 0.0));
+	TEST_START2
+	glm::dmat3x3 rotM1 = makeCsysMatrix(X_DIR, Y_DIR);
+	glm::dmat3x3 rotM2 = makeCsysMatrix(Y_DIR, X_DIR);
+	glm::dmat3x3 rotM3 = makeCsysMatrix(Z_DIR, X_DIR);
 	glm::dmat3x3 rotM4 = makeCsysMatrix(glm::dvec3(0.8, 1.0, 0.0), glm::dvec3(1.0, 1.0, 0.5));
 
-	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), nullptr);
+	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), &rotM1);
 	MeshCsys csys2(glm::dvec3(0.0, 0.0, 2.0), &rotM2);
-	MeshCsys csys3(glm::dvec3(0.0, 0.0, 5.0), &rotM2);
-	MeshCsys csys4(glm::dvec3(0.0, 0.0, 8.0), &rotM2);
+	MeshCsys csys3(glm::dvec3(0.0, 0.0, 5.0), &rotM3);
+	MeshCsys csys4(glm::dvec3(0.0, 0.0, 8.0), &rotM4);
 
 	std::vector<MeshCsys> csyss({ csys1, csys2, csys3, csys4 });
 
@@ -1824,25 +1824,20 @@ int extruded2Drecs(const std::string& fileName)
 	mesh2D.extrudeYedge(1.0, 3);									//15.0 - 16.0
 	mesh2D.extrudeYedge(10.0, 2);									//16.0 - 26.0
 
-	for(int i = 0; i < 4; i++){
-		MeshEdge edge = mesh2D.getEdge(0, i);
-		std::cout << std::endl;
-		for (int nid = edge.nodeIter.first(); nid; nid = edge.nodeIter.next()) {
-			std::cout << nid << " ";
-		}
-	}
 
-	int firstNodeID = 1, firstElementID = 1;
-	for (int i = 0; i < 4; i++) {
-
+	for (int i = 0; i < 2; i++) {
 		mesh2D.setCsys(csyss[i]);
-		//mesh2D.setFirstElementID(firstElementID);
-		//mesh2D.setFirstNodeID(firstNodeID);
 		mesh2D.writeNodes();
 		mesh2D.writeElements();
 
-		//firstNodeID += mesh2D.numberOfNodes();
-		//firstElementID += mesh2D.numberOfElements();
+		for (int j = 0; j < 4; j++) {
+			MeshEdge edge = mesh2D.getEdge(1, j);
+			std::cout << std::endl;
+			for (int nid = edge.nodeIter.first(); nid; nid = edge.nodeIter.next()) {
+				std::cout << nid << " ";
+			}
+		}
+		std::cout << std::endl;
 	}
 
 	TEST_END

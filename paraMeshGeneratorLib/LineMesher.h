@@ -4,6 +4,7 @@
 
 
 class LineMesher : private Mesher {
+
 public:
 
 	static void writeNodesLineQ(

@@ -49,12 +49,7 @@ glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
 	yAxis = glm::cross(zAxis, xAxis);
 	yAxis = glm::normalize(yAxis);
 
-	//glm::dmat3x3 rotMat(xAxis, yAxis, zAxis);	
-	glm::dmat3x3 rotMat(
-		xAxis[0], yAxis[0], zAxis[0],
-		xAxis[1], yAxis[1], zAxis[1],
-		xAxis[2], yAxis[2], zAxis[2]);
-
+	glm::dmat3x3 rotMat(xAxis, yAxis, zAxis);	
 	return rotMat;
 
 }

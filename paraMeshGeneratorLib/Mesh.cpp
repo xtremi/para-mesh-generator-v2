@@ -48,7 +48,7 @@ void MeshRec2D::extrudeYedge(double length, int nElements) {
 void MeshRec2D::writeNodes() {
 	bool firstExtrusion = true;
 	
-	glm::dvec3	currentPos = csys.pos;
+	
 	double		spacingY = lengthY / (double)(nNodesY - 1);
 	
 	//Updates the node iterators for this mesh writing:
@@ -56,6 +56,7 @@ void MeshRec2D::writeNodes() {
 		extrusionsXdir[i].setNodeOffset(Mesher::getWriter()->getNextNodeID());
 	}
 
+	glm::dvec3	currentPos(0.0);
 	for (MeshExtrusion& extr : extrusionsXdir) {
 
 		glm::dvec2	dxy(extr.spacing(), spacingY);
@@ -66,10 +67,10 @@ void MeshRec2D::writeNodes() {
 			startSpace = extr.spacing();
 
 		if(extr.extrusionType == ExtrusionType::line){
-			glm::dvec3 cpos = currentPos + csys.dirX()*startSpace;
-			MeshCsys csys(cpos, csys.csys);
-			PlaneMesher::writeNodesXYq(glm::dvec3(0.), csys, MeshDensity2D(nNodesEdgeX, nNodesY), dxy);
-			currentPos += csys.dirX() * extr.length;
+			currentPos.x += startSpace;
+			
+			PlaneMesher::writeNodesXYq(currentPos, csys, MeshDensity2D(nNodesEdgeX, nNodesY), dxy);
+			currentPos.x += extr.length;
 		}
 		else if (extr.extrusionType == ExtrusionType::arc){
 			glm::dvec3 cpos = currentPos - glm::dvec3(0.0, 0.0, extr.radius);
@@ -118,7 +119,6 @@ void MeshRec2D::writeElements() {
 	
 	for (int i = 0; i < extrusionsXdir.size(); i++) {
 		extr = &extrusionsXdir[i];
-		//extr->setNodeOffset(nodeID1);
 		
 		if (!extr->isStart){
 			RowMesher2D::writeElements(&prevExtr->edges[2].nodeIter, &extr->edges[0].nodeIter);
