@@ -98,7 +98,7 @@ void ConeMesher::writeNodes_nthLine(
 		endPos = coordsOnCircle(currentAng, radius.end(), rotaxis) + pos;
 
 		if (i % skipNth) {
-			LineMesher::writeNodesLine(pos, csys, meshDens.dir2(), endPos);
+			LineMesher::writeNodesLine(curPos.pos, csys, meshDens.dir2(), endPos);
 		}
 		currentAng += dang;
 	}

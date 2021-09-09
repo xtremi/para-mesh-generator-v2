@@ -2,6 +2,7 @@
 #include "Mesher.h"
 #include "FeaWrite.h"
 
+
 class LineMesher : private Mesher {
 public:
 
@@ -46,6 +47,6 @@ public:
 
 	static void writeNodes(const std::vector<glm::dvec2>& xycoords, double zcoord);
 
-
+	static NodeIterator1D nodeIterator(int nnodes);
 
 };

@@ -84,6 +84,9 @@
     <ClInclude Include="RecTubeMesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
+    <ClInclude Include="NodeIterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -145,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="RecTubeMesher.cpp">
       <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeIterator.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
