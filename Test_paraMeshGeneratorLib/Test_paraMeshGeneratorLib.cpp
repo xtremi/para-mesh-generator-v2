@@ -36,6 +36,9 @@ int speedTestWriteCubes(const std::string& fileName);
 int speedTestWriteRotatedCubes(const std::string& fileName);
 int speedTestWriteNodesAndElements(const std::string& fileName);
 
+int nodeIterator1D(const std::string& fileName);
+int meshEdgeExtrusion(const std::string& fileName);
+
 int lineMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
 int recEdgeMesher(const std::string& fileName);
@@ -88,6 +91,10 @@ std::vector<TestDef> testFunctions({
 	TestDef(14, "speedTestWriteCubes",				"speed test", (testFunction)speedTestWriteCubes),
 	TestDef(15, "speedTestWriteRotatedCubes",		"speed test", (testFunction)speedTestWriteRotatedCubes),
 	TestDef(16, "speedTestWriteNodesAndElements",	"speed test", (testFunction)speedTestWriteNodesAndElements),
+	
+	TestDef(30, "nodeIterator",			"utilities", (testFunction)nodeIterator1D),
+	TestDef(40, "meshEdgeExtrusion",	"utilities", (testFunction)meshEdgeExtrusion),
+	
 
 	TestDef(101, "lineMesher",			"basic meshers 1D", (testFunction)lineMesher),	
 	TestDef(102, "arcMesher",			"basic meshers 1D", (testFunction)arcMesher),
@@ -1797,6 +1804,141 @@ int refinementCone3dHeight(const std::string& fileName)
 	TEST_END
 }
 
+template<typename T>
+bool equalVectors(const std::vector<T>& vec1, const std::vector<T>& vec2) {
+	if (vec1.size() != vec2.size()) return false;
+	for (int i = 0; i < vec1.size(); i++) {
+		if (vec1[i] != vec2[i]) return false;
+	}
+	return true;
+}
+
+std::vector<int> getNodeIteratorResult(NodeIterator1D& nit) {
+	std::vector<int> res;
+	for (int nid = nit.first(); nid; nid = nit.next()) {
+		res.push_back(nid);
+	}
+	return res;
+}
+
+int nodeIterator1D(const std::string& fileName) {
+
+	std::vector<int> result;
+	std::vector<int> expectedResult;
+	
+	NodeIterator1D it1(1, 4, 1);
+	result = getNodeIteratorResult(it1);
+	expectedResult = {1,2,3,4};
+	if (!equalVectors(result, expectedResult)) return 1;
+
+	NodeIterator1D it2(1, 4, 1, 9);
+	result = getNodeIteratorResult(it2);
+	expectedResult = { 9, 1, 2, 3, 4 };
+	if (!equalVectors(result, expectedResult)) return 1;
+
+	NodeIterator1D it3(2, 4, 2);
+	result = getNodeIteratorResult(it3);
+	expectedResult = { 2, 4, 6, 8 };
+	if (!equalVectors(result, expectedResult)) return 1;
+
+	NodeIterator1D it4(99, 3, 100, 1000);
+	result = getNodeIteratorResult(it4);
+	expectedResult = { 1000, 99, 199, 299 };
+	if (!equalVectors(result, expectedResult)) return 1;
+	
+	return 0;
+}
+
+int meshEdgeExtrusion(const std::string& fileName) {
+
+	double length = 10.0;
+
+	/*
+	   1-->                                                2
+	1---2---3---4--------13--------14--19--20--21          |
+ 	|   |   |   |        |          |   |   |   |          V
+0	5---6---7---8--------15--------16--22--23--24
+|	|   |   |   |        |          |   |   |   |
+v	9--10--11--12--------17--------18--25--26--27  
+       3-->
+
+
+
+	*/
+	std::vector<std::vector<int>> expectedEdges;
+	std::vector<std::vector<int>> resultEdges;
+
+	//First extrusion:
+	MeshEdgeExtrusion edgeExtr1(length, 3, 3, 1);
+	expectedEdges = std::vector<std::vector<int>>({
+		{1,5,9},
+		{1,2,3,4},
+		{4,8,12},
+		{9,10,11,12},
+		{1,5,9}
+		});
+
+	resultEdges = std::vector<std::vector<int>>({
+		getNodeIteratorResult(edgeExtr1.edges[0].nodeIter),
+		getNodeIteratorResult(edgeExtr1.edges[1].nodeIter),
+		getNodeIteratorResult(edgeExtr1.edges[2].nodeIter),
+		getNodeIteratorResult(edgeExtr1.edges[3].nodeIter),
+		getNodeIteratorResult(edgeExtr1.edges[4].nodeIter)
+		});
+
+	for (int i = 0; i < 5; i++) {
+		if (!equalVectors(expectedEdges[i], resultEdges[i])) return 1;
+	}
+
+	//Second extrusion:
+	MeshEdgeExtrusion edgeExtr2(length, 2, 3, 13, &edgeExtr1);
+	expectedEdges = std::vector<std::vector<int>>({
+		{4, 8, 12},
+		{4, 13, 14},
+		{14,16,18},
+		{12, 17, 18},
+		{13, 15, 17}
+		});
+
+	resultEdges = std::vector<std::vector<int>>({
+		getNodeIteratorResult(edgeExtr2.edges[0].nodeIter),
+		getNodeIteratorResult(edgeExtr2.edges[1].nodeIter),
+		getNodeIteratorResult(edgeExtr2.edges[2].nodeIter),
+		getNodeIteratorResult(edgeExtr2.edges[3].nodeIter),
+		getNodeIteratorResult(edgeExtr2.edges[4].nodeIter)
+		});
+
+	for (int i = 0; i < 5; i++) {
+		if (!equalVectors(expectedEdges[i], resultEdges[i])) return 1;
+	}
+
+	//Third extrusion:
+	MeshEdgeExtrusion edgeExtr3(length, 3, 3, 19, &edgeExtr2);
+	expectedEdges = std::vector<std::vector<int>>({
+		{14, 16, 18},
+		{14, 19, 20, 21},
+		{21, 24, 27},
+		{18, 25, 26, 27},
+		{19, 22, 25}
+		});
+
+	resultEdges = std::vector<std::vector<int>>({
+		getNodeIteratorResult(edgeExtr3.edges[0].nodeIter),
+		getNodeIteratorResult(edgeExtr3.edges[1].nodeIter),
+		getNodeIteratorResult(edgeExtr3.edges[2].nodeIter),
+		getNodeIteratorResult(edgeExtr3.edges[3].nodeIter),
+		getNodeIteratorResult(edgeExtr3.edges[4].nodeIter),
+		});
+
+	for (int i = 0; i < 5; i++) {
+		if (!equalVectors(expectedEdges[i], resultEdges[i])) return 1;
+	}
+
+
+
+	return 0;
+}
+
 /*
 	Not ready
 */
@@ -1817,26 +1959,40 @@ int extruded2Drecs(const std::string& fileName)
 
 	//NastranFEAwriter writer(&file);
 	//Mesher::setFEAwriter(&writer);
-	MeshRec2D mesh2D;
+	MeshRec2D_ext mesh2D;
 	mesh2D.initRectangle(glm::dvec2(4.0, 4.0), glm::ivec2(4, 3));	//0.0 - 4.0
-	mesh2D.extrudeYedge(1.0, 3);									//4.0 - 5.0
-	mesh2D.extrudeYedge(10.0, 2);									//5.0 - 15.0
+	mesh2D.extrudeYedge(1.0, 2);									//4.0 - 5.0
+	mesh2D.extrudeYedge(10.0, 3);									//5.0 - 15.0
 	mesh2D.extrudeYedge(1.0, 3);									//15.0 - 16.0
 	mesh2D.extrudeYedge(10.0, 2);									//16.0 - 26.0
 
 
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 4; i++) {
 		mesh2D.setCsys(csyss[i]);
 		mesh2D.writeNodes();
 		mesh2D.writeElements();
+		
+		//Section 0 and 1
+		for(int k = 0; k < 4; k++){
+			std::cout << "\nMeshEdge section " << k ;
+			for (int j = 0; j < 4; j++) {
+				MeshEdge edge = mesh2D.getEdge(k, j);
+				std::cout << "\nEdge " << j << ": ";
+				for (int nid = edge.nodeIter.first(); nid; nid = edge.nodeIter.next()) {
+					std::cout << nid << " ";
+				}
+			}
+		}
 
+		std::cout << "\nMeshEdge_ext";
 		for (int j = 0; j < 4; j++) {
-			MeshEdge edge = mesh2D.getEdge(1, j);
+			MeshEdge_ext edge = mesh2D.getExtrudedEdge(j);
 			std::cout << std::endl;
 			for (int nid = edge.nodeIter.first(); nid; nid = edge.nodeIter.next()) {
 				std::cout << nid << " ";
 			}
 		}
+	
 		std::cout << std::endl;
 	}
 

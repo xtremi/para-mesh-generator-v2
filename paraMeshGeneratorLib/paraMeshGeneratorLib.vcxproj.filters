@@ -87,6 +87,9 @@
     <ClInclude Include="NodeIterator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Extrusion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -150,6 +153,9 @@
       <Filter>Meshers\source</Filter>
     </ClCompile>
     <ClCompile Include="NodeIterator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extrusion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

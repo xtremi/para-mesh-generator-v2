@@ -26,6 +26,7 @@
     <ClInclude Include="CylinderMesher.h" />
     <ClInclude Include="DiskMesher.h" />
     <ClInclude Include="EllipseMesher.h" />
+    <ClInclude Include="Extrusion.h" />
     <ClInclude Include="FeaWrite.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="LineMesher.h" />
@@ -49,6 +50,7 @@
     <ClCompile Include="CylinderMesher.cpp" />
     <ClCompile Include="DiskMesher.cpp" />
     <ClCompile Include="EllipseMesher.cpp" />
+    <ClCompile Include="Extrusion.cpp" />
     <ClCompile Include="FeaWrite.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="LineMesher.cpp" />

@@ -6,8 +6,8 @@
 
 enum class Dim { DIM1D, DIM2D, DIM3D };
 
-enum class direction{x,y,z};
-enum class plane {xy, xz, yz};
+enum class direction{x,y,z, custom};
+enum class plane {xy, xz, yz, custom};
 
 void getPlaneDirections(plane pln, direction& d1, direction& d2);
 direction getPlaneNormal(plane pln);

@@ -2,26 +2,69 @@
 #include "PlaneMesher.h"
 #include "ConeMesher.h"
 
-void MeshRec2D::initRectangle(const glm::dvec2& _sizeXY, const glm::ivec2& _nNodesXY) {
+void MeshRec2D_ext::initRectangle(const glm::dvec2& _sizeXY, const glm::ivec2& _nNodesXY) {
 	lengthY = _sizeXY.y;
 	nNodesY = _nNodesXY.y;
-	extrusionsXdir.push_back(MeshEdgeExtrusion(_sizeXY.x, _nNodesXY.x - 1, nNodesY, nNodes, true));
+	extrusionsXdir.push_back(MeshEdgeExtrusion(_sizeXY.x, _nNodesXY.x - 1, nNodesY, nNodes));
 
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
 
-void MeshRec2D::extrudeYedgeArc(double endAng, double radius, int nElements) {
-	extrusionsXdir.push_back(MeshEdgeExtrusion(radius, endAng , nElements, nNodesY, nNodes));
+void MeshRec2D_ext::extrudeYedgeArc(double endAng, double radius, int nElements) {
+	extrusionsXdir.push_back(MeshEdgeExtrusion(radius, endAng , nElements, nNodesY, nNodes, &extrusionsXdir[extrusionsXdir.size() - 1]));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 
 }
 
-void MeshRec2D::extrudeYedge(double length, int nElements) {
-	extrusionsXdir.push_back(MeshEdgeExtrusion(length, nElements, nNodesY, nNodes));
+void MeshRec2D_ext::extrudeYedge(double length, int nElements) {
+	extrusionsXdir.push_back(MeshEdgeExtrusion(length, nElements, nNodesY, nNodes, &extrusionsXdir[extrusionsXdir.size() - 1]));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
+}
+
+MeshEdge MeshRec2D_ext::getEdge(int section, int edgeIndex) {
+	if (section < extrusionsXdir.size() && edgeIndex < 4) {
+		return extrusionsXdir[section].edges[edgeIndex];
+	}
+	return MeshEdge();
+}
+
+
+/*
+
+		nElements
+	|---|---|---|---|
+		---Edg1-->
+	 x---x---x---x---x
+ |	 x---x---x---x---x  |
+Edg0 x---x---x---x---x Edg2
+ |	 x---x---x---x---x  |
+ v	 x---x---x---x---x  v
+		---Edg3-->
+
+	<-----length----->
+	----> Extrusion
+
+
+*/
+MeshEdge_ext MeshRec2D_ext::getExtrudedEdge(int edgeIndex) {
+	std::vector<NodeIterator1D> iterators;
+	
+	if (edgeIndex == 1 || edgeIndex == 3) {
+		for (MeshEdgeExtrusion& edgeExtr : extrusionsXdir) {
+			iterators.push_back(edgeExtr.edges[edgeIndex].nodeIter);
+		}
+	}
+	else if (edgeIndex == 0) {
+		iterators.push_back(extrusionsXdir[0].edges[0].nodeIter);
+	}
+	else if (edgeIndex == 2) {
+		iterators.push_back(extrusionsXdir[extrusionsXdir.size() - 1].edges[2].nodeIter);
+	}
+	
+	return MeshEdge_ext(iterators);
 }
 
 /*
@@ -45,11 +88,9 @@ void MeshRec2D::extrudeYedge(double length, int nElements) {
 
 
 */
-void MeshRec2D::writeNodes() {
-	bool firstExtrusion = true;
-	
-	
-	double		spacingY = lengthY / (double)(nNodesY - 1);
+void MeshRec2D_ext::writeNodes() {
+	bool firstExtrusion = true;		
+	double spacingY = lengthY / (double)(nNodesY - 1);
 	
 	//Updates the node iterators for this mesh writing:
 	for (int i = 0; i < extrusionsXdir.size(); i++) {
@@ -112,38 +153,43 @@ void MeshRec2D::writeNodes() {
  nodeID1_side2 = x22
 
 */
-void MeshRec2D::writeElements() {
+void MeshRec2D_ext::writeElements() {
 
-	MeshEdgeExtrusion* extr = nullptr, *prevExtr = nullptr;
+	MeshEdgeExtrusion* extr = nullptr;// , *prevExtr = nullptr;
 	MeshDensity2D meshDens(0, nNodesY);
 	
 	for (int i = 0; i < extrusionsXdir.size(); i++) {
 		extr = &extrusionsXdir[i];
 		
-		if (!extr->isStart){
-			RowMesher2D::writeElements(&prevExtr->edges[2].nodeIter, &extr->edges[0].nodeIter);
+		if (!extr->isStart()){
+			RowMesher2D::writeElements(&extr->edges[0].nodeIter, &extr->edges[4].nodeIter);
 		}
-		Mesher::setNodeID1(extr->edges[0].nodeIter.first());
+		Mesher::setNodeID1(extr->edges[4].nodeIter.first());
 		meshDens.setDir1(extr->nNodes());
 		PlaneMesher::writeElements(meshDens);
 		
-		prevExtr = extr;
 	}
 	
 }
 
-void MeshRec2D::calculateNumberOfNodesX() {
+/*
+	Reduce 1 for each iteration to remove duplication node
+	Each non start section reuses one node from the previous section
+
+	Start with nNodesX because first section has correct number of nodes.
+*/
+void MeshRec2D_ext::calculateNumberOfNodesX() {
 	nNodesX = 0;
 	for (MeshExtrusion& meshExtrusion : extrusionsXdir) {
-		nNodesX += meshExtrusion.nNodes();
+		nNodesX += (meshExtrusion.nNodes());
 	}
 }
 
-void MeshRec2D::calculateNumberOfNodes() {
+void MeshRec2D_ext::calculateNumberOfNodes() {
 	calculateNumberOfNodesX();
 	nNodes = nNodesX * nNodesY;
 }
-void MeshRec2D::calculateNumberOfElements() {
+void MeshRec2D_ext::calculateNumberOfElements() {
 	nElements = (nNodesX - 1) * (nNodesY - 1);
 }
 

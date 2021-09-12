@@ -1,6 +1,18 @@
 #pragma once
 #include "Mesher.h"
 #include "FeaWrite.h"
+#include "Mesh.h"
+
+
+class Line : public MeshPrimitive1D
+{
+public:
+	Line(double length, glm::dvec3& pos, MeshCsys& csys) : MeshPrimitive1D(){}
+
+private:
+	direction dir;
+
+};
 
 
 class LineMesher : private Mesher {
