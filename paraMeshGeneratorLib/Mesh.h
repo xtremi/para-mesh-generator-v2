@@ -50,15 +50,12 @@ public:
 	MeshPrimitive2D() : MeshPrimitive() {
 		elementDim = Dim::DIM2D;
 	}
-protected:
-	size_t iteratedFaceID;
 };
 class MeshPrimitive3D : public MeshPrimitive{
 public:
 	MeshPrimitive3D() : MeshPrimitive() {
 		elementDim = Dim::DIM3D;
 	}
-	size_t iteratedFaceID;
 };
 /*
 	Not implemented
@@ -72,11 +69,12 @@ private:
 	MeshDensity2D	meshDensity;
 };
 
-class MeshRec2D_ext : public MeshPrimitive2D {
+class Mesh2D_planeExtrusion : public MeshPrimitive2D {
 public:
-	MeshRec2D_ext() : MeshPrimitive2D() {}
+	Mesh2D_planeExtrusion(int nElementsY, double lengthY);
+	Mesh2D_planeExtrusion();
 
-	void initRectangle(const glm::dvec2& _sizeXY, const glm::ivec2& _nNodesXY);
+	void setStartEdgeY(int nElementsY, double lengthY);
 
 	void extrudeYedge(double length, int nElements);
 	void extrudeYedgeArc(double endAng, double radius, int nElements);

@@ -1,6 +1,11 @@
 #pragma once
 #include <vector>
 
+/*
+	Base class for node iterators
+	in any shape, direction or dimensions
+	
+*/
 class NodeIterator {
 public:
 	int first();	
@@ -8,7 +13,7 @@ public:
 	virtual int next() = 0;
 	virtual void reset() = 0;
 
-	int firstNodeID;
+	int firstNodeID = 0;
 	int nodeIDoffset = 0;
 
 	virtual int numberOfNodes() { return -1; }
@@ -21,9 +26,20 @@ public:
 
 	 5    8   11   14   17   20
 	 x    x    x    x    x    x
-	 --> dir
+	 |--->|--->|--->|--->|--->|
+	  nodeIncr  = 3
+	  firstNode = 5
+	  preNode   = 0
+	  nNodes    = 6
+
+	 55    1   10   19   28   37   46
+	  x    x    x    x    x    x    x
+	  |--->|--->|--->|--->|--->|--->|
+	  nodeIncr  = 9
+	  firstNode = 1
+	  preNode   = 55
+	  nNodes    = 6  (6 passed to constructor, incremented by constructor because preNode > 0)
 */
-class NodeIterator1Dm;
 class NodeIterator1D : public NodeIterator {
 public:
 
@@ -42,10 +58,13 @@ protected:
 	int currentIterIndex;
 };
 
+/*
+	Chain of multiple NodeIterators1D
+*/
 class NodeIterator1Dm : public NodeIterator {
 public:
 	NodeIterator1Dm() {}
-	NodeIterator1Dm(const std::vector<NodeIterator1D>& _iterators);
+	NodeIterator1Dm(const std::vector<NodeIterator1D>& _iterators, bool overlappingNodes);
 	int next();
 	void reset();
 
@@ -54,9 +73,8 @@ public:
 
 private:
 	std::vector<NodeIterator1D> iterators;
-
 	int currentNodeIterIndex;
-	
+	bool hasOverlappingNodes = false;
 };
 
 

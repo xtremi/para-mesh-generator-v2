@@ -37,6 +37,7 @@ int speedTestWriteRotatedCubes(const std::string& fileName);
 int speedTestWriteNodesAndElements(const std::string& fileName);
 
 int nodeIterator1D(const std::string& fileName);
+int nodeIterator1Dm(const std::string& fileName);
 int meshEdgeExtrusion(const std::string& fileName);
 
 int lineMesher(const std::string& fileName);
@@ -92,7 +93,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(15, "speedTestWriteRotatedCubes",		"speed test", (testFunction)speedTestWriteRotatedCubes),
 	TestDef(16, "speedTestWriteNodesAndElements",	"speed test", (testFunction)speedTestWriteNodesAndElements),
 	
-	TestDef(30, "nodeIterator",			"utilities", (testFunction)nodeIterator1D),
+	TestDef(30, "nodeIterator1D",			"utilities", (testFunction)nodeIterator1D),
+	TestDef(31, "nodeIterator1Dm",			"utilities", (testFunction)nodeIterator1Dm),
 	TestDef(40, "meshEdgeExtrusion",	"utilities", (testFunction)meshEdgeExtrusion),
 	
 
@@ -1813,7 +1815,7 @@ bool equalVectors(const std::vector<T>& vec1, const std::vector<T>& vec2) {
 	return true;
 }
 
-std::vector<int> getNodeIteratorResult(NodeIterator1D& nit) {
+std::vector<int> getNodeIteratorResult(NodeIterator& nit) {
 	std::vector<int> res;
 	for (int nid = nit.first(); nid; nid = nit.next()) {
 		res.push_back(nid);
@@ -1846,6 +1848,34 @@ int nodeIterator1D(const std::string& fileName) {
 	expectedResult = { 1000, 99, 199, 299 };
 	if (!equalVectors(result, expectedResult)) return 1;
 	
+	return 0;
+}
+
+int nodeIterator1Dm(const std::string& fileName) {
+
+	std::vector<int> result;
+	std::vector<int> expectedResult;
+
+	
+	NodeIterator1D it1(1, 4, 1);		//1,2,3,4	
+	NodeIterator1D it2(8, 2, 2, 9);		//9,8,10	
+	NodeIterator1D it3(100, 3, 3, 900);	//900,100,103,106
+
+	expectedResult = { 1,2,3,4, 9,8,10, 900,100,103,106 };
+	NodeIterator1Dm itm1(std::vector<NodeIterator1D>({ it1,it2,it3 }), false);
+	result = getNodeIteratorResult(itm1);
+	if (!equalVectors(result, expectedResult)) return 1;
+
+	it1 = NodeIterator1D(10, 4, 1);			//10,11,12,13	
+	it2 = NodeIterator1D(8, 2, 2, 13);		//13,8,10	
+	it3 = NodeIterator1D(100, 3, 3, 10);	//10,100,103,106
+
+
+	expectedResult = { 10,11,12,13,		8,10,	100,103,106 };
+	itm1 = NodeIterator1Dm(std::vector<NodeIterator1D>({ it1,it2,it3 }), true);
+	result = getNodeIteratorResult(itm1);
+	if (!equalVectors(result, expectedResult)) return 1;
+
 	return 0;
 }
 
@@ -1959,41 +1989,17 @@ int extruded2Drecs(const std::string& fileName)
 
 	//NastranFEAwriter writer(&file);
 	//Mesher::setFEAwriter(&writer);
-	MeshRec2D_ext mesh2D;
-	mesh2D.initRectangle(glm::dvec2(4.0, 4.0), glm::ivec2(4, 3));	//0.0 - 4.0
-	mesh2D.extrudeYedge(1.0, 2);									//4.0 - 5.0
-	mesh2D.extrudeYedge(10.0, 3);									//5.0 - 15.0
-	mesh2D.extrudeYedge(1.0, 3);									//15.0 - 16.0
-	mesh2D.extrudeYedge(10.0, 2);									//16.0 - 26.0
+	Mesh2D_planeExtrusion mesh2D(8, 4.0);
+	mesh2D.extrudeYedge(1.0, 2);	//0.0 - 1.0
+	mesh2D.extrudeYedge(10.0, 30);	//1.0 - 11.0
+	mesh2D.extrudeYedge(1.0, 3);	//11.0 - 12.0
+	mesh2D.extrudeYedge(10.0, 2);	//12.0 - 22.0
 
 
 	for (int i = 0; i < 4; i++) {
 		mesh2D.setCsys(csyss[i]);
 		mesh2D.writeNodes();
 		mesh2D.writeElements();
-		
-		//Section 0 and 1
-		for(int k = 0; k < 4; k++){
-			std::cout << "\nMeshEdge section " << k ;
-			for (int j = 0; j < 4; j++) {
-				MeshEdge edge = mesh2D.getEdge(k, j);
-				std::cout << "\nEdge " << j << ": ";
-				for (int nid = edge.nodeIter.first(); nid; nid = edge.nodeIter.next()) {
-					std::cout << nid << " ";
-				}
-			}
-		}
-
-		std::cout << "\nMeshEdge_ext";
-		for (int j = 0; j < 4; j++) {
-			MeshEdge_ext edge = mesh2D.getExtrudedEdge(j);
-			std::cout << std::endl;
-			for (int nid = edge.nodeIter.first(); nid; nid = edge.nodeIter.next()) {
-				std::cout << nid << " ";
-			}
-		}
-	
-		std::cout << std::endl;
 	}
 
 	TEST_END

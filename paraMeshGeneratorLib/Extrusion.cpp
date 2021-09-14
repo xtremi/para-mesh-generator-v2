@@ -67,6 +67,13 @@ void MeshEdgeExtrusion::addToFirstNodeID(int n) {
 		edg.nodeIter.firstNodeID += n;
 }
 
+int MeshEdgeExtrusion::endCornerNode1() {
+	return edges[2].startNode();
+}
+int MeshEdgeExtrusion::endCornerNode2() {
+	return edges[2].endNode();
+}
+
 /*!
 
 isStart extrusion:
@@ -107,12 +114,13 @@ void MeshEdgeExtrusion::initEdges(int nnodeEdge1, int firstNodeID, MeshExtrusion
 	//the end nodes of the previous extrusion
 	int preNodeEdge1 = 0, preNodeEdge2 = 0;
 	if (!isStart()) {
-		preNodeEdge1 = ((MeshEdgeExtrusion*)previousExtrusion)->edges[2].nodeIter.first();
-		preNodeEdge2 = ((MeshEdgeExtrusion*)previousExtrusion)->edges[3].nodeIter.last();
+		//Move to function of MeshEdgeExtrusion:
+		preNodeEdge1 = ((MeshEdgeExtrusion*)previousExtrusion)->endCornerNode1();
+		preNodeEdge2 = ((MeshEdgeExtrusion*)previousExtrusion)->endCornerNode2();
 	}
 
-	/*								firstNodeID						nNodes      nodeIncr		preNode*/
-	edges[4] =MeshEdge(NodeIterator1D(0,									nnodeEdge1, nnodesExtr));
+	/*								firstNodeID							nNodes      nodeIncr		preNode*/
+	edges[4] =MeshEdge(NodeIterator1D(0,								nnodeEdge1, nnodesExtr));
 	if(isStart()){
 		edges[0] = edges[4];
 	}	

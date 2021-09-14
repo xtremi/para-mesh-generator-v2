@@ -70,8 +70,9 @@ void NodeIterator1D::reset() {
 	1D multi
 
 */
-NodeIterator1Dm::NodeIterator1Dm(const std::vector<NodeIterator1D>& _iterators) {
+NodeIterator1Dm::NodeIterator1Dm(const std::vector<NodeIterator1D>& _iterators, bool overlappingNodes) {
 	iterators = _iterators;
+	hasOverlappingNodes = overlappingNodes;
 }
 int NodeIterator1Dm::next() {
 	if (int nextNode = iterators[currentNodeIterIndex].next()) {
@@ -79,10 +80,17 @@ int NodeIterator1Dm::next() {
 	}
 	else {
 		currentNodeIterIndex++;
-		if (currentNodeIterIndex == iterators.size())
+		if (currentNodeIterIndex == iterators.size()){
 			return 0;
-		else
+		}
+		else{
+			//If has overlapping nodes, skip the first of each iterators
+			//Not for the first iterator
+			if(hasOverlappingNodes){
+				iterators[currentNodeIterIndex].next();
+			}
 			return next();
+		}
 	}
 }
 

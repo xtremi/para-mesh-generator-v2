@@ -14,6 +14,8 @@ public:
 	}
 	
 	NodeIterator1D nodeIter;
+	int startNode() { return nodeIter.first(); }
+	int endNode() { return nodeIter.last(); }
 };
 
 class MeshEdge_ext {
@@ -22,18 +24,17 @@ public:
 	MeshEdge_ext(NodeIterator1Dm _nodeIter) {
 		nodeIter = _nodeIter;
 	}
-
-	NodeIterator1Dm nodeIter;
+	NodeIterator1Dm nodeIter;	
 };
 
 class MeshFace {
 public:
 	MeshFace() {}
-	MeshFace(size_t _faceID, NodeIterator2D _nodeIter) {
-		faceID = _faceID; nodeIter = _nodeIter;
+	MeshFace(NodeIterator2D _nodeIter) {
+		nodeIter = _nodeIter;
 	}
-	size_t faceID;
 	NodeIterator2D nodeIter;
+
 };
 
 /*
@@ -71,6 +72,8 @@ private:
 
 	Extrusion of edge (result in new face)
 
+	isStart = true
+
 		nElements
 	|---|---|---|---|
 		---Edg1-->
@@ -84,7 +87,23 @@ Edg0 x---x---x---x---x Edg2
 	<-----length----->
 	----> Extrusion
 
-	o1 / o2 - en
+	isStart = false
+
+		nElements
+	|---|---|---|---|
+		---Edg1-->
+	 |--|x---x---x---o1
+ |	 |-e5x---x---x---x  |
+Edg0 |--|x---x---x---x Edg2
+ |	 |--|x---x---x---x  |
+ v	 |--|x---x---x---o2  v
+		v  --Edg3-->
+		 
+	Edge 0 is the edge containing the nodes at the end of the previous extrusion
+	Edge 5 is the first row of nodes (same direction of edge 0) belonging to
+	this extrusion
+
+	o1 / o2 - endCornerNode1 / endCornerNode2
 
 */
 class MeshEdgeExtrusion : public MeshExtrusion {
@@ -108,6 +127,9 @@ public:
 		edge[5] is the first edge with nodes belonging to this extrusion
 	*/
 	MeshEdge edges[5];
+
+	int endCornerNode1();
+	int endCornerNode2();
 
 	void setNodeOffset(int nOffs);
 	void addToFirstNodeID(int n);
