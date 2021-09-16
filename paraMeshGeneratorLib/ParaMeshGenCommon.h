@@ -332,6 +332,14 @@ struct MeshCsys {
 		local2globalT = pos; //csys ? (*csys) * pos : pos;
 		local2globalR = csys ? (*csys) : glm::dmat3x3(1.0);		
 	}	
+	/*
+		Moves along its own axes
+		(Changing pos directly moves the CSYS along the axes of parent CSYS)
+	*/
+	void moveInLocalCsys(const glm::dvec3& transl) {
+		pos += (*csys) * transl;
+	}
+
 	glm::dvec3		pos;
 	glm::dmat3x3*	csys = nullptr;
 
@@ -379,6 +387,9 @@ struct MeshCsys {
 
 	void update() {
 		if(parentCsys) setParentCsys(parentCsys);
+		else {
+			if (csys) local2globalR = *csys;
+		}
 	}
 
 	void setParentCsys(MeshCsys* _parentCsys) {

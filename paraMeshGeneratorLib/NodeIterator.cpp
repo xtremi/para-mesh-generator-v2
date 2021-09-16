@@ -116,28 +116,46 @@ int NodeIterator1Dm::numberOfNodes() {
 */
 NodeIterator2D::NodeIterator2D(int _firstNode, int _nNodesX, int _nNodesY, int _nodeIncrX, int _nodeIncrY) {
 	firstNodeID = _firstNode;
-	nNodesX = _nNodesX;
-	nNodesY = _nNodesY;
-	nodeIncrX = _nodeIncrX;
-	nodeIncrY = _nodeIncrY;
+	nNodes = glm::ivec2(_nNodesX, _nNodesY);
+	nodeIncr = glm::ivec2(_nodeIncrX, _nodeIncrY);
+	currentIterIndices = glm::ivec2(0, 0);
 }
 
+/*
+
+		   ----> dirX incrX = 25
+
+  |	   1x   26x   51x   76x  101x
+  |
+dirY   6x   31x   56x   81x  106x
+  |
+  V   11x   36x   61x   86x  111x
+incrY = 5
+*/
 int NodeIterator2D::next() {
 
-	if (currentIterIndexY == nNodesY) {
-		if (currentIterIndexX == nNodesX) {
+	if (currentIterIndices[0] == nNodes[0] && currentIterIndices[1] == (nNodes[1] - 1))
+		return 0;
 
-		}
+	if (currentIterIndices[0] == nNodes[0]) {
+		currentIterIndices[0] = 0;
+		currentIterIndices[1]++;
+		return next();
+	}
+	else {
+		return (currentIterIndices[0]++)*nodeIncr[0] + currentIterIndices[1]*nodeIncr[1] + firstNodeID + nodeIDoffset;
 	}
 
-	if (currentIterIndexX == nNodesX && currentIterIndexY == nNodesY)
-		return 0;
 	return 0;
 }
 
+int NodeIterator2D::last() {
+	currentIterIndices = nNodes - 1;
+	return next();
+}
+
 void NodeIterator2D::reset() {
-	currentIterIndexX = 0;
-	currentIterIndexY = 0;
+	currentIterIndices = glm::ivec2(0, 0);
 }
 
 /*

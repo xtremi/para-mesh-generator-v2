@@ -14,7 +14,9 @@ void Mesh2D_planeExtrusion::setStartEdgeY(int nElementsY, double _lengthY) {
 }
 
 void Mesh2D_planeExtrusion::extrudeYedgeArc(double endAng, double radius, int nElements) {
-	extrusionsXdir.push_back(MeshEdgeExtrusion(radius, endAng , nElements, nNodesY, nNodes, &extrusionsXdir[extrusionsXdir.size() - 1]));
+	MeshEdgeExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
+
+	extrusionsXdir.push_back(MeshEdgeExtrusion(radius, endAng , nElements, nNodesY, nNodes, prevExtrusion));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 
@@ -102,7 +104,11 @@ void Mesh2D_planeExtrusion::writeNodes() {
 		extrusionsXdir[i].setNodeOffset(Mesher::getWriter()->getNextNodeID());
 	}
 
+	glm::dmat3x3 rotM(1.0);
+	csys.update();
+	MeshCsys    currentCsys(&csys, glm::dvec3(0.), &rotM);
 	glm::dvec3	currentPos(0.0);
+	double currentArcAngle = 0.0;
 	for (MeshExtrusion& extr : extrusionsXdir) {
 
 		glm::dvec2	dxy(extr.spacing(), spacingY);
@@ -113,19 +119,30 @@ void Mesh2D_planeExtrusion::writeNodes() {
 			startSpace = extr.spacing();
 
 		if(extr.extrusionType == ExtrusionType::line){
-			currentPos.x += startSpace;
+			currentPos.x = startSpace;
 			
-			PlaneMesher::writeNodesXYq(currentPos, csys, MeshDensity2D(nNodesEdgeX, nNodesY), dxy);
-			currentPos.x += (extr.length - startSpace);
+			PlaneMesher::writeNodesXYq(currentPos, currentCsys, MeshDensity2D(nNodesEdgeX, nNodesY), dxy);
+			currentCsys.pos.x += (extr.length);// -startSpace);
+			currentCsys.update();
 		}
 		else if (extr.extrusionType == ExtrusionType::arc){
-			glm::dvec3 cpos = currentPos - glm::dvec3(0.0, 0.0, extr.radius);
-			//ConeMesher::writeNodesY(cpos, extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge);
-			//ConeMesher::writeNodesY(MeshCsys(cpos), extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge);
-			//nodeID = writer->writeNodesConeY(cpos, extr.radius, extr.radius, startSpace, extr.endAngle, lengthY, nodesPerEdge, nodeID);
-			double dx = extr.radius * glm::sin(extr.endAngle);
-			double dy = extr.radius * glm::cos(extr.endAngle);
-			currentPos = glm::dvec3(extr.radius * glm::sin(extr.endAngle), 0.0, extr.radius * glm::cos(extr.endAngle)) + cpos;
+			
+			//MeshCsys arcCenter(&currentCsys);
+			currentPos.z = extr.radius;
+			//arcCenter.update();
+
+			ArcAngles ang;
+			ang.setStart(-startSpace - GLMPI);
+			ang.setEnd(- (GLMPI + extr.endAngle));
+
+			ConeMesher::writeNodesY(currentPos, currentCsys, MeshDensity2D(nNodesEdgeX, nNodesY),
+				Cone2Dradius(extr.radius, extr.radius), ang, lengthY);
+			
+			currentArcAngle += extr.endAngle;
+			currentCsys.moveInLocalCsys(coordsOnCircle(ang.end, extr.radius, direction::y) + glm::dvec3(0,0,extr.radius));
+			rotM = makeCsysMatrix(Y_DIR, currentArcAngle/*GLMPI/8.0*/);
+			currentCsys.update();
+			//currentPos.z -= extr.radius;
 		}
 
 		firstExtrusion = false;

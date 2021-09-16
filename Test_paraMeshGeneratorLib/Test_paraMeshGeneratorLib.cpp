@@ -38,6 +38,8 @@ int speedTestWriteNodesAndElements(const std::string& fileName);
 
 int nodeIterator1D(const std::string& fileName);
 int nodeIterator1Dm(const std::string& fileName);
+int nodeIterator2D(const std::string& fileName);
+int nodeIterator2Dm(const std::string& fileName);
 int meshEdgeExtrusion(const std::string& fileName);
 
 int lineMesher(const std::string& fileName);
@@ -76,8 +78,8 @@ int refinementCone3dHeight(const std::string& fileName);
 
 
 int extruded2Drecs(const std::string& fileName);
-#ifdef TO_FIX
 int extrude2Darc(const std::string& filename);
+#ifdef TO_FIX
 int extrude2DarcMulti(const std::string& filename);
 #endif
 
@@ -95,6 +97,8 @@ std::vector<TestDef> testFunctions({
 	
 	TestDef(30, "nodeIterator1D",			"utilities", (testFunction)nodeIterator1D),
 	TestDef(31, "nodeIterator1Dm",			"utilities", (testFunction)nodeIterator1Dm),
+	TestDef(32, "nodeIterator2D",			"utilities", (testFunction)nodeIterator2D),
+	TestDef(33, "nodeIterator2Dm",			"utilities", (testFunction)nodeIterator2Dm),
 	TestDef(40, "meshEdgeExtrusion",	"utilities", (testFunction)meshEdgeExtrusion),
 	
 
@@ -133,8 +137,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(433, "refinementCone3dHeight",	"basic meshers 3D", (testFunction)refinementCone3dHeight),
 
 	TestDef(500, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
-#ifdef TO_FIX
 	TestDef(570, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
+#ifdef TO_FIX
 	TestDef(590, "extrude2DarcMulti",	"extrusion", (testFunction)extrude2DarcMulti),
 #endif
 
@@ -1851,6 +1855,8 @@ int nodeIterator1D(const std::string& fileName) {
 	return 0;
 }
 
+
+
 int nodeIterator1Dm(const std::string& fileName) {
 
 	std::vector<int> result;
@@ -1877,6 +1883,23 @@ int nodeIterator1Dm(const std::string& fileName) {
 	if (!equalVectors(result, expectedResult)) return 1;
 
 	return 0;
+}
+
+int nodeIterator2D(const std::string& fileName) {
+
+	std::vector<int> result;
+	std::vector<int> expectedResult;
+
+	NodeIterator2D it1(1, 5, 3, 25, 5);
+	result = getNodeIteratorResult(it1);
+	expectedResult = { 1,26,51,76,101,6,31,56,81,106,11,36,61,86,111 };
+	if (!equalVectors(result, expectedResult)) return 1;
+
+	return 0;
+}
+
+int nodeIterator2Dm(const std::string& fileName) {
+	return 1;
 }
 
 int meshEdgeExtrusion(const std::string& fileName) {
@@ -1991,7 +2014,7 @@ int extruded2Drecs(const std::string& fileName)
 	//Mesher::setFEAwriter(&writer);
 	Mesh2D_planeExtrusion mesh2D(8, 4.0);
 	mesh2D.extrudeYedge(1.0, 2);	//0.0 - 1.0
-	mesh2D.extrudeYedge(10.0, 30);	//1.0 - 11.0
+	mesh2D.extrudeYedge(10.0, 3);	//1.0 - 11.0
 	mesh2D.extrudeYedge(1.0, 3);	//11.0 - 12.0
 	mesh2D.extrudeYedge(10.0, 2);	//12.0 - 22.0
 
@@ -2004,23 +2027,32 @@ int extruded2Drecs(const std::string& fileName)
 
 	TEST_END
 }
-#ifdef TO_FIX
+
 int extrude2Darc(const std::string& fileName)
 {
 	TEST_START
+	glm::dmat3x3 rotM1 = makeCsysMatrix(X_DIR, Y_DIR);
+	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), &rotM1);
+	
+	Mesh2D_planeExtrusion mesh2D(8, 4.0);
+	mesh2D.extrudeYedgeArc(GLMPI/3.0, 10.0, 10);	//0.0 - 1.0
+	mesh2D.extrudeYedgeArc(GLMPI/3.0, 2.0, 5);	//0.0 - 1.0
+	mesh2D.extrudeYedgeArc(GLMPI/1.0, 1.0, 10);	//0.0 - 1.0
+	mesh2D.extrudeYedgeArc(-GLMPI/1.0, -1.0, 8);	//0.0 - 1.0
+	mesh2D.setCsys(csys1);
+	mesh2D.writeNodes();
+	mesh2D.writeElements();
 
-	glm::dmat3x3 csys1 = makeCsysMatrix(glm::dvec3(1.0, 0.0, 0.0), glm::dvec3(0.0, 1.0, 0.0));
+	
+	rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
+	mesh2D.setCsys(csys1);
 
-	NastranFEAwriter writer(&file);
-	Mesher::setFEAwriter(&writer);
-	MeshRec2D mesh2D;
-	mesh2D.initRectangle(glm::dvec2(4.0, 4.0), glm::ivec2(4, 6));
-	mesh2D.extrudeYedgeArc(glm::pi<double>() / 1.0, 2.0, 22);
-	mesh2D.writeNodes(&writer);
-	mesh2D.writeElements(&writer);
+	mesh2D.writeNodes();
+	mesh2D.writeElements();
+
 	TEST_END
 }
-
+#ifdef TO_FIX
 int extrude2DarcMulti(const std::string& filename) 
 {
 	TEST_START
