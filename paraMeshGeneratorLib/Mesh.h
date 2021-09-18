@@ -86,8 +86,23 @@ public:
 	MeshEdge	 getEdge(int section, int edgeIndex);
 	MeshEdge_ext getExtrudedEdge(int edgeIndex);
 
+private:
+	struct ExtrudeStepData {
+		glm::dvec3 pos;
+		MeshCsys   csys;
+		double	   startSpace;
+		double	   arcAngle;
+		int		   nNodesEdgeX;
+		glm::dvec2 dxy;
+
+	};
+
 protected:
 	std::vector<MeshEdgeExtrusion> extrusionsXdir;
+	void setNodeOffsetOnMeshEdgeExtrusions(int nodeIDoffset);
+
+	void writeNodesExtrudeLine(ExtrudeStepData& current, MeshExtrusion& curExtr);
+	void writeNodesExtrudeArc(ExtrudeStepData& current, MeshExtrusion& curExtr);
 
 	void calculateNumberOfNodes();
 	void calculateNumberOfElements();

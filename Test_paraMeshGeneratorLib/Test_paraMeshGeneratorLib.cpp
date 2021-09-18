@@ -77,8 +77,9 @@ int refinementCone2dHeight(const std::string& fileName);
 int refinementCone3dHeight(const std::string& fileName);
 
 
-int extruded2Drecs(const std::string& fileName);
-int extrude2Darc(const std::string& filename);
+int extrude2DedgeLine(const std::string& fileName);
+int extrude2DedgeArc(const std::string& filename);
+int extrude2DedgeArcAndLine(const std::string& filename);
 #ifdef TO_FIX
 int extrude2DarcMulti(const std::string& filename);
 #endif
@@ -136,8 +137,9 @@ std::vector<TestDef> testFunctions({
 	TestDef(432, "refinementCone2dHeight",	"basic meshers 2D", (testFunction)refinementCone2dHeight),
 	TestDef(433, "refinementCone3dHeight",	"basic meshers 3D", (testFunction)refinementCone3dHeight),
 
-	TestDef(500, "extruded2Drecs",		"extrusion", (testFunction)extruded2Drecs),
-	TestDef(570, "extrude2Darc",		"extrusion", (testFunction)extrude2Darc),	
+	TestDef(500, "extrude2DedgeLine",		"extrusion", (testFunction)extrude2DedgeLine),
+	TestDef(520, "extrude2DedgeArc",		"extrusion", (testFunction)extrude2DedgeArc),
+	TestDef(540, "extrude2DedgeArcAndLine",		"extrusion", (testFunction)extrude2DedgeArcAndLine),
 #ifdef TO_FIX
 	TestDef(590, "extrude2DarcMulti",	"extrusion", (testFunction)extrude2DarcMulti),
 #endif
@@ -150,7 +152,9 @@ int main(int argc, char* argv[]) {
 
 	std::set<int> testsToRun;
 	if (argc > 2 && !strcmp(argv[1], "-only")) {
-		testsToRun.insert(std::stoi(argv[2]));
+		for (int i = 2; i < argc; i++) {
+			testsToRun.insert(std::stoi(argv[i]));
+		}
 	}
 
 	for (TestDef& testDef : testFunctions) {
@@ -1992,10 +1996,7 @@ v	9--10--11--12--------17--------18--25--26--27
 	return 0;
 }
 
-/*
-	Not ready
-*/
-int extruded2Drecs(const std::string& fileName)
+int extrude2DedgeLine(const std::string& fileName)
 {
 	TEST_START2
 	glm::dmat3x3 rotM1 = makeCsysMatrix(X_DIR, Y_DIR);
@@ -2028,7 +2029,7 @@ int extruded2Drecs(const std::string& fileName)
 	TEST_END
 }
 
-int extrude2Darc(const std::string& fileName)
+int extrude2DedgeArc(const std::string& fileName)
 {
 	TEST_START
 	glm::dmat3x3 rotM1 = makeCsysMatrix(X_DIR, Y_DIR);
@@ -2052,6 +2053,35 @@ int extrude2Darc(const std::string& fileName)
 
 	TEST_END
 }
+
+int extrude2DedgeArcAndLine(const std::string& fileName)
+{
+	TEST_START
+	glm::dmat3x3 rotM1 = makeCsysMatrix(X_DIR, Y_DIR);
+	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), &rotM1);
+
+	Mesh2D_planeExtrusion mesh2D(8, 4.0);
+	mesh2D.extrudeYedgeArc(GLMPI / 3.0, 10.0, 10);	//0.0 - 1.0
+	mesh2D.extrudeYedgeArc(GLMPI / 3.0, 2.0, 5);	//0.0 - 1.0
+	mesh2D.extrudeYedge(5.0, 5);	
+	mesh2D.extrudeYedgeArc(GLMPI, 0.5, 8);	//0.0 - 1.0
+	mesh2D.extrudeYedge(5.0, 5);
+	mesh2D.extrudeYedgeArc(-GLMPI / 3.0, -1.5, 5);	//0.0 - 1.0
+	mesh2D.extrudeYedgeArc(-GLMPI / 3.0, -8.0, 10);	//0.0 - 1.0
+
+	mesh2D.setCsys(csys1);
+	mesh2D.writeNodes();
+	mesh2D.writeElements();
+	
+	rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
+	mesh2D.setCsys(csys1);
+
+	mesh2D.writeNodes();
+	mesh2D.writeElements();
+
+	TEST_END
+}
+
 #ifdef TO_FIX
 int extrude2DarcMulti(const std::string& filename) 
 {

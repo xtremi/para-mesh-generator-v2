@@ -74,6 +74,16 @@ MeshEdge_ext Mesh2D_planeExtrusion::getExtrudedEdge(int edgeIndex) {
 	return MeshEdge_ext(NodeIterator1Dm(iterators, true));
 }
 
+/*!
+	Updates the node iterators for this mesh writing:
+*/
+void Mesh2D_planeExtrusion::setNodeOffsetOnMeshEdgeExtrusions(int nodeIDoffset) {
+	for (int i = 0; i < extrusionsXdir.size(); i++) {
+		extrusionsXdir[i].setNodeOffset(nodeIDoffset);
+	}
+
+}
+
 /*
 
  x1 x2 x3 x4    x13  x14  x15        x22         x2
@@ -96,59 +106,61 @@ MeshEdge_ext Mesh2D_planeExtrusion::getExtrudedEdge(int edgeIndex) {
 
 */
 void Mesh2D_planeExtrusion::writeNodes() {
-	bool firstExtrusion = true;		
+	bool   firstExtrusion = true;		
 	double spacingY = lengthY / (double)(nNodesY - 1);
 	
-	//Updates the node iterators for this mesh writing:
-	for (int i = 0; i < extrusionsXdir.size(); i++) {
-		extrusionsXdir[i].setNodeOffset(Mesher::getWriter()->getNextNodeID());
-	}
+	setNodeOffsetOnMeshEdgeExtrusions(Mesher::getWriter()->getNextNodeID());
+	csys.update();
 
 	glm::dmat3x3 rotM(1.0);
-	csys.update();
-	MeshCsys    currentCsys(&csys, glm::dvec3(0.), &rotM);
-	glm::dvec3	currentPos(0.0);
-	double currentArcAngle = 0.0;
+	ExtrudeStepData curExtrData;
+	curExtrData.csys = MeshCsys(&csys, glm::dvec3(0.), &rotM);
+	curExtrData.pos = glm::dvec3(0.0);
+	curExtrData.arcAngle= 0.0;
+	
+
 	for (MeshExtrusion& extr : extrusionsXdir) {
 
-		glm::dvec2	dxy(extr.spacing(), spacingY);
-		double		startSpace	= 0.0;
-		int			nNodesEdgeX = extr.nNodes();
+		curExtrData.dxy = glm::dvec2(extr.spacing(), spacingY);
+		curExtrData.startSpace	= 0.0;
+		curExtrData.nNodesEdgeX = extr.nNodes();
 		
 		if (!firstExtrusion)
-			startSpace = extr.spacing();
+			curExtrData.startSpace = extr.spacing();
 
 		if(extr.extrusionType == ExtrusionType::line){
-			currentPos.x = startSpace;
-			
-			PlaneMesher::writeNodesXYq(currentPos, currentCsys, MeshDensity2D(nNodesEdgeX, nNodesY), dxy);
-			currentCsys.pos.x += (extr.length);// -startSpace);
-			currentCsys.update();
+			writeNodesExtrudeLine(curExtrData, extr);
 		}
 		else if (extr.extrusionType == ExtrusionType::arc){
-			
-			//MeshCsys arcCenter(&currentCsys);
-			currentPos.z = extr.radius;
-			//arcCenter.update();
-
-			ArcAngles ang;
-			ang.setStart(-startSpace - GLMPI);
-			ang.setEnd(- (GLMPI + extr.endAngle));
-
-			ConeMesher::writeNodesY(currentPos, currentCsys, MeshDensity2D(nNodesEdgeX, nNodesY),
-				Cone2Dradius(extr.radius, extr.radius), ang, lengthY);
-			
-			currentArcAngle += extr.endAngle;
-			currentCsys.moveInLocalCsys(coordsOnCircle(ang.end, extr.radius, direction::y) + glm::dvec3(0,0,extr.radius));
-			rotM = makeCsysMatrix(Y_DIR, currentArcAngle/*GLMPI/8.0*/);
-			currentCsys.update();
-			//currentPos.z -= extr.radius;
+			writeNodesExtrudeArc(curExtrData, extr);
 		}
-
+		curExtrData.csys.update();
 		firstExtrusion = false;
 	}
 	
 }
+
+void Mesh2D_planeExtrusion::writeNodesExtrudeLine(ExtrudeStepData& curExtrData, MeshExtrusion& curExtr) {
+	curExtrData.pos = glm::dvec3(curExtrData.startSpace, 0., 0.);
+	PlaneMesher::writeNodesXYq(curExtrData.pos, curExtrData.csys, MeshDensity2D(curExtrData.nNodesEdgeX, nNodesY), curExtrData.dxy);
+	curExtrData.csys.moveInLocalCsys(glm::dvec3(curExtr.length, 0.,0.));
+}
+void Mesh2D_planeExtrusion::writeNodesExtrudeArc(ExtrudeStepData& curExtrData, MeshExtrusion& curExtr) {
+
+	curExtrData.pos = glm::dvec3(0., 0., curExtr.radius);
+
+	ArcAngles ang;
+	ang.setStart(-curExtrData.startSpace - GLMPI);
+	ang.setEnd(-(GLMPI + curExtr.endAngle));
+
+	ConeMesher::writeNodesY(curExtrData.pos, curExtrData.csys, MeshDensity2D(curExtrData.nNodesEdgeX, nNodesY),
+		Cone2Dradius(curExtr.radius, curExtr.radius), ang, lengthY);
+
+	curExtrData.arcAngle += curExtr.endAngle;
+	curExtrData.csys.moveInLocalCsys(coordsOnCircle(ang.end, curExtr.radius, direction::y) + glm::dvec3(0, 0, curExtr.radius));
+	(*curExtrData.csys.csys) = makeCsysMatrix(Y_DIR, curExtrData.arcAngle);
+}
+
 
 /*
 
