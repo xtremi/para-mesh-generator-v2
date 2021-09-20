@@ -231,13 +231,21 @@ void MeshFaceExtrusion::initFaces(const MeshDensity2D& face0nodes, int firstNode
 	int S3	   = (nD1 - 1)*nExtr;
 	int S5	   = (nD2 - 1)*nFace4;
 	
+	NodeIterator1D prevIterEdg0, prevIterEdg1, prevIterEdg2, prevIterEdg3;
+	if(prevExtr){
+		prevIterEdg0 = ((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator0();
+		prevIterEdg1 = ((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator1();
+		prevIterEdg2 = ((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator2();
+		prevIterEdg3 = ((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator3();
+	}
+		
 	/*						firstNodeID			nNodesX	nNodesZ	nodeIncrX	nodeIncrZ	preNode*/
 	faces[6] = MeshFace(NodeIterator2D(0,		nD1,	nD2,	nExtr,		nFace4));	
-	faces[1] = MeshFace(NodeIterator2D(0,		nExtr,	nD2,	1,			nFace4,		((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator1()));
+	faces[1] = MeshFace(NodeIterator2D(0,		nExtr,	nD2,	1,			nFace4,		prevIterEdg1));
 	faces[2] = MeshFace(NodeIterator2D(nExtr-1,	nD1,	nD2,	nExtr,		nFace4));
-	faces[3] = MeshFace(NodeIterator2D(S3,		nExtr,	nD2,	1,			nFace4,		((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator3()));
-	faces[4] = MeshFace(NodeIterator2D(0,		nExtr,	nD1,	1,			nExtr,		((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator0()));
-	faces[5] = MeshFace(NodeIterator2D(S5,		nExtr,	nD1,	1,			nExtr,		((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator2()));
+	faces[3] = MeshFace(NodeIterator2D(S3,		nExtr,	nD2,	1,			nFace4,		prevIterEdg3));
+	faces[4] = MeshFace(NodeIterator2D(0,		nExtr,	nD1,	1,			nExtr,		prevIterEdg0));
+	faces[5] = MeshFace(NodeIterator2D(S5,		nExtr,	nD1,	1,			nExtr,		prevIterEdg2));
 	
 	if (isStart()) { faces[0] = faces[6]; }
 		

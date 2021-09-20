@@ -114,7 +114,12 @@ int NodeIterator1Dm::numberOfNodes() {
 	2D
 
 */
-NodeIterator2D::NodeIterator2D(int _firstNode, int _nNodesX, int _nNodesY, int _nodeIncrX, int _nodeIncrY, const NodeIterator1D& _preNodes) {
+NodeIterator2D::NodeIterator2D(
+	int _firstNode, 
+	int _nNodesX, 	int _nNodesY, 
+	int _nodeIncrX, int _nodeIncrY, 
+	const NodeIterator1D& _preNodes) 
+{
 	firstNodeID = _firstNode;
 	nNodes		= glm::ivec2(_nNodesX, _nNodesY);
 	nodeIncr	= glm::ivec2(_nodeIncrX, _nodeIncrY);

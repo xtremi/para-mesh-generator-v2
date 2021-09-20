@@ -2021,6 +2021,7 @@ int meshFaceExtrusion(const std::string& fileName) {
 
 	//First extrusion:
 	MeshFaceExtrusion faceExtr1(length, 2, meshDensFace, 1);
+	
 	expectedFaces = std::vector<std::vector<int>>({
 		{1,4,7,10,	13,16,19,22, 25,28,31,34},
 		{1,2,3, 13,14,15, 25,26,27},
@@ -2038,8 +2039,8 @@ int meshFaceExtrusion(const std::string& fileName) {
 		if (!equalVectors(expectedFaces[i], resultFaces[i])) return 1;
 	}
 
-	//Second extrusion:
-	MeshFaceExtrusion faceExt2(length, 2, meshDensFace, 36, &faceExtr1);
+	//Second extrusion:	
+	MeshFaceExtrusion faceExtr2(length, 2, meshDensFace, 37, &faceExtr1);
 	expectedFaces = std::vector<std::vector<int>>({
 		{3,6,9,12, 15,18,21,24, 27,30,33,36},		
 		{3,37,38, 15,45,46, 27,53,54},
@@ -2052,7 +2053,7 @@ int meshFaceExtrusion(const std::string& fileName) {
 		});
 	resultFaces.clear();
 	for (int i = 0; i < 7; i++) {
-		resultFaces.push_back(getNodeIteratorResult(faceExtr1.faces[i].nodeIter));
+		resultFaces.push_back(getNodeIteratorResult(faceExtr2.faces[i].nodeIter));
 	}
 
 	for (int i = 0; i < 7; i++) {
