@@ -46,7 +46,7 @@ int NodeIterator1D::next() {
 	//First iteration with preNode:
 	if ((currentIterIndex == 0) && (preNode > 0)) {
 		currentIterIndex++;
-		return preNode + nodeIDoffset;
+		return preNode + nodeIDoffset;//TODO: why is nodeIDoffset used and not firstNodeID not?
 	}
 	else{
 		if (preNode > 0) {
@@ -114,11 +114,18 @@ int NodeIterator1Dm::numberOfNodes() {
 	2D
 
 */
-NodeIterator2D::NodeIterator2D(int _firstNode, int _nNodesX, int _nNodesY, int _nodeIncrX, int _nodeIncrY) {
+NodeIterator2D::NodeIterator2D(int _firstNode, int _nNodesX, int _nNodesY, int _nodeIncrX, int _nodeIncrY, const NodeIterator1D& _preNodes) {
 	firstNodeID = _firstNode;
-	nNodes = glm::ivec2(_nNodesX, _nNodesY);
-	nodeIncr = glm::ivec2(_nodeIncrX, _nodeIncrY);
+	nNodes		= glm::ivec2(_nNodesX, _nNodesY);
+	nodeIncr	= glm::ivec2(_nodeIncrX, _nodeIncrY);
+	preNodes	= _preNodes;
 	currentIterIndices = glm::ivec2(0, 0);
+
+	if (preNodes.numberOfNodes() > 0) {
+		nNodes.x++;
+		hasPreNodes = true;
+		preNodes.reset();
+	}
 }
 
 /*
@@ -131,19 +138,44 @@ dirY   6x   31x   56x   81x  106x
   |
   V   11x   36x   61x   86x  111x
 incrY = 5
+
+incrY = 12
+  ^	   (103)x---25x---26x---27x
+  |         |     |	   |     |
+dirY   (102)x---13x---14x---15x
+  |	        |     |     |     |
+  |    (101)x--- 1x----2x----3x
+	preNodes
+	----> dirX incrX = 1
+
 */
 int NodeIterator2D::next() {
-
+	//End of iteration:
 	if (currentIterIndices[0] == nNodes[0] && currentIterIndices[1] == (nNodes[1] - 1))
 		return 0;
 
+	//if last in dirX - reset X iter - incr Y iter
 	if (currentIterIndices[0] == nNodes[0]) {
 		currentIterIndices[0] = 0;
 		currentIterIndices[1]++;
 		return next();
 	}
 	else {
-		return (currentIterIndices[0]++)*nodeIncr[0] + currentIterIndices[1]*nodeIncr[1] + firstNodeID + nodeIDoffset;
+
+		if ((currentIterIndices[0] == 0 && hasPreNodes)) {
+			currentIterIndices[0]++;
+			return preNodes.next() + nodeIDoffset;//TODO: why is nodeIDoffset used and not firstNodeID not?;
+		}
+		else {
+			if (hasPreNodes) {
+				return ((currentIterIndices[0]++) - 1)*nodeIncr[0] + currentIterIndices[1] * nodeIncr[1] + firstNodeID + nodeIDoffset;
+			}
+			else {
+				return (currentIterIndices[0]++)*nodeIncr[0] + currentIterIndices[1] * nodeIncr[1] + firstNodeID + nodeIDoffset;
+			}
+		}
+
+		
 	}
 
 	return 0;

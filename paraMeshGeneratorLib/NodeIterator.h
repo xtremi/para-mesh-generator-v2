@@ -56,7 +56,7 @@ protected:
 	int nodeIncr;
 	int preNode = 0;
 
-	int currentIterIndex;
+	int currentIterIndex = 0;
 };
 
 /*
@@ -79,24 +79,24 @@ private:
 };
 
 
-/*
-	   ----> dirX
+/*!
+	NodeIterator for nodes in 2D grid.
 
-  |	   1x    2x    3x    4x    5x
-  |
-dirY   6x    7x    8x    9x   10x
-  |
-  V   11x   12x   13x   14x   15x
+	Iterates in dirX first, then dirY
 
+		x---iteration 1  --->x
+		x---iteration 2  --->x
+		x---iteration ...--->x
+		x---iteration N..--->x
 
-	Iterates in dirX first:
+	With a NodeIterator1D preNodes (Will be used if nNodes() of preNodes is > 0)
+		The first node in each x-direction iteration will
+		be the next node of preNodes (See Example 2)
 
-	x---iteration 1  --->x
-	x---iteration 2  --->x
-	x---iteration ...--->x
-	x---iteration ...--->x
-
-
+::::::::::::::::::::::::::::::::::::::::::::
+	Example 1:
+::::::::::::::::::::::::::::::::::::::::::::
+	nNodesX = 5, nNodesY = 3
 		   ----> dirX incrX = 25
 
   |	   1x   26x   51x   76x  101x
@@ -106,14 +106,32 @@ dirY   6x   31x   56x   81x  106x
   V   11x   36x   61x   86x  111x
 incrY = 5
 
-*/
-/*
-	Not implemented
+Iteration result = 1,26,51,76,101, 6,31,...,106, 11,...,111
+
+
+::::::::::::::::::::::::::::::::::::::::::::
+	Example 2:
+::::::::::::::::::::::::::::::::::::::::::::
+
+	nNodesX = 3, nNodesY = 3
+
+incrY = 12
+  ^	   (103)x---25x---26x---27x
+  |         |     |	   |     |
+dirY   (102)x---13x---14x---15x
+  |	        |     |     |     |
+  |    (101)x--- 1x----2x----3x
+    preNodes
+    ----> dirX incrX = 1
+
+Iteration result = 101,1,2,3, 102,13,14,15, 103,25,26,27
+
+
 */
 class NodeIterator2D : public NodeIterator {
 public:
 	NodeIterator2D() {}
-	NodeIterator2D(int _firstNode, int _nNodesX, int _nNodesY, int _nodeIncrX, int _nodeIncrY);
+	NodeIterator2D(int _firstNode, int _nNodesX, int _nNodesY, int _nodeIncrX, int _nodeIncrY, const NodeIterator1D& _preNodes = NodeIterator1D());
 	int next();
 	int last();
 	void reset();
@@ -123,6 +141,8 @@ private:
 	glm::ivec2 currentIterIndices;
 	glm::ivec2 nNodes;
 	glm::ivec2 nodeIncr;
+	NodeIterator1D preNodes;
+	bool hasPreNodes = false;
 };
 
 /*

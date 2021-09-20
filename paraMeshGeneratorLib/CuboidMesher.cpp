@@ -45,7 +45,8 @@ void CuboidMesher::writeNodesXYZ(const glm::dvec3& pos, MeshCsys& csys, const Me
 
 /*
 
-	 6x-----x5
+	 6
+	 -x5
 	 /     /
    7x-----x4
 

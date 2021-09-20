@@ -109,8 +109,51 @@ protected:
 	void calculateNumberOfNodesX();
 
 	double lengthY;
-	int	   nNodesY;
-	int	   nNodesX;
+	MeshDensity2D meshDensity;
+};
+
+
+class Mesh3D_volumeExtrusion : public MeshPrimitive3D {
+public:
+	Mesh3D_volumeExtrusion(const MeshDensity2D& meshDensYZface, const glm::dvec2& sizeYZ);
+	Mesh3D_volumeExtrusion();
+
+	void setStartFaceYZ(const MeshDensity2D& meshDensYZface, const glm::dvec2& sizeYZ);
+
+	void extrudeYZface(double length, int nElements);
+	void extrudeYZedgeArc(double endAng, double radius, int nElements);
+
+	virtual void writeNodes();
+	virtual void writeElements();
+
+	MeshFace getFace(int section, int faceIndex);
+	//MeshEdge	 getEdge(int section, int edgeIndex);
+	//MeshEdge_ext getExtrudedEdge(int edgeIndex);
+
+private:
+	struct ExtrudeStepData {
+		glm::dvec3 pos;
+		MeshCsys   csys;
+		double	   startSpace;
+		double	   arcAngle;
+		int		   nNodesEdgeX;
+		glm::dvec2 dxyz;
+
+	};
+
+protected:
+	std::vector<MeshFaceExtrusion> extrusionsXdir;
+	void setNodeOffsetOnMeshEdgeExtrusions(int nodeIDoffset);
+
+	void writeNodesExtrudeLine(ExtrudeStepData& current, MeshExtrusion& curExtr);
+	void writeNodesExtrudeArc(ExtrudeStepData& current, MeshExtrusion& curExtr);
+
+	void calculateNumberOfNodes();
+	void calculateNumberOfElements();
+	void calculateNumberOfNodesX();
+
+	glm::dvec2 sizeYZ;
+	MeshDensity3D meshDensity;
 };
 
 

@@ -41,6 +41,7 @@ int nodeIterator1Dm(const std::string& fileName);
 int nodeIterator2D(const std::string& fileName);
 int nodeIterator2Dm(const std::string& fileName);
 int meshEdgeExtrusion(const std::string& fileName);
+int meshFaceExtrusion(const std::string& fileName);
 
 int lineMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
@@ -101,6 +102,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(32, "nodeIterator2D",			"utilities", (testFunction)nodeIterator2D),
 	TestDef(33, "nodeIterator2Dm",			"utilities", (testFunction)nodeIterator2Dm),
 	TestDef(40, "meshEdgeExtrusion",	"utilities", (testFunction)meshEdgeExtrusion),
+	TestDef(50, "meshFaceExtrusion",	"utilities", (testFunction)meshFaceExtrusion),
 	
 
 	TestDef(101, "lineMesher",			"basic meshers 1D", (testFunction)lineMesher),	
@@ -1894,9 +1896,17 @@ int nodeIterator2D(const std::string& fileName) {
 	std::vector<int> result;
 	std::vector<int> expectedResult;
 
+	//From NodeIterator2D example 1
 	NodeIterator2D it1(1, 5, 3, 25, 5);
 	result = getNodeIteratorResult(it1);
 	expectedResult = { 1,26,51,76,101,6,31,56,81,106,11,36,61,86,111 };
+	if (!equalVectors(result, expectedResult)) return 1;
+
+	//From NodeIterator2D example 2
+	NodeIterator1D preNodesIt(101, 3, 1);
+	NodeIterator2D it2(1, 3, 3, 1, 12, preNodesIt);
+	result = getNodeIteratorResult(it2);
+	expectedResult = { 101,1,2,3, 102,13,14,15, 103,25,26,27 };
 	if (!equalVectors(result, expectedResult)) return 1;
 
 	return 0;
@@ -1918,8 +1928,6 @@ int meshEdgeExtrusion(const std::string& fileName) {
 |	|   |   |   |        |          |   |   |   |
 v	9--10--11--12--------17--------18--25--26--27  
        3-->
-
-
 
 	*/
 	std::vector<std::vector<int>> expectedEdges;
@@ -1993,6 +2001,64 @@ v	9--10--11--12--------17--------18--25--26--27
 
 
 
+	return 0;
+}
+
+
+
+int meshFaceExtrusion(const std::string& fileName) {
+
+	double length = 10.0;
+
+	TEST_START2
+	MeshDensity3D meshDens(3, 4, 3);
+	MeshDensity2D meshDensFace(meshDens.dir2(), meshDens.dir3());
+	CuboidMesher::writeNodes(NULL_POS, glCsys, meshDens, glm::dvec3(5.0, 7.0, 5.0), plane::xy);
+	CuboidMesher::writeElements(meshDens);
+	
+	std::vector<std::vector<int>> expectedFaces;
+	std::vector<std::vector<int>> resultFaces;
+
+	//First extrusion:
+	MeshFaceExtrusion faceExtr1(length, 2, meshDensFace, 1);
+	expectedFaces = std::vector<std::vector<int>>({
+		{1,4,7,10,	13,16,19,22, 25,28,31,34},
+		{1,2,3, 13,14,15, 25,26,27},
+		{3,6,9,12, 15,18,21,24, 27,30,33,36},
+		{10,11,12, 22,23,24, 34,35,36},
+		{1,2,3, 4,5,6, 7,8,9, 10,11,12},
+		{25,26,27, 28,29,30, 31,32,33, 34,35,36}
+		});
+	resultFaces.clear();
+	for (int i = 0; i < 6; i++) {
+		resultFaces.push_back(getNodeIteratorResult(faceExtr1.faces[i].nodeIter));
+	}
+
+	for (int i = 0; i < 6; i++) {
+		if (!equalVectors(expectedFaces[i], resultFaces[i])) return 1;
+	}
+
+	//Second extrusion:
+	MeshFaceExtrusion faceExt2(length, 2, meshDensFace, 36, &faceExtr1);
+	expectedFaces = std::vector<std::vector<int>>({
+		{3,6,9,12, 15,18,21,24, 27,30,33,36},		
+		{3,37,38, 15,45,46, 27,53,54},
+		{38,40,42,44, 46,48,50,52, 54,56,58,60},
+		{12,43,44, 24,51,52, 36,59,60},
+		{3,37,38, 6,39,40, 9,41,42, 12,43,44},
+		{27,53,54, 30,55,56, 33,57,58, 36,59,60},
+
+		{37,39,41,43, 45,47,49,51, 53,55,57,59},
+		});
+	resultFaces.clear();
+	for (int i = 0; i < 7; i++) {
+		resultFaces.push_back(getNodeIteratorResult(faceExtr1.faces[i].nodeIter));
+	}
+
+	for (int i = 0; i < 7; i++) {
+		if (!equalVectors(expectedFaces[i], resultFaces[i])) return 1;
+	}
+	
 	return 0;
 }
 

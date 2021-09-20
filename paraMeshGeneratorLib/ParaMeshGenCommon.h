@@ -118,6 +118,7 @@ struct MeshDensity2D : public NodeVec2D {
 	int nElNorm() const { return nElDir2(); }
 
 	int nNodes() const { return dir1() * dir2(); }
+	int nElements() const { return nElDir1() * nElDir2(); }
 };
 
 

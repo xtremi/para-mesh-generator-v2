@@ -1,5 +1,5 @@
 #pragma once
-#include "NodeIterator.h"
+#include "ParaMeshGenCommon.h"
 
 enum class ExtrusionType {
 	line,
@@ -127,7 +127,6 @@ public:
 		edge[5] is the first edge with nodes belonging to this extrusion
 	*/
 	MeshEdge edges[5];
-
 	int endCornerNode1();
 	int endCornerNode2();
 
@@ -137,28 +136,59 @@ protected:
 	void initEdges(int nnodeEdge1, int firstNodeID, MeshExtrusion* previousExtrusion);
 };
 
-/*
+/*          F3 (back)
 
-		 _________e8________
+		 _________e10_______
 		|\                  |\
 		| \                 | \
-		|  \e5              |  \e7
-		|   \            e12|   \
-	  e9|    \              |    \
-		|     \_______e6__________\
-		|     |             |     |    ^
-		| _ _ | _ _ e4_ _ _ |     |	   |
-		 \    |              \    |e11 |        ^
-		  \   |e10            \e3 |	   | Length | Extrusion
-		 e1\  |                \  |	   |        |
-			\ |                 \ |	   |
-			 \|__________________\|	   v
-					   e2
-
-
+		|  \e2   F5(top)    |  \e6
+		|   \             e7|   \
+	  e3|    \              |    \
+		|     \_______e9__________\
+ F0->   |     |             |     |  <-F2
+(F6)	| _ _ | _ _ e11 _ _ |     |	    -----> extrude dir (x)
+		 \    |              \    |e5 
+		  \   |e1  F1(front)  \e4 |	   
+		 e0\  |                \  |	   
+			\ |                 \ |	   
+			 \|__________________\|	   
+				  ^   e8
+                  |
+				 F4 (bottom)
+			   
+			   <----------------->
+			        length
 
 */
 class MeshFaceExtrusion : public MeshExtrusion {
-	MeshFaceExtrusion(double _length, int _nElements) : MeshExtrusion(_length, _nElements) {}
-	//MeshEdge edges[12];
+public:
+	MeshFaceExtrusion(
+		double				 _length,
+		int					 _nElements,
+		const MeshDensity2D& face0nodes, 
+		int					 firstNodeID,
+		MeshExtrusion*		 previousExtrusion = nullptr);
+	MeshFaceExtrusion(		 
+		double				 _radius,
+		double				 _endAngle,
+		int					 _nElements,
+		const MeshDensity2D& face0nodes,
+		int					 firstNodeID,
+		MeshExtrusion*		 previousExtrusion = nullptr);
+
+	/*!
+		face[0] is the face same face as face[5] of the previous extrusion
+		face[6] is the first face with nodes belonging to this extrusion
+	*/
+	MeshFace faces[7];
+	NodeIterator1D getEndEdgeIterator0();
+	NodeIterator1D getEndEdgeIterator1();
+	NodeIterator1D getEndEdgeIterator2();
+	NodeIterator1D getEndEdgeIterator3();
+
+	void setNodeOffset(int nOffs);
+	void addToFirstNodeID(int n);
+protected:
+	void initFaces(const MeshDensity2D& face1nodes, int firstNodeID, MeshExtrusion* previousExtrusion);
+	NodeIterator1D endEdgeIterators[4];
 };
