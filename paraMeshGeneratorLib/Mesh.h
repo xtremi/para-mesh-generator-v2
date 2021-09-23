@@ -137,7 +137,7 @@ private:
 		double	   startSpace;
 		double	   arcAngle;
 		int		   nNodesEdgeX;
-		glm::dvec2 dxyz;
+		glm::dvec3 dxyz;
 
 	};
 

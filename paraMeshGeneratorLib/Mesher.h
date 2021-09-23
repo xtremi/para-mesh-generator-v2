@@ -20,3 +20,8 @@ class RowMesher2D : private Mesher{
 public:
 	static void writeElements(NodeIterator1D* nodeIt1, NodeIterator1D* nodeIt2);
 };
+
+class RowMesher3D : private Mesher {
+public:
+	static void writeElements(NodeIterator2D* nodeIt1, NodeIterator2D* nodeIt2);
+};

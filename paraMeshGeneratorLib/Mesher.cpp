@@ -23,3 +23,9 @@ void RowMesher2D::writeElements(NodeIterator1D* nodeIt1, NodeIterator1D* nodeIt2
 		n[2] = nodeIt2->next();
 	}
 }
+
+
+void RowMesher3D::writeElements(NodeIterator2D* nodeIt1, NodeIterator2D* nodeIt2) {
+
+
+}

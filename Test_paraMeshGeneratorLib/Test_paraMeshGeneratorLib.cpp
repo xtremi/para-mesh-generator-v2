@@ -81,6 +81,9 @@ int refinementCone3dHeight(const std::string& fileName);
 int extrude2DedgeLine(const std::string& fileName);
 int extrude2DedgeArc(const std::string& filename);
 int extrude2DedgeArcAndLine(const std::string& filename);
+int extrude3DfaceLine(const std::string& fileName);
+int extrude3DfaceArc(const std::string& fileName);
+int extrude3DfaceArcAndLine(const std::string& fileName);
 #ifdef TO_FIX
 int extrude2DarcMulti(const std::string& filename);
 #endif
@@ -142,6 +145,11 @@ std::vector<TestDef> testFunctions({
 	TestDef(500, "extrude2DedgeLine",		"extrusion", (testFunction)extrude2DedgeLine),
 	TestDef(520, "extrude2DedgeArc",		"extrusion", (testFunction)extrude2DedgeArc),
 	TestDef(540, "extrude2DedgeArcAndLine",		"extrusion", (testFunction)extrude2DedgeArcAndLine),
+
+	TestDef(600, "extrude3DfaceLine",		"extrusion", (testFunction)extrude3DfaceLine),
+	TestDef(620, "extrude3DfaceArc",		"extrusion", (testFunction)extrude3DfaceArc),
+	TestDef(640, "extrude3DfaceArcAndLine",		"extrusion", (testFunction)extrude3DfaceArcAndLine),
+
 #ifdef TO_FIX
 	TestDef(590, "extrude2DarcMulti",	"extrusion", (testFunction)extrude2DarcMulti),
 #endif
@@ -2059,6 +2067,27 @@ int meshFaceExtrusion(const std::string& fileName) {
 	for (int i = 0; i < 7; i++) {
 		if (!equalVectors(expectedFaces[i], resultFaces[i])) return 1;
 	}
+
+	//third extrusion:
+	MeshFaceExtrusion faceExtr3(length, 2, meshDensFace, 61, &faceExtr2);
+	expectedFaces = std::vector<std::vector<int>>({
+		{38,40,42,44, 46,48,50,52, 54,56,58,60},
+		{38,61,62, 46,69,70, 54,77,78},
+		{62,64,66,68, 70,72,74,76, 78,80,82,84},
+		{44,67,68, 52,75,76, 60,83,84},
+		{38,61,62, 40,63,64, 42,65,66, 44,67,68},
+		{54,77,78, 56,79,80, 58,81,82, 60,83,84},
+
+		{61,63,65,67, 69,71,73,75, 77,79,81,83},
+		});
+	resultFaces.clear();
+	for (int i = 0; i < 7; i++) {
+		resultFaces.push_back(getNodeIteratorResult(faceExtr3.faces[i].nodeIter));
+	}
+
+	for (int i = 0; i < 7; i++) {
+		if (!equalVectors(expectedFaces[i], resultFaces[i])) return 1;
+	}
 	
 	return 0;
 }
@@ -2078,8 +2107,6 @@ int extrude2DedgeLine(const std::string& fileName)
 
 	std::vector<MeshCsys> csyss({ csys1, csys2, csys3, csys4 });
 
-	//NastranFEAwriter writer(&file);
-	//Mesher::setFEAwriter(&writer);
 	Mesh2D_planeExtrusion mesh2D(8, 4.0);
 	mesh2D.extrudeYedge(1.0, 2);	//0.0 - 1.0
 	mesh2D.extrudeYedge(10.0, 3);	//1.0 - 11.0
@@ -2147,6 +2174,29 @@ int extrude2DedgeArcAndLine(const std::string& fileName)
 	mesh2D.writeElements();
 
 	TEST_END
+}
+
+
+int extrude3DfaceLine(const std::string& fileName){
+
+	TEST_START2
+	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(4,3), glm::dvec2(5.0, 2.0));
+	mesh3D.extrudeYZface(10., 2);
+	mesh3D.extrudeYZface(10.0, 2);
+	mesh3D.extrudeYZface(5.0, 2);
+	//mesh3D.setCsys(csyss[i]);
+	mesh3D.writeNodes();
+	mesh3D.writeElements();
+
+	writeDebugBeamElements(&writer, 1, Mesher::getWriter()->getNextNodeID());
+
+	TEST_END
+}
+int extrude3DfaceArc(const std::string& fileName) {
+	return false;
+}
+int extrude3DfaceArcAndLine(const std::string& fileName) {
+	return false;
 }
 
 #ifdef TO_FIX

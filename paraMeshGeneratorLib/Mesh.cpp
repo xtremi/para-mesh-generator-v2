@@ -1,6 +1,8 @@
 #include "Mesh.h"
 #include "PlaneMesher.h"
 #include "ConeMesher.h"
+#include "CuboidMesher.h"
+#include "Cone3Dmesher.h"
 
 Mesh2D_planeExtrusion::Mesh2D_planeExtrusion(int nElementsY, double lengthY)
 	: MeshPrimitive2D(){
@@ -20,40 +22,34 @@ void Mesh2D_planeExtrusion::setStartEdgeY(int nElementsY, double _lengthY) {
 }
 void Mesh3D_volumeExtrusion::setStartFaceYZ(const MeshDensity2D& _meshDensYZface, const glm::dvec2& _sizeYZ) {
 	sizeYZ = _sizeYZ;
-	meshDensity.setDir1(_meshDensYZface.dir1());
-	meshDensity.setDir2(_meshDensYZface.dir2());
+	meshDensity.setDir2(_meshDensYZface.dir1()); //y-dir
+	meshDensity.setDir3(_meshDensYZface.dir2()); //z-dir
 }
 
 void Mesh2D_planeExtrusion::extrudeYedgeArc(double endAng, double radius, int nElements) {
 	MeshEdgeExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-
 	extrusionsXdir.push_back(MeshEdgeExtrusion(radius, endAng , nElements, meshDensity.dir2(), nNodes, prevExtrusion));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
 void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radius, int nElements) {
 	MeshFaceExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	
-	//extrusionsXdir.push_back(MeshFaceExtrusion(radius, endAng, nElements, meshDensity.dir2(), nNodes, prevExtrusion));
+	extrusionsXdir.push_back(MeshFaceExtrusion(radius, endAng, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
 
 
 void Mesh2D_planeExtrusion::extrudeYedge(double length, int nElements) {
-	
 	MeshEdgeExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
 	extrusionsXdir.push_back(MeshEdgeExtrusion(length, nElements, meshDensity.dir2(), nNodes, prevExtrusion));
-
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
 
 void Mesh3D_volumeExtrusion::extrudeYZface(double length, int nElements) {
-
 	MeshFaceExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	//extrusionsXdir.push_back(MeshFaceExtrusion(length, nElements, meshDensity.dir2(), nNodes, prevExtrusion));
-
+	extrusionsXdir.push_back(MeshFaceExtrusion(length, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
@@ -175,15 +171,64 @@ void Mesh2D_planeExtrusion::writeNodes() {
 	}
 	
 }
-void Mesh3D_volumeExtrusion::writeNodes() {}
+void Mesh3D_volumeExtrusion::writeNodes() {
+	bool   firstExtrusion = true;
+	glm::dvec2 spacingYZ(sizeYZ[0] / (double)meshDensity.nElDir2(), sizeYZ[1] / (double)meshDensity.nElDir3());
+
+	setNodeOffsetOnMeshEdgeExtrusions(Mesher::getWriter()->getNextNodeID()); //to rename function
+	csys.update();
+
+	glm::dmat3x3 rotM(1.0);
+	ExtrudeStepData curExtrData;
+	curExtrData.csys = MeshCsys(&csys, glm::dvec3(0.), &rotM);
+	curExtrData.pos = glm::dvec3(0.0);
+	curExtrData.arcAngle = 0.0;
+
+
+	for (MeshExtrusion& extr : extrusionsXdir) {
+
+		curExtrData.dxyz = glm::dvec3(extr.spacing(), spacingYZ);
+		curExtrData.startSpace = 0.0;
+		curExtrData.nNodesEdgeX = extr.nNodes();
+
+		if (!firstExtrusion)
+			curExtrData.startSpace = extr.spacing();
+
+		if (extr.extrusionType == ExtrusionType::line) {
+			writeNodesExtrudeLine(curExtrData, extr);
+		}
+		else if (extr.extrusionType == ExtrusionType::arc) {
+			writeNodesExtrudeArc(curExtrData, extr);
+		}
+		curExtrData.csys.update();
+		firstExtrusion = false;
+	}
+
+
+
+}
 
 
 void Mesh2D_planeExtrusion::writeNodesExtrudeLine(ExtrudeStepData& curExtrData, MeshExtrusion& curExtr) {
 	curExtrData.pos = glm::dvec3(curExtrData.startSpace, 0., 0.);
-	PlaneMesher::writeNodesXYq(curExtrData.pos, curExtrData.csys, MeshDensity2D(curExtrData.nNodesEdgeX, meshDensity.dir2()), curExtrData.dxy);
+	PlaneMesher::writeNodesXYq(
+		curExtrData.pos, 
+		curExtrData.csys, 
+		MeshDensity2D(curExtrData.nNodesEdgeX, meshDensity.dir2()),
+		curExtrData.dxy);
+
 	curExtrData.csys.moveInLocalCsys(glm::dvec3(curExtr.length, 0.,0.));
 }
-void Mesh3D_volumeExtrusion::writeNodesExtrudeLine(ExtrudeStepData& curExtrData, MeshExtrusion& curExtr) {}
+void Mesh3D_volumeExtrusion::writeNodesExtrudeLine(ExtrudeStepData& curExtrData, MeshExtrusion& curExtr) {
+	curExtrData.pos = glm::dvec3(curExtrData.startSpace, 0., 0.);
+	CuboidMesher::writeNodesQ(
+		curExtrData.pos, 
+		curExtrData.csys,
+		MeshDensity3D(curExtrData.nNodesEdgeX, meshDensity.dir2(), meshDensity.dir3()), 
+		curExtrData.dxyz,
+		plane::xy);
+	curExtrData.csys.moveInLocalCsys(glm::dvec3(curExtr.length, 0., 0.));
+}
 
 void Mesh2D_planeExtrusion::writeNodesExtrudeArc(ExtrudeStepData& curExtrData, MeshExtrusion& curExtr) {
 
@@ -241,12 +286,27 @@ void Mesh2D_planeExtrusion::writeElements() {
 		Mesher::setNodeID1(extr->edges[4].nodeIter.first());
 		meshDens.setDir1(extr->nNodes());
 		PlaneMesher::writeElements(meshDens);
-		
 	}
 	
 }
 
-void Mesh3D_volumeExtrusion::writeElements() {}
+void Mesh3D_volumeExtrusion::writeElements() {
+
+	MeshFaceExtrusion* extr = nullptr;// , *prevExtr = nullptr;
+	MeshDensity3D meshDens(0, meshDensity.dir2(), meshDensity.dir3());
+
+	for (int i = 0; i < extrusionsXdir.size(); i++) {
+		extr = &extrusionsXdir[i];
+
+		if (!extr->isStart()) {
+			//RowMesher2D::writeElements(&extr->edges[0].nodeIter, &extr->edges[4].nodeIter);
+		}
+		Mesher::setNodeID1(extr->faces[6].nodeIter.first());
+		meshDens.setDir1(extr->nNodes());
+		CuboidMesher::writeElements(meshDens);
+	}
+
+}
 
 /*
 	Reduce 1 for each iteration to remove duplication node

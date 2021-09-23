@@ -216,6 +216,7 @@ struct MeshDensity3D : public NodeVec3D {
 	int nElAxis() const { return nElDir3(); }
 
 	MeshDensity2D meshDensD12() const { return MeshDensity2D(dir1(), dir2(), closedLoop); }
+	MeshDensity2D meshDensD23() const { return MeshDensity2D(dir2(), dir3(), closedLoop); }
 	int nnodesPlaneD12() const { return dir1() * dir2(); }
 };
 

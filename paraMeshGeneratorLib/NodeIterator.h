@@ -48,6 +48,7 @@ public:
 	NodeIterator1D(int _firstNode, int _nNodes, int _nodeIncr = 1, int _preNode = 0);
 	int next();
 	int last();
+	int get(int i);
 	void reset();
 	int numberOfNodes() { return nNodes; }
 
@@ -134,11 +135,16 @@ public:
 	NodeIterator2D(int _firstNode, int _nNodesX, int _nNodesY, int _nodeIncrX, int _nodeIncrY, const NodeIterator1D& _preNodes = NodeIterator1D());
 	int next();
 	int last();
+	int get(int ix, int iy);
 	void reset();
 	int numberOfNodes() { return nodeIncr[0] * nodeIncr[1]; }
 
+	void first4(int& n1, int& n2, int& n3, int& n4);
+	void next4(int& n1, int& n2, int& n3, int& n4);
+
 private:	
 	glm::ivec2 currentIterIndices;
+	std::vector<glm::ivec2> currentIterIndices4;
 	glm::ivec2 nNodes;
 	glm::ivec2 nodeIncr;
 	NodeIterator1D preNodes;

@@ -38,23 +38,23 @@ preNode    n0      n1      n2
 
 */
 int NodeIterator1D::next() {
-	//End of iteration:
-	if (currentIterIndex == nNodes){
+	if (currentIterIndex == nNodes) {
 		return 0;
-	}
-
-	//First iteration with preNode:
-	if ((currentIterIndex == 0) && (preNode > 0)) {
-		currentIterIndex++;
+	}	
+	return get(currentIterIndex++);
+}
+/*
+	Does not check index limits
+*/
+int NodeIterator1D::get(int i) {
+	if ((i == 0) && (preNode > 0)) {
 		return preNode + nodeIDoffset;//TODO: why is nodeIDoffset used and not firstNodeID not?
 	}
-	else{
-		if (preNode > 0) {
-			return ((currentIterIndex++) - 1) * nodeIncr + firstNodeID + nodeIDoffset;
-		}
-		else {
-			return (currentIterIndex++) * nodeIncr + firstNodeID + nodeIDoffset;
-		}		
+	else if (preNode > 0) {
+		return (i - 1) * nodeIncr + firstNodeID + nodeIDoffset;
+	}
+	else {
+		return i * nodeIncr + firstNodeID + nodeIDoffset;
 	}
 }
 int NodeIterator1D::last() {
@@ -156,8 +156,9 @@ dirY   (102)x---13x---14x---15x
 */
 int NodeIterator2D::next() {
 	//End of iteration:
-	if (currentIterIndices[0] == nNodes[0] && currentIterIndices[1] == (nNodes[1] - 1))
+	if (currentIterIndices[0] == nNodes[0] && currentIterIndices[1] == (nNodes[1] - 1)){
 		return 0;
+	}
 
 	//if last in dirX - reset X iter - incr Y iter
 	if (currentIterIndices[0] == nNodes[0]) {
@@ -166,21 +167,32 @@ int NodeIterator2D::next() {
 		return next();
 	}
 	else {
-
+		return get(currentIterIndices[0]++, currentIterIndices[1]);
+				
+		/*
 		if ((currentIterIndices[0] == 0 && hasPreNodes)) {
 			currentIterIndices[0]++;
-			return preNodes.next() + nodeIDoffset;//TODO: why is nodeIDoffset used and not firstNodeID not?;
+			return preNodes.next() + nodeIDoffset;//TODO: why is nodeIDoffset used and firstNodeID not?;
 		}
-		else {
-			if (hasPreNodes) {
-				return ((currentIterIndices[0]++) - 1)*nodeIncr[0] + currentIterIndices[1] * nodeIncr[1] + firstNodeID + nodeIDoffset;
-			}
-			else {
-				return (currentIterIndices[0]++)*nodeIncr[0] + currentIterIndices[1] * nodeIncr[1] + firstNodeID + nodeIDoffset;
-			}
-		}
-
 		
+		else {
+			return get(currentIterIndices[0]++, currentIterIndices[1]);
+		}	*/	
+	}
+
+	return 0;
+}
+
+int NodeIterator2D::get(int ix, int iy) {
+	
+	if (ix == 0 && hasPreNodes) {
+		return preNodes.get(iy) + nodeIDoffset;//TODO: why is nodeIDoffset used and not firstNodeID not?;
+	}
+	else if (hasPreNodes) {
+		return (ix - 1)*nodeIncr[0] + iy * nodeIncr[1] + firstNodeID + nodeIDoffset;
+	}
+	else {
+		return ix*nodeIncr[0] + iy * nodeIncr[1] + firstNodeID + nodeIDoffset;
 	}
 
 	return 0;
@@ -193,6 +205,33 @@ int NodeIterator2D::last() {
 
 void NodeIterator2D::reset() {
 	currentIterIndices = glm::ivec2(0, 0);
+}
+
+
+void NodeIterator2D::first4(int& n1, int& n2, int& n3, int& n4) {
+	currentIterIndices4 = { {0,0}, {1,0},{1,1}, {0,1} };
+	return next4(n1,n2,n3,n4);
+}
+/*
+	Returns the 4 next nodes in the following order:
+
+	^
+	|Y
+
+	x---x---x---x---x---x---x
+ 	| 7 | 8 | 9 | 10| 11| 12|
+	x---x---x---x---x---x---x        n4x----xn3 
+	| 1 | 2 | 3 | 4 | 5 | 6 |          |    |
+	x---x---x---x---x---x---x -->X   n1x----xn2
+
+*/
+void NodeIterator2D::next4(int& n1, int& n2, int& n3, int& n4) {
+
+	for (glm::ivec2& indices : currentIterIndices4) {
+		currentIterIndices = indices;
+		n1 = next(); n2 = next();
+	}
+
 }
 
 /*
