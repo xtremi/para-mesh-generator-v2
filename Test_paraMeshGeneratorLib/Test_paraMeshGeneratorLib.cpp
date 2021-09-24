@@ -2245,10 +2245,11 @@ int extrude2DedgeArcAndLine(const std::string& fileName)
 int extrude3DfaceLine(const std::string& fileName){
 
 	TEST_START2
-	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(4,3), glm::dvec2(5.0, 2.0));
+	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(8,3), glm::dvec2(5.0, 2.0));
 	mesh3D.extrudeYZface(10., 2);
-	mesh3D.extrudeYZface(10.0, 2);
-	mesh3D.extrudeYZface(5.0, 2);
+	mesh3D.extrudeYZface(10., 3);
+	mesh3D.extrudeYZface(5.0, 4);
+	mesh3D.extrudeYZface(5.0, 34);
 	//mesh3D.setCsys(csyss[i]);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();

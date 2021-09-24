@@ -299,7 +299,7 @@ void Mesh3D_volumeExtrusion::writeElements() {
 		extr = &extrusionsXdir[i];
 
 		if (!extr->isStart()) {
-			//RowMesher2D::writeElements(&extr->edges[0].nodeIter, &extr->edges[4].nodeIter);
+			RowMesher3D::writeElements(&extr->faces[0].nodeIter, &extr->faces[6].nodeIter);
 		}
 		Mesher::setNodeID1(extr->faces[6].nodeIter.first());
 		meshDens.setDir1(extr->nNodes());
@@ -321,13 +321,23 @@ void Mesh2D_planeExtrusion::calculateNumberOfNodesX() {
 	}
 	meshDensity.setDir1(nNodesX);
 }
-void Mesh3D_volumeExtrusion::calculateNumberOfNodesX() {}
+//same as Mesh2D_planeExtrusion::calculateNumberOfNodesX
+void Mesh3D_volumeExtrusion::calculateNumberOfNodesX() {
+	int nNodesX = 0;
+	for (MeshExtrusion& meshExtrusion : extrusionsXdir) {
+		nNodesX += (meshExtrusion.nNodes());
+	}
+	meshDensity.setDir1(nNodesX);
+}
 
 void Mesh2D_planeExtrusion::calculateNumberOfNodes() {
 	calculateNumberOfNodesX();
 	nNodes = meshDensity.nNodes();
 }
-void Mesh3D_volumeExtrusion::calculateNumberOfNodes() {}
+void Mesh3D_volumeExtrusion::calculateNumberOfNodes() {
+	calculateNumberOfNodesX();
+	nNodes = meshDensity.nNodes();
+}
 
 void Mesh2D_planeExtrusion::calculateNumberOfElements() {
 	nElements = meshDensity.nElements();

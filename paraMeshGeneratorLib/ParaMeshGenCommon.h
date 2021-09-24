@@ -218,6 +218,9 @@ struct MeshDensity3D : public NodeVec3D {
 	MeshDensity2D meshDensD12() const { return MeshDensity2D(dir1(), dir2(), closedLoop); }
 	MeshDensity2D meshDensD23() const { return MeshDensity2D(dir2(), dir3(), closedLoop); }
 	int nnodesPlaneD12() const { return dir1() * dir2(); }
+
+	int nNodes() const { return dir1() * dir2() * dir3(); }
+	int nElements() const { return nElDir1() * nElDir2() * nElDir3(); }
 };
 
 /*
