@@ -139,12 +139,12 @@ public:
 	void reset();
 	int numberOfNodes() { return nodeIncr[0] * nodeIncr[1]; }
 
-	void first4(int& n1, int& n2, int& n3, int& n4);
-	void next4(int& n1, int& n2, int& n3, int& n4);
+	bool first4(int& n1, int& n2, int& n3, int& n4);
+	bool next4(int& n1, int& n2, int& n3, int& n4);
 
 private:	
 	glm::ivec2 currentIterIndices;
-	std::vector<glm::ivec2> currentIterIndices4;
+	//std::vector<glm::ivec2> currentIterIndices4;
 	glm::ivec2 nNodes;
 	glm::ivec2 nodeIncr;
 	NodeIterator1D preNodes;

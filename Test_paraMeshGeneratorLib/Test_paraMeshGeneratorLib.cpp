@@ -39,6 +39,7 @@ int speedTestWriteNodesAndElements(const std::string& fileName);
 int nodeIterator1D(const std::string& fileName);
 int nodeIterator1Dm(const std::string& fileName);
 int nodeIterator2D(const std::string& fileName);
+int nodeIterator2D_4(const std::string& fileName);
 int nodeIterator2Dm(const std::string& fileName);
 int meshEdgeExtrusion(const std::string& fileName);
 int meshFaceExtrusion(const std::string& fileName);
@@ -102,8 +103,9 @@ std::vector<TestDef> testFunctions({
 	
 	TestDef(30, "nodeIterator1D",			"utilities", (testFunction)nodeIterator1D),
 	TestDef(31, "nodeIterator1Dm",			"utilities", (testFunction)nodeIterator1Dm),
-	TestDef(32, "nodeIterator2D",			"utilities", (testFunction)nodeIterator2D),
+	TestDef(32, "nodeIterator2D",			"utilities", (testFunction)nodeIterator2D),	
 	TestDef(33, "nodeIterator2Dm",			"utilities", (testFunction)nodeIterator2Dm),
+	TestDef(34, "nodeIterator2D_4",			"utilities", (testFunction)nodeIterator2D_4),
 	TestDef(40, "meshEdgeExtrusion",	"utilities", (testFunction)meshEdgeExtrusion),
 	TestDef(50, "meshFaceExtrusion",	"utilities", (testFunction)meshFaceExtrusion),
 	
@@ -1833,10 +1835,32 @@ bool equalVectors(const std::vector<T>& vec1, const std::vector<T>& vec2) {
 	return true;
 }
 
+template<typename T>
+bool equalVecVectors(const std::vector<std::vector<T>>& vec1, std::vector<std::vector<T>>& vec2) {
+	if (vec1.size() != vec2.size()) {
+		return false;
+	}
+	for (int i = 0; i < vec1.size(); i++) {
+		if (!equalVectors(vec1[i], vec2[i])) {
+			return false;
+		}
+	}
+	return true;
+}
+
 std::vector<int> getNodeIteratorResult(NodeIterator& nit) {
 	std::vector<int> res;
 	for (int nid = nit.first(); nid; nid = nit.next()) {
 		res.push_back(nid);
+	}
+	return res;
+}
+
+std::vector<std::vector<int>> getNodeIteratorResult_4(NodeIterator2D& nit) {
+	std::vector<std::vector<int>> res;
+	int n1, n2, n3, n4;
+	for (int b = nit.first4(n1, n2, n3, n4); b; b = nit.next4(n1, n2, n3, n4)) {
+		res.push_back(std::vector<int>({ n1,n2,n3,n4 }));
 	}
 	return res;
 }
@@ -1916,6 +1940,47 @@ int nodeIterator2D(const std::string& fileName) {
 	result = getNodeIteratorResult(it2);
 	expectedResult = { 101,1,2,3, 102,13,14,15, 103,25,26,27 };
 	if (!equalVectors(result, expectedResult)) return 1;
+
+	return 0;
+}
+
+int nodeIterator2D_4(const std::string& fileName) {
+
+	std::vector<std::vector<int>> result;
+	std::vector<std::vector<int>> expectedResult;
+
+	/*
+	::::::::::::::::::::::::::::::::::::::::::::
+	From NodeIterator2D example 1
+	::::::::::::::::::::::::::::::::::::::::::::
+		nNodesX = 5, nNodesY = 3
+			   	  		  
+	incrY = 5
+	  ^	  11x   36x   61x   86x  111x
+	  |       
+	dirY   6x   31x   56x   81x  106x
+	  |	   
+	  |    1x   26x   51x   76x  101x
+
+		----> dirX incrX = 25
+	
+	
+	*/
+	NodeIterator2D it1(1, 5, 3, 25, 5);
+	result = getNodeIteratorResult_4(it1);
+	expectedResult = { 
+		{1, 26, 31, 6}, {26, 51, 56, 31}, {51, 76, 81, 56}, {76, 101, 106, 81}, 
+		{6, 31, 36, 11}, {31, 56, 61, 36}, {56, 81, 86, 61}, {81, 106, 111, 86}
+	};
+
+	if (!equalVecVectors(result, expectedResult)) return 1;
+
+	//From NodeIterator2D example 2
+	//NodeIterator1D preNodesIt(101, 3, 1);
+	//NodeIterator2D it2(1, 3, 3, 1, 12, preNodesIt);
+	//result = getNodeIteratorResult(it2);
+	//expectedResult = { 101,1,2,3, 102,13,14,15, 103,25,26,27 };
+	//if (!equalVectors(result, expectedResult)) return 1;
 
 	return 0;
 }

@@ -168,16 +168,6 @@ int NodeIterator2D::next() {
 	}
 	else {
 		return get(currentIterIndices[0]++, currentIterIndices[1]);
-				
-		/*
-		if ((currentIterIndices[0] == 0 && hasPreNodes)) {
-			currentIterIndices[0]++;
-			return preNodes.next() + nodeIDoffset;//TODO: why is nodeIDoffset used and firstNodeID not?;
-		}
-		
-		else {
-			return get(currentIterIndices[0]++, currentIterIndices[1]);
-		}	*/	
 	}
 
 	return 0;
@@ -208,8 +198,9 @@ void NodeIterator2D::reset() {
 }
 
 
-void NodeIterator2D::first4(int& n1, int& n2, int& n3, int& n4) {
-	currentIterIndices4 = { {0,0}, {1,0},{1,1}, {0,1} };
+bool NodeIterator2D::first4(int& n1, int& n2, int& n3, int& n4) {
+	//currentIterIndices4 = { {0,0}, {1,0},{1,1}, {0,1} };
+	currentIterIndices = glm::ivec2(0);
 	return next4(n1,n2,n3,n4);
 }
 /*
@@ -225,13 +216,27 @@ void NodeIterator2D::first4(int& n1, int& n2, int& n3, int& n4) {
 	x---x---x---x---x---x---x -->X   n1x----xn2
 
 */
-void NodeIterator2D::next4(int& n1, int& n2, int& n3, int& n4) {
+bool NodeIterator2D::next4(int& n1, int& n2, int& n3, int& n4) {
+	static const std::vector<glm::ivec2>iter4Offset = { {0,0}, {1,0},{1,1}, {0,1} };
 
-	for (glm::ivec2& indices : currentIterIndices4) {
-		currentIterIndices = indices;
-		n1 = next(); n2 = next();
+	//End of iteration:
+	if (currentIterIndices[1] == (nNodes[1] - 1)) {
+		return false;
 	}
 
+
+	int i = 0;
+	int* n[4] = { &n1,&n2,&n3,&n4 };
+	for (int i = 0; i < 4; i++) {
+		*n[i] = get(currentIterIndices[0] + iter4Offset[i][0], currentIterIndices[1] + iter4Offset[i][1]);
+	}
+	currentIterIndices[0]++;
+	if (currentIterIndices[0] == (nNodes[0] - 1)) {
+		currentIterIndices[0] = 0;
+		currentIterIndices[1]++;
+	}
+
+	return true;
 }
 
 /*
