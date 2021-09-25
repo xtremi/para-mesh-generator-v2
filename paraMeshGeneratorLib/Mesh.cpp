@@ -32,9 +32,9 @@ void Mesh2D_planeExtrusion::extrudeYedgeArc(double endAng, double radius, int nE
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
-void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radius, int nElements) {
+void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner, double radiusOuter, int nElements) {
 	MeshFaceExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	extrusionsXdir.push_back(MeshFaceExtrusion(radius, endAng, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion));
+	extrusionsXdir.push_back(MeshFaceExtrusion(radiusInner, radiusOuter, endAng, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
@@ -245,7 +245,26 @@ void Mesh2D_planeExtrusion::writeNodesExtrudeArc(ExtrudeStepData& curExtrData, M
 	curExtrData.csys.moveInLocalCsys(coordsOnCircle(ang.end, curExtr.radius, direction::y) + glm::dvec3(0, 0, curExtr.radius));
 	(*curExtrData.csys.csys) = makeCsysMatrix(Y_DIR, curExtrData.arcAngle);
 }
-void Mesh3D_volumeExtrusion::writeNodesExtrudeArc(ExtrudeStepData& curExtrData, MeshExtrusion& curExtr) {}
+void Mesh3D_volumeExtrusion::writeNodesExtrudeArc(ExtrudeStepData& curExtrData, MeshExtrusion& curExtr) {
+	
+	MeshFaceExtrusion* curFextr = (MeshFaceExtrusion*)&curExtr;
+	
+	curExtrData.pos = glm::dvec3(0., 0., curExtr.radius);
+
+	ArcAngles ang;
+	ang.setStart(-curExtrData.startSpace - GLMPI);
+	ang.setEnd(-(GLMPI + curExtr.endAngle));
+
+	Cone3Dmesher::writeNodes(curExtrData.pos, curExtrData.csys, 
+		MeshDensity3D(curExtrData.nNodesEdgeX, meshDensity.dir2(), meshDensity.dir3()),
+		Pipe3Dradius(curExtr.radius, curFextr->radiusOuter, curExtr.radius, curFextr->radiusOuter),
+		ang, sizeYZ[0], direction::y);
+
+	curExtrData.arcAngle += curExtr.endAngle;
+	curExtrData.csys.moveInLocalCsys(coordsOnCircle(ang.end, curExtr.radius, direction::y) + glm::dvec3(0, 0, curExtr.radius));
+	(*curExtrData.csys.csys) = makeCsysMatrix(Y_DIR, curExtrData.arcAngle);
+
+}
 
 /*
 

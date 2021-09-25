@@ -67,15 +67,17 @@ MeshFaceExtrusion::MeshFaceExtrusion(
 }
 
 MeshFaceExtrusion::MeshFaceExtrusion(
-	double				 _radius,
+	double				 _radiusInner,
+	double				 _radiusOuter,
 	double				 _endAngle,
 	int					 _nElements,
 	const MeshDensity2D& face0nodes,
 	int					 firstNodeID,
 	MeshExtrusion*		 previousExtrusion)
-	: MeshExtrusion(_radius, _endAngle, _nElements, previousExtrusion)
+	: MeshExtrusion(_radiusInner, _endAngle, _nElements, previousExtrusion)
 {
 	initFaces(face0nodes, firstNodeID, previousExtrusion);
+	radiusOuter = _radiusOuter;
 }
 
 /*!

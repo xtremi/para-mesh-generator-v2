@@ -169,7 +169,8 @@ public:
 		int					 firstNodeID,
 		MeshExtrusion*		 previousExtrusion = nullptr);
 	MeshFaceExtrusion(		 
-		double				 _radius,
+		double				 _radiusInner,
+		double				 _radiusOuter,
 		double				 _endAngle,
 		int					 _nElements,
 		const MeshDensity2D& face0nodes,
@@ -188,7 +189,13 @@ public:
 
 	void setNodeOffset(int nOffs);
 	void addToFirstNodeID(int n);
+
+
+	double radiusOuter;
+
 protected:
 	void initFaces(const MeshDensity2D& face1nodes, int firstNodeID, MeshExtrusion* previousExtrusion);
 	NodeIterator1D endEdgeIterators[4];
+
+	
 };

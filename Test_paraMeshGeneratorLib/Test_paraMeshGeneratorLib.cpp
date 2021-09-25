@@ -2250,15 +2250,22 @@ int extrude3DfaceLine(const std::string& fileName){
 	mesh3D.extrudeYZface(10., 3);
 	mesh3D.extrudeYZface(5.0, 4);
 	mesh3D.extrudeYZface(5.0, 34);
-	//mesh3D.setCsys(csyss[i]);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
-
-	writeDebugBeamElements(&writer, 1, Mesher::getWriter()->getNextNodeID());
-
 	TEST_END
 }
 int extrude3DfaceArc(const std::string& fileName) {
+
+	TEST_START2
+	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(7, 10), glm::dvec2(5.0, 2.0));
+	mesh3D.extrudeYZedgeArc(-GLMPI / 10.0, -100.0, -96.0, 30);
+	mesh3D.extrudeYZedgeArc(GLMPI / 1.0, 4.0, 8., 20);	//0.0 - 1.0
+	mesh3D.extrudeYZedgeArc(GLMPI / 3.0, 10.0, 14.0, 10);	//0.0 - 1.0
+	mesh3D.extrudeYZedgeArc(-GLMPI / 1.0, -6, -2, 18);
+	mesh3D.writeNodes();
+	mesh3D.writeElements();
+	TEST_END
+
 	return false;
 }
 int extrude3DfaceArcAndLine(const std::string& fileName) {

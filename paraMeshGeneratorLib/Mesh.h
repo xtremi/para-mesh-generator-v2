@@ -121,7 +121,7 @@ public:
 	void setStartFaceYZ(const MeshDensity2D& meshDensYZface, const glm::dvec2& sizeYZ);
 
 	void extrudeYZface(double length, int nElements);
-	void extrudeYZedgeArc(double endAng, double radius, int nElements);
+	void extrudeYZedgeArc(double endAng, double radiusInner, double radiusOuter, int nElements);
 
 	virtual void writeNodes();
 	virtual void writeElements();
