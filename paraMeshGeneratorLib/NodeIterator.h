@@ -46,11 +46,11 @@ public:
 
 	NodeIterator1D() {}
 	NodeIterator1D(int _firstNode, int _nNodes, int _nodeIncr = 1, int _preNode = 0);
-	int next();
-	int last();
-	int get(int i);
+	virtual int next();
+	virtual int last();
+	virtual int get(int i);
 	void reset();
-	int numberOfNodes() { return nNodes; }
+	virtual int numberOfNodes() { return nNodes; }
 
 protected:
 	int nNodes;
@@ -59,6 +59,25 @@ protected:
 
 	int currentIterIndex = 0;
 };
+
+class NodeIterator1Dref : public NodeIterator1D {
+public:
+
+	NodeIterator1Dref() {}
+	NodeIterator1Dref(int _firstNode, int _nRef, int _preNode = 0);
+	virtual int next();
+	virtual int last();
+	virtual int get(int i);
+	void reset();
+
+protected:
+	int nRef = 0;
+};
+
+
+
+
+
 
 /*
 	Chain of multiple NodeIterators1D
@@ -133,22 +152,42 @@ class NodeIterator2D : public NodeIterator {
 public:
 	NodeIterator2D() {}
 	NodeIterator2D(int _firstNode, int _nNodesX, int _nNodesY, int _nodeIncrX, int _nodeIncrY, const NodeIterator1D& _preNodes = NodeIterator1D());
-	int next();
-	int last();
-	int get(int ix, int iy);
-	void reset();
-	int numberOfNodes() { return nodeIncr[0] * nodeIncr[1]; }
+	virtual int next();
+	virtual int last();
+	virtual int get(int ix, int iy);
+	virtual void reset();
+	virtual int numberOfNodes() { return nodeIncr[0] * nodeIncr[1]; }
 
-	bool first4(int& n1, int& n2, int& n3, int& n4);
-	bool next4(int& n1, int& n2, int& n3, int& n4);
+	virtual bool first4(int& n1, int& n2, int& n3, int& n4);
+	virtual bool next4(int& n1, int& n2, int& n3, int& n4);
 
-private:	
+protected:	
 	glm::ivec2 currentIterIndices;
 	//std::vector<glm::ivec2> currentIterIndices4;
 	glm::ivec2 nNodes;
 	glm::ivec2 nodeIncr;
 	NodeIterator1D preNodes;
 	bool hasPreNodes = false;
+};
+
+class NodeIterator2Dref : public NodeIterator2D {
+public:
+	NodeIterator2Dref() {}
+	NodeIterator2Dref(
+		int _firstNode, 
+		int _nNodesX, 	int _nRef, 
+		const NodeIterator1D& _preNodes = NodeIterator1D());
+	virtual int next();
+	virtual int last();
+	virtual int get(int ix, int iy);
+	virtual void reset();
+	virtual int numberOfNodes();
+
+	virtual bool first4(int& n1, int& n2, int& n3, int& n4);
+	virtual bool next4(int& n1, int& n2, int& n3, int& n4);
+
+protected:
+	int nRef;
 };
 
 /*

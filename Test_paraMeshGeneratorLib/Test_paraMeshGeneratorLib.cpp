@@ -37,9 +37,11 @@ int speedTestWriteRotatedCubes(const std::string& fileName);
 int speedTestWriteNodesAndElements(const std::string& fileName);
 
 int nodeIterator1D(const std::string& fileName);
+int nodeIterator1Dref(const std::string& fileName);
 int nodeIterator1Dm(const std::string& fileName);
 int nodeIterator2D(const std::string& fileName);
 int nodeIterator2D_4(const std::string& fileName);
+int nodeIterator2Dref(const std::string& fileName);
 int nodeIterator2Dm(const std::string& fileName);
 int meshEdgeExtrusion(const std::string& fileName);
 int meshFaceExtrusion(const std::string& fileName);
@@ -101,13 +103,17 @@ std::vector<TestDef> testFunctions({
 	TestDef(15, "speedTestWriteRotatedCubes",		"speed test", (testFunction)speedTestWriteRotatedCubes),
 	TestDef(16, "speedTestWriteNodesAndElements",	"speed test", (testFunction)speedTestWriteNodesAndElements),
 	
-	TestDef(30, "nodeIterator1D",			"utilities", (testFunction)nodeIterator1D),
-	TestDef(31, "nodeIterator1Dm",			"utilities", (testFunction)nodeIterator1Dm),
-	TestDef(32, "nodeIterator2D",			"utilities", (testFunction)nodeIterator2D),	
-	TestDef(33, "nodeIterator2Dm",			"utilities", (testFunction)nodeIterator2Dm),
-	TestDef(34, "nodeIterator2D_4",			"utilities", (testFunction)nodeIterator2D_4),
-	TestDef(40, "meshEdgeExtrusion",	"utilities", (testFunction)meshEdgeExtrusion),
-	TestDef(50, "meshFaceExtrusion",	"utilities", (testFunction)meshFaceExtrusion),
+	TestDef(30, "nodeIterator1D",		"utilities", (testFunction)nodeIterator1D),
+	TestDef(31, "nodeIterator1Dm",		"utilities", (testFunction)nodeIterator1Dm),
+	TestDef(32, "nodeIterator1Dref",	"utilities", (testFunction)nodeIterator1Dref),
+
+	TestDef(40, "nodeIterator2D",		"utilities", (testFunction)nodeIterator2D),	
+	TestDef(41, "nodeIterator2Dm",		"utilities", (testFunction)nodeIterator2Dm),
+	TestDef(42, "nodeIterator2D_4",		"utilities", (testFunction)nodeIterator2D_4),
+	TestDef(43, "nodeIterator2Dref",	"utilities", (testFunction)nodeIterator2Dref),
+	
+	TestDef(50, "meshEdgeExtrusion",	"utilities", (testFunction)meshEdgeExtrusion),
+	TestDef(60, "meshFaceExtrusion",	"utilities", (testFunction)meshFaceExtrusion),
 	
 
 	TestDef(101, "lineMesher",			"basic meshers 1D", (testFunction)lineMesher),	
@@ -1923,6 +1929,33 @@ int nodeIterator1Dm(const std::string& fileName) {
 	return 0;
 }
 
+/*
+
+	NOT COMPLETED
+*/
+int nodeIterator1Dref(const std::string& fileName) {
+	TEST_START2
+
+	glm::dvec2 size(20.0, 17.0);
+	int nRef = 3;
+	int nNodesDir2 = std::pow(2, nRef + 1) + 1;
+	MeshDensity2Dref meshDens(nRef, nNodesDir2, false);
+
+	PlaneMesherRef::writeNodes(pos, glCsys, meshDens, size, true, plane::xy);
+	PlaneMesherRef::writeElements(meshDens);
+
+	std::vector<int> result;
+	std::vector<int> expectedResult;
+
+	NodeIterator1Dref it1(1, 10, 3);
+	result = getNodeIteratorResult(it1);
+	expectedResult = {  };
+	if (!equalVectors(result, expectedResult)) return 1;
+
+	TEST_END
+	return 0;
+}
+
 int nodeIterator2D(const std::string& fileName) {
 
 	std::vector<int> result;
@@ -1982,6 +2015,35 @@ int nodeIterator2D_4(const std::string& fileName) {
 	//expectedResult = { 101,1,2,3, 102,13,14,15, 103,25,26,27 };
 	//if (!equalVectors(result, expectedResult)) return 1;
 
+	return 0;
+}
+
+/*
+
+	NOT COMPLETED
+*/
+int nodeIterator2Dref(const std::string& fileName) {
+	TEST_START2
+
+	glm::dvec2 size(20.0, 17.0);
+	int nRef = 3;
+	int nNodesDir2 = std::pow(2, nRef + 1) + 1;
+	MeshDensity2Dref meshDens(nRef, nNodesDir2, false);
+
+	PlaneMesherRef::writeNodes(pos, glCsys, meshDens, size, true, plane::xy);
+	PlaneMesherRef::writeElements(meshDens);
+	
+	std::vector<int> result;
+	std::vector<int> expectedResult;
+
+
+	//From NodeIterator2D example 1
+	NodeIterator2Dref it1(1, 10, 3);
+	result = getNodeIteratorResult(it1);
+	expectedResult = {  };
+	if (!equalVectors(result, expectedResult)) return 1;
+
+	TEST_END
 	return 0;
 }
 

@@ -65,6 +65,25 @@ void NodeIterator1D::reset() {
 	currentIterIndex = 0;
 }
 
+NodeIterator1Dref::NodeIterator1Dref(int _firstNode, int _nRef, int _preNode)
+	: NodeIterator1D(_firstNode, 0, 0, _preNode)
+{
+	nRef = _nRef;
+}
+int NodeIterator1Dref::next() {
+	return 0;
+}
+int NodeIterator1Dref::last() {
+	return 0;
+}
+int NodeIterator1Dref::get(int i) {
+	return 0;
+}
+void NodeIterator1Dref::reset() {
+	NodeIterator1D::reset();
+}
+
+
 /*
 
 	1D multi
@@ -238,6 +257,41 @@ bool NodeIterator2D::next4(int& n1, int& n2, int& n3, int& n4) {
 
 	return true;
 }
+
+
+NodeIterator2Dref::NodeIterator2Dref(
+	int _firstNode,
+	int _nNodesX, int _nRef,
+	const NodeIterator1D& _preNodes) :
+	NodeIterator2D(_firstNode, _nNodesX, 0, 0, 0, preNodes)
+{
+	nRef = _nRef;
+}
+
+
+int NodeIterator2Dref::next() {
+	return 0;
+}
+int NodeIterator2Dref::last() {
+	return 0;
+}
+int NodeIterator2Dref::get(int ix, int iy) {
+	return 0;
+}
+void NodeIterator2Dref::reset(){
+	NodeIterator2D::reset();
+}
+int NodeIterator2Dref::numberOfNodes() {
+	return 0;
+}
+
+bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
+	return false;
+}
+bool NodeIterator2Dref::next4(int& n1, int& n2, int& n3, int& n4) {
+	return false;
+}
+
 
 /*
 
