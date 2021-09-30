@@ -1,5 +1,7 @@
 #pragma once
 #include "ParaMeshGenCommon.h"
+#include "NodeIterator.h"
+
 
 enum class ExtrusionType {
 	line,
@@ -59,7 +61,6 @@ public:
 
 	bool isStart() { return _isStart; }
 	ExtrusionType extrusionType;
-	int			  extrusionIndex = 0;
 	double		  length;				// ExtrusionType::line
 	double		  radius, endAngle;		// ExtrusionType::arc
 	int			  nElements;
@@ -126,6 +127,7 @@ public:
 		edge[0] is the edge same edge as edge[2] of the previous extrusion
 		edge[5] is the first edge with nodes belonging to this extrusion
 	*/
+	MeshDensity2D meshDens;
 	MeshEdge edges[5];
 	int endCornerNode1();
 	int endCornerNode2();

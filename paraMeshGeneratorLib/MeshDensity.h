@@ -1,0 +1,254 @@
+#pragma once
+#include "math_utilities.h"
+
+/*
+	Wrapper for glm::ivec2 representing number of nodes for a "2D structured mesh"
+*/
+struct NodeVec2D {
+	NodeVec2D() {}
+	NodeVec2D(int _dir1, int _dir2) : nnodes{ glm::ivec2(_dir1, _dir2) } {}
+
+	glm::ivec2& nodes() { return nnodes; }
+	int dir1() const { return nnodes.x; }
+	int dir2() const { return nnodes.y; }
+	/*
+		Circular direction, around cicumference
+	*/
+	virtual int circ() const { return dir1(); }
+	/*
+		Radial/normal direction, out of circle
+	*/
+	virtual int norm() const { return dir2(); }
+
+
+	void setDir1(int n) { nnodes.x = n; }
+	void setDir2(int n) { nnodes.y = n; }
+	virtual void setCirc(int n) { setDir1(n); }
+	virtual void setNorm(int n) { setDir2(n); }
+
+protected:
+	glm::ivec2 nnodes;
+};
+
+/*
+	Wrapper for glm::ivec3 representing number of nodes for a "3D structured mesh"
+*/
+struct NodeVec3D {
+	NodeVec3D() {}
+	NodeVec3D(int _dir1, int _dir2, int _dir3) : nnodes{ glm::ivec3(_dir1, _dir2, _dir3) } {}
+
+	glm::ivec3& nodes() { return nnodes; }
+	int dir1() const { return nnodes.x; }
+	int dir2() const { return nnodes.y; }
+	int dir3() const { return nnodes.z; }
+	/*
+		Circular direction, around cicumference (for cone/cylinder)
+	*/
+	int circ() const { return dir1(); }
+	/*
+		Radial/normal direction, out of circle (for cone/cylinder)
+	*/
+	int norm() const { return dir2(); }
+	/*
+		Along axis/height of a cone/cylinder
+	*/
+	int axis()   const { return dir3(); }
+
+	void setDir1(int n) { nnodes.x = n; }
+	void setDir2(int n) { nnodes.y = n; }
+	void setDir3(int n) { nnodes.z = n; }
+	void setCirc(int n) { setDir1(n); }
+	void setNorm(int n) { setDir2(n); }
+	void setAxis(int n) { setDir3(n); }
+
+protected:
+	glm::ivec3 nnodes;
+};
+
+/*
+NOT USED
+	Mesh density for 1D structured mesh with element number function and closed loop definition
+*/
+struct MeshDensity1D {
+	MeshDensity1D(int _nnodes, bool _closedLoop = false) : nnodes{ _nnodes }, closedLoop{ _closedLoop }{}
+	int nEl() const { return closedLoop ? nnodes : nnodes - 1; }
+	bool closedLoop;
+	int nnodes;
+};
+
+/*
+	Extends NodeVec2D with element number functions and closed loop definition
+
+	dir2
+	^
+  c3|               c2
+	x--x--x--x--x--x
+	|  |  |  |  |  |  
+	x--x--x--x--x--x
+	|  |  |  |  |  |
+	x--x--x--x--x--x --->dir1
+  c0               c1
+*/
+struct MeshDensity2D : public NodeVec2D {
+	MeshDensity2D() {}
+	MeshDensity2D(int _dir1, int _dir2, bool closedLoopDir1 = false) : NodeVec2D(_dir1, _dir2), closedLoop{ closedLoopDir1 } {}
+
+	bool closedLoop;
+	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
+
+	int nElDir1() const { return closedLoop ? dir1() : dir1() - 1; }
+	int nElDir2() const { return dir2() - 1; }
+	int nElCirc() const { return nElDir1(); }
+	int nElNorm() const { return nElDir2(); }
+
+	int nNodes() const { return dir1() * dir2(); }
+	int nElements() const { return nElDir1() * nElDir2(); }
+
+	int cornerNode(int cornerID);
+
+};
+
+
+struct MeshDensity2DrecTube : public MeshDensity2D {
+	MeshDensity2DrecTube() {}
+	MeshDensity2DrecTube(int nNodePerimeterInner, int nNodeLayers, const glm::dvec2& sizeInner)
+		: MeshDensity2D(nNodePerimeterInner, nNodeLayers, true)
+	{
+		setNodesInner(nNodePerimeterInner, sizeInner);
+	}
+	MeshDensity2DrecTube(int nNodesWidth, int nNodesHeight, int nNodeLayers)
+		: MeshDensity2D(0, nNodeLayers, true)
+	{
+		setNodesInner(nNodesWidth, nNodesHeight);
+	}
+
+	void setNodesInner(int nNodePerimeterInner, const glm::dvec2& sizeInner);
+	void setNodesInner(int nNodesWidth, int nNodesHeight);
+	void setNodesLayer(int nLayers);
+
+	int nNodePerimeter(int layer) const;
+
+	int nNodesWidth(int layer) const;
+	int nNodesHeight(int layer) const;
+	void cornerNodes(int n[4], int layer) const;
+
+private:
+	int nNodesW, nNodesH;
+};
+
+/*
+	Extends NodeVec3D with element number functions and closed loop definition
+*/
+struct MeshDensity3D : public NodeVec3D {
+	MeshDensity3D() {}
+	MeshDensity3D(int _dir1, int _dir2, int _dir3, bool closedLoopDir1 = false) : NodeVec3D(_dir1, _dir2, _dir3), closedLoop{ closedLoopDir1 } {}
+
+	bool closedLoop;
+	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
+
+	int nElDir1() const { return closedLoop ? dir1() : dir1() - 1; }
+	int nElDir2() const { return dir2() - 1; }
+	int nElDir3() const { return dir3() - 1; }
+	int nElCirc() const { return nElDir1(); }
+	int nElNorm() const { return nElDir2(); }
+	int nElAxis() const { return nElDir3(); }
+
+	MeshDensity2D meshDensD12() const { return MeshDensity2D(dir1(), dir2(), closedLoop); }
+	MeshDensity2D meshDensD23() const { return MeshDensity2D(dir2(), dir3(), closedLoop); }
+	int nnodesPlaneD12() const { return dir1() * dir2(); }
+
+	int nNodes() const { return dir1() * dir2() * dir3(); }
+	int nElements() const { return nElDir1() * nElDir2() * nElDir3(); }
+};
+
+/*
+	Extends NodeVec2D with element number functions and closed loop definition,
+	for a 2D structured mesh with refinement in direction 1.
+*/
+struct MeshDensity2Dref : public NodeVec2D {
+	MeshDensity2Dref() {}
+	MeshDensity2Dref(int _nRefDir1, int _nNodesDir2, bool closedLoopDir2 = false) : NodeVec2D(_nRefDir1, _nNodesDir2), closedLoop{ closedLoopDir2 } {}
+
+	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
+	bool closedLoop;
+
+	int nRefs() const { return dir1(); }
+	int nElDir2() const { return closedLoop ? dir2() : dir2() - 1; }
+	int nElCirc() const { return nElDir2(); }
+
+	void setNrefs(int n) { setDir1(n); }
+
+	//virtual from NodeVec2D
+	void setCirc(int n) { setDir2(n); }
+	void setNorm(int n) { setDir1(n); }
+	int circ() const { return dir2(); }
+	int norm() const { return dir1(); }
+
+	//First layer is refLayer = 0
+	int nElRowB(int refLayer) const {
+		return nElDir2() / std::pow(2, refLayer);
+	}
+	int nElRowT(int refLayer) const {
+		return nElRowB(refLayer + 1);
+	}
+
+	int nNodesRowB(int refLayer) const {
+		return closedLoop ? nElRowB(refLayer) : nElRowB(refLayer) + 1;
+	}
+	int nNodesRowM(int refLayer) const {
+		return 3 * nElRowB(refLayer) / 4;
+	}
+	int nNodesRowT(int refLayer) const {
+		return nNodesRowB(refLayer + 1);
+	}
+
+};
+
+/*
+	Extends NodeVec3D with element number functions and closed loop definition,
+	for a 3D structured mesh with refinement in direction 3
+*/
+struct MeshDensity3Dref : public NodeVec3D {
+	MeshDensity3Dref() {}
+	MeshDensity3Dref(int _nRefDir3, int _nNodesDir1, int _nNodesDir2, bool closedLoopDir1 = false)
+		: NodeVec3D(_nNodesDir1, _nNodesDir2, _nRefDir3), closedLoop{ closedLoopDir1 } {}
+
+	bool closedLoop;
+	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
+
+	int nRefs() const { return dir3(); }
+	int nElDir1() const { return closedLoop ? dir1() : dir1() - 1; }
+	int nElDir2() const { return dir2() - 1; }
+	int nElCirc() const { return nElDir1(); }
+
+	MeshDensity2D meshDensD12B(int refLayer) const {
+		int n1 = nElDir1() / std::pow(2, refLayer);
+		if (!closedLoop) n1++;
+		int n2 = nElDir2() / std::pow(2, refLayer) + 1;
+		return MeshDensity2D(n1, n2, closedLoop);
+	}
+	MeshDensity2D meshDensD12M1(int refLayer) const {
+		int n1 = 3 * (nElDir1() / std::pow(2, refLayer)) / 4;
+		int n2 = nElDir2() / std::pow(2, refLayer) + 1;
+		return MeshDensity2D(n1, n2, closedLoop);
+	}
+	MeshDensity2D meshDensD12M2(int refLayer) const {
+		int n1 = nElDir1() / std::pow(2, refLayer + 1);
+		if (!closedLoop) n1++;
+		int n2 = nElDir2() / std::pow(2, refLayer) + 1;
+		return MeshDensity2D(n1, n2, closedLoop);
+	}
+	MeshDensity2D meshDensD12M3(int refLayer) const {
+		int n1 = nElDir1() / std::pow(2, refLayer + 1);
+		if (!closedLoop) n1++;
+		int n2 = 3 * (nElDir2() / std::pow(2, refLayer)) / 4;// +1;
+		return MeshDensity2D(n1, n2, closedLoop);
+	}
+	MeshDensity2D meshDensD12T(int refLayer) const {
+		return meshDensD12B(refLayer + 1);
+	}
+	int nnodesPlaneD12() const { return dir1() * dir2(); }
+
+	int setNrefs(int n) { setDir1(n); }
+
+};

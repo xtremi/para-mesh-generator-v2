@@ -147,16 +147,19 @@ o1/o2 - preNode1 / preNode2
 */
 void MeshEdgeExtrusion::initEdges(int nnodeEdge1, int firstNodeID, MeshExtrusion* previousExtrusion) {
 	int nnodesExtr = nNodes();
-	
+	meshDens = MeshDensity2D(nElements + 1, nnodesExtr);
+
 	//the end nodes of the previous extrusion
 	int preNodeEdge1 = 0, preNodeEdge2 = 0;
 	if (!isStart()) {
 		preNodeEdge1 = ((MeshEdgeExtrusion*)previousExtrusion)->endCornerNode1();
 		preNodeEdge2 = ((MeshEdgeExtrusion*)previousExtrusion)->endCornerNode2();
+		preNodeEdge1 = ((MeshEdgeExtrusion*)previousExtrusion)->meshDens.cornerNode(2);
+		preNodeEdge1 = ((MeshEdgeExtrusion*)previousExtrusion)->meshDens.cornerNode(3);
 	}
 
 	/*								firstNodeID							nNodes      nodeIncr		preNode*/
-	edges[4] =MeshEdge(NodeIterator1D(0,								nnodeEdge1, nnodesExtr));
+	edges[4] = MeshEdge(NodeIterator1D(0,								nnodeEdge1, nnodesExtr));
 	if(isStart()){
 		edges[0] = edges[4];
 	}	

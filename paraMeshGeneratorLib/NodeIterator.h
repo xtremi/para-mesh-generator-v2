@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "glm/glm.hpp"
+#include "MeshDensity.h"
 
 /*
 	Base class for node iterators
@@ -151,7 +152,11 @@ Iteration result = 101,1,2,3, 102,13,14,15, 103,25,26,27
 class NodeIterator2D : public NodeIterator {
 public:
 	NodeIterator2D() {}
-	NodeIterator2D(int _firstNode, int _nNodesX, int _nNodesY, int _nodeIncrX, int _nodeIncrY, const NodeIterator1D& _preNodes = NodeIterator1D());
+	NodeIterator2D(
+		int _firstNode, 
+		int _nNodesX, int _nNodesY, 
+		int _nodeIncrX, int _nodeIncrY, 
+		const NodeIterator1D& _preNodes = NodeIterator1D());
 	virtual int next();
 	virtual int last();
 	virtual int get(int ix, int iy);

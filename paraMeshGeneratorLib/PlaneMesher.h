@@ -1,6 +1,8 @@
 #pragma once
 #include "Mesher.h"
 #include "FeaWrite.h"
+#include "MeshDensity.h"
+
 
 class PlaneMesher : private Mesher
 {

@@ -297,8 +297,8 @@ void writeXYZplanes(MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dv
 	PlaneMesher::writeElements(meshDens);
 }
 
-static const int nCubesSpeedTest = 100;
-static const int nNodesCubeSpeedTest = 50;
+static const int nCubesSpeedTest = 50;
+static const int nNodesCubeSpeedTest = 10;
 int speedTestWriteCubes(const std::string& fileName) {
 	TEST_START
 
@@ -2044,7 +2044,7 @@ int nodeIterator2Dref(const std::string& fileName) {
 	if (!equalVectors(result, expectedResult)) return 1;
 
 	TEST_END
-	return 0;
+	return 1;
 }
 
 int nodeIterator2Dm(const std::string& fileName) {

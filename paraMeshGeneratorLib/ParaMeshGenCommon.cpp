@@ -84,28 +84,3 @@ glm::dvec3 coordsOnCircle(double angle, double radius, direction rotAxis) {
 	}
 }
 
-bool limitArcAngles(ArcAngles& arcAngles, double& dang, int nnodes) {
-	return limitArcAngles(arcAngles.start, arcAngles.end, dang, nnodes);
-}
-
-
-void ArcAngles::setFullCircle(){
-	start = 0.0;
-	end = GLM2PI;
-	m_fullCircle = true;
-}
-
-double ArcAngles::angStep(int nnodes) const {
-	double dang = (end - start);
-	if(!m_fullCircle)
-		dang /= (double)(nnodes - 1);
-	else
-		dang /= (double)nnodes;
-	return dang;
-}
-
-const glm::dvec2 Rectangle::recDirs[4] = {
-	glm::dvec2(1.0, 0.0),
-	glm::dvec2(0.0, -1.0),
-	glm::dvec2(-1.0, 0.0),
-	glm::dvec2(0.0, 1.0) };
