@@ -36,6 +36,9 @@ int speedTestWriteCubes(const std::string& fileName);
 int speedTestWriteRotatedCubes(const std::string& fileName);
 int speedTestWriteNodesAndElements(const std::string& fileName);
 
+int meshDensity2DcornerNodes(const std::string& fileName);
+int meshDensity3DcornerNodes(const std::string& fileName);
+
 int nodeIterator1D(const std::string& fileName);
 int nodeIterator1Dref(const std::string& fileName);
 int nodeIterator1Dm(const std::string& fileName);
@@ -55,6 +58,7 @@ int meshCsys1(const std::string& fileName);
 int meshCsys2(const std::string& fileName);
 int meshCsys3(const std::string& fileName);
 
+int planeMesherSimple(const std::string& fileName);
 int planeMesher(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
@@ -68,6 +72,7 @@ int recToEllipseMesherRef(const std::string& fileName);
 int recTubeMesher(const std::string& fileName);
 int recTubeMesherRef(const std::string& fileName);
 
+int cuboidMesherSimple(const std::string& fileName);
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
 int cone3Dmesher(const std::string& fileName);
@@ -103,6 +108,10 @@ std::vector<TestDef> testFunctions({
 	TestDef(15, "speedTestWriteRotatedCubes",		"speed test", (testFunction)speedTestWriteRotatedCubes),
 	TestDef(16, "speedTestWriteNodesAndElements",	"speed test", (testFunction)speedTestWriteNodesAndElements),
 	
+	TestDef(20, "meshDensity2DcornerNodes",	"utilities", (testFunction)meshDensity2DcornerNodes),
+	TestDef(21, "meshDensity3DcornerNodes",	"utilities", (testFunction)meshDensity3DcornerNodes),
+	
+	
 	TestDef(30, "nodeIterator1D",		"utilities", (testFunction)nodeIterator1D),
 	TestDef(31, "nodeIterator1Dm",		"utilities", (testFunction)nodeIterator1Dm),
 	TestDef(32, "nodeIterator1Dref",	"utilities", (testFunction)nodeIterator1Dref),
@@ -125,6 +134,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(151, "meshCsys2",			"transformations",  (testFunction)meshCsys2),
 	TestDef(152, "meshCsys3",			"transformations",  (testFunction)meshCsys3),
 
+	TestDef(202, "planeMesherSimple",	"basic meshers 2D", (testFunction)planeMesherSimple),
 	TestDef(203, "planeMesher",			"basic meshers 2D", (testFunction)planeMesher),
 	TestDef(204, "planeMesherRef",		"basic meshers 2D", (testFunction)planeMesherRef),
 	TestDef(205, "coneMesher",			"basic meshers 2D", (testFunction)coneMesher),
@@ -139,6 +149,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(213, "recTubeMesher",			"basic meshers 2D", (testFunction)recTubeMesher),
 	TestDef(214, "recTubeMesherRef",		"basic meshers 2D", (testFunction)recTubeMesherRef),
 	
+	TestDef(319, "cuboidMesherSimple",	"basic meshers 3D", (testFunction)cuboidMesherSimple),
 	TestDef(320, "cuboidMesher",	    "basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(321, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
 	TestDef(322, "cone3Dmesher",	    "basic meshers 3D", (testFunction)cone3Dmesher),	
@@ -297,7 +308,7 @@ void writeXYZplanes(MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dv
 	PlaneMesher::writeElements(meshDens);
 }
 
-static const int nCubesSpeedTest = 50;
+static const int nCubesSpeedTest = 10;
 static const int nNodesCubeSpeedTest = 10;
 int speedTestWriteCubes(const std::string& fileName) {
 	TEST_START
@@ -786,6 +797,26 @@ int ellipseMesher(const std::string& fileName) {
 	EllipseMesher::getLocalCoords(localCoords, 1500, EllipseRadius(100.0, 50.0), ArcAngles());
 	LineMesher::writeNodes(localCoords, 4.0);
 	LineMesher::writeElementsLine(1500, true);
+
+	TEST_END
+}
+
+int planeMesherSimple(const std::string& fileName){
+	TEST_START2
+
+	MeshDensity2D meshDens(6, 4);
+	glm::dvec2 size(20.0, 15.0);
+
+	PlaneMesher::writeNodes(pos, glCsys, meshDens, size, plane::xy);
+	PlaneMesher::writeElements(meshDens);
+	pos.x += 1.5*size.x;
+
+	PlaneMesher::writeNodes(pos, glCsys, meshDens, size, plane::xz);
+	PlaneMesher::writeElements(meshDens);
+	pos.x += 1.5*size.x;
+
+	PlaneMesher::writeNodes(pos, glCsys, meshDens, size, plane::yz);
+	PlaneMesher::writeElements(meshDens);
 
 	TEST_END
 }
@@ -1405,6 +1436,26 @@ int recTubeMesherRef(const std::string& fileName) {
 	TEST_END
 }
 
+int cuboidMesherSimple(const std::string& fileName) {
+	TEST_START2
+
+	MeshDensity3D meshDens(5, 3, 4);
+	glm::dvec3 size(20.0, 15.0, 17.0);
+
+	CuboidMesher::writeNodes(pos, glCsys, meshDens, size, plane::xy);
+	CuboidMesher::writeElements(meshDens);
+	pos.x += 1.5*size.x;
+	
+	CuboidMesher::writeNodes(pos, glCsys, meshDens, size, plane::xz);
+	CuboidMesher::writeElements(meshDens);
+	pos.x += 1.5*size.x;
+	
+	CuboidMesher::writeNodes(pos, glCsys, meshDens, size, plane::yz);
+	CuboidMesher::writeElements(meshDens);
+
+	TEST_END
+}
+
 int cuboidMesher(const std::string& fileName) {
 	TEST_START2
 
@@ -1871,6 +1922,43 @@ std::vector<std::vector<int>> getNodeIteratorResult_4(NodeIterator2D& nit) {
 	return res;
 }
 
+int meshDensity2DcornerNodes(const std::string& fileName){
+	TEST_START2
+
+	MeshDensity2D meshDens(3, 4);
+	PlaneMesher::writeNodesXY(pos, glCsys, meshDens, glm::dvec2(5.0));
+	PlaneMesher::writeElements(meshDens);
+
+	int firstNodeID = 1;
+	std::vector<int> expectedNodeIDs({1,3,12,10});
+	for (int i = 0; i < 4; i++) {
+		if ((firstNodeID + meshDens.cornerNode(i)) != expectedNodeIDs[i]) {
+			return 1;
+		}
+	}
+
+	TEST_END
+}
+int meshDensity3DcornerNodes(const std::string& fileName) {
+	TEST_START2
+
+	MeshDensity3D meshDens(3, 4, 5);
+	CuboidMesher::writeNodesXYZ(pos, glCsys, meshDens, glm::dvec3(5.0));
+	CuboidMesher::writeElements(meshDens);
+
+	int firstNodeID = 1;
+	std::vector<int> expectedNodeIDs({ 1,49,58,10,3,51,60, 12 });
+	for (int i = 0; i < 8; i++) {
+		if ((firstNodeID + meshDens.cornerNode(i)) != expectedNodeIDs[i]) {
+			return 1;
+		}
+	}
+
+
+	TEST_END
+
+}
+
 int nodeIterator1D(const std::string& fileName) {
 
 	std::vector<int> result;
@@ -2056,13 +2144,13 @@ int meshEdgeExtrusion(const std::string& fileName) {
 	double length = 10.0;
 
 	/*
-	   1-->                                                2
-	1---2---3---4--------13--------14--19--20--21          |
- 	|   |   |   |        |          |   |   |   |          V
-0	5---6---7---8--------15--------16--22--23--24
-|	|   |   |   |        |          |   |   |   |
-v	9--10--11--12--------17--------18--25--26--27  
-       3-->
+		3-->                                               
+^	9--10--11--12--------17--------18--25--26--27   ^      
+|	|   |   |   |        |          |   |   |   |   |       
+0	5---6---7---8--------15--------16--22--23--24   2
+	|   |   |   |        |          |   |   |   |
+	1---2---3---4--------13--------14--19--20--21
+	   1-->
 
 	*/
 	std::vector<std::vector<int>> expectedEdges;

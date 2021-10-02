@@ -147,25 +147,26 @@ o1/o2 - preNode1 / preNode2
 */
 void MeshEdgeExtrusion::initEdges(int nnodeEdge1, int firstNodeID, MeshExtrusion* previousExtrusion) {
 	int nnodesExtr = nNodes();
-	meshDens = MeshDensity2D(nElements + 1, nnodesExtr);
+	meshDens = MeshDensity2D(nnodesExtr, nnodeEdge1);
 
 	//the end nodes of the previous extrusion
 	int preNodeEdge1 = 0, preNodeEdge2 = 0;
 	if (!isStart()) {
 		preNodeEdge1 = ((MeshEdgeExtrusion*)previousExtrusion)->endCornerNode1();
 		preNodeEdge2 = ((MeshEdgeExtrusion*)previousExtrusion)->endCornerNode2();
-		preNodeEdge1 = ((MeshEdgeExtrusion*)previousExtrusion)->meshDens.cornerNode(2);
-		preNodeEdge1 = ((MeshEdgeExtrusion*)previousExtrusion)->meshDens.cornerNode(3);
 	}
 
-	/*								firstNodeID							nNodes      nodeIncr		preNode*/
-	edges[4] = MeshEdge(NodeIterator1D(0,								nnodeEdge1, nnodesExtr));
+	int c1 = meshDens.cornerNode(1);
+	int c3 = meshDens.cornerNode(3);
+
+	/*							firstNodeID		nNodes      nodeIncr		preNode*/
+	edges[4] = MeshEdge(NodeIterator1D(0,	nnodeEdge1, nnodesExtr));
 	if(isStart()){
 		edges[0] = edges[4];
 	}	
-	edges[1] = MeshEdge(NodeIterator1D(0,								nnodesExtr, 1,				preNodeEdge1));
-	edges[2] = MeshEdge(NodeIterator1D(nnodesExtr - 1,					nnodeEdge1, nnodesExtr));
-	edges[3] = MeshEdge(NodeIterator1D(((nnodeEdge1 - 1) * nnodesExtr),	nnodesExtr, 1,				preNodeEdge2));
+	edges[1] = MeshEdge(NodeIterator1D(0,	nnodesExtr, 1,				preNodeEdge1));
+	edges[2] = MeshEdge(NodeIterator1D(c1,	nnodeEdge1, nnodesExtr));
+	edges[3] = MeshEdge(NodeIterator1D(c3,	nnodesExtr, 1,				preNodeEdge2));
 	addToFirstNodeID(firstNodeID);
 	
 	//Should not have firstNodeID added on this edge:

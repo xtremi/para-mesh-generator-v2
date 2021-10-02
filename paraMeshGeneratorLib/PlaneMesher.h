@@ -3,6 +3,20 @@
 #include "FeaWrite.h"
 #include "MeshDensity.h"
 
+/*
+	dir2 (default = y)
+
+	^
+[c3]|                   [c2]
+	x13-x14-x15-x16-x17-x18
+	|   |   |   |   |   |
+	x7--x8--x9--x10-x11-x12
+	|   |   |   |   |   |
+	x1--x2--x3--x4--x5--x6  --->dir1 (default = x)
+[c0]				    [c1]
+
+*/
+
 
 class PlaneMesher : private Mesher
 {

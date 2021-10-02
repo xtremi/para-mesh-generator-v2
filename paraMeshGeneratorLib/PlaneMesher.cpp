@@ -349,7 +349,7 @@ void PlaneMesherRef::writeElements_layerB(const MeshDensity2Dref& meshDens, int&
 	for (int i = 0; i < nElrowB; i++) {
 		n[0] = nid1++;								//  3x------x2
 		n[1] = n[0] + 1;							//   |      |
-		n[2] = n[1] + nNodesRowB;			//   |      |
+		n[2] = n[1] + nNodesRowB;					//   |      |
 		n[3] = n[2] - 1;							//  0x------x1
 
 		if (meshDens.closedLoop && i == (nElrowB - 1)) {

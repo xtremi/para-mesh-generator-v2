@@ -79,15 +79,17 @@ struct MeshDensity1D {
 /*
 	Extends NodeVec2D with element number functions and closed loop definition
 
-	dir2
-	^
-  c3|               c2
-	x--x--x--x--x--x
-	|  |  |  |  |  |  
-	x--x--x--x--x--x
-	|  |  |  |  |  |
-	x--x--x--x--x--x --->dir1
-  c0               c1
+	dir2 (default = y)
+
+	 ^
+ [c3]|       edg3       [c2]
+	 x13-x---x---x---x---x18
+	 |   |   |   |   |   |
+edg0 x7--x---x---x---x---x12  edg2
+	 |   |   |   |   |   |
+	 x1--x2--x---x---x---x6  --->dir1 (default = x)
+ [c0] 		edg1	     [c1]
+
 */
 struct MeshDensity2D : public NodeVec2D {
 	MeshDensity2D() {}
@@ -138,6 +140,27 @@ private:
 
 /*
 	Extends NodeVec3D with element number functions and closed loop definition
+
+	         F3 (back)
+
+	 [c2]_________e10_______[c6]
+		|\                  |\
+		| \                 | \
+		|  \e2   F5(top)    |  \e6
+		|   \             e7|   \
+	  e3|    \              |    \
+		| [c1]\_______e9__________\[c5]
+F0(F6)->|     |             |     |  <-F2
+    [c3]| _ __| _ _ e11 _ _ |[c7] |	    -----> extrude dir (x)
+		 \    |              \    |e5
+		  \   |e1  F1(front)  \e4 |
+		 e0\  |                \  |
+			\ |                 \ |
+			 \|__________________\|
+		  [c0]	  ^   e8          [c4]
+				  |
+				 F4 (bottom)
+
 */
 struct MeshDensity3D : public NodeVec3D {
 	MeshDensity3D() {}
@@ -159,6 +182,8 @@ struct MeshDensity3D : public NodeVec3D {
 
 	int nNodes() const { return dir1() * dir2() * dir3(); }
 	int nElements() const { return nElDir1() * nElDir2() * nElDir3(); }
+
+	int cornerNode(int cornerID);
 };
 
 /*
