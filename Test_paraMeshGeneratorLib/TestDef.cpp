@@ -17,12 +17,24 @@ void TestDef::run() {
 	
 	//Do test:
 	std::string meshFilePath = TEST_OUTPUT_FOLDER + fileName + ".dat";
-	int testRes = function(meshFilePath);
+	
+	std::string caughtErrorMessage = "";
+	int testRes = false;
+	try{
+		testRes = function(meshFilePath);
+	}
+	catch (const char* errmsg) {
+		testRes = false;
+		caughtErrorMessage = errmsg;
+	}
 
 	//Log:
 	std::string timeStr = durationString(durationMS());
 	std::string resultString = testRes ? "FAIL" : "PASS";
 	std::cout << resultString + " " + timeStr << std::endl;
+	if(!caughtErrorMessage.empty()){
+		std::cout << "\t" << "Caught error message: " << caughtErrorMessage << std::endl;
+	}
 
 	//GMSH bat script (for visualization):
 	createGMSHbatScript();

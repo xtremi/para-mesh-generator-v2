@@ -1,6 +1,6 @@
 #pragma once
 #include "ParaMeshGenCommon.h"
-#include "NodeIterator.h"
+#include "MeshDensity.h"
 
 
 enum class ExtrusionType {
@@ -73,33 +73,44 @@ private:
 
 	Extrusion of edge (result in new face)
 
-	isStart = true
+	-----------------------------------------
+		isStart = true
+	-----------------------------------------
+
+	 <-----length---->
 
 		nElements
 	|---|---|---|---|
-		---Edg1-->
-	 x---x---x---x---o1
- |	 x---x---x---x---x  |
-Edg0 x---x---x---x---x Edg2
- |	 x---x---x---x---x  |
- v	 x---x---x---x---o2  v
 		---Edg3-->
+ ^	 x---x---x---x---o1 ^
+ |	 x---x---x---x---x  |
+Edg0 x---x---x---x---x Edg2  |----> Extrusion
+ |	 x---x---x---x---x  |
+ 	 x---x---x---x---o2  
+		---Edg1-->
+	 |-----------|
+	 MeshDensity2D meshDens covers this part
 
-	<-----length----->
-	----> Extrusion
-
-	isStart = false
+	
+	
+	-----------------------------------------
+		isStart = false
+	-----------------------------------------
 
 		nElements
-	|---|---|---|---|
-		---Edg1-->
-	 |--|x---x---x---o1
+	 |---|---|---|---|
+
+		^  --Edg3-->
+ ^   |--|x---x---x---o1 ^
  |	 |-e5x---x---x---x  |
-Edg0 |--|x---x---x---x Edg2
+Edg0 |--|x---x---x---x Edg2  |----> Extrusion
  |	 |--|x---x---x---x  |
- v	 |--|x---x---x---o2  v
-		v  --Edg3-->
-		 
+ 	 |--|x---x---x---o2  
+		  --Edg1-->
+
+		 |-----------|
+		  MeshDensity2D meshDens covers this part
+
 	Edge 0 is the edge containing the nodes at the end of the previous extrusion
 	Edge 5 is the first row of nodes (same direction of edge 0) belonging to
 	this extrusion
@@ -123,11 +134,16 @@ public:
 		int	   firstNodeID, 
 		MeshExtrusion* previousExtrusion = nullptr);
 
+	/*
+		The mesh density of the nodes of these extrusion.
+		This means from edge0 is not included.
+	*/
+	MeshDensity2D meshDens;
+
 	/*!		
 		edge[0] is the edge same edge as edge[2] of the previous extrusion
 		edge[5] is the first edge with nodes belonging to this extrusion
-	*/
-	MeshDensity2D meshDens;
+	*/	
 	MeshEdge edges[5];
 	int endCornerNode1();
 	int endCornerNode2();

@@ -1,5 +1,6 @@
 #pragma once
 #include "math_utilities.h"
+#include "NodeIterator.h"
 
 /*
 	Wrapper for glm::ivec2 representing number of nodes for a "2D structured mesh"
@@ -107,6 +108,8 @@ struct MeshDensity2D : public NodeVec2D {
 	int nElements() const { return nElDir1() * nElDir2(); }
 
 	int cornerNode(int cornerID);
+	NodeIterator1D edgeNodeIterator(int edgeID, int firstNodeID, int preNode = 0);
+
 
 };
 
@@ -140,8 +143,9 @@ private:
 
 /*
 	Extends NodeVec3D with element number functions and closed loop definition
-
-	         F3 (back)
+  ^
+  |	         F3 (back)
+  |dir3 (z-dir)
 
 	 [c2]_________e10_______[c6]
 		|\                  |\
@@ -151,14 +155,14 @@ private:
 	  e3|    \              |    \
 		| [c1]\_______e9__________\[c5]
 F0(F6)->|     |             |     |  <-F2
-    [c3]| _ __| _ _ e11 _ _ |[c7] |	    -----> extrude dir (x)
+    [c3]| _ __| _ _ e11 _ _ |[c7] |	    
 		 \    |              \    |e5
 		  \   |e1  F1(front)  \e4 |
-		 e0\  |                \  |
-			\ |                 \ |
-			 \|__________________\|
-		  [c0]	  ^   e8          [c4]
-				  |
+  ^ 	 e0\  |                \  |
+   \		\ |                 \ |
+dir2\		 \|__________________\|   -----> dir1 (default = x-dir)
+(y-dir)		  [c0]	  ^   e8          [c4]
+				      |
 				 F4 (bottom)
 
 */
@@ -184,6 +188,7 @@ struct MeshDensity3D : public NodeVec3D {
 	int nElements() const { return nElDir1() * nElDir2() * nElDir3(); }
 
 	int cornerNode(int cornerID);
+	NodeIterator2D faceNodeIterator(int faceID, int firstNodeID, const NodeIterator1D& preNodes = NodeIterator1D());
 };
 
 /*

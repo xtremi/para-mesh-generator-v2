@@ -13,29 +13,26 @@ int MeshDensity2D::cornerNode(int cornerID) {
 		break;
 	}
 }
-/*
 
-			 F3 (back)
+NodeIterator1D MeshDensity2D::edgeNodeIterator(int edgeID, int firstNodeID, int preNode)
+{
+	if (edgeID == 0) {
+		return NodeIterator1D(firstNodeID, dir2(), dir1(), preNode);
+	}
+	else if (edgeID == 1) {
+		return NodeIterator1D(firstNodeID, dir1(), 1, preNode);
+	}
+	else if (edgeID == 2) {
+		return NodeIterator1D(firstNodeID + cornerNode(1), dir2(), dir1(), preNode);
+	}
+	else if (edgeID == 3) {
+		return NodeIterator1D(firstNodeID + cornerNode(3), dir1(), 1, preNode);
+	}
+	else {
+		throw("Invalid edge ID in MeshDensity2D::edgeNodeIterator");
+	}
+}
 
-	 [c2]_________e10_______[c6]
-		|\                  |\
-		| \                 | \
-		|  \e2   F5(top)    |  \e6
-		|   \             e7|   \
-	  e3|    \              |    \
-		| [c1]\_______e9__________\[c5]
-F0(F6)->|     |             |     |  <-F2
-	[c3]| _ __| _ _ e11 _ _ |[c7] |	    -----> dir1
-		 \    |              \    |e5
-	 ^	  \   |e1  F1(front)  \e4 |
-  ^  |	 e0\  |                \  |
-   \ |dir3	\ |                 \ |
-dir2\|	     \|__________________\|
-		  [c0]	  ^   e8          [c4]
-				  |
-				 F4 (bottom)
-
-*/
 int MeshDensity3D::cornerNode(int cornerID) {
 	switch (cornerID)
 	{
@@ -52,6 +49,49 @@ int MeshDensity3D::cornerNode(int cornerID) {
 		break;
 	}
 
+}
+
+/*
+
+Example:
+	d1 x d2 x d3 = X x Y x Z = 3x4x3 nodes
+
+ ________________________________________________________________
+| Face	| start	  | nodesX	| nodesY	| incrX		| incrY		|
+|---------------------------------------------------------------|
+|	0	| 	0	  |	d2(y)	|	d3(x)	|	d1(y)	| d1d2(xy)  |
+|	1	| 	0	  |	d1(x)	|	d3(z)	|	1   	| d1d2(xy)	|
+|	2	| corner4 |	d2(y)	|	d3(x)	|	d1(y)	| d1d2(xy)  |
+|	3	| corner3 |	d1(x)	|	d3(z)	|	1   	| d1d2(xy)	|
+|	4	| 	0	  |	d1(x)	|	d2(y)	|	1   	| d1(x)	    |
+|	5	| corner1 |	d1(x)	|	d2(y)	|	1   	| d1(x)	    |
+|----------------------------------------------------------------
+
+
+*/
+NodeIterator2D MeshDensity3D::faceNodeIterator(int faceID, int n1, const NodeIterator1D& preNodes) {
+	
+	if (faceID == 0) {
+		return NodeIterator2D(n1, dir2(), dir3(), dir1(), dir1()*dir2(), preNodes);
+	}
+	else if (faceID == 1) {
+		return NodeIterator2D(n1, dir1(), dir3(), 1, dir1()*dir2(), preNodes);
+	}
+	else if (faceID == 2) {
+		return NodeIterator2D(n1 + cornerNode(4), dir2(), dir3(), dir1(), dir1()*dir2(), preNodes);
+	}
+	else if (faceID == 3) {
+		return NodeIterator2D(n1 + cornerNode(3), dir1(), dir3(), 1, dir1()*dir2(), preNodes);
+	}
+	else if (faceID == 4) {
+		return NodeIterator2D(n1, dir1(), dir2(), 1, dir1(), preNodes);
+	}
+	else if (faceID == 5) {
+		return NodeIterator2D(n1 + cornerNode(1), dir1(), dir2(), 1, dir1(), preNodes);
+	}
+	else {
+		throw("Invalid face ID in MeshDensity3D::faceNodeIterator");
+	}
 
 }
 

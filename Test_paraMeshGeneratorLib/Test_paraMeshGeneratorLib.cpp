@@ -38,6 +38,10 @@ int speedTestWriteNodesAndElements(const std::string& fileName);
 
 int meshDensity2DcornerNodes(const std::string& fileName);
 int meshDensity3DcornerNodes(const std::string& fileName);
+int meshDensity2DnodeIterator(const std::string& fileName);
+int meshDensity2DnodeIteratorPreNodes(const std::string& fileName);
+int meshDensity3DnodeIterator(const std::string& fileName);
+int meshDensity3DnodeIteratorPreNodes(const std::string& fileName);
 
 int nodeIterator1D(const std::string& fileName);
 int nodeIterator1Dref(const std::string& fileName);
@@ -108,8 +112,12 @@ std::vector<TestDef> testFunctions({
 	TestDef(15, "speedTestWriteRotatedCubes",		"speed test", (testFunction)speedTestWriteRotatedCubes),
 	TestDef(16, "speedTestWriteNodesAndElements",	"speed test", (testFunction)speedTestWriteNodesAndElements),
 	
-	TestDef(20, "meshDensity2DcornerNodes",	"utilities", (testFunction)meshDensity2DcornerNodes),
-	TestDef(21, "meshDensity3DcornerNodes",	"utilities", (testFunction)meshDensity3DcornerNodes),
+	TestDef(20, "meshDensity2DcornerNodes",			"utilities", (testFunction)meshDensity2DcornerNodes),
+	TestDef(21, "meshDensity3DcornerNodes",			"utilities", (testFunction)meshDensity3DcornerNodes),
+	TestDef(22, "meshDensity2DnodeIterator",		"utilities", (testFunction)meshDensity2DnodeIterator),
+	TestDef(23, "meshDensity2DnodeIteratorPreNodes","utilities", (testFunction)meshDensity2DnodeIteratorPreNodes),
+	TestDef(24, "meshDensity3DnodeIterator",		"utilities", (testFunction)meshDensity3DnodeIterator),
+	TestDef(25, "meshDensity3DnodeIteratorPreNodes","utilities", (testFunction)meshDensity3DnodeIteratorPreNodes),
 	
 	
 	TestDef(30, "nodeIterator1D",		"utilities", (testFunction)nodeIterator1D),
@@ -185,7 +193,7 @@ int main(int argc, char* argv[]) {
 			testsToRun.insert(std::stoi(argv[i]));
 		}
 	}
-
+	
 	for (TestDef& testDef : testFunctions) {
 		if (testsToRun.empty() || (testsToRun.find(testDef.id) != testsToRun.end())) {
 			testDef.run();
@@ -1939,6 +1947,117 @@ int meshDensity2DcornerNodes(const std::string& fileName){
 
 	TEST_END
 }
+int meshDensity2DnodeIterator(const std::string& fileName) {
+
+	MeshDensity2D meshDens(3, 4);
+	std::vector<std::vector<int>> expectedNodeIDs({
+		{1,4,7, 10},
+		{1,2,3},
+		{3,6,9,12},
+		{10,11,12}
+	});
+
+	std::vector<std::vector<int>> actualNodeIDs;
+	for (int i = 0; i < 4; i++) {
+		NodeIterator1D iter = meshDens.edgeNodeIterator(i, 1);
+		actualNodeIDs.push_back(getNodeIteratorResult(iter));
+	};
+
+	if (!equalVecVectors(actualNodeIDs, expectedNodeIDs)) {
+		return 1;
+	}
+	return 0;
+}
+
+int meshDensity2DnodeIteratorPreNodes(const std::string& fileName) {
+	MeshDensity2D meshDens(3, 4);
+	int preNodes[4] = { 100, 33, 44, 660 };
+	std::vector<std::vector<int>> expectedNodeIDs({
+		{preNodes[0], 1,4,7, 10},
+		{preNodes[1], 1,2,3},
+		{preNodes[2], 3,6,9,12},
+		{preNodes[3], 10,11,12}
+		});
+
+	std::vector<std::vector<int>> actualNodeIDs;
+	for (int i = 0; i < 4; i++) {
+		NodeIterator1D iter = meshDens.edgeNodeIterator(i, 1, preNodes[i]);
+		actualNodeIDs.push_back(getNodeIteratorResult(iter));
+	};
+
+	if (!equalVecVectors(actualNodeIDs, expectedNodeIDs)) {
+		return 1;
+	}
+	return 0;
+}
+
+
+int meshDensity3DnodeIterator(const std::string& fileName) {
+
+	MeshDensity3D meshDens(3, 4, 5);
+
+	std::vector<std::vector<int>> expectedNodeIDs;
+	std::vector<std::vector<int>> actualNodeIDs;
+
+	expectedNodeIDs = std::vector<std::vector<int>>({
+		{1,4,7,10,	13,16,19,22, 25,28,31,34, 37,40,43,46, 49,52,55,58},
+		{1,2,3, 13,14,15, 25,26,27, 37,38,39, 49,50,51},
+		{3,6,9,12, 15,18,21,24, 27,30,33,36, 39,42,45,48, 51,54,57,60},
+		{10,11,12, 22,23,24, 34,35,36, 46,47,48, 58,59,60},
+		{1,2,3, 4,5,6, 7,8,9, 10,11,12},
+		{49,50,51, 52,53,54, 55,56,57, 58,59,60},
+		});
+	
+	for (int i = 0; i < 6; i++) {
+		NodeIterator2D iter = meshDens.faceNodeIterator(i, 1);
+		actualNodeIDs.push_back(getNodeIteratorResult(iter));
+	}
+
+	if (!equalVecVectors(actualNodeIDs, expectedNodeIDs)) {
+		return 1;
+	}
+
+	return 0;
+}
+
+int meshDensity3DnodeIteratorPreNodes(const std::string& fileName) {
+	MeshDensity3D meshDens(3, 4, 5);
+
+	std::vector<std::vector<int>> expectedNodeIDs;
+	std::vector<std::vector<int>> actualNodeIDs;
+
+	//should be prenodes values per row not all in the beginning
+	expectedNodeIDs = std::vector<std::vector<int>>({
+		{100,1,4,7,10,		101,13,16,19,22,	102,25,28,31,34,	103,37,40,43,46,	104,49,52,55,58},
+		{210,1,2,3,			220,13,14,15,		230,25,26,27,		240,37,38,39,		250,49,50,51},
+		{1,3,6,9,12,		11,15,18,21,24,		21,27,30,33,36,		31,39,42,45,48,		41,51,54,57,60},
+		{88,10,11,12,		90,22,23,24,		92,34,35,36,		94,46,47,48,		96,58,59,60},
+		{100,1,2,3,			101,4,5,6,			102,7,8,9,			103,10,11,12},
+		{100,49,50,51,		99,52,53,54,		98,55,56,57,		97,58,59,60},
+		});
+
+	std::vector<NodeIterator1D> preNodesIter({
+		NodeIterator1D(100,		5, 1),
+		NodeIterator1D(210,		5, 10),
+		NodeIterator1D(1,		5, 10),
+		NodeIterator1D(88,		5, 2),
+		NodeIterator1D(100,		4, 1),
+		NodeIterator1D(100,		4, -1),
+	});
+
+	for (int i = 0; i < 6; i++) {
+		NodeIterator2D iter = meshDens.faceNodeIterator(i, 1, preNodesIter[i]);
+		actualNodeIDs.push_back(getNodeIteratorResult(iter));
+	}
+
+	if (!equalVecVectors(actualNodeIDs, expectedNodeIDs)) {
+		return 1;
+	}
+
+	return 0;
+}
+
+
 int meshDensity3DcornerNodes(const std::string& fileName) {
 	TEST_START2
 

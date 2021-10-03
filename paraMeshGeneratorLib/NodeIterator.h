@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "glm/glm.hpp"
-#include "MeshDensity.h"
+
 
 /*
 	Base class for node iterators

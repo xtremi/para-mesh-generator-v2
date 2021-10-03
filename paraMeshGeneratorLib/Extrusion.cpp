@@ -117,8 +117,9 @@ isStart extrusion:
 
 nElements = 3
 nNodes    = 4
-x1  x2  x3  x4
 x5  x6  x7  x8
+x1  x2  x3  x4
+
 
  ------------------
 
@@ -126,8 +127,9 @@ normal extrusion:
 
 nElements = 3
 nNodes    = 3
--   x1  x2  x3
 -   x5  x6  x7
+-   x1  x2  x3
+
 
 
   initial  second         third
@@ -159,17 +161,13 @@ void MeshEdgeExtrusion::initEdges(int nnodeEdge1, int firstNodeID, MeshExtrusion
 	int c1 = meshDens.cornerNode(1);
 	int c3 = meshDens.cornerNode(3);
 
-	/*							firstNodeID		nNodes      nodeIncr		preNode*/
-	edges[4] = MeshEdge(NodeIterator1D(0,	nnodeEdge1, nnodesExtr));
-	if(isStart()){
+	edges[4] = MeshEdge(meshDens.edgeNodeIterator(0, firstNodeID));
+	if (isStart()) {
 		edges[0] = edges[4];
-	}	
-	edges[1] = MeshEdge(NodeIterator1D(0,	nnodesExtr, 1,				preNodeEdge1));
-	edges[2] = MeshEdge(NodeIterator1D(c1,	nnodeEdge1, nnodesExtr));
-	edges[3] = MeshEdge(NodeIterator1D(c3,	nnodesExtr, 1,				preNodeEdge2));
-	addToFirstNodeID(firstNodeID);
-	
-	//Should not have firstNodeID added on this edge:
+	}
+	edges[1] = MeshEdge(meshDens.edgeNodeIterator(1, firstNodeID, preNodeEdge1));
+	edges[2] = MeshEdge(meshDens.edgeNodeIterator(2, firstNodeID));
+	edges[3] = MeshEdge(meshDens.edgeNodeIterator(3, firstNodeID, preNodeEdge2));
 	if (!isStart()) {
 		edges[0] = ((MeshEdgeExtrusion*)previousExtrusion)->edges[2];
 	}
