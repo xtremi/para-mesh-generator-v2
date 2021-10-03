@@ -92,7 +92,7 @@ private:
 		MeshCsys   csys;
 		double	   startSpace;
 		double	   arcAngle;
-		int		   nNodesEdgeX;
+		//int		   nNodesEdgeX;
 		glm::dvec2 dxy;
 
 	};
@@ -121,7 +121,7 @@ public:
 	void setStartFaceYZ(const MeshDensity2D& meshDensYZface, const glm::dvec2& sizeYZ);
 
 	void extrudeYZface(double length, int nElements);
-	void extrudeYZedgeArc(double endAng, double radiusInner, double radiusOuter, int nElements);
+	void extrudeYZedgeArc(double endAng, double radiusInner, int nElements);
 
 	virtual void writeNodes();
 	virtual void writeElements();

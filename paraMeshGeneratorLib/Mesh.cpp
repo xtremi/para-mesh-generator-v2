@@ -32,9 +32,9 @@ void Mesh2D_planeExtrusion::extrudeYedgeArc(double endAng, double radius, int nE
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
-void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner, double radiusOuter, int nElements) {
+void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner, int nElements) {
 	MeshFaceExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	extrusionsXdir.push_back(MeshFaceExtrusion(radiusInner, radiusOuter, endAng, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion));
+	extrusionsXdir.push_back(MeshFaceExtrusion(radiusInner, endAng, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
@@ -155,7 +155,6 @@ void Mesh2D_planeExtrusion::writeNodes() {
 
 		curExtrData.dxy = glm::dvec2(extr.spacing(), spacingY);
 		curExtrData.startSpace	= 0.0;
-		curExtrData.nNodesEdgeX = extr.nNodes();
 		
 		if (!firstExtrusion)
 			curExtrData.startSpace = extr.spacing();
@@ -214,7 +213,7 @@ void Mesh2D_planeExtrusion::writeNodesExtrudeLine(ExtrudeStepData& curExtrData, 
 	PlaneMesher::writeNodesXYq(
 		curExtrData.pos, 
 		curExtrData.csys, 
-		MeshDensity2D(curExtrData.nNodesEdgeX, meshDensity.dir2()),
+		((MeshEdgeExtrusion*)&curExtr)->meshDens,
 		curExtrData.dxy);
 
 	curExtrData.csys.moveInLocalCsys(glm::dvec3(curExtr.length, 0.,0.));
@@ -224,9 +223,10 @@ void Mesh3D_volumeExtrusion::writeNodesExtrudeLine(ExtrudeStepData& curExtrData,
 	CuboidMesher::writeNodesQ(
 		curExtrData.pos, 
 		curExtrData.csys,
-		MeshDensity3D(curExtrData.nNodesEdgeX, meshDensity.dir2(), meshDensity.dir3()), 
+		((MeshFaceExtrusion*)&curExtr)->meshDens,
 		curExtrData.dxyz,
 		plane::xy);
+
 	curExtrData.csys.moveInLocalCsys(glm::dvec3(curExtr.length, 0., 0.));
 }
 
@@ -238,8 +238,12 @@ void Mesh2D_planeExtrusion::writeNodesExtrudeArc(ExtrudeStepData& curExtrData, M
 	ang.setStart(-curExtrData.startSpace - GLMPI);
 	ang.setEnd(-(GLMPI + curExtr.endAngle));
 
-	ConeMesher::writeNodesY(curExtrData.pos, curExtrData.csys, MeshDensity2D(curExtrData.nNodesEdgeX, meshDensity.dir2()),
-		Cone2Dradius(curExtr.radius, curExtr.radius), ang, lengthY);
+	ConeMesher::writeNodesY(
+		curExtrData.pos, 
+		curExtrData.csys, 
+		((MeshEdgeExtrusion*)&curExtr)->meshDens,
+		Cone2Dradius(curExtr.radius, curExtr.radius),
+		ang, lengthY);
 
 	curExtrData.arcAngle += curExtr.endAngle;
 	curExtrData.csys.moveInLocalCsys(coordsOnCircle(ang.end, curExtr.radius, direction::y) + glm::dvec3(0, 0, curExtr.radius));
@@ -255,9 +259,13 @@ void Mesh3D_volumeExtrusion::writeNodesExtrudeArc(ExtrudeStepData& curExtrData, 
 	ang.setStart(-curExtrData.startSpace - GLMPI);
 	ang.setEnd(-(GLMPI + curExtr.endAngle));
 
-	Cone3Dmesher::writeNodes(curExtrData.pos, curExtrData.csys, 
-		MeshDensity3D(curExtrData.nNodesEdgeX, meshDensity.dir2(), meshDensity.dir3()),
-		Pipe3Dradius(curExtr.radius, curFextr->radiusOuter, curExtr.radius, curFextr->radiusOuter),
+	Cone3Dmesher::writeNodes(
+		curExtrData.pos, 
+		curExtrData.csys, 
+		((MeshFaceExtrusion*)&curExtr)->meshDens,
+		Pipe3Dradius(
+			curExtr.radius, curExtr.radius + sizeYZ[1],//curFextr->radiusOuter, 
+			curExtr.radius, curExtr.radius + sizeYZ[1]),//curFextr->radiusOuter),
 		ang, sizeYZ[0], direction::y);
 
 	curExtrData.arcAngle += curExtr.endAngle;
@@ -293,8 +301,7 @@ void Mesh3D_volumeExtrusion::writeNodesExtrudeArc(ExtrudeStepData& curExtrData, 
 */
 void Mesh2D_planeExtrusion::writeElements() {
 
-	MeshEdgeExtrusion* extr = nullptr;// , *prevExtr = nullptr;
-	MeshDensity2D meshDens(0, meshDensity.dir2());
+	MeshEdgeExtrusion* extr = nullptr;
 	
 	for (int i = 0; i < extrusionsXdir.size(); i++) {
 		extr = &extrusionsXdir[i];
@@ -303,16 +310,14 @@ void Mesh2D_planeExtrusion::writeElements() {
 			RowMesher2D::writeElements(&extr->edges[0].nodeIter, &extr->edges[4].nodeIter);
 		}
 		Mesher::setNodeID1(extr->edges[4].nodeIter.first());
-		meshDens.setDir1(extr->nNodes());
-		PlaneMesher::writeElements(meshDens);
+		PlaneMesher::writeElements(extr->meshDens);
 	}
 	
 }
 
 void Mesh3D_volumeExtrusion::writeElements() {
 
-	MeshFaceExtrusion* extr = nullptr;// , *prevExtr = nullptr;
-	MeshDensity3D meshDens(0, meshDensity.dir2(), meshDensity.dir3());
+	MeshFaceExtrusion* extr = nullptr;
 
 	for (int i = 0; i < extrusionsXdir.size(); i++) {
 		extr = &extrusionsXdir[i];
@@ -321,8 +326,7 @@ void Mesh3D_volumeExtrusion::writeElements() {
 			RowMesher3D::writeElements(&extr->faces[0].nodeIter, &extr->faces[6].nodeIter);
 		}
 		Mesher::setNodeID1(extr->faces[6].nodeIter.first());
-		meshDens.setDir1(extr->nNodes());
-		CuboidMesher::writeElements(meshDens);
+		CuboidMesher::writeElements(extr->meshDens);
 	}
 
 }

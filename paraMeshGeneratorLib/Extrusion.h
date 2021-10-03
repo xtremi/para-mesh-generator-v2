@@ -82,11 +82,11 @@ private:
 		nElements
 	|---|---|---|---|
 		---Edg3-->
- ^	 x---x---x---x---o1 ^
+ ^	 x---x---x---x---o2 ^
  |	 x---x---x---x---x  |
 Edg0 x---x---x---x---x Edg2  |----> Extrusion
  |	 x---x---x---x---x  |
- 	 x---x---x---x---o2  
+ 	 x---x---x---x---o1  
 		---Edg1-->
 	 |-----------|
 	 MeshDensity2D meshDens covers this part
@@ -101,11 +101,11 @@ Edg0 x---x---x---x---x Edg2  |----> Extrusion
 	 |---|---|---|---|
 
 		^  --Edg3-->
- ^   |--|x---x---x---o1 ^
+ ^   |--|x---x---x---o2 ^
  |	 |-e5x---x---x---x  |
 Edg0 |--|x---x---x---x Edg2  |----> Extrusion
  |	 |--|x---x---x---x  |
- 	 |--|x---x---x---o2  
+ 	 |--|x---x---x---o1  
 		  --Edg1-->
 
 		 |-----------|
@@ -145,6 +145,7 @@ public:
 		edge[5] is the first edge with nodes belonging to this extrusion
 	*/	
 	MeshEdge edges[5];
+	MeshEdge getEdge(int edgeID);
 	int endCornerNode1();
 	int endCornerNode2();
 
@@ -188,13 +189,18 @@ public:
 		MeshExtrusion*		 previousExtrusion = nullptr);
 	MeshFaceExtrusion(		 
 		double				 _radiusInner,
-		double				 _radiusOuter,
 		double				 _endAngle,
 		int					 _nElements,
 		const MeshDensity2D& face0nodes,
 		int					 firstNodeID,
 		MeshExtrusion*		 previousExtrusion = nullptr);
 
+
+	/*
+		The mesh density of the nodes of this extrusion.
+		This means from face0 is not included.
+	*/
+	MeshDensity3D meshDens;
 	/*!
 		face[0] is the face same face as face[5] of the previous extrusion
 		face[6] is the first face with nodes belonging to this extrusion
@@ -207,9 +213,6 @@ public:
 
 	void setNodeOffset(int nOffs);
 	void addToFirstNodeID(int n);
-
-
-	double radiusOuter;
 
 protected:
 	void initFaces(const MeshDensity2D& face1nodes, int firstNodeID, MeshExtrusion* previousExtrusion);
