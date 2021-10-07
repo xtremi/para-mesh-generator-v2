@@ -92,7 +92,6 @@ NodeIterator2D MeshDensity3D::faceNodeIterator(int faceID, int n1, const NodeIte
 	else {
 		throw("Invalid face ID in MeshDensity3D::faceNodeIterator");
 	}
-
 }
 
 void MeshDensity2DrecTube::setNodesInner(int nNodePerimeterInner, const glm::dvec2& sizeInner) {

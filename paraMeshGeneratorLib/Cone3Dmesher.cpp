@@ -7,6 +7,7 @@
 #include "glm/gtc/constants.hpp"
 #include "math_utilities.h"
 
+
 void Cone3Dmesher::writeNodes(
 	const glm::dvec3&		pos,
 	MeshCsys&				csys,
@@ -18,6 +19,8 @@ void Cone3Dmesher::writeNodes(
 {
 MESHER_NODE_WRITE_START
 
+#define ordering1
+#ifdef ordering1
 	double dH  = height       / (double)meshDens.nElAxis();
 	double dRi = radius.dRi() / (double)meshDens.nElAxis();
 	double dRo = radius.dRo() / (double)meshDens.nElAxis();
@@ -31,6 +34,22 @@ MESHER_NODE_WRITE_START
 		currentRadius.radi.x += dRi;
 		currentRadius.radi.y += dRo;
 	}
+#else
+	double dRi = radius.dRi() / (double)meshDens.nElAxis();
+	double dRo = radius.dRo() / (double)meshDens.nElAxis();
+
+	Cone2Dradius currentRadius(radius.start.inner(), radius.end.inner());
+	double dRstart = (radius.start.outer() - radius.start.inner()) / (double)meshDens.nElAxis();
+	double dRend   = (radius.end.outer() - radius.end.inner()) / (double)meshDens.nElAxis();
+
+	MeshDensity2D meshDensCone(meshDens.circ(), meshDens.axis());
+
+	for (int i = 0; i < meshDens.norm(); i++) {
+		ConeMesher::writeNodes(curPos, csys, meshDensCone, currentRadius, angle, height, axis);
+		currentRadius.incrStart(dRstart);
+		currentRadius.incrEnd(dRend);
+	}
+#endif
 
 MESHER_NODE_WRITE_END
 }

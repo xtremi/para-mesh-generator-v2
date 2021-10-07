@@ -79,6 +79,7 @@ int recTubeMesherRef(const std::string& fileName);
 int cuboidMesherSimple(const std::string& fileName);
 int cuboidMesher(const std::string& fileName);
 int cuboidMesherRef(const std::string& fileName);
+int cone3DmesherSimple(const std::string& fileName);
 int cone3Dmesher(const std::string& fileName);
 int cone3DmesherRef(const std::string& fileName);
 int recToEllipse3Dmesher(const std::string& fileName);
@@ -160,6 +161,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(319, "cuboidMesherSimple",	"basic meshers 3D", (testFunction)cuboidMesherSimple),
 	TestDef(320, "cuboidMesher",	    "basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(321, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
+	TestDef(325, "cone3DmesherSimple",	"basic meshers 3D", (testFunction)cone3DmesherSimple),
 	TestDef(322, "cone3Dmesher",	    "basic meshers 3D", (testFunction)cone3Dmesher),	
 	TestDef(323, "cone3DmesherRef",	    "basic meshers 3D", (testFunction)cone3DmesherRef),
 	TestDef(324, "recToEllipse3Dmesher","basic meshers 3D", (testFunction)recToEllipse3Dmesher),
@@ -1519,6 +1521,28 @@ int cuboidMesherRef(const std::string& fileName) {
 	TEST_END
 }
 
+int cone3DmesherSimple(const std::string& fileName) {
+	TEST_START2
+
+	MeshDensity3D meshDens(5, 4, 3);
+	Pipe3Dradius  radius(12., 18., 12., 18.);
+	ArcAngles	  angle(0.0, 0.25*GLMPI);
+	double		  height = 16.0;
+
+	Cone3Dmesher::writeNodes(pos, glCsys, meshDens, radius, angle, height, direction::x);
+	Cone3Dmesher::writeElements(meshDens);
+	pos.x += 2.*height;
+
+	Cone3Dmesher::writeNodes(pos, glCsys, meshDens, radius, angle, height, direction::y);
+	Cone3Dmesher::writeElements(meshDens);
+	pos.x += 2.*height;
+
+	Cone3Dmesher::writeNodes(pos, glCsys, meshDens, radius, angle, height, direction::z);
+	Cone3Dmesher::writeElements(meshDens);
+
+	TEST_END
+}
+
 int cone3Dmesher(const std::string& fileName) {
 	TEST_START2
 
@@ -2537,13 +2561,15 @@ int extrude3DfaceArc(const std::string& fileName) {
 }
 int extrude3DfaceArcAndLine(const std::string& fileName) {
 	TEST_START2
-	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(7, 10), glm::dvec2(5.0, 2.0));
-	mesh3D.extrudeYZedgeArc(-GLMPI / 10.0, -100.0, 30);
-	mesh3D.extrudeYZedgeArc(GLMPI / 1.0, 4.0, 20);
-	mesh3D.extrudeYZedgeArc(GLMPI / 3.0, 10.0, 10);
-	mesh3D.extrudeYZedgeArc(-GLMPI / 1.0, -6, 18);
-	mesh3D.extrudeYZface(20., 20);
-	mesh3D.extrudeYZedgeArc(GLMPI / 1.0, 4.0, 20);
+	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(3, 4), glm::dvec2(5.0, 2.0));
+	
+	
+	mesh3D.extrudeYZedgeArc(-GLMPI / 10.0, -100.0, 8);
+	mesh3D.extrudeYZedgeArc(GLMPI / 1.0, 6.0, 7);
+	mesh3D.extrudeYZedgeArc(GLMPI / 3.0, 10.0, 6);
+	mesh3D.extrudeYZedgeArc(-GLMPI / 1.0, -6, 7);
+	mesh3D.extrudeYZface(10., 4);
+	mesh3D.extrudeYZedgeArc(GLMPI / 1.0, 6.0, 6);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END

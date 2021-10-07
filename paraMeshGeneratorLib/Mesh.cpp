@@ -264,8 +264,8 @@ void Mesh3D_volumeExtrusion::writeNodesExtrudeArc(ExtrudeStepData& curExtrData, 
 		curExtrData.csys, 
 		((MeshFaceExtrusion*)&curExtr)->meshDens,
 		Pipe3Dradius(
-			curExtr.radius, curExtr.radius + sizeYZ[1],//curFextr->radiusOuter, 
-			curExtr.radius, curExtr.radius + sizeYZ[1]),//curFextr->radiusOuter),
+			curExtr.radius, curExtr.radius - sizeYZ[1],//curFextr->radiusOuter, 
+			curExtr.radius, curExtr.radius - sizeYZ[1]),//curFextr->radiusOuter),
 		ang, sizeYZ[0], direction::y);
 
 	curExtrData.arcAngle += curExtr.endAngle;
@@ -323,7 +323,7 @@ void Mesh3D_volumeExtrusion::writeElements() {
 		extr = &extrusionsXdir[i];
 
 		if (!extr->isStart()) {
-			RowMesher3D::writeElements(&extr->faces[0].nodeIter, &extr->faces[6].nodeIter);
+			//RowMesher3D::writeElements(&extr->faces[0].nodeIter, &extr->faces[6].nodeIter);
 		}
 		Mesher::setNodeID1(extr->faces[6].nodeIter.first());
 		CuboidMesher::writeElements(extr->meshDens);
