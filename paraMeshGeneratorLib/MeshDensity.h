@@ -243,44 +243,44 @@ struct MeshDensity2Dref : public NodeVec2D {
 */
 struct MeshDensity3Dref : public NodeVec3D {
 	MeshDensity3Dref() {}
-	MeshDensity3Dref(int _nRefDir3, int _nNodesDir1, int _nNodesDir2, bool closedLoopDir1 = false)
-		: NodeVec3D(_nNodesDir1, _nNodesDir2, _nRefDir3), closedLoop{ closedLoopDir1 } {}
+	MeshDensity3Dref(int _nRefDir2, int _nNodesDir1, int _nNodesDir3, bool closedLoopDir1 = false)
+		: NodeVec3D(_nNodesDir1, _nRefDir2, _nNodesDir3), closedLoop{ closedLoopDir1 } {}
 
 	bool closedLoop;
 	void setClosedLoop(bool _closedLoop = true) { closedLoop = _closedLoop; }
 
-	int nRefs() const { return dir3(); }
+	int nRefs() const { return dir2(); }
 	int nElDir1() const { return closedLoop ? dir1() : dir1() - 1; }
-	int nElDir2() const { return dir2() - 1; }
+	int nElDir3() const { return dir3() - 1; }
 	int nElCirc() const { return nElDir1(); }
 
 	MeshDensity2D meshDensD12B(int refLayer) const {
 		int n1 = nElDir1() / std::pow(2, refLayer);
 		if (!closedLoop) n1++;
-		int n2 = nElDir2() / std::pow(2, refLayer) + 1;
+		int n2 = nElDir3() / std::pow(2, refLayer) + 1;
 		return MeshDensity2D(n1, n2, closedLoop);
 	}
 	MeshDensity2D meshDensD12M1(int refLayer) const {
 		int n1 = 3 * (nElDir1() / std::pow(2, refLayer)) / 4;
-		int n2 = nElDir2() / std::pow(2, refLayer) + 1;
+		int n2 = nElDir3() / std::pow(2, refLayer) + 1;
 		return MeshDensity2D(n1, n2, closedLoop);
 	}
 	MeshDensity2D meshDensD12M2(int refLayer) const {
 		int n1 = nElDir1() / std::pow(2, refLayer + 1);
 		if (!closedLoop) n1++;
-		int n2 = nElDir2() / std::pow(2, refLayer) + 1;
+		int n2 = nElDir3() / std::pow(2, refLayer) + 1;
 		return MeshDensity2D(n1, n2, closedLoop);
 	}
 	MeshDensity2D meshDensD12M3(int refLayer) const {
 		int n1 = nElDir1() / std::pow(2, refLayer + 1);
 		if (!closedLoop) n1++;
-		int n2 = 3 * (nElDir2() / std::pow(2, refLayer)) / 4;// +1;
+		int n2 = 3 * (nElDir3() / std::pow(2, refLayer)) / 4;// +1;
 		return MeshDensity2D(n1, n2, closedLoop);
 	}
 	MeshDensity2D meshDensD12T(int refLayer) const {
 		return meshDensD12B(refLayer + 1);
 	}
-	int nnodesPlaneD12() const { return dir1() * dir2(); }
+	int nnodesPlaneD13() const { return dir1() * dir3(); }
 
 	int setNrefs(int n) { setDir1(n); }
 

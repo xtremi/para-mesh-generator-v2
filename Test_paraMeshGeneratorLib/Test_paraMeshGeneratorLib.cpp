@@ -1515,7 +1515,7 @@ int cuboidMesherRef(const std::string& fileName) {
 	//Cuboid 2:
 	nRef = 4;
 	meshDens.setDir1(std::pow(2, nRef + 1) + 1);
-	meshDens.setDir2(std::pow(2, nRef + 2) + 1);
+	meshDens.setDir3(std::pow(2, nRef + 2) + 1);
 	CuboidMesherRef::writeNodes(pos, glCsys, meshDens, size, false, plane::xy);
 	CuboidMesherRef::writeElements(meshDens);
 

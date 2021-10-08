@@ -137,7 +137,7 @@ void CuboidMesherRef::writeNodes(
 	
 	RefLayerData rlData;
 	rlData.curPos			= pos;
-	rlData.curElSize		= glm::dvec2(size.x / (double)meshDens.nElDir1(), size.y / (double)meshDens.nElDir2());
+	rlData.curElSize		= glm::dvec2(size.x / (double)meshDens.nElDir1(), size.y / (double)meshDens.nElDir3());
 	rlData.curElSizeRefDir  = initialRefElSize3D(size.z, meshDens.nRefs(), startWithOffset);
 	
 	if (startWithOffset) {
