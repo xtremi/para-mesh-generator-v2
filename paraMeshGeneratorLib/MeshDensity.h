@@ -49,18 +49,18 @@ struct NodeVec3D {
 	/*
 		Radial/normal direction, out of circle (for cone/cylinder)
 	*/
-	int norm() const { return dir2(); }
+	int norm() const { return dir3(); }
 	/*
 		Along axis/height of a cone/cylinder
 	*/
-	int axis()   const { return dir3(); }
+	int axis()   const { return dir2(); }
 
 	void setDir1(int n) { nnodes.x = n; }
 	void setDir2(int n) { nnodes.y = n; }
 	void setDir3(int n) { nnodes.z = n; }
 	void setCirc(int n) { setDir1(n); }
-	void setNorm(int n) { setDir2(n); }
-	void setAxis(int n) { setDir3(n); }
+	void setNorm(int n) { setDir3(n); }
+	void setAxis(int n) { setDir2(n); }
 
 protected:
 	glm::ivec3 nnodes;
@@ -177,11 +177,14 @@ struct MeshDensity3D : public NodeVec3D {
 	int nElDir2() const { return dir2() - 1; }
 	int nElDir3() const { return dir3() - 1; }
 	int nElCirc() const { return nElDir1(); }
-	int nElNorm() const { return nElDir2(); }
-	int nElAxis() const { return nElDir3(); }
+	int nElNorm() const { return nElDir3(); }
+	int nElAxis() const { return nElDir2(); }
+
 
 	MeshDensity2D meshDensD12() const { return MeshDensity2D(dir1(), dir2(), closedLoop); }
+	MeshDensity2D meshDensD13() const { return MeshDensity2D(dir1(), dir3(), closedLoop); }
 	MeshDensity2D meshDensD23() const { return MeshDensity2D(dir2(), dir3(), closedLoop); }
+	MeshDensity2D meshDensDisk() const { return meshDensD13(); }
 	int nnodesPlaneD12() const { return dir1() * dir2(); }
 
 	int nNodes() const { return dir1() * dir2() * dir3(); }

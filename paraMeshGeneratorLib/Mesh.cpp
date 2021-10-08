@@ -34,7 +34,8 @@ void Mesh2D_planeExtrusion::extrudeYedgeArc(double endAng, double radius, int nE
 }
 void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner, int nElements) {
 	MeshFaceExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	extrusionsXdir.push_back(MeshFaceExtrusion(radiusInner, endAng, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion));
+	extrusionsXdir.push_back(MeshFaceExtrusion(radiusInner, endAng, nElements, 
+		MeshDensity2D(meshDensity.axis(), meshDensity.norm()), nNodes, prevExtrusion));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
@@ -323,7 +324,7 @@ void Mesh3D_volumeExtrusion::writeElements() {
 		extr = &extrusionsXdir[i];
 
 		if (!extr->isStart()) {
-			//RowMesher3D::writeElements(&extr->faces[0].nodeIter, &extr->faces[6].nodeIter);
+			RowMesher3D::writeElements(&extr->faces[0].nodeIter, &extr->faces[6].nodeIter);
 		}
 		Mesher::setNodeID1(extr->faces[6].nodeIter.first());
 		CuboidMesher::writeElements(extr->meshDens);

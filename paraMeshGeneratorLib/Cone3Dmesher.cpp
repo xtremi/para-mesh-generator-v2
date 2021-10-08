@@ -19,14 +19,14 @@ void Cone3Dmesher::writeNodes(
 {
 MESHER_NODE_WRITE_START
 
-#define ordering1
+#define ordering2
 #ifdef ordering1
 	double dH  = height       / (double)meshDens.nElAxis();
 	double dRi = radius.dRi() / (double)meshDens.nElAxis();
 	double dRo = radius.dRo() / (double)meshDens.nElAxis();
 
 	Cone2Dradius currentRadius(radius.start);
-	MeshDensity2D meshDensDisk = meshDens.meshDensD12();
+	MeshDensity2D meshDensDisk = meshDens.meshDensDisk();
 
 	for (int i = 0; i < meshDens.axis(); i++) {
 		DiskMesher::writeNodes(curPos, csys, meshDensDisk, currentRadius, angle, axis);
@@ -39,8 +39,8 @@ MESHER_NODE_WRITE_START
 	double dRo = radius.dRo() / (double)meshDens.nElAxis();
 
 	Cone2Dradius currentRadius(radius.start.inner(), radius.end.inner());
-	double dRstart = (radius.start.outer() - radius.start.inner()) / (double)meshDens.nElAxis();
-	double dRend   = (radius.end.outer() - radius.end.inner()) / (double)meshDens.nElAxis();
+	double dRstart = (radius.start.outer() - radius.start.inner()) / (double)meshDens.nElNorm();
+	double dRend   = (radius.end.outer() - radius.end.inner()) / (double)meshDens.nElNorm();
 
 	MeshDensity2D meshDensCone(meshDens.circ(), meshDens.axis());
 

@@ -926,7 +926,7 @@ int coneMesher(const std::string& fileName) {
 	//Full cone:
 	pos.x += 2.1*radius.start();
 	angle.setFullCircle();
-	meshDens.closedLoop = true;
+	meshDens.setClosedLoop();
 	ConeMesher::writeNodes(pos, glCsys, meshDens, radius, angle, height, direction::z);
 	ConeMesher::writeElements(meshDens);
 
@@ -937,6 +937,7 @@ int coneMesher(const std::string& fileName) {
 	pos.x = 0.0;
 	meshDens.nodes().x *= 2;
 	meshDens.nodes().y /= 2;
+	meshDens.setClosedLoop(false);
 	angle.setEnd(0.99*GLM2PI);
 	ConeMesher::writeNodes(pos, glCsys, meshDens, radius, angle, height, direction::z);
 	ConeMesher::writeElements(meshDens);
@@ -1546,7 +1547,7 @@ int cone3DmesherSimple(const std::string& fileName) {
 int cone3Dmesher(const std::string& fileName) {
 	TEST_START2
 
-	MeshDensity3D meshDens(15, 4, 16);
+	MeshDensity3D meshDens(12, 8, 4);
 	Pipe3Dradius  radius(5.0, 9.0, 3.0, 5.0);
 	ArcAngles	  angle(0.0, 0.95*GLM2PI);
 	double		  height = 32.0;
