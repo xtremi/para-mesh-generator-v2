@@ -1,4 +1,5 @@
 #include "NodeIterator.h"
+#include "RefinementCalculations.h"
 
 int NodeIterator::first() {
 	reset();
@@ -65,12 +66,46 @@ void NodeIterator1D::reset() {
 	currentIterIndex = 0;
 }
 
-NodeIterator1Dref::NodeIterator1Dref(int _firstNode, int _nRef, int _preNode)
-	: NodeIterator1D(_firstNode, 0, 0, _preNode)
+NodeIterator1Dref::NodeIterator1Dref(int _nRef, int _nElementEdge0, Type _type, int _preNode)
+	: NodeIterator1D(_type == Type::edge1 ? 1 : (_nElementEdge0 + 1), 0, 0, _preNode)
 {
+	type = _type;
+	nElementEdge0 = _nElementEdge0;
 	nRef = _nRef;
 }
 int NodeIterator1Dref::next() {
+	
+	if (currentIterIndex == 0){
+		currentIterIndex++;
+		previousNodeID = firstNodeID;
+		return firstNodeID;
+	}
+	else {
+		if (currentRef == nRef) {
+			return 0;
+		}
+
+		if (currentIterIndex % 2) {
+			if(type == Type::edge3){
+				previousNodeID += refinement::nNodesLayerMT_2d(currentRef, nElementEdge0);
+				currentRef++;
+			}
+			else if(type == Type::edge1) {
+				previousNodeID += refinement::nNodesLayerBM_2d(currentRef, nElementEdge0);
+				currentRef++;
+			}
+			
+		}
+		else {
+			if (type == Type::edge3 || type == Type::edge1) {
+				previousNodeID += refinement::nNodesLayerB_2d(currentRef, nElementEdge0);
+			}
+		}
+		currentIterIndex++;
+		return previousNodeID;
+	}
+
+	
 	return 0;
 }
 int NodeIterator1Dref::last() {
@@ -81,6 +116,7 @@ int NodeIterator1Dref::get(int i) {
 }
 void NodeIterator1Dref::reset() {
 	NodeIterator1D::reset();
+	currentRef = 0;
 }
 
 

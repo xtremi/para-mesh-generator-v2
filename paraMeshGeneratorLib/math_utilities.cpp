@@ -13,6 +13,9 @@ const glm::mat3x3 UNIT_MAT_3x3 = glm::dmat3x3(1.0);
 double pow2(double val) {
 	return std::pow(val, 2.0);
 }
+int twoPow(int exponent) {
+	return (int)std::pow((double)2, (double)exponent);
+}
 
 //https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
 glm::dmat3x3 makeCsysMatrix(const glm::dvec3& _rotAxis, double angle) {

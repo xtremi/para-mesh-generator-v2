@@ -20,6 +20,8 @@ double initialRefElSize2D(double totalMeshLength, int nRefinements, bool skipFir
 double initialRefElSize3D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight);
 
 double pow2(double val);
+int twoPow(int exponent);
+
 
 bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes);
 

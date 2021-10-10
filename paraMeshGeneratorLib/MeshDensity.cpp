@@ -1,5 +1,6 @@
 #include "MeshDensity.h"
 #include "Shapes.h"
+#include "RefinementCalculations.h"
 
 int MeshDensity2D::cornerNode(int cornerID) {
 	switch (cornerID)
@@ -123,4 +124,24 @@ void MeshDensity2DrecTube::cornerNodes(int n[4], int layer) const {
 	n[1] = nNodesWidth(layer);
 	n[2] = n[1] + nNodesHeight(layer);
 	n[3] = n[2] + nNodesWidth(layer);
+}
+
+
+int MeshDensity2Dref::nElRowB(int refLayer) const {
+	return refinement::nElementsLayerB_2d(refLayer, nElDir2());
+	//return nElDir2() / std::pow(2, refLayer);
+}
+int MeshDensity2Dref::nElRowT(int refLayer) const {
+	return refinement::nElementsLayerT_2d(refLayer, nElDir2());
+	//return nElRowB(refLayer + 1);
+}
+
+int MeshDensity2Dref::nNodesRowB(int refLayer) const {
+	return closedLoop ? nElRowB(refLayer) : nElRowB(refLayer) + 1;
+}
+int MeshDensity2Dref::nNodesRowM(int refLayer) const {	
+	return 3 * nElRowB(refLayer) / 4;
+}
+int MeshDensity2Dref::nNodesRowT(int refLayer) const {
+	return nNodesRowB(refLayer + 1);
 }

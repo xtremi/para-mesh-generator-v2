@@ -99,6 +99,9 @@
     <ClInclude Include="MeshDensity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RefinementCalculations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -174,6 +177,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MeshCsys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RefinementCalculations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

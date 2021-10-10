@@ -63,16 +63,20 @@ protected:
 
 class NodeIterator1Dref : public NodeIterator1D {
 public:
-
+	enum class Type { edge1, edge3 };
 	NodeIterator1Dref() {}
-	NodeIterator1Dref(int _firstNode, int _nRef, int _preNode = 0);
+	NodeIterator1Dref(int _nRef, int _nElementEdge0, Type _type, int _preNode = 0);
 	virtual int next();
 	virtual int last();
 	virtual int get(int i);
 	void reset();
 
 protected:
+	Type type;
 	int nRef = 0;
+	int currentRef = 0;
+	int previousNodeID = 0;
+	int nElementEdge0;
 };
 
 

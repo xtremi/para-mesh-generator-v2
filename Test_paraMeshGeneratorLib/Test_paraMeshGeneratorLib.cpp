@@ -26,7 +26,7 @@
 #include "Mesh.h"
 
 #include "math_utilities.h"
-
+#include "RefinementCalculations.h"
 
 int speedTestAddition(const std::string& fileName);
 int speedTestMultiplication(const std::string& fileName);
@@ -52,6 +52,8 @@ int nodeIterator2Dref(const std::string& fileName);
 int nodeIterator2Dm(const std::string& fileName);
 int meshEdgeExtrusion(const std::string& fileName);
 int meshFaceExtrusion(const std::string& fileName);
+
+int refinementCalc2D(const std::string& fileName);
 
 int lineMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
@@ -132,6 +134,8 @@ std::vector<TestDef> testFunctions({
 	
 	TestDef(50, "meshEdgeExtrusion",	"utilities", (testFunction)meshEdgeExtrusion),
 	TestDef(60, "meshFaceExtrusion",	"utilities", (testFunction)meshFaceExtrusion),
+	
+	TestDef(65, "refinementCalc2D",	"utilities", (testFunction)refinementCalc2D),
 	
 
 	TestDef(101, "lineMesher",			"basic meshers 1D", (testFunction)lineMesher),	
@@ -2177,12 +2181,18 @@ int nodeIterator1Dref(const std::string& fileName) {
 	PlaneMesherRef::writeElements(meshDens);
 
 	std::vector<int> result;
-	std::vector<int> expectedResult;
+	std::vector<int> expectedResult({ 17,38,47,58,63,69 });
 
-	NodeIterator1Dref it1(1, 10, 3);
+	NodeIterator1Dref it1(nRef, 16, NodeIterator1Dref::Type::edge3);
 	result = getNodeIteratorResult(it1);
-	expectedResult = {  };
 	if (!equalVectors(result, expectedResult)) return 1;
+
+	
+	expectedResult = std::vector<int>({ 1,30,39,54,59,67 });
+	NodeIterator1Dref it2(nRef, 16, NodeIterator1Dref::Type::edge1);
+	result = getNodeIteratorResult(it2);
+	if (!equalVectors(result, expectedResult)) return 1;
+	
 
 	TEST_END
 	return 0;
@@ -2448,6 +2458,34 @@ int meshFaceExtrusion(const std::string& fileName) {
 		if (!equalVectors(expectedFaces[i], resultFaces[i])) return 1;
 	}
 	
+	return 0;
+}
+/*
+b0 = 8 el / 9 nodes
+m0 = 6 nodes
+to = 4 el / 5 nodes
+b1 = 4 el / 5 nodes
+m1 = 3 nodes
+t1 = 2 el / 3 nodes
+b2 = 2 el / 3 nodes
+*/
+int refinementCalc2D(const std::string& fileName) {
+
+	if (refinement::nElementsLayerB_2d(0, 8) != 8) return 1;
+	if (refinement::nNodesLayerB_2d(0, 8) != 9) return 1;
+	if (refinement::nNodesLayerM_2d(0, 8) != 6) return 1;
+	if (refinement::nElementsLayerT_2d(0, 8) != 4) return 1;
+	if (refinement::nNodesLayerT_2d(0, 8) != 5) return 1;
+
+	if (refinement::nElementsLayerB_2d(1, 8) != 4) return 1;
+	if (refinement::nNodesLayerB_2d(1, 8) != 5) return 1;
+	if (refinement::nNodesLayerM_2d(1, 8) != 3) return 1;
+	if (refinement::nElementsLayerT_2d(1, 8) != 2) return 1;
+	if (refinement::nNodesLayerT_2d(1, 8) != 3) return 1;
+
+	if (refinement::nElementsLayerB_2d(2, 8) != 2) return 1;
+	if (refinement::nNodesLayerB_2d(2, 8) != 3) return 1;
+
 	return 0;
 }
 

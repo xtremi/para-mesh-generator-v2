@@ -218,22 +218,11 @@ struct MeshDensity2Dref : public NodeVec2D {
 	int norm() const { return dir1(); }
 
 	//First layer is refLayer = 0
-	int nElRowB(int refLayer) const {
-		return nElDir2() / std::pow(2, refLayer);
-	}
-	int nElRowT(int refLayer) const {
-		return nElRowB(refLayer + 1);
-	}
-
-	int nNodesRowB(int refLayer) const {
-		return closedLoop ? nElRowB(refLayer) : nElRowB(refLayer) + 1;
-	}
-	int nNodesRowM(int refLayer) const {
-		return 3 * nElRowB(refLayer) / 4;
-	}
-	int nNodesRowT(int refLayer) const {
-		return nNodesRowB(refLayer + 1);
-	}
+	int nElRowB(int refLayer) const;
+	int nElRowT(int refLayer) const;
+	int nNodesRowB(int refLayer) const;
+	int nNodesRowM(int refLayer) const;
+	int nNodesRowT(int refLayer) const;
 
 };
 
