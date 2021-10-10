@@ -11,5 +11,8 @@ namespace refinement {
 	int nElementsLayerB_2d(int refLayer, int nElementsEdge0);
 	int nElementsLayerT_2d(int refLayer, int nElementsEdge0);
 
+	int minElementsEdge0_2d(int nRef);
+	int minNodesEdge0_2d(int nRef);
+
 }
 

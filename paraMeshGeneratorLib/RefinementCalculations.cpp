@@ -57,3 +57,10 @@ int refinement::nElementsLayerB_2d(int refLayer, int nElementsEdge0) {
 int refinement::nElementsLayerT_2d(int refLayer, int nElementsEdge0) {
 	return nElementsLayerB_2d(refLayer + 1, nElementsEdge0);
 }
+
+int refinement::minElementsEdge0_2d(int nRef) {
+	return twoPow(nRef + 1);
+}
+int refinement::minNodesEdge0_2d(int nRef) {
+	return minElementsEdge0_2d(nRef) + 1;
+}

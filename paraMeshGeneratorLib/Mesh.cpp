@@ -48,6 +48,13 @@ void Mesh2D_planeExtrusion::extrudeYedge(double length, int nElements) {
 	calculateNumberOfElements();
 }
 
+void Mesh2D_planeExtrusion::extrudeYedgeRef(double length, int nRef) {
+	MeshEdgeExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
+	extrusionsXdir.push_back(MeshEdgeExtrusion(length, nElements, meshDensity.dir2(), nNodes, prevExtrusion));
+	calculateNumberOfNodes();
+	calculateNumberOfElements();
+}
+
 void Mesh3D_volumeExtrusion::extrudeYZface(double length, int nElements) {
 	MeshFaceExtrusion* prevExtrusion = extrusionsXdir.size() > 0 ? &extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
 	extrusionsXdir.push_back(MeshFaceExtrusion(length, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion));
@@ -85,22 +92,22 @@ Edg0 x---x---x---x---x Edg2
 
 
 */
-MeshEdge_ext Mesh2D_planeExtrusion::getExtrudedEdge(int edgeIndex) {
+MeshEdge Mesh2D_planeExtrusion::getExtrudedEdge(int edgeIndex) {
 	std::vector<NodeIterator1D> iterators;
 	
 	if (edgeIndex == 1 || edgeIndex == 3) {
 		for (MeshEdgeExtrusion& edgeExtr : extrusionsXdir) {
-			iterators.push_back(edgeExtr.edges[edgeIndex].nodeIter);
+			iterators.push_back(*edgeExtr.edges[edgeIndex].nodeIter);
 		}
 	}
 	else if (edgeIndex == 0) {
-		iterators.push_back(extrusionsXdir[0].edges[0].nodeIter);
+		iterators.push_back(*extrusionsXdir[0].edges[0].nodeIter);
 	}
 	else if (edgeIndex == 2) {
-		iterators.push_back(extrusionsXdir[extrusionsXdir.size() - 1].edges[2].nodeIter);
+		iterators.push_back(*extrusionsXdir[extrusionsXdir.size() - 1].edges[2].nodeIter);
 	}
 	
-	return MeshEdge_ext(NodeIterator1Dm(iterators, true));
+	return MeshEdge(std::shared_ptr<NodeIterator1Dm>(new NodeIterator1Dm(iterators, true)));
 }
 
 /*!
@@ -308,9 +315,9 @@ void Mesh2D_planeExtrusion::writeElements() {
 		extr = &extrusionsXdir[i];
 		
 		if (!extr->isStart()){
-			RowMesher2D::writeElements(&extr->edges[0].nodeIter, &extr->edges[4].nodeIter);
+			RowMesher2D::writeElements(extr->edges[0].nodeIter.get(), extr->edges[4].nodeIter.get());
 		}
-		Mesher::setNodeID1(extr->edges[4].nodeIter.first());
+		Mesher::setNodeID1(extr->edges[4].nodeIter->first());
 		PlaneMesher::writeElements(extr->meshDens);
 	}
 	

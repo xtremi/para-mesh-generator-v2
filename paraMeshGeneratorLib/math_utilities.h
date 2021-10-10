@@ -19,7 +19,13 @@ glm::dmat3x3 makeCsysMatrix(const glm::dvec3& rotAxis, double angle);
 double initialRefElSize2D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight);
 double initialRefElSize3D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight);
 
+/*
+	returns val^2
+*/
 double pow2(double val);
+/*
+	returns 2^exponent
+*/
 int twoPow(int exponent);
 
 

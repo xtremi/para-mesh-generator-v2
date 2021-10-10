@@ -77,14 +77,15 @@ public:
 	void setStartEdgeY(int nElementsY, double lengthY);
 
 	void extrudeYedge(double length, int nElements);
+	void extrudeYedgeRef(double length, int nRef);
 	void extrudeYedgeArc(double endAng, double radius, int nElements);
 
 	virtual void writeNodes();
 	virtual void writeElements();
 
 
-	MeshEdge	 getEdge(int section, int edgeIndex);
-	MeshEdge_ext getExtrudedEdge(int edgeIndex);
+	MeshEdge getEdge(int section, int edgeIndex);
+	MeshEdge getExtrudedEdge(int edgeIndex);
 
 private:
 	struct ExtrudeStepData {

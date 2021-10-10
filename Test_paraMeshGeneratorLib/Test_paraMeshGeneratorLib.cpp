@@ -2174,28 +2174,49 @@ int nodeIterator1Dref(const std::string& fileName) {
 
 	glm::dvec2 size(20.0, 17.0);
 	int nRef = 3;
-	int nNodesDir2 = std::pow(2, nRef + 1) + 1;
-	MeshDensity2Dref meshDens(nRef, nNodesDir2, false);
+	int nNodesDir2 = refinement::minNodesEdge0_2d(nRef);
+	MeshDensity2Dref meshDens(nRef, nNodesDir2);
 
 	PlaneMesherRef::writeNodes(pos, glCsys, meshDens, size, true, plane::xy);
 	PlaneMesherRef::writeElements(meshDens);
 
+	/*edge3*/
 	std::vector<int> result;
 	std::vector<int> expectedResult({ 17,38,47,58,63,69 });
 
-	NodeIterator1Dref it1(nRef, 16, NodeIterator1Dref::Type::edge3);
+	NodeIterator1Dref it1(17, nRef, 16, NodeIterator1Dref::Type::edge3);
 	result = getNodeIteratorResult(it1);
 	if (!equalVectors(result, expectedResult)) return 1;
-
 	
+	if (it1.get(0) != 17) return 1;
+	if (it1.get(1) != 38) return 1;
+	if (it1.get(5) != 69) return 1;
+	if (it1.last() != 69) return 1;
+
+	/*edge1*/
 	expectedResult = std::vector<int>({ 1,30,39,54,59,67 });
-	NodeIterator1Dref it2(nRef, 16, NodeIterator1Dref::Type::edge1);
+	NodeIterator1Dref it2(1, nRef, 16, NodeIterator1Dref::Type::edge1);
 	result = getNodeIteratorResult(it2);
 	if (!equalVectors(result, expectedResult)) return 1;
 	
+	if (it2.get(0) != 1) return 1;
+	if (it2.get(2) != 39) return 1;
+	if (it2.get(5) != 67) return 1;
+	if (it2.last() != 67) return 1;
+
+	/*edge3 with preNode*/
+	expectedResult = std::vector<int>({ 100, 1,30,39,54,59,67 });
+	NodeIterator1Dref it3(1, nRef, 16, NodeIterator1Dref::Type::edge1, 100);
+	result = getNodeIteratorResult(it3);
+	if (!equalVectors(result, expectedResult)) return 1;
+
+	/*edge1 with preNode*/
+	expectedResult = std::vector<int>({1000, 1,30,39,54,59,67 });
+	NodeIterator1Dref it4(1, nRef, 16, NodeIterator1Dref::Type::edge1, 1000);
+	result = getNodeIteratorResult(it4);
+	if (!equalVectors(result, expectedResult)) return 1;
 
 	TEST_END
-	return 0;
 }
 
 int nodeIterator2D(const std::string& fileName) {
@@ -2321,11 +2342,11 @@ int meshEdgeExtrusion(const std::string& fileName) {
 		});
 
 	resultEdges = std::vector<std::vector<int>>({
-		getNodeIteratorResult(edgeExtr1.edges[0].nodeIter),
-		getNodeIteratorResult(edgeExtr1.edges[1].nodeIter),
-		getNodeIteratorResult(edgeExtr1.edges[2].nodeIter),
-		getNodeIteratorResult(edgeExtr1.edges[3].nodeIter),
-		getNodeIteratorResult(edgeExtr1.edges[4].nodeIter)
+		getNodeIteratorResult(*edgeExtr1.edges[0].nodeIter),
+		getNodeIteratorResult(*edgeExtr1.edges[1].nodeIter),
+		getNodeIteratorResult(*edgeExtr1.edges[2].nodeIter),
+		getNodeIteratorResult(*edgeExtr1.edges[3].nodeIter),
+		getNodeIteratorResult(*edgeExtr1.edges[4].nodeIter)
 		});
 
 	for (int i = 0; i < 5; i++) {
@@ -2343,11 +2364,11 @@ int meshEdgeExtrusion(const std::string& fileName) {
 		});
 
 	resultEdges = std::vector<std::vector<int>>({
-		getNodeIteratorResult(edgeExtr2.edges[0].nodeIter),
-		getNodeIteratorResult(edgeExtr2.edges[1].nodeIter),
-		getNodeIteratorResult(edgeExtr2.edges[2].nodeIter),
-		getNodeIteratorResult(edgeExtr2.edges[3].nodeIter),
-		getNodeIteratorResult(edgeExtr2.edges[4].nodeIter)
+		getNodeIteratorResult(*edgeExtr2.edges[0].nodeIter),
+		getNodeIteratorResult(*edgeExtr2.edges[1].nodeIter),
+		getNodeIteratorResult(*edgeExtr2.edges[2].nodeIter),
+		getNodeIteratorResult(*edgeExtr2.edges[3].nodeIter),
+		getNodeIteratorResult(*edgeExtr2.edges[4].nodeIter)
 		});
 
 	for (int i = 0; i < 5; i++) {
@@ -2365,11 +2386,11 @@ int meshEdgeExtrusion(const std::string& fileName) {
 		});
 
 	resultEdges = std::vector<std::vector<int>>({
-		getNodeIteratorResult(edgeExtr3.edges[0].nodeIter),
-		getNodeIteratorResult(edgeExtr3.edges[1].nodeIter),
-		getNodeIteratorResult(edgeExtr3.edges[2].nodeIter),
-		getNodeIteratorResult(edgeExtr3.edges[3].nodeIter),
-		getNodeIteratorResult(edgeExtr3.edges[4].nodeIter),
+		getNodeIteratorResult(*edgeExtr3.edges[0].nodeIter),
+		getNodeIteratorResult(*edgeExtr3.edges[1].nodeIter),
+		getNodeIteratorResult(*edgeExtr3.edges[2].nodeIter),
+		getNodeIteratorResult(*edgeExtr3.edges[3].nodeIter),
+		getNodeIteratorResult(*edgeExtr3.edges[4].nodeIter),
 		});
 
 	for (int i = 0; i < 5; i++) {

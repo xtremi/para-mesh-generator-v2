@@ -1,7 +1,7 @@
 #pragma once
 #include "ParaMeshGenCommon.h"
 #include "MeshDensity.h"
-
+#include  <memory>
 
 enum class ExtrusionType {
 	line,
@@ -11,14 +11,16 @@ enum class ExtrusionType {
 class MeshEdge {
 public:
 	MeshEdge() {}
-	MeshEdge(NodeIterator1D _nodeIter) {
+	MeshEdge(std::shared_ptr<NodeIterator1D> _nodeIter) {
 		nodeIter = _nodeIter;
 	}
 	
-	NodeIterator1D nodeIter;
-	int startNode() { return nodeIter.first(); }
-	int endNode() { return nodeIter.last(); }
+	std::shared_ptr<NodeIterator1D> nodeIter;
+	int startNode() { return nodeIter->first(); }
+	int endNode() { return nodeIter->last(); }
 };
+/*
+	is MeshEdge now -> with NodeIterator1Dm
 
 class MeshEdge_ext {
 public:
@@ -28,7 +30,7 @@ public:
 	}
 	NodeIterator1Dm nodeIter;	
 };
-
+*/
 class MeshFace {
 public:
 	MeshFace() {}

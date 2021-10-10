@@ -84,7 +84,7 @@ MeshFaceExtrusion::MeshFaceExtrusion(
 */
 void MeshEdgeExtrusion::setNodeOffset(int nOffs) {
 	for (MeshEdge& edg : edges)
-		edg.nodeIter.nodeIDoffset = nOffs;
+		edg.nodeIter->nodeIDoffset = nOffs;
 }
 void MeshFaceExtrusion::setNodeOffset(int nOffs) {
 	for (MeshFace& face : faces)
@@ -93,7 +93,7 @@ void MeshFaceExtrusion::setNodeOffset(int nOffs) {
 
 void MeshEdgeExtrusion::addToFirstNodeID(int n) {
 	for (MeshEdge& edg : edges)
-		edg.nodeIter.firstNodeID += n;
+		edg.nodeIter->firstNodeID += n;
 }
 void MeshFaceExtrusion::addToFirstNodeID(int n) {
 	for (MeshFace& face : faces)
@@ -156,10 +156,10 @@ void MeshEdgeExtrusion::initEdges(int nnodeEdge1, int firstNodeID, MeshExtrusion
 		preNodeEdge2 = ((MeshEdgeExtrusion*)previousExtrusion)->endCornerNode2();
 	}
 		
-	edges[1] = MeshEdge(meshDens.edgeNodeIterator(1, firstNodeID, preNodeEdge1));
-	edges[2] = MeshEdge(meshDens.edgeNodeIterator(2, firstNodeID));
-	edges[3] = MeshEdge(meshDens.edgeNodeIterator(3, firstNodeID, preNodeEdge2));
-	edges[4] = MeshEdge(meshDens.edgeNodeIterator(0, firstNodeID));
+	edges[1] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(1, firstNodeID, preNodeEdge1))));
+	edges[2] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(2, firstNodeID))));
+	edges[3] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(3, firstNodeID, preNodeEdge2))));
+	edges[4] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(0, firstNodeID))));
 	if (isStart()) {
 		edges[0] = edges[4];
 	}

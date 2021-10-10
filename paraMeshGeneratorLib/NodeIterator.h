@@ -50,7 +50,7 @@ public:
 	virtual int next();
 	virtual int last();
 	virtual int get(int i);
-	void reset();
+	virtual void reset();
 	virtual int numberOfNodes() { return nNodes; }
 
 protected:
@@ -61,38 +61,19 @@ protected:
 	int currentIterIndex = 0;
 };
 
-class NodeIterator1Dref : public NodeIterator1D {
-public:
-	enum class Type { edge1, edge3 };
-	NodeIterator1Dref() {}
-	NodeIterator1Dref(int _nRef, int _nElementEdge0, Type _type, int _preNode = 0);
-	virtual int next();
-	virtual int last();
-	virtual int get(int i);
-	void reset();
-
-protected:
-	Type type;
-	int nRef = 0;
-	int currentRef = 0;
-	int previousNodeID = 0;
-	int nElementEdge0;
-};
-
-
-
-
-
-
 /*
 	Chain of multiple NodeIterators1D
 */
-class NodeIterator1Dm : public NodeIterator {
+class NodeIterator1Dm : public NodeIterator1D {
 public:
 	NodeIterator1Dm() {}
 	NodeIterator1Dm(const std::vector<NodeIterator1D>& _iterators, bool overlappingNodes);
 	int next();
 	void reset();
+	int get(int i) {
+		throw("NodeIterator1Dm::get() not implemented");
+		return 0;
+	}
 
 	int numberOfNodes();
 
@@ -102,6 +83,59 @@ private:
 	int currentNodeIterIndex;
 	bool hasOverlappingNodes = false;
 };
+
+
+/*
+    x_______________x_______________x
+    |               |               |
+    |			    |			    |
+    |			    |			    |
+    |			    |			    |
+    |			    |			    |
+    x_______________x_______________x
+    |\              |              /|
+    |  \        	|		    /   |
+    |	 \  x_______x_______x /     |
+    |       |       |       |	    |
+    |	    |       |       |       |
+    x_______x_______x_______x_______x
+    |       |       |       |       |
+  ^ |       |       |       |       |   ^
+  | x_______x_______x_______x_______x   |
+  | | \     |     / |  \    |     / |   |
+  | |   x___x___x/  |   x___x___x   |   |
+  | |   |   |   |   |   |   |   |   |	|
+  | x___x___x___x___x___x___x___x___x	| 
+  |										|
+edge3    	  --edge0-->			  edge 1	
+			
+*/
+class NodeIterator1Dref : public NodeIterator1D {
+public:
+	enum class Type { edge1, edge3 };
+	NodeIterator1Dref() {}
+	NodeIterator1Dref(int firstNodeID, int _nRef, int _nElementEdge0, Type _type, int _preNode = 0);
+	virtual int next();
+	virtual int last();
+	virtual int get(int i);
+	void reset();
+
+protected:
+	Type type;
+	int nRef = 0;
+	int currentRef = 0;
+	int currentNodeID = 0;
+	int nElementEdge0;
+	bool preNodeReturned = false;
+
+};
+
+
+
+
+
+
+
 
 
 /*!

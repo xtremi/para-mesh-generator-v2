@@ -66,19 +66,25 @@ void NodeIterator1D::reset() {
 	currentIterIndex = 0;
 }
 
-NodeIterator1Dref::NodeIterator1Dref(int _nRef, int _nElementEdge0, Type _type, int _preNode)
-	: NodeIterator1D(_type == Type::edge1 ? 1 : (_nElementEdge0 + 1), 0, 0, _preNode)
+NodeIterator1Dref::NodeIterator1Dref(int firstNodeID, int _nRef, int _nElementEdge0, Type _type, int _preNode)
+	: NodeIterator1D(firstNodeID, 0, 0, _preNode)
 {
 	type = _type;
 	nElementEdge0 = _nElementEdge0;
 	nRef = _nRef;
 }
 int NodeIterator1Dref::next() {
-	
+		
 	if (currentIterIndex == 0){
+
+		if (preNode > 0 && !preNodeReturned) {
+			preNodeReturned = true;
+			return preNode;
+		}
+
 		currentIterIndex++;
-		previousNodeID = firstNodeID;
-		return firstNodeID;
+		currentNodeID = 0;
+		return currentNodeID + firstNodeID + nodeIDoffset;
 	}
 	else {
 		if (currentRef == nRef) {
@@ -87,32 +93,55 @@ int NodeIterator1Dref::next() {
 
 		if (currentIterIndex % 2) {
 			if(type == Type::edge3){
-				previousNodeID += refinement::nNodesLayerMT_2d(currentRef, nElementEdge0);
+				currentNodeID += refinement::nNodesLayerMT_2d(currentRef, nElementEdge0);
 				currentRef++;
 			}
 			else if(type == Type::edge1) {
-				previousNodeID += refinement::nNodesLayerBM_2d(currentRef, nElementEdge0);
+				currentNodeID += refinement::nNodesLayerBM_2d(currentRef, nElementEdge0);
 				currentRef++;
 			}
 			
 		}
 		else {
 			if (type == Type::edge3 || type == Type::edge1) {
-				previousNodeID += refinement::nNodesLayerB_2d(currentRef, nElementEdge0);
+				currentNodeID += refinement::nNodesLayerB_2d(currentRef, nElementEdge0);
 			}
 		}
 		currentIterIndex++;
-		return previousNodeID;
+		return currentNodeID + firstNodeID + nodeIDoffset;
 	}
 
 	
 	return 0;
 }
-int NodeIterator1Dref::last() {
-	return 0;
-}
+
+/*
+	Returns the i-th nodeID of the iterator.
+
+	Obs!: Iterates from start to i-th value to get i-th value
+*/
 int NodeIterator1Dref::get(int i) {
-	return 0;
+
+	int nId = 0;
+	reset();
+	for (int j = 0; j < (i + 1); j++) {
+		nId = next();
+	}
+
+	return nId;
+}
+
+/*
+	Returns the last nodeID of the iterator.
+
+	Obs!: Iterates from start to end to find last ID
+*/
+int NodeIterator1Dref::last() {
+	int nid = 0;
+	for (int nthId = first(); nthId; nthId = next()) {
+		nid = nthId;
+	}
+	return nid;
 }
 void NodeIterator1Dref::reset() {
 	NodeIterator1D::reset();
@@ -125,7 +154,8 @@ void NodeIterator1Dref::reset() {
 	1D multi
 
 */
-NodeIterator1Dm::NodeIterator1Dm(const std::vector<NodeIterator1D>& _iterators, bool overlappingNodes) {
+NodeIterator1Dm::NodeIterator1Dm(const std::vector<NodeIterator1D>& _iterators, bool overlappingNodes) 
+	: NodeIterator1D(0, 0, 0){
 	iterators = _iterators;
 	hasOverlappingNodes = overlappingNodes;
 }
