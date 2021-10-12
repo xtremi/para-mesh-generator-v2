@@ -3,7 +3,7 @@
 #include "FeaWrite.h"
 #include "Geometry.h"
 #include "Extrusion.h"
-
+#include <memory>
 
 class Mesh {
 public:
@@ -87,23 +87,9 @@ public:
 	MeshEdge getEdge(int section, int edgeIndex);
 	MeshEdge getExtrudedEdge(int edgeIndex);
 
-private:
-	struct ExtrudeStepData {
-		glm::dvec3 pos;
-		MeshCsys   csys;
-		double	   startSpace;
-		double	   arcAngle;
-		//int		   nNodesEdgeX;
-		glm::dvec2 dxy;
-
-	};
-
 protected:
-	std::vector<MeshEdgeExtrusion> extrusionsXdir;
+	std::vector<std::shared_ptr<MeshEdgeExtrusion>> extrusionsXdir;
 	void setNodeOffsetOnMeshEdgeExtrusions(int nodeIDoffset);
-
-	void writeNodesExtrudeLine(ExtrudeStepData& current, MeshExtrusion& curExtr);
-	void writeNodesExtrudeArc(ExtrudeStepData& current, MeshExtrusion& curExtr);
 
 	void calculateNumberOfNodes();
 	void calculateNumberOfElements();
@@ -128,26 +114,11 @@ public:
 	virtual void writeElements();
 
 	MeshFace getFace(int section, int faceIndex);
-	//MeshEdge	 getEdge(int section, int edgeIndex);
-	//MeshEdge_ext getExtrudedEdge(int edgeIndex);
 
-private:
-	struct ExtrudeStepData {
-		glm::dvec3 pos;
-		MeshCsys   csys;
-		double	   startSpace;
-		double	   arcAngle;
-		int		   nNodesEdgeX;
-		glm::dvec3 dxyz;
-
-	};
 
 protected:
-	std::vector<MeshFaceExtrusion> extrusionsXdir;
+	std::vector<std::shared_ptr<MeshFaceExtrusion>> extrusionsXdir;
 	void setNodeOffsetOnMeshEdgeExtrusions(int nodeIDoffset);
-
-	void writeNodesExtrudeLine(ExtrudeStepData& current, MeshExtrusion& curExtr);
-	void writeNodesExtrudeArc(ExtrudeStepData& current, MeshExtrusion& curExtr);
 
 	void calculateNumberOfNodes();
 	void calculateNumberOfElements();

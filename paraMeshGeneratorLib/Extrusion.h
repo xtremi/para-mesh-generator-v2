@@ -1,12 +1,37 @@
 #pragma once
 #include "ParaMeshGenCommon.h"
 #include "MeshDensity.h"
+#include "MeshCsys.h"
 #include  <memory>
 
 enum class ExtrusionType {
 	line,
 	arc
 };
+
+
+class ExtrudeStepData{
+public:	
+	glm::dvec3 pos;
+	MeshCsys   csys;
+	double	   startSpace;
+	double	   arcAngle;
+};
+
+class ExtrudeEdgeStepData : public ExtrudeStepData{
+public:
+	glm::dvec2 dxy;
+	double lengthY;
+};
+
+class ExtrudeFaceStepData : public ExtrudeStepData {
+public:
+	int		   nNodesEdgeX;
+	glm::dvec3 dxyz;
+	glm::dvec2 sizeYZ;
+};
+
+
 
 class MeshEdge {
 public:
@@ -19,18 +44,7 @@ public:
 	int startNode() { return nodeIter->first(); }
 	int endNode() { return nodeIter->last(); }
 };
-/*
-	is MeshEdge now -> with NodeIterator1Dm
 
-class MeshEdge_ext {
-public:
-	MeshEdge_ext() {}
-	MeshEdge_ext(NodeIterator1Dm _nodeIter) {
-		nodeIter = _nodeIter;
-	}
-	NodeIterator1Dm nodeIter;	
-};
-*/
 class MeshFace {
 public:
 	MeshFace() {}
@@ -45,7 +59,7 @@ public:
 
 	Extrusion of "anything" (edge or face)
 
-		nElements
+		nElements 
 	|---|---|---|---|
 	x
 	x
@@ -56,20 +70,47 @@ public:
 */
 class MeshExtrusion {
 public:
-	MeshExtrusion(double _length, int _nElements, MeshExtrusion* previousExtrusion = nullptr);
-	MeshExtrusion(double _radius, double _endAngle, int _nElements, MeshExtrusion* previousExtrusion = nullptr);
-	double spacing();
-	int nNodes();
-
+	MeshExtrusion(int _nElements, MeshExtrusion* previousExtrusion = nullptr);	
+	virtual int nNodes();
 	bool isStart() { return _isStart; }
-	ExtrusionType extrusionType;
-	double		  length;				// ExtrusionType::line
-	double		  radius, endAngle;		// ExtrusionType::arc
-	int			  nElements;
-private: 
+	virtual double spacing() {
+		return 0.;
+	}
+
+	virtual void writeNodes(ExtrudeStepData* curStepData){}
+	virtual void writeElements(){}
+
+protected: 
+	int nElements;	//in extrusion direction
 	bool _isStart;
 };
 
+/*
+	MeshExtrusion can inherit this for line extrusion properties
+*/
+class MeshExtrusion_lineProp {
+protected:
+	MeshExtrusion_lineProp(double _length) : length{ _length } { }
+	double length;
+};
+
+/*
+	MeshExtrusion can inherit this for arc extrusion properties
+*/
+class MeshExtrusion_arcProp {
+protected:
+	MeshExtrusion_arcProp(double _radius, double _endAngle) : radius{_radius}, endAngle{_endAngle}{}
+	double radius, endAngle;
+};
+
+/*
+	MeshExtrusion can inherit this for ref extrusion properties
+*/
+class MeshExtrusion_refProp {
+protected:
+	MeshExtrusion_refProp(int _nRef) : nRef{_nRef}{}
+	int nRef;
+};
 
 /*
 
@@ -123,38 +164,104 @@ Edg0 |--|x---x---x---x Edg2  |----> Extrusion
 class MeshEdgeExtrusion : public MeshExtrusion {
 public:
 	MeshEdgeExtrusion(
-		double _length, 
 		int	   _nElements, 
 		int	   nnodeEdge1, 
 		int	   firstNodeID, 
-		MeshExtrusion* previousExtrusion = nullptr);
-	MeshEdgeExtrusion(
-		double _radius, 
-		double _endAngle, 
-		int	   _nElements, 
-		int	   nnodeEdge1, 
-		int	   firstNodeID, 
-		MeshExtrusion* previousExtrusion = nullptr);
-
-	/*
-		The mesh density of the nodes of these extrusion.
-		This means from edge0 is not included.
-	*/
-	MeshDensity2D meshDens;
+		MeshEdgeExtrusion* previousExtrusion = nullptr);
 
 	/*!		
 		edge[0] is the edge same edge as edge[2] of the previous extrusion
 		edge[5] is the first edge with nodes belonging to this extrusion
 	*/	
 	MeshEdge edges[5];
-	MeshEdge getEdge(int edgeID);
-	int endCornerNode1();
-	int endCornerNode2();
+	virtual int endCornerNode1();
+	virtual int endCornerNode2();
 
-	void setNodeOffset(int nOffs);
-	void addToFirstNodeID(int n);
+	virtual void setNodeOffset(int nOffs);
+	virtual void addToFirstNodeID(int n);	
+};
+
+class MeshEdgeExtrusion_noRef : public MeshEdgeExtrusion{
+public:
+	MeshEdgeExtrusion_noRef(
+		int	   _nElements,
+		int	   nnodeEdge1,
+		int	   firstNodeID,
+		MeshEdgeExtrusion* previousExtrusion = nullptr);
+
+	virtual void writeElements();
+
 protected:
-	void initEdges(int nnodeEdge1, int firstNodeID, MeshExtrusion* previousExtrusion);
+	MeshDensity2D meshDens;
+	
+	void initEdges(int nnodeEdge1, int firstNodeID, MeshEdgeExtrusion* previousExtrusion);
+};
+
+class MeshEdgeExtrusion_ref : public MeshEdgeExtrusion, public MeshExtrusion_refProp {
+public:
+	MeshEdgeExtrusion_ref(
+		int	   _nRef,
+		int	   nnodeEdge1,
+		int	   firstNodeID,
+		MeshEdgeExtrusion* previousExtrusion = nullptr);
+
+	virtual void writeElements();
+
+protected:
+	MeshDensity2Dref meshDens;
+	void initEdges(int nnodeEdge1, int firstNodeID, MeshEdgeExtrusion* previousExtrusion);
+};
+
+class MeshEdgeExtrusionLine : public MeshEdgeExtrusion_noRef, public MeshExtrusion_lineProp {
+public:
+	MeshEdgeExtrusionLine(
+		double _length,
+		int	   _nElements,
+		int	   nnodeEdge1,
+		int	   firstNodeID,
+		MeshEdgeExtrusion* previousExtrusion = nullptr);
+
+	double spacing();
+	void writeNodes(ExtrudeStepData* curStepData);
+};
+
+class MeshEdgeExtrusionArc : public MeshEdgeExtrusion_noRef, public MeshExtrusion_arcProp {
+public:
+	MeshEdgeExtrusionArc(
+		double _radius,
+		double _endAngle,
+		int	   _nElements,
+		int	   nnodeEdge1,
+		int	   firstNodeID,
+		MeshEdgeExtrusion* previousExtrusion = nullptr);
+
+	double spacing();
+	void writeNodes(ExtrudeStepData* curStepData);
+};
+
+class MeshEdgeExtrusionLineRef : public MeshEdgeExtrusion_ref, public MeshExtrusion_lineProp {
+public:
+	MeshEdgeExtrusionLineRef(
+		double _length,
+		int	   _nRef,
+		int	   nnodeEdge1,
+		int	   firstNodeID,
+		MeshEdgeExtrusion* previousExtrusion = nullptr);
+
+	double spacing();
+	void writeNodes(ExtrudeStepData* curStepData);
+};
+class MeshEdgeExtrusionArcRef : public MeshEdgeExtrusion_ref, public MeshExtrusion_arcProp {
+	MeshEdgeExtrusionArcRef(
+		double _radius,
+		double _endAngle,
+		int	   _nRef,
+		int	   nnodeEdge1,
+		int	   firstNodeID,
+		MeshEdgeExtrusion* previousExtrusion = nullptr);
+
+	double spacing();
+	void writeNodes(ExtrudeStepData* curStepData);
 };
 
 /*          F3 (back)
@@ -184,25 +291,12 @@ protected:
 class MeshFaceExtrusion : public MeshExtrusion {
 public:
 	MeshFaceExtrusion(
-		double				 _length,
 		int					 _nElements,
 		const MeshDensity2D& face0nodes, 
 		int					 firstNodeID,
-		MeshExtrusion*		 previousExtrusion = nullptr);
-	MeshFaceExtrusion(		 
-		double				 _radiusInner,
-		double				 _endAngle,
-		int					 _nElements,
-		const MeshDensity2D& face0nodes,
-		int					 firstNodeID,
-		MeshExtrusion*		 previousExtrusion = nullptr);
+		MeshFaceExtrusion*	 previousExtrusion = nullptr);
 
 
-	/*
-		The mesh density of the nodes of this extrusion.
-		This means from face0 is not included.
-	*/
-	MeshDensity3D meshDens;
 	/*!
 		face[0] is the face same face as face[5] of the previous extrusion
 		face[6] is the first face with nodes belonging to this extrusion
@@ -217,8 +311,52 @@ public:
 	void addToFirstNodeID(int n);
 
 protected:
-	void initFaces(const MeshDensity2D& face1nodes, int firstNodeID, MeshExtrusion* previousExtrusion);
-	NodeIterator1D endEdgeIterators[4];
-
-	
+	NodeIterator1D endEdgeIterators[4];	
 };
+
+
+class MeshFaceExtrusion_noRef : public MeshFaceExtrusion {
+public:
+	MeshFaceExtrusion_noRef(
+		int	   _nElements,
+		const  MeshDensity2D& face0nodes,
+		int	   firstNodeID,
+		MeshFaceExtrusion* previousExtrusion = nullptr);
+
+	virtual void writeElements();
+
+protected:
+	MeshDensity3D meshDens;
+	void initFaces(const MeshDensity2D& face0nodes, int firstNodeID, MeshFaceExtrusion* previousExtrusion);
+};
+
+
+class MeshFaceExtrusionLine : public MeshFaceExtrusion_noRef, public MeshExtrusion_lineProp {
+public:
+	MeshFaceExtrusionLine(
+		double _length,
+		int	   _nElements,
+		const MeshDensity2D& face0nodes,
+		int	   firstNodeID,
+		MeshFaceExtrusion* previousExtrusion = nullptr);
+
+	double spacing();
+	void writeNodes(ExtrudeStepData* curStepData);
+};
+
+
+class MeshFaceExtrusionArc : public MeshFaceExtrusion_noRef, public MeshExtrusion_arcProp {
+public:
+	MeshFaceExtrusionArc(
+		double				 _radiusInner,
+		double				 _endAngle,
+		int					 _nElements,
+		const MeshDensity2D& face0nodes,
+		int					 firstNodeID,
+		MeshFaceExtrusion*		 previousExtrusion = nullptr);
+
+	double spacing();
+	void writeNodes(ExtrudeStepData* curStepData);
+
+};
+

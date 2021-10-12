@@ -1,28 +1,20 @@
 #include "Extrusion.h"
+#include "PlaneMesher.h"
+#include "CuboidMesher.h"
+#include "Cone3Dmesher.h"
+#include "ConeMesher.h"
 
-MeshExtrusion::MeshExtrusion(double _length, int _nElements, MeshExtrusion* previousExtrusion) {
-	length = _length;
+MeshExtrusion::MeshExtrusion(int _nElements, MeshExtrusion* previousExtrusion) {
 	nElements = _nElements;
-	extrusionType = ExtrusionType::line;
-	_isStart = (bool)!previousExtrusion;
-}
-MeshExtrusion::MeshExtrusion(double _radius, double _endAngle, int _nElements, MeshExtrusion* previousExtrusion) {
-	radius = _radius;
-	endAngle = _endAngle;
-	nElements = _nElements;
-	extrusionType = ExtrusionType::arc;
-	//length = 2.0*glm::pi<double>()*radius * (endAngle/ 2.0*glm::pi<double>());
-	length = radius * endAngle;
 	_isStart = (bool)!previousExtrusion;
 }
 
-
-
-double MeshExtrusion::spacing() {
-	if (extrusionType == ExtrusionType::line)
+double MeshEdgeExtrusionLine::spacing() {
 		return length / (double)(nElements);
-	else if (extrusionType == ExtrusionType::arc)
-		return endAngle / (double)(nElements);
+}
+
+double MeshEdgeExtrusionArc::spacing() {
+	return endAngle / (double)(nElements);
 }
 
 //Number of nodes along extrusion
@@ -32,50 +24,260 @@ int MeshExtrusion::nNodes() {
 
 
 MeshEdgeExtrusion::MeshEdgeExtrusion(
+	int	   _nElements,
+	int	   nnodeEdge1,
+	int	   firstNodeID,
+	MeshEdgeExtrusion* previousExtrusion) : MeshExtrusion( _nElements, previousExtrusion)
+{
+}
+
+MeshEdgeExtrusion_noRef::MeshEdgeExtrusion_noRef(
+	int	   _nElements,
+	int	   nnodeEdge1,
+	int	   firstNodeID,
+	MeshEdgeExtrusion* previousExtrusion) : MeshEdgeExtrusion(_nElements, nnodeEdge1, firstNodeID, previousExtrusion)
+{
+	initEdges(nnodeEdge1, firstNodeID, previousExtrusion);
+}
+void MeshEdgeExtrusion_noRef::writeElements() {
+	PlaneMesher::writeElements(meshDens);
+}
+
+/*!
+
+isStart extrusion:
+
+nElements = 3
+nNodes    = 4
+x5  x6  x7  x8
+x1  x2  x3  x4
+
+
+ ------------------
+
+normal extrusion:
+
+nElements = 3
+nNodes    = 3
+-   x5  x6  x7
+-   x1  x2  x3
+
+
+
+  initial  second         third
+  extr.    extrusion      extrusion
+|--------|<------------|<-----------------|
+|        |             |                  |
+
+x--x--x--o2-----x------o2-----x---x---x---o2
+|  |  |  |      |      |      |   |   |   |
+x--x--x--x------x------x------x---x---x---x
+|  |  |  |      |      |      |   |   |   |
+x--x--x--o1-----x------o1-----x---x---x---o1
+
+o1/o2 - preNode1 / preNode2
+
+
+*/
+void MeshEdgeExtrusion_noRef::initEdges(int nnodeEdge1, int firstNodeID, MeshEdgeExtrusion* previousExtrusion) {
+	int nnodesExtr = nNodes();
+	meshDens = MeshDensity2D(nnodesExtr, nnodeEdge1);
+
+	//the end nodes of the previous extrusion
+	int preNodeEdge1 = 0, preNodeEdge2 = 0;
+	if (!isStart()) {
+		preNodeEdge1 = previousExtrusion->endCornerNode1();
+		preNodeEdge2 = previousExtrusion->endCornerNode2();
+	}
+
+	edges[1] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(1, firstNodeID, preNodeEdge1))));
+	edges[2] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(2, firstNodeID))));
+	edges[3] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(3, firstNodeID, preNodeEdge2))));
+	edges[4] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(0, firstNodeID))));
+	if (isStart()) {
+		edges[0] = edges[4];
+	}
+	else {
+		edges[0] = ((MeshEdgeExtrusion*)previousExtrusion)->edges[2];
+	}
+}
+
+MeshEdgeExtrusion_ref::MeshEdgeExtrusion_ref(
+	int	   _nRef,
+	int	   nnodeEdge1,
+	int	   firstNodeID,
+	MeshEdgeExtrusion* previousExtrusion) 
+	: MeshEdgeExtrusion(0, nnodeEdge1, firstNodeID, previousExtrusion), MeshExtrusion_refProp(_nRef)
+{
+	initEdges(nnodeEdge1, firstNodeID, previousExtrusion);
+}
+void MeshEdgeExtrusion_ref::writeElements() {
+	PlaneMesherRef::writeElements(meshDens);
+}
+
+void MeshEdgeExtrusion_ref::initEdges(int nnodeEdge1, int firstNodeID, MeshEdgeExtrusion* previousExtrusion)
+{
+	throw("MeshEdgeExtrusion_noRef::initEdges() not implemented");
+}
+
+MeshEdgeExtrusionLine::MeshEdgeExtrusionLine(
 	double _length,
 	int	   _nElements,
 	int	   nnodeEdge1,
 	int	   firstNodeID,
-	MeshExtrusion* previousExtrusion)
-: MeshExtrusion(_length, _nElements, previousExtrusion)
-{
-	initEdges(nnodeEdge1, firstNodeID, previousExtrusion);
+	MeshEdgeExtrusion* previousExtrusion) 
+	: MeshEdgeExtrusion_noRef(_nElements, nnodeEdge1, firstNodeID, previousExtrusion),
+	MeshExtrusion_lineProp(_length)
+{}
+
+void MeshEdgeExtrusionLine::writeNodes(ExtrudeStepData* curExtrData) {
+	curExtrData->pos = glm::dvec3(curExtrData->startSpace, 0., 0.);
+	PlaneMesher::writeNodesXYq(
+		curExtrData->pos,
+		curExtrData->csys,
+		meshDens,
+		((ExtrudeEdgeStepData*)curExtrData)->dxy);
+
+	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));
 }
 
-MeshEdgeExtrusion::MeshEdgeExtrusion(
+
+MeshEdgeExtrusionArc::MeshEdgeExtrusionArc(
 	double _radius,
 	double _endAngle,
 	int	   _nElements,
 	int	   nnodeEdge1,
 	int	   firstNodeID,
-	MeshExtrusion* previousExtrusion)
-	: MeshExtrusion(_radius, _endAngle, _nElements, previousExtrusion)
-{
-	initEdges(nnodeEdge1, firstNodeID, previousExtrusion);
+	MeshEdgeExtrusion* previousExtrusion)
+	: MeshEdgeExtrusion_noRef(_nElements, nnodeEdge1, firstNodeID, previousExtrusion),
+	MeshExtrusion_arcProp(_radius, _endAngle)
+{}
+
+void MeshEdgeExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
+	ExtrudeEdgeStepData* curExtrData = (ExtrudeEdgeStepData*)_curExtrData;
+	
+	curExtrData->pos = glm::dvec3(0., 0., radius);
+
+	ArcAngles ang;
+	ang.setStart(curExtrData->startSpace - GLMPI);
+	ang.setEnd(-(GLMPI + endAngle));
+
+	ConeMesher::writeNodesY(
+		curExtrData->pos,
+		curExtrData->csys,
+		meshDens,
+		Cone2Dradius(radius, radius),
+		ang, curExtrData->lengthY);
+
+	curExtrData->arcAngle += endAngle;
+	curExtrData->csys.moveInLocalCsys(coordsOnCircle(ang.end, radius, direction::y) + glm::dvec3(0, 0, radius));
+	(*curExtrData->csys.csys) = makeCsysMatrix(Y_DIR, curExtrData->arcAngle);
 }
 
+MeshEdgeExtrusionLineRef::MeshEdgeExtrusionLineRef(
+	double _length,
+	int	   _nRef,
+	int	   nnodeEdge1,
+	int	   firstNodeID,
+	MeshEdgeExtrusion* previousExtrusion)
+	: MeshEdgeExtrusion_ref(_nRef, nnodeEdge1, firstNodeID, previousExtrusion),
+	MeshExtrusion_lineProp(_length)
+{}
+
+void MeshEdgeExtrusionLineRef::writeNodes(ExtrudeStepData* curStepData) {
+
+}
+
+MeshEdgeExtrusionArcRef::MeshEdgeExtrusionArcRef(
+	double _radius,
+	double _endAngle,
+	int	   _nRef,
+	int	   nnodeEdge1,
+	int	   firstNodeID,
+	MeshEdgeExtrusion* previousExtrusion)
+	: MeshEdgeExtrusion_ref(_nRef, nnodeEdge1, firstNodeID, previousExtrusion),
+	MeshExtrusion_arcProp(_radius, _endAngle)
+{}
+
+void MeshEdgeExtrusionArcRef::writeNodes(ExtrudeStepData* curStepData) {
+
+}
 
 MeshFaceExtrusion::MeshFaceExtrusion(
-	double				 _length,
 	int					 _nElements,
 	const MeshDensity2D& face0nodes,
 	int					 firstNodeID,
-	MeshExtrusion*		 previousExtrusion)
-	: MeshExtrusion(_length, _nElements, previousExtrusion)
-{
-	initFaces(face0nodes, firstNodeID, previousExtrusion);
+	MeshFaceExtrusion*	 previousExtrusion)
+	: MeshExtrusion(_nElements, previousExtrusion)
+{}
+
+MeshFaceExtrusion_noRef::MeshFaceExtrusion_noRef(
+	int	   _nElements,
+	const  MeshDensity2D& face0nodes,
+	int	   firstNodeID,
+	MeshFaceExtrusion* previousExtrusion)
+	: MeshFaceExtrusion(_nElements, face0nodes, firstNodeID, previousExtrusion)
+{}
+
+void MeshFaceExtrusion_noRef::writeElements(){
+	CuboidMesher::writeElements(meshDens);
 }
 
-MeshFaceExtrusion::MeshFaceExtrusion(
+MeshFaceExtrusionLine::MeshFaceExtrusionLine(
+	double _length,
+	int	   _nElements,
+	const MeshDensity2D& face0nodes,
+	int	   firstNodeID,
+	MeshFaceExtrusion* previousExtrusion)
+	: MeshFaceExtrusion_noRef(_nElements, face0nodes, firstNodeID, previousExtrusion),
+	MeshExtrusion_lineProp(_length)
+{}
+
+void MeshFaceExtrusionLine::writeNodes(ExtrudeStepData* curExtrData) {
+	curExtrData->pos = glm::dvec3(curExtrData->startSpace, 0., 0.);
+	CuboidMesher::writeNodesQ(
+		curExtrData->pos,
+		curExtrData->csys,
+		meshDens,
+		((ExtrudeFaceStepData*)curExtrData)->dxyz,
+		plane::xy);
+
+	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));
+}
+
+MeshFaceExtrusionArc::MeshFaceExtrusionArc(
 	double				 _radiusInner,
 	double				 _endAngle,
 	int					 _nElements,
 	const MeshDensity2D& face0nodes,
 	int					 firstNodeID,
-	MeshExtrusion*		 previousExtrusion)
-	: MeshExtrusion(_radiusInner, _endAngle, _nElements, previousExtrusion)
-{
-	initFaces(face0nodes, firstNodeID, previousExtrusion);
+	MeshFaceExtrusion*		 previousExtrusion)
+	: MeshFaceExtrusion_noRef(_nElements, face0nodes, firstNodeID, previousExtrusion),
+	MeshExtrusion_arcProp(_radiusInner, _endAngle)
+{}
+
+void MeshFaceExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
+
+	ExtrudeFaceStepData* curExtrData = (ExtrudeFaceStepData*)_curExtrData;
+
+	curExtrData->pos = glm::dvec3(0., 0., radius);
+
+	ArcAngles ang;
+	ang.setStart(-curExtrData->startSpace - GLMPI);
+	ang.setEnd(-(GLMPI + endAngle));
+
+	Cone3Dmesher::writeNodes(
+		curExtrData->pos,
+		curExtrData->csys,
+		meshDens,
+		Pipe3Dradius(
+			radius, radius - curExtrData->sizeYZ[1],//curFextr->radiusOuter, 
+			radius, radius - curExtrData->sizeYZ[1]),//curFextr->radiusOuter),
+		ang, curExtrData->sizeYZ[0], direction::y);
+
+	curExtrData->arcAngle += endAngle;
+	curExtrData->csys.moveInLocalCsys(coordsOnCircle(ang.end, radius, direction::y) + glm::dvec3(0, 0, radius));
+	(*curExtrData->csys.csys) = makeCsysMatrix(Y_DIR, curExtrData->arcAngle);
 }
 
 /*!
@@ -109,64 +311,7 @@ int MeshEdgeExtrusion::endCornerNode2() {
 	return edges[2].endNode();
 }
 
-/*!
 
-isStart extrusion:
-
-nElements = 3
-nNodes    = 4
-x5  x6  x7  x8
-x1  x2  x3  x4
-
-
- ------------------
-
-normal extrusion:
-
-nElements = 3
-nNodes    = 3
--   x5  x6  x7
--   x1  x2  x3
-
-
-
-  initial  second         third
-  extr.    extrusion      extrusion
-|--------|<------------|<-----------------|
-|        |             |                  |
-         
-x--x--x--o2-----x------o2-----x---x---x---o2
-|  |  |  |      |      |      |   |   |   |
-x--x--x--x------x------x------x---x---x---x
-|  |  |  |      |      |      |   |   |   |
-x--x--x--o1-----x------o1-----x---x---x---o1
-
-o1/o2 - preNode1 / preNode2 
-
-
-*/
-void MeshEdgeExtrusion::initEdges(int nnodeEdge1, int firstNodeID, MeshExtrusion* previousExtrusion) {
-	int nnodesExtr = nNodes();
-	meshDens = MeshDensity2D(nnodesExtr, nnodeEdge1);
-
-	//the end nodes of the previous extrusion
-	int preNodeEdge1 = 0, preNodeEdge2 = 0;
-	if (!isStart()) {
-		preNodeEdge1 = ((MeshEdgeExtrusion*)previousExtrusion)->endCornerNode1();
-		preNodeEdge2 = ((MeshEdgeExtrusion*)previousExtrusion)->endCornerNode2();
-	}
-		
-	edges[1] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(1, firstNodeID, preNodeEdge1))));
-	edges[2] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(2, firstNodeID))));
-	edges[3] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(3, firstNodeID, preNodeEdge2))));
-	edges[4] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(0, firstNodeID))));
-	if (isStart()) {
-		edges[0] = edges[4];
-	}
-	else {
-		edges[0] = ((MeshEdgeExtrusion*)previousExtrusion)->edges[2];
-	}
-}
 
 /*
    ^ Z-dir
@@ -194,7 +339,10 @@ NodeIterator1D MeshFaceExtrusion::getEndEdgeIterator3(){
 }
 
 
-void MeshFaceExtrusion::initFaces(const MeshDensity2D& face0nodes, int firstNodeID, MeshExtrusion* prevExtr) {
+void MeshFaceExtrusion_noRef::initFaces(
+	const MeshDensity2D& face0nodes, 
+	int firstNodeID, 
+	MeshFaceExtrusion* prevExtr) {
 	int nExtr = nNodes();
 
 	meshDens = MeshDensity3D(nExtr, face0nodes.dir1(), face0nodes.dir2());
