@@ -88,9 +88,9 @@ protected:
 /*
 	MeshExtrusion can inherit this for line extrusion properties
 */
-class MeshExtrusion_lineProp {
+class MeshExtrusion_linearProp {
 protected:
-	MeshExtrusion_lineProp(double _length) : length{ _length } { }
+	MeshExtrusion_linearProp(double _length) : length{ _length } { }
 	double length;
 };
 
@@ -212,9 +212,9 @@ protected:
 	void initEdges(int nnodeEdge1, int firstNodeID, MeshEdgeExtrusion* previousExtrusion);
 };
 
-class MeshEdgeExtrusionLine : public MeshEdgeExtrusion_noRef, public MeshExtrusion_lineProp {
+class MeshEdgeExtrusionLinear : public MeshEdgeExtrusion_noRef, public MeshExtrusion_linearProp {
 public:
-	MeshEdgeExtrusionLine(
+	MeshEdgeExtrusionLinear(
 		double _length,
 		int	   _nElements,
 		int	   nnodeEdge1,
@@ -239,9 +239,9 @@ public:
 	void writeNodes(ExtrudeStepData* curStepData);
 };
 
-class MeshEdgeExtrusionLineRef : public MeshEdgeExtrusion_ref, public MeshExtrusion_lineProp {
+class MeshEdgeExtrusionLinearRef : public MeshEdgeExtrusion_ref, public MeshExtrusion_linearProp {
 public:
-	MeshEdgeExtrusionLineRef(
+	MeshEdgeExtrusionLinearRef(
 		double _length,
 		int	   _nRef,
 		int	   nnodeEdge1,
@@ -331,9 +331,9 @@ protected:
 };
 
 
-class MeshFaceExtrusionLine : public MeshFaceExtrusion_noRef, public MeshExtrusion_lineProp {
+class MeshFaceExtrusionLinear : public MeshFaceExtrusion_noRef, public MeshExtrusion_linearProp {
 public:
-	MeshFaceExtrusionLine(
+	MeshFaceExtrusionLinear(
 		double _length,
 		int	   _nElements,
 		const MeshDensity2D& face0nodes,

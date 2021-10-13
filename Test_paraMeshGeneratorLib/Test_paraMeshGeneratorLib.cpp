@@ -99,9 +99,6 @@ int extrude2DedgeArcAndLine(const std::string& filename);
 int extrude3DfaceLine(const std::string& fileName);
 int extrude3DfaceArc(const std::string& fileName);
 int extrude3DfaceArcAndLine(const std::string& fileName);
-#ifdef TO_FIX
-int extrude2DarcMulti(const std::string& filename);
-#endif
 
 void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode);
 
@@ -182,10 +179,6 @@ std::vector<TestDef> testFunctions({
 	TestDef(600, "extrude3DfaceLine",		"extrusion", (testFunction)extrude3DfaceLine),
 	TestDef(620, "extrude3DfaceArc",		"extrusion", (testFunction)extrude3DfaceArc),
 	TestDef(640, "extrude3DfaceArcAndLine",		"extrusion", (testFunction)extrude3DfaceArcAndLine),
-
-#ifdef TO_FIX
-	TestDef(590, "extrude2DarcMulti",	"extrusion", (testFunction)extrude2DarcMulti),
-#endif
 
 	
 });
@@ -2332,7 +2325,7 @@ int meshEdgeExtrusion(const std::string& fileName) {
 	std::vector<std::vector<int>> resultEdges;
 
 	//First extrusion:
-	MeshEdgeExtrusion edgeExtr1(length, 3, 3, 1);
+	MeshEdgeExtrusionLinear edgeExtr1(length, 3, 3, 1);
 	expectedEdges = std::vector<std::vector<int>>({
 		{1,5,9},
 		{1,2,3,4},
@@ -2354,7 +2347,7 @@ int meshEdgeExtrusion(const std::string& fileName) {
 	}
 
 	//Second extrusion:
-	MeshEdgeExtrusion edgeExtr2(length, 2, 3, 13, &edgeExtr1);
+	MeshEdgeExtrusionLinear edgeExtr2(length, 2, 3, 13, &edgeExtr1);
 	expectedEdges = std::vector<std::vector<int>>({
 		{4, 8, 12},
 		{4, 13, 14},
@@ -2376,7 +2369,7 @@ int meshEdgeExtrusion(const std::string& fileName) {
 	}
 
 	//Third extrusion:
-	MeshEdgeExtrusion edgeExtr3(length, 3, 3, 19, &edgeExtr2);
+	MeshEdgeExtrusionLinear edgeExtr3(length, 3, 3, 19, &edgeExtr2);
 	expectedEdges = std::vector<std::vector<int>>({
 		{14, 16, 18},
 		{14, 19, 20, 21},
@@ -2418,7 +2411,7 @@ int meshFaceExtrusion(const std::string& fileName) {
 	std::vector<std::vector<int>> resultFaces;
 
 	//First extrusion:
-	MeshFaceExtrusion faceExtr1(length, 2, meshDensFace, 1);
+	MeshFaceExtrusionLinear faceExtr1(length, 2, meshDensFace, 1);
 	
 	expectedFaces = std::vector<std::vector<int>>({
 		{1,4,7,10,	13,16,19,22, 25,28,31,34},
@@ -2438,7 +2431,7 @@ int meshFaceExtrusion(const std::string& fileName) {
 	}
 
 	//Second extrusion:	
-	MeshFaceExtrusion faceExtr2(length, 2, meshDensFace, 37, &faceExtr1);
+	MeshFaceExtrusionLinear faceExtr2(length, 2, meshDensFace, 37, &faceExtr1);
 	expectedFaces = std::vector<std::vector<int>>({
 		{3,6,9,12, 15,18,21,24, 27,30,33,36},		
 		{3,37,38, 15,45,46, 27,53,54},
@@ -2459,7 +2452,7 @@ int meshFaceExtrusion(const std::string& fileName) {
 	}
 
 	//third extrusion:
-	MeshFaceExtrusion faceExtr3(length, 2, meshDensFace, 61, &faceExtr2);
+	MeshFaceExtrusionLinear faceExtr3(length, 2, meshDensFace, 61, &faceExtr2);
 	expectedFaces = std::vector<std::vector<int>>({
 		{38,40,42,44, 46,48,50,52, 54,56,58,60},
 		{38,61,62, 46,69,70, 54,77,78},
@@ -2599,10 +2592,10 @@ int extrude3DfaceLine(const std::string& fileName){
 
 	TEST_START2
 	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(8,3), glm::dvec2(5.0, 2.0));
-	mesh3D.extrudeYZface(10., 2);
-	mesh3D.extrudeYZface(10., 3);
-	mesh3D.extrudeYZface(5.0, 4);
-	mesh3D.extrudeYZface(5.0, 34);
+	mesh3D.extrudeYZface(10., 2); //0.0  - 10.0
+	mesh3D.extrudeYZface(10., 3); //10.0 - 20.0
+	mesh3D.extrudeYZface(5.0, 4); //20.0 - 25.0
+	mesh3D.extrudeYZface(5.0, 34);//25.0 - 30.0
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END
@@ -2611,10 +2604,10 @@ int extrude3DfaceArc(const std::string& fileName) {
 
 	TEST_START2
 	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(7, 10), glm::dvec2(5.0, 2.0));
-	mesh3D.extrudeYZedgeArc(-GLMPI / 10.0, -100.0, 30);
-	mesh3D.extrudeYZedgeArc(GLMPI / 1.0, 4.0, 20);	//0.0 - 1.0
-	mesh3D.extrudeYZedgeArc(GLMPI / 3.0, 10.0,  10);	//0.0 - 1.0
-	mesh3D.extrudeYZedgeArc(-GLMPI / 1.0, -6, 18);
+	mesh3D.extrudeYZedgeArc(-0.1* GLMPI, -100.0, 30);
+	mesh3D.extrudeYZedgeArc(0.9 * GLMPI, 4.0, 20);	
+	mesh3D.extrudeYZedgeArc(0.3 * GLMPI, 10.0,  10);
+	mesh3D.extrudeYZedgeArc(-1.0* GLMPI, -6, 18);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END
@@ -2624,46 +2617,18 @@ int extrude3DfaceArcAndLine(const std::string& fileName) {
 	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(3, 4), glm::dvec2(5.0, 2.0));
 	
 	
-	mesh3D.extrudeYZedgeArc(-GLMPI / 10.0, -100.0, 8);
-	mesh3D.extrudeYZedgeArc(GLMPI / 1.0, 6.0, 7);
-	mesh3D.extrudeYZedgeArc(GLMPI / 3.0, 10.0, 6);
-	mesh3D.extrudeYZedgeArc(-GLMPI / 1.0, -6, 7);
+	mesh3D.extrudeYZedgeArc(-0.1 * GLMPI, -100.0, 8);
+	mesh3D.extrudeYZedgeArc(1.0 * GLMPI, 6.0, 7);
+	mesh3D.extrudeYZedgeArc(0.3 * GLMPI, 10.0, 6);
+	mesh3D.extrudeYZedgeArc(-1.0 * GLMPI, -6, 7);
 	mesh3D.extrudeYZface(10., 4);
-	mesh3D.extrudeYZedgeArc(GLMPI / 1.0, 6.0, 6);
+	mesh3D.extrudeYZedgeArc(1.0 * GLMPI, 6.0, 6);
+	mesh3D.extrudeYZface(20., 4);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END
 }
 
-#ifdef TO_FIX
-int extrude2DarcMulti(const std::string& filename) 
-{
-	TEST_START
-
-	MeshRec2D mesh2D;
-	mesh2D.initRectangle(glm::dvec2(4.0, 4.0), glm::ivec2(4, 8));
-	mesh2D.extrudeYedgeArc(glm::pi<double>() / 2.0, 2.0, 8);
-	mesh2D.extrudeYedgeArc(glm::pi<double>() / 1.2, 3.0, 16);
-	mesh2D.extrudeYedge(3.0, 5);
-
-	glm::dvec3 pos(0.0);
-	int nodeID = 1;
-	int elementID = 1;
-	for(int i = 0; i < 4; i++){
-		mesh2D.setFirstNodeID(nodeID);
-		mesh2D.setFirstElementID(elementID);
-
-		mesh2D.setPosition(pos);
-		mesh2D.writeNodes(&writer);
-		mesh2D.writeElements(&writer);
-		pos += glm::dvec3(1.0, 0.0, 0.5);
-
-		nodeID    += mesh2D.numberOfNodes();
-		elementID += mesh2D.numberOfElements();
-	}
-	TEST_END
-}
-#endif
 
 
 

@@ -9,15 +9,9 @@ MeshExtrusion::MeshExtrusion(int _nElements, MeshExtrusion* previousExtrusion) {
 	_isStart = (bool)!previousExtrusion;
 }
 
-double MeshEdgeExtrusionLine::spacing() {
-		return length / (double)(nElements);
-}
-
-double MeshEdgeExtrusionArc::spacing() {
-	return endAngle / (double)(nElements);
-}
-
-//Number of nodes along extrusion
+/*!
+	Number of nodes along extrusion
+*/
 int MeshExtrusion::nNodes() { 
 	return isStart() ? (nElements + 1) : nElements; 
 }
@@ -28,8 +22,7 @@ MeshEdgeExtrusion::MeshEdgeExtrusion(
 	int	   nnodeEdge1,
 	int	   firstNodeID,
 	MeshEdgeExtrusion* previousExtrusion) : MeshExtrusion( _nElements, previousExtrusion)
-{
-}
+{}
 
 MeshEdgeExtrusion_noRef::MeshEdgeExtrusion_noRef(
 	int	   _nElements,
@@ -120,17 +113,24 @@ void MeshEdgeExtrusion_ref::initEdges(int nnodeEdge1, int firstNodeID, MeshEdgeE
 	throw("MeshEdgeExtrusion_noRef::initEdges() not implemented");
 }
 
-MeshEdgeExtrusionLine::MeshEdgeExtrusionLine(
+
+/************************************************
+	MeshEdgeExtrusionLinear
+************************************************/
+MeshEdgeExtrusionLinear::MeshEdgeExtrusionLinear(
 	double _length,
 	int	   _nElements,
 	int	   nnodeEdge1,
 	int	   firstNodeID,
 	MeshEdgeExtrusion* previousExtrusion) 
 	: MeshEdgeExtrusion_noRef(_nElements, nnodeEdge1, firstNodeID, previousExtrusion),
-	MeshExtrusion_lineProp(_length)
+	MeshExtrusion_linearProp(_length)
 {}
 
-void MeshEdgeExtrusionLine::writeNodes(ExtrudeStepData* curExtrData) {
+double MeshEdgeExtrusionLinear::spacing() {
+	return length / (double)(nElements);
+}
+void MeshEdgeExtrusionLinear::writeNodes(ExtrudeStepData* curExtrData) {
 	curExtrData->pos = glm::dvec3(curExtrData->startSpace, 0., 0.);
 	PlaneMesher::writeNodesXYq(
 		curExtrData->pos,
@@ -141,7 +141,9 @@ void MeshEdgeExtrusionLine::writeNodes(ExtrudeStepData* curExtrData) {
 	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));
 }
 
-
+/************************************************
+	MeshEdgeExtrusionArc
+************************************************/
 MeshEdgeExtrusionArc::MeshEdgeExtrusionArc(
 	double _radius,
 	double _endAngle,
@@ -152,14 +154,16 @@ MeshEdgeExtrusionArc::MeshEdgeExtrusionArc(
 	: MeshEdgeExtrusion_noRef(_nElements, nnodeEdge1, firstNodeID, previousExtrusion),
 	MeshExtrusion_arcProp(_radius, _endAngle)
 {}
-
+double MeshEdgeExtrusionArc::spacing() {
+	return endAngle / (double)(nElements);
+}
 void MeshEdgeExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
 	ExtrudeEdgeStepData* curExtrData = (ExtrudeEdgeStepData*)_curExtrData;
 	
 	curExtrData->pos = glm::dvec3(0., 0., radius);
 
 	ArcAngles ang;
-	ang.setStart(curExtrData->startSpace - GLMPI);
+	ang.setStart(-curExtrData->startSpace - GLMPI);
 	ang.setEnd(-(GLMPI + endAngle));
 
 	ConeMesher::writeNodesY(
@@ -174,20 +178,29 @@ void MeshEdgeExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
 	(*curExtrData->csys.csys) = makeCsysMatrix(Y_DIR, curExtrData->arcAngle);
 }
 
-MeshEdgeExtrusionLineRef::MeshEdgeExtrusionLineRef(
+/************************************************
+	MeshEdgeExtrusionLinearRef
+************************************************/
+MeshEdgeExtrusionLinearRef::MeshEdgeExtrusionLinearRef(
 	double _length,
 	int	   _nRef,
 	int	   nnodeEdge1,
 	int	   firstNodeID,
 	MeshEdgeExtrusion* previousExtrusion)
 	: MeshEdgeExtrusion_ref(_nRef, nnodeEdge1, firstNodeID, previousExtrusion),
-	MeshExtrusion_lineProp(_length)
+	MeshExtrusion_linearProp(_length)
 {}
-
-void MeshEdgeExtrusionLineRef::writeNodes(ExtrudeStepData* curStepData) {
+double MeshEdgeExtrusionLinearRef::spacing() {
+	return 0.0;
+}
+void MeshEdgeExtrusionLinearRef::writeNodes(ExtrudeStepData* curStepData) {
 
 }
 
+
+/************************************************
+	MeshEdgeExtrusionArcRef
+************************************************/
 MeshEdgeExtrusionArcRef::MeshEdgeExtrusionArcRef(
 	double _radius,
 	double _endAngle,
@@ -198,7 +211,9 @@ MeshEdgeExtrusionArcRef::MeshEdgeExtrusionArcRef(
 	: MeshEdgeExtrusion_ref(_nRef, nnodeEdge1, firstNodeID, previousExtrusion),
 	MeshExtrusion_arcProp(_radius, _endAngle)
 {}
-
+double MeshEdgeExtrusionArcRef::spacing() {
+	return 0.0;
+}
 void MeshEdgeExtrusionArcRef::writeNodes(ExtrudeStepData* curStepData) {
 
 }
@@ -217,23 +232,30 @@ MeshFaceExtrusion_noRef::MeshFaceExtrusion_noRef(
 	int	   firstNodeID,
 	MeshFaceExtrusion* previousExtrusion)
 	: MeshFaceExtrusion(_nElements, face0nodes, firstNodeID, previousExtrusion)
-{}
+{
+	initFaces(face0nodes, firstNodeID, previousExtrusion);
+}
 
 void MeshFaceExtrusion_noRef::writeElements(){
 	CuboidMesher::writeElements(meshDens);
 }
 
-MeshFaceExtrusionLine::MeshFaceExtrusionLine(
+/************************************************
+	MeshFaceExtrusionLinear
+************************************************/
+MeshFaceExtrusionLinear::MeshFaceExtrusionLinear(
 	double _length,
 	int	   _nElements,
 	const MeshDensity2D& face0nodes,
 	int	   firstNodeID,
 	MeshFaceExtrusion* previousExtrusion)
 	: MeshFaceExtrusion_noRef(_nElements, face0nodes, firstNodeID, previousExtrusion),
-	MeshExtrusion_lineProp(_length)
+	MeshExtrusion_linearProp(_length)
 {}
-
-void MeshFaceExtrusionLine::writeNodes(ExtrudeStepData* curExtrData) {
+double MeshFaceExtrusionLinear::spacing() {
+	return length / (double)(nElements);
+}
+void MeshFaceExtrusionLinear::writeNodes(ExtrudeStepData* curExtrData) {
 	curExtrData->pos = glm::dvec3(curExtrData->startSpace, 0., 0.);
 	CuboidMesher::writeNodesQ(
 		curExtrData->pos,
@@ -245,6 +267,10 @@ void MeshFaceExtrusionLine::writeNodes(ExtrudeStepData* curExtrData) {
 	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));
 }
 
+
+/************************************************
+	MeshFaceExtrusionArc
+************************************************/
 MeshFaceExtrusionArc::MeshFaceExtrusionArc(
 	double				 _radiusInner,
 	double				 _endAngle,
@@ -255,7 +281,9 @@ MeshFaceExtrusionArc::MeshFaceExtrusionArc(
 	: MeshFaceExtrusion_noRef(_nElements, face0nodes, firstNodeID, previousExtrusion),
 	MeshExtrusion_arcProp(_radiusInner, _endAngle)
 {}
-
+double MeshFaceExtrusionArc::spacing() {
+	return endAngle / (double)(nElements);
+}
 void MeshFaceExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
 
 	ExtrudeFaceStepData* curExtrData = (ExtrudeFaceStepData*)_curExtrData;

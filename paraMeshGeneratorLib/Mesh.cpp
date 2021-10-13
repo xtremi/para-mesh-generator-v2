@@ -28,10 +28,10 @@ void Mesh3D_volumeExtrusion::setStartFaceYZ(const MeshDensity2D& _meshDensYZface
 
 void Mesh2D_planeExtrusion::extrudeYedge(double length, int nElements) {
 	std::shared_ptr<MeshEdgeExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	//extrusionsXdir.push_back(std::shared_ptr<MeshEdgeExtrusionLine>(new MeshEdgeExtrusionLine(
+	//extrusionsXdir.push_back(std::shared_ptr<MeshEdgeExtrusionLinear>(new MeshEdgeExtrusionLinear(
 	//	length, nElements, meshDensity.dir2(), nNodes, prevExtrusion.get())));
 
-	extrusionsXdir.push_back(std::make_shared<MeshEdgeExtrusionLine>(
+	extrusionsXdir.push_back(std::make_shared<MeshEdgeExtrusionLinear>(
 		length, nElements, meshDensity.dir2(), nNodes, prevExtrusion.get()));
 
 	calculateNumberOfNodes();
@@ -48,7 +48,7 @@ void Mesh2D_planeExtrusion::extrudeYedgeArc(double endAng, double radius, int nE
 }
 void Mesh2D_planeExtrusion::extrudeYedgeRef(double length, int nRef) {
 	std::shared_ptr<MeshEdgeExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	extrusionsXdir.push_back(std::make_shared<MeshEdgeExtrusionLineRef>(
+	extrusionsXdir.push_back(std::make_shared<MeshEdgeExtrusionLinearRef>(
 		length, nRef, meshDensity.dir2(), nNodes, prevExtrusion.get()));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
@@ -56,9 +56,9 @@ void Mesh2D_planeExtrusion::extrudeYedgeRef(double length, int nRef) {
 
 void Mesh3D_volumeExtrusion::extrudeYZface(double length, int nElements) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	//extrusionsXdir.push_back(std::shared_ptr<MeshFaceExtrusionLine>(new MeshFaceExtrusionLine(
+	//extrusionsXdir.push_back(std::shared_ptr<MeshFaceExtrusionLinear>(new MeshFaceExtrusionLinear(
 	//	length, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion.get())));
-	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionLine>(
+	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionLinear>(
 		length, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion.get()));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
@@ -173,7 +173,7 @@ void Mesh2D_planeExtrusion::writeNodes() {
 	curExtrData.csys = MeshCsys(&csys, glm::dvec3(0.), &rotM);
 	curExtrData.pos = glm::dvec3(0.0);
 	curExtrData.arcAngle= 0.0;
-	
+	curExtrData.lengthY = lengthY;
 
 	for (std::shared_ptr<MeshEdgeExtrusion> extr : extrusionsXdir) {
 
@@ -201,7 +201,7 @@ void Mesh3D_volumeExtrusion::writeNodes() {
 	curExtrData.csys = MeshCsys(&csys, glm::dvec3(0.), &rotM);
 	curExtrData.pos = glm::dvec3(0.0);
 	curExtrData.arcAngle = 0.0;
-
+	curExtrData.sizeYZ = sizeYZ;
 
 	for (std::shared_ptr<MeshFaceExtrusion> extr : extrusionsXdir) {
 
