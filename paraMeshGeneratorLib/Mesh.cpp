@@ -28,9 +28,6 @@ void Mesh3D_volumeExtrusion::setStartFaceYZ(const MeshDensity2D& _meshDensYZface
 
 void Mesh2D_planeExtrusion::extrudeYedge(double length, int nElements) {
 	std::shared_ptr<MeshEdgeExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	//extrusionsXdir.push_back(std::shared_ptr<MeshEdgeExtrusionLinear>(new MeshEdgeExtrusionLinear(
-	//	length, nElements, meshDensity.dir2(), nNodes, prevExtrusion.get())));
-
 	extrusionsXdir.push_back(std::make_shared<MeshEdgeExtrusionLinear>(
 		length, nElements, meshDensity.dir2(), nNodes, prevExtrusion.get()));
 
@@ -39,8 +36,6 @@ void Mesh2D_planeExtrusion::extrudeYedge(double length, int nElements) {
 }
 void Mesh2D_planeExtrusion::extrudeYedgeArc(double endAng, double radius, int nElements) {
 	std::shared_ptr<MeshEdgeExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	//extrusionsXdir.push_back(std::shared_ptr<MeshEdgeExtrusionArc>(new MeshEdgeExtrusionArc(
-	//	radius, endAng , nElements, meshDensity.dir2(), nNodes, prevExtrusion.get())));
 	extrusionsXdir.push_back(std::make_shared<MeshEdgeExtrusionArc>(
 			radius, endAng , nElements, meshDensity.dir2(), nNodes, prevExtrusion.get()));
 	calculateNumberOfNodes();
@@ -56,8 +51,6 @@ void Mesh2D_planeExtrusion::extrudeYedgeRef(double length, int nRef) {
 
 void Mesh3D_volumeExtrusion::extrudeYZface(double length, int nElements) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	//extrusionsXdir.push_back(std::shared_ptr<MeshFaceExtrusionLinear>(new MeshFaceExtrusionLinear(
-	//	length, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion.get())));
 	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionLinear>(
 		length, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion.get()));
 	calculateNumberOfNodes();
@@ -65,9 +58,6 @@ void Mesh3D_volumeExtrusion::extrudeYZface(double length, int nElements) {
 }
 void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner, int nElements) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	//extrusionsXdir.push_back(std::shared_ptr<MeshFaceExtrusionArc>(new MeshFaceExtrusionArc(
-	//	radiusInner, endAng, nElements, MeshDensity2D(meshDensity.axis(), 
-	//		meshDensity.norm()), nNodes, prevExtrusion.get())));
 	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionArc>(
 		radiusInner, endAng, nElements, MeshDensity2D(meshDensity.axis(),
 		meshDensity.norm()), nNodes, prevExtrusion.get()));

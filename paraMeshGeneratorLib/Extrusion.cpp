@@ -83,10 +83,10 @@ void MeshEdgeExtrusion_noRef::initEdges(int nnodeEdge1, int firstNodeID, MeshEdg
 		preNodeEdge2 = previousExtrusion->endCornerNode2();
 	}
 
-	edges[1] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(1, firstNodeID, preNodeEdge1))));
-	edges[2] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(2, firstNodeID))));
-	edges[3] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(3, firstNodeID, preNodeEdge2))));
-	edges[4] = MeshEdge(std::shared_ptr<NodeIterator1D>(new NodeIterator1D(meshDens.edgeNodeIterator(0, firstNodeID))));
+	edges[1] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(1, firstNodeID, preNodeEdge1)));
+	edges[2] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(2, firstNodeID)));
+	edges[3] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(3, firstNodeID, preNodeEdge2)));
+	edges[4] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(0, firstNodeID)));
 	if (isStart()) {
 		edges[0] = edges[4];
 	}
@@ -110,7 +110,26 @@ void MeshEdgeExtrusion_ref::writeElements() {
 
 void MeshEdgeExtrusion_ref::initEdges(int nnodeEdge1, int firstNodeID, MeshEdgeExtrusion* previousExtrusion)
 {
-	throw("MeshEdgeExtrusion_noRef::initEdges() not implemented");
+	int nnodesExtr = nNodes();
+	meshDens = MeshDensity2Dref(nRef, nnodeEdge1);
+
+	//the end nodes of the previous extrusion
+	int preNodeEdge1 = 0, preNodeEdge2 = 0;
+	if (!isStart()) {
+		preNodeEdge1 = previousExtrusion->endCornerNode1();
+		preNodeEdge2 = previousExtrusion->endCornerNode2();
+	}
+
+	edges[1] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(1, firstNodeID, preNodeEdge1)));
+	edges[2] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(2, firstNodeID)));
+	edges[3] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(3, firstNodeID, preNodeEdge2)));
+	edges[4] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(0, firstNodeID)));
+	if (isStart()) {
+		edges[0] = edges[4];
+	}
+	else {
+		edges[0] = ((MeshEdgeExtrusion*)previousExtrusion)->edges[2];
+	}
 }
 
 

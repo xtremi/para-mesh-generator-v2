@@ -2614,9 +2614,7 @@ int extrude3DfaceArc(const std::string& fileName) {
 }
 int extrude3DfaceArcAndLine(const std::string& fileName) {
 	TEST_START2
-	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(3, 4), glm::dvec2(5.0, 2.0));
-	
-	
+	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(3, 4), glm::dvec2(5.0, 2.0));		
 	mesh3D.extrudeYZedgeArc(-0.1 * GLMPI, -100.0, 8);
 	mesh3D.extrudeYZedgeArc(1.0 * GLMPI, 6.0, 7);
 	mesh3D.extrudeYZedgeArc(0.3 * GLMPI, 10.0, 6);

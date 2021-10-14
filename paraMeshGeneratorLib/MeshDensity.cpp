@@ -95,6 +95,23 @@ NodeIterator2D MeshDensity3D::faceNodeIterator(int faceID, int n1, const NodeIte
 	}
 }
 
+
+NodeIterator1Dref MeshDensity2Dref::edgeNodeIteratorRefDir(int edgeID, int firstNodeID, int preNode) {
+
+}
+
+NodeIterator1D MeshDensity2Dref::edgeNodeIterator(int edgeID, int firstNodeID, int preNode) {
+	if (edgeID == 0) {
+		return NodeIterator1D(firstNodeID, dir2(), 1, preNode);
+	}
+	else if (edgeID == 2) {
+		return NodeIterator1D(firstNodeID, dir2(), 1, preNode);
+	}
+	else {
+		throw("Invalid edge ID in MeshDensity2Dref::edgeNodeIterator");
+	}
+}
+
 void MeshDensity2DrecTube::setNodesInner(int nNodePerimeterInner, const glm::dvec2& sizeInner) {
 	setCirc(nNodePerimeterInner);
 	Rectangle rec(sizeInner);
