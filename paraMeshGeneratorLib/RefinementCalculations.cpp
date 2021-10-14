@@ -64,3 +64,14 @@ int refinement::minElementsEdge0_2d(int nRef) {
 int refinement::minNodesEdge0_2d(int nRef) {
 	return minElementsEdge0_2d(nRef) + 1;
 }
+
+/*!
+
+	Total number of nodes in a mesh created by PlaneMesherRef
+
+	total = (9/2)N x sum(1/2^i, i=1, i=nRef) + 2 x nRef
+	total = (9/2)N x (1 - 1/2^nRef) + 2 x nRef 
+*/
+int refinement::nNodesTot_2d(int nRef, int nElementsEdge0) {	
+	return (int)(4.5*(float)nElementsEdge0 * (1 - 1. / (float)twoPow(nRef))) + 2 * nRef;
+}

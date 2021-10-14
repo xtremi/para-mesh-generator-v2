@@ -95,9 +95,29 @@ NodeIterator2D MeshDensity3D::faceNodeIterator(int faceID, int n1, const NodeIte
 	}
 }
 
+int MeshDensity2Dref::cornerNode(int cornerID) {
+	switch (cornerID)
+	{
+	case 0: return 0;												 break;
+	case 1: return cornerNode(2) - nNodesRowT(nRefs());			 break;
+	case 2: return refinement::nNodesTot_2d(nRefs(), nElDir2()) - 1; break;
+	case 3: return dir2() - 1;										 break;
+	default:
+		throw("Invalid corner ID in MeshDensity2Dref::cornerNode");
+		break;
+	}
+}
 
 NodeIterator1Dref MeshDensity2Dref::edgeNodeIteratorRefDir(int edgeID, int firstNodeID, int preNode) {
-
+	if (edgeID == 1) {
+		return NodeIterator1Dref(firstNodeID, nRefs(), nElDir2(), NodeIterator1Dref::Type::edge1, preNode);
+	}
+	else if (edgeID == 3) {
+		return NodeIterator1Dref(firstNodeID + cornerNode(3), nRefs(), nElDir2(), NodeIterator1Dref::Type::edge3, preNode);
+	}
+	else {
+		throw("Invalid edge ID in MeshDensity2Dref::edgeNodeIteratorRefDir");
+	}
 }
 
 NodeIterator1D MeshDensity2Dref::edgeNodeIterator(int edgeID, int firstNodeID, int preNode) {
@@ -105,7 +125,7 @@ NodeIterator1D MeshDensity2Dref::edgeNodeIterator(int edgeID, int firstNodeID, i
 		return NodeIterator1D(firstNodeID, dir2(), 1, preNode);
 	}
 	else if (edgeID == 2) {
-		return NodeIterator1D(firstNodeID, dir2(), 1, preNode);
+		return NodeIterator1D(firstNodeID + cornerNode(2), 1, preNode);
 	}
 	else {
 		throw("Invalid edge ID in MeshDensity2Dref::edgeNodeIterator");

@@ -37,6 +37,7 @@ int speedTestWriteRotatedCubes(const std::string& fileName);
 int speedTestWriteNodesAndElements(const std::string& fileName);
 
 int meshDensity2DcornerNodes(const std::string& fileName);
+int meshDensity2DrefCornerNodes(const std::string& fileName);
 int meshDensity3DcornerNodes(const std::string& fileName);
 int meshDensity2DnodeIterator(const std::string& fileName);
 int meshDensity2DnodeIteratorPreNodes(const std::string& fileName);
@@ -118,6 +119,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(23, "meshDensity2DnodeIteratorPreNodes","utilities", (testFunction)meshDensity2DnodeIteratorPreNodes),
 	TestDef(24, "meshDensity3DnodeIterator",		"utilities", (testFunction)meshDensity3DnodeIterator),
 	TestDef(25, "meshDensity3DnodeIteratorPreNodes","utilities", (testFunction)meshDensity3DnodeIteratorPreNodes),
+	TestDef(26, "meshDensity2DrefCornerNodes",		"utilities", (testFunction)meshDensity2DrefCornerNodes),
+	
 	
 	
 	TestDef(30, "nodeIterator1D",		"utilities", (testFunction)nodeIterator1D),
@@ -1969,6 +1972,21 @@ int meshDensity2DcornerNodes(const std::string& fileName){
 
 	TEST_END
 }
+
+int meshDensity2DrefCornerNodes(const std::string& fileName) {
+
+	MeshDensity2Dref meshDens(3, 17);
+	
+	int firstNodeID = 1;
+	std::vector<int> expectedNodeIDs({ 1,67,69,17 });
+	for (int i = 0; i < 4; i++) {
+		if ((firstNodeID + meshDens.cornerNode(i)) != expectedNodeIDs[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 int meshDensity2DnodeIterator(const std::string& fileName) {
 
 	MeshDensity2D meshDens(3, 4);
@@ -2499,6 +2517,10 @@ int refinementCalc2D(const std::string& fileName) {
 
 	if (refinement::nElementsLayerB_2d(2, 8) != 2) return 1;
 	if (refinement::nNodesLayerB_2d(2, 8) != 3) return 1;
+
+	if (refinement::nNodesTot_2d(3, 16) != 69) return 1;
+
+
 
 	return 0;
 }

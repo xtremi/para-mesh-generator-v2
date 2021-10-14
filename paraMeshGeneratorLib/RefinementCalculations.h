@@ -2,6 +2,8 @@
 
 namespace refinement {
 
+	int nNodesTot_2d(int nRef, int nElementsEdge0);
+
 	int nNodesLayerB_2d(int refLayer, int nElementsEdge0);
 	int nNodesLayerM_2d(int refLayer, int nElementsEdge0);
 	int nNodesLayerT_2d(int refLayer, int nElementsEdge0);
