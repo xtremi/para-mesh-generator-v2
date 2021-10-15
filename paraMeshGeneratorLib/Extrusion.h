@@ -207,6 +207,10 @@ public:
 
 	virtual void writeElements();
 
+	int nNodesEdge2afterRefinement() {
+		return meshDens.dir2ref();
+	}
+
 protected:
 	MeshDensity2Dref meshDens;
 	void initEdges(int nnodeEdge1, int firstNodeID, MeshEdgeExtrusion* previousExtrusion);

@@ -120,9 +120,9 @@ void MeshEdgeExtrusion_ref::initEdges(int nnodeEdge1, int firstNodeID, MeshEdgeE
 		preNodeEdge2 = previousExtrusion->endCornerNode2();
 	}
 
-	edges[1] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(1, firstNodeID, preNodeEdge1)));
+	edges[1] = MeshEdge(std::make_shared<NodeIterator1Dref>(meshDens.edgeNodeIteratorRefDir(1, firstNodeID, preNodeEdge1)));
 	edges[2] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(2, firstNodeID)));
-	edges[3] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(3, firstNodeID, preNodeEdge2)));
+	edges[3] = MeshEdge(std::make_shared<NodeIterator1Dref>(meshDens.edgeNodeIteratorRefDir(3, firstNodeID, preNodeEdge2)));
 	edges[4] = MeshEdge(std::make_shared<NodeIterator1D>(meshDens.edgeNodeIterator(0, firstNodeID)));
 	if (isStart()) {
 		edges[0] = edges[4];
@@ -212,8 +212,17 @@ MeshEdgeExtrusionLinearRef::MeshEdgeExtrusionLinearRef(
 double MeshEdgeExtrusionLinearRef::spacing() {
 	return 0.0;
 }
-void MeshEdgeExtrusionLinearRef::writeNodes(ExtrudeStepData* curStepData) {
+void MeshEdgeExtrusionLinearRef::writeNodes(ExtrudeStepData* _curExtrData) {
+	ExtrudeEdgeStepData* curExtrData = (ExtrudeEdgeStepData*)_curExtrData;
 
+	curExtrData->pos = glm::dvec3(curExtrData->startSpace, 0., 0.);
+	PlaneMesherRef::writeNodesXY(
+		curExtrData->pos,
+		curExtrData->csys,
+		meshDens,
+		glm::dvec2(length, curExtrData->lengthY), true);
+
+	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));
 }
 
 

@@ -99,13 +99,24 @@ int MeshDensity2Dref::cornerNode(int cornerID) {
 	switch (cornerID)
 	{
 	case 0: return 0;												 break;
-	case 1: return cornerNode(2) - nNodesRowT(nRefs());			 break;
+	case 1: return cornerNode(2) - nNodesRowT(nRefs() - 1) + 1;		 break;
 	case 2: return refinement::nNodesTot_2d(nRefs(), nElDir2()) - 1; break;
 	case 3: return dir2() - 1;										 break;
 	default:
 		throw("Invalid corner ID in MeshDensity2Dref::cornerNode");
 		break;
 	}
+}
+
+
+/*!number of nodes in dir2 after refinement (nodes on edge 2)*/
+int MeshDensity2Dref::dir2ref(){ 
+	return refinement::nNodesLayerT_2d(nRefs() - 1, dir2()); 
+}
+
+/*!number of elements in dir2 after refinement (elements on edge 2)*/
+int MeshDensity2Dref::nElDir2ref() { 
+	return closedLoop ? dir2ref() : dir2ref() - 1; 
 }
 
 NodeIterator1Dref MeshDensity2Dref::edgeNodeIteratorRefDir(int edgeID, int firstNodeID, int preNode) {

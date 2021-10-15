@@ -2,6 +2,7 @@
 #include "math_utilities.h"
 #include "NodeIterator.h"
 
+
 /*
 	Wrapper for glm::ivec2 representing number of nodes for a "2D structured mesh"
 */
@@ -207,6 +208,11 @@ struct MeshDensity2Dref : public NodeVec2D {
 	int nRefs() const { return dir1(); }
 	int nElDir2() const { return closedLoop ? dir2() : dir2() - 1; }
 	int nElCirc() const { return nElDir2(); }
+
+	/*!number of nodes in dir2 after refinement (nodes on edge 2)*/
+	int dir2ref();
+	/*!number of elements in dir2 after refinement (elements on edge 2)*/
+	int nElDir2ref();
 
 	void setNrefs(int n) { setDir1(n); }
 

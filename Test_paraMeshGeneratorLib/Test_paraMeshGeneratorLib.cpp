@@ -97,6 +97,7 @@ int refinementCone3dHeight(const std::string& fileName);
 int extrude2DedgeLine(const std::string& fileName);
 int extrude2DedgeArc(const std::string& filename);
 int extrude2DedgeArcAndLine(const std::string& filename);
+int extrude2DedgeRef(const std::string& filename);
 int extrude3DfaceLine(const std::string& fileName);
 int extrude3DfaceArc(const std::string& fileName);
 int extrude3DfaceArcAndLine(const std::string& fileName);
@@ -178,6 +179,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(500, "extrude2DedgeLine",		"extrusion", (testFunction)extrude2DedgeLine),
 	TestDef(520, "extrude2DedgeArc",		"extrusion", (testFunction)extrude2DedgeArc),
 	TestDef(540, "extrude2DedgeArcAndLine",		"extrusion", (testFunction)extrude2DedgeArcAndLine),
+	TestDef(550, "extrude2DedgeRef",		"extrusion", (testFunction)extrude2DedgeRef),
+
 
 	TestDef(600, "extrude3DfaceLine",		"extrusion", (testFunction)extrude3DfaceLine),
 	TestDef(620, "extrude3DfaceArc",		"extrusion", (testFunction)extrude3DfaceArc),
@@ -2607,6 +2610,26 @@ int extrude2DedgeArcAndLine(const std::string& fileName)
 	mesh2D.writeElements();
 
 	TEST_END
+}
+
+int extrude2DedgeRef(const std::string& fileName) {
+	TEST_START
+	glm::dmat3x3 rotM1 = makeCsysMatrix(X_DIR, Y_DIR);
+	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), &rotM1);
+
+	Mesh2D_planeExtrusion mesh2D(16, 4.0);
+	mesh2D.extrudeYedge(2.0, 4);	//0.0 - 1.0
+	mesh2D.extrudeYedgeRef(5.0, 3);	//0.0 - 1.0
+	//mesh2D.extrudeYedge(10.0, 2);	//0.0 - 1.0
+
+	//rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
+	//mesh2D.setCsys(csys1);
+
+	mesh2D.writeNodes();
+	mesh2D.writeElements();
+
+	TEST_END
+
 }
 
 

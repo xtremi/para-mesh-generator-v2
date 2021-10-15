@@ -47,6 +47,8 @@ void Mesh2D_planeExtrusion::extrudeYedgeRef(double length, int nRef) {
 		length, nRef, meshDensity.dir2(), nNodes, prevExtrusion.get()));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
+
+	//meshDensity.setDir2(((MeshEdgeExtrusionLinearRef*)extrusionsXdir.back().get())->nNodesEdge2afterRefinement());
 }
 
 void Mesh3D_volumeExtrusion::extrudeYZface(double length, int nElements) {
