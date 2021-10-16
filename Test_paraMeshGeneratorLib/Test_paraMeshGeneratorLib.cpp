@@ -2620,7 +2620,7 @@ int extrude2DedgeRef(const std::string& fileName) {
 	Mesh2D_planeExtrusion mesh2D(16, 4.0);
 	mesh2D.extrudeYedge(2.0, 4);	//0.0 - 1.0
 	mesh2D.extrudeYedgeRef(5.0, 3);	//0.0 - 1.0
-	//mesh2D.extrudeYedge(10.0, 2);	//0.0 - 1.0
+	mesh2D.extrudeYedge(10.0, 2);	//0.0 - 1.0
 
 	//rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
 	//mesh2D.setCsys(csys1);

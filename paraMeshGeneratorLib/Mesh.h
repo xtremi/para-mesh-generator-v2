@@ -21,8 +21,8 @@ public:
 	void setCsys(MeshCsys& _csys) { csys = _csys; }
 
 protected:
-	virtual void calculateNumberOfNodes() = 0;
-	virtual void calculateNumberOfElements() = 0;
+	//virtual void calculateNumberOfNodes() = 0;
+	//virtual void calculateNumberOfElements() = 0;
 
 	Dim elementDim;
 	MeshCsys csys;
@@ -91,12 +91,12 @@ protected:
 	std::vector<std::shared_ptr<MeshEdgeExtrusion>> extrusionsXdir;
 	void setNodeOffsetOnMeshEdgeExtrusions(int nodeIDoffset);
 
-	void calculateNumberOfNodes();
-	void calculateNumberOfElements();
-	void calculateNumberOfNodesX();
-
+	//void calculateNumberOfNodes();
+	//void calculateNumberOfElements();
+	//void calculateNumberOfNodesX();
+	int	   nNodesEdgeY;
 	double lengthY;
-	MeshDensity2D meshDensity;
+	//MeshDensity2D meshDensity;
 };
 
 

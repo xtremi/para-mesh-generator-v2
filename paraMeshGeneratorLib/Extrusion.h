@@ -80,6 +80,9 @@ public:
 	virtual void writeNodes(ExtrudeStepData* curStepData){}
 	virtual void writeElements(){}
 
+	virtual int numberOfNodes() { return 0; }
+	virtual int numberOfElements() { return 0; }
+
 protected: 
 	int nElements;	//in extrusion direction
 	bool _isStart;
@@ -176,7 +179,6 @@ public:
 	MeshEdge edges[5];
 	virtual int endCornerNode1();
 	virtual int endCornerNode2();
-
 	virtual void setNodeOffset(int nOffs);
 	virtual void addToFirstNodeID(int n);	
 };
@@ -190,6 +192,9 @@ public:
 		MeshEdgeExtrusion* previousExtrusion = nullptr);
 
 	virtual void writeElements();
+	virtual int numberOfNodes() { return meshDens.nNodes(); }
+	virtual int numberOfElements() { return meshDens.nElements(); }
+
 
 protected:
 	MeshDensity2D meshDens;
@@ -206,6 +211,8 @@ public:
 		MeshEdgeExtrusion* previousExtrusion = nullptr);
 
 	virtual void writeElements();
+	virtual int numberOfNodes() { return meshDens.nNodes(); }
+	virtual int numberOfElements() { return meshDens.nElements(); }
 
 	int nNodesEdge2afterRefinement() {
 		return meshDens.dir2ref();

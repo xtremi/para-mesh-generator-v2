@@ -136,7 +136,7 @@ NodeIterator1D MeshDensity2Dref::edgeNodeIterator(int edgeID, int firstNodeID, i
 		return NodeIterator1D(firstNodeID, dir2(), 1, preNode);
 	}
 	else if (edgeID == 2) {
-		return NodeIterator1D(firstNodeID + cornerNode(2), 1, preNode);
+		return NodeIterator1D(firstNodeID + cornerNode(1), dir2ref(), 1, preNode);
 	}
 	else {
 		throw("Invalid edge ID in MeshDensity2Dref::edgeNodeIterator");
@@ -192,4 +192,10 @@ int MeshDensity2Dref::nNodesRowM(int refLayer) const {
 }
 int MeshDensity2Dref::nNodesRowT(int refLayer) const {
 	return nNodesRowB(refLayer + 1);
+}
+int MeshDensity2Dref::nNodes() const {
+	return refinement::nNodesTot_2d(nRefs(), nElDir2());
+}
+int MeshDensity2Dref::nElements() const {
+	throw("MeshDensity2Dref::nElements() - is not implemented");
 }

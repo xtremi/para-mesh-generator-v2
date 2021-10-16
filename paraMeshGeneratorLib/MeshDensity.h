@@ -229,6 +229,9 @@ struct MeshDensity2Dref : public NodeVec2D {
 	int nNodesRowM(int refLayer) const;
 	int nNodesRowT(int refLayer) const;
 
+	int nNodes() const;
+	int nElements() const;
+
 	int cornerNode(int cornerID);
 	NodeIterator1Dref edgeNodeIteratorRefDir(int edgeID, int firstNodeID, int preNode = 0);
 	NodeIterator1D    edgeNodeIterator(int edgeID, int firstNodeID, int preNode = 0);
