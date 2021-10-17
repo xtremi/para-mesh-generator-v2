@@ -41,6 +41,7 @@ int meshDensity2DrefCornerNodes(const std::string& fileName);
 int meshDensity3DcornerNodes(const std::string& fileName);
 int meshDensity2DnodeIterator(const std::string& fileName);
 int meshDensity2DnodeIteratorPreNodes(const std::string& fileName);
+int meshDensity2DrefNodeIterator(const std::string& fileName);
 int meshDensity3DnodeIterator(const std::string& fileName);
 int meshDensity3DnodeIteratorPreNodes(const std::string& fileName);
 
@@ -118,9 +119,10 @@ std::vector<TestDef> testFunctions({
 	TestDef(21, "meshDensity3DcornerNodes",			"utilities", (testFunction)meshDensity3DcornerNodes),
 	TestDef(22, "meshDensity2DnodeIterator",		"utilities", (testFunction)meshDensity2DnodeIterator),
 	TestDef(23, "meshDensity2DnodeIteratorPreNodes","utilities", (testFunction)meshDensity2DnodeIteratorPreNodes),
-	TestDef(24, "meshDensity3DnodeIterator",		"utilities", (testFunction)meshDensity3DnodeIterator),
-	TestDef(25, "meshDensity3DnodeIteratorPreNodes","utilities", (testFunction)meshDensity3DnodeIteratorPreNodes),
-	TestDef(26, "meshDensity2DrefCornerNodes",		"utilities", (testFunction)meshDensity2DrefCornerNodes),
+	TestDef(25, "meshDensity2DrefNodeIterator",		"utilities", (testFunction)meshDensity2DrefNodeIterator),
+	TestDef(26, "meshDensity3DnodeIterator",		"utilities", (testFunction)meshDensity3DnodeIterator),
+	TestDef(27, "meshDensity3DnodeIteratorPreNodes","utilities", (testFunction)meshDensity3DnodeIteratorPreNodes),
+	TestDef(28, "meshDensity2DrefCornerNodes",		"utilities", (testFunction)meshDensity2DrefCornerNodes),
 	
 	
 	
@@ -2031,6 +2033,63 @@ int meshDensity2DnodeIteratorPreNodes(const std::string& fileName) {
 	if (!equalVecVectors(actualNodeIDs, expectedNodeIDs)) {
 		return 1;
 	}
+	return 0;
+}
+
+int meshDensity2DrefNodeIterator(const std::string& fileName) {
+
+	TEST_START2
+	MeshDensity2Dref meshDens1(3, 17);
+	MeshDensity2Dref meshDens2(3, 33);
+
+	PlaneMesherRef::writeNodes(pos, glCsys, meshDens1, glm::dvec2(8.0, 5.0), false, plane::xy);
+	PlaneMesherRef::writeElements(meshDens1);
+
+	pos.x += 10.;
+	PlaneMesherRef::writeNodes(pos, glCsys, meshDens2, glm::dvec2(16.0, 10.0), false, plane::xy);
+	PlaneMesherRef::writeElements(meshDens2);
+	writer.close();
+
+	std::vector<std::vector<int>> actualNodeIDs;
+	std::vector<std::vector<int>> expectedNodeIDs({
+		{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17},
+		{1,30,39,54,59,67},
+		{67,68,69},
+		{17,38,47,58,63,69}
+	});	
+
+	NodeIterator1D iter = meshDens1.edgeNodeIterator(0, 1);
+	actualNodeIDs.push_back(getNodeIteratorResult(iter));
+	NodeIterator1Dref iterRef = meshDens1.edgeNodeIteratorRefDir(1, 1);
+	actualNodeIDs.push_back(getNodeIteratorResult(iterRef));
+	iter = meshDens1.edgeNodeIterator(2, 1);
+	actualNodeIDs.push_back(getNodeIteratorResult(iter));
+	iterRef = meshDens1.edgeNodeIteratorRefDir(3, 1);
+	actualNodeIDs.push_back(getNodeIteratorResult(iterRef));
+	if (!equalVecVectors(actualNodeIDs, expectedNodeIDs)) {
+		return 1;
+	}
+
+	expectedNodeIDs = {
+		{70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102},
+		{70,127,144,173,182,197},
+		{197,198,199,200,201},
+		{102,143,160,181,190,201}
+	};
+	actualNodeIDs.clear();
+
+	iter = meshDens2.edgeNodeIterator(0, 70);
+	actualNodeIDs.push_back(getNodeIteratorResult(iter));
+	iterRef = meshDens2.edgeNodeIteratorRefDir(1, 70);
+	actualNodeIDs.push_back(getNodeIteratorResult(iterRef));
+	iter = meshDens2.edgeNodeIterator(2, 70);
+	actualNodeIDs.push_back(getNodeIteratorResult(iter));
+	iterRef = meshDens2.edgeNodeIteratorRefDir(3, 70);
+	actualNodeIDs.push_back(getNodeIteratorResult(iterRef));
+	if (!equalVecVectors(actualNodeIDs, expectedNodeIDs)) {
+		return 1;
+	}
+
 	return 0;
 }
 
