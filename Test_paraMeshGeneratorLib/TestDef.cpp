@@ -1,7 +1,7 @@
 #include "TestDef.h"
 #include <fstream>
 
-const std::string TEST_OUTPUT_FOLDER = "D:\\VS2017_Projects\\para-mesh-generator-v2\\test_output\\";
+const std::string TEST_OUTPUT_FOLDER = "..\\test_output\\";
 const std::string GMSH_EXE_PATH = "D:\\Program Files\\Gmsh\\gmsh-4.7.1-Windows64\\gmsh.exe";
 
 
