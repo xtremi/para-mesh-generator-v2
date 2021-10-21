@@ -328,9 +328,11 @@ bool NodeIterator2D::next4(int& n1, int& n2, int& n3, int& n4) {
 NodeIterator2Dref::NodeIterator2Dref(
 	int _firstNode,
 	int _nNodesX, int _nRef,
+	Type _type,
 	const NodeIterator1D& _preNodes) :
 	NodeIterator2D(_firstNode, _nNodesX, 0, 0, 0, preNodes)
 {
+	type = _type;
 	nRef = _nRef;
 }
 
@@ -355,6 +357,9 @@ bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
 	return false;
 }
 bool NodeIterator2Dref::next4(int& n1, int& n2, int& n3, int& n4) {
+	
+
+
 	return false;
 }
 

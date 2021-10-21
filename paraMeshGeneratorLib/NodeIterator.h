@@ -215,10 +215,12 @@ protected:
 
 class NodeIterator2Dref : public NodeIterator2D {
 public:
+	enum class Type { face1, face3, face4, face5 };
 	NodeIterator2Dref() {}
 	NodeIterator2Dref(
 		int _firstNode, 
 		int _nNodesX, 	int _nRef, 
+		Type _type,
 		const NodeIterator1D& _preNodes = NodeIterator1D());
 	virtual int next();
 	virtual int last();
@@ -230,6 +232,11 @@ public:
 	virtual bool next4(int& n1, int& n2, int& n3, int& n4);
 
 protected:
+	enum class RowType{
+		b0m2,   m2m3t0, t0b0, 
+		b0m1m2, m2t0};
+
+	Type type;
 	int nRef;
 };
 
