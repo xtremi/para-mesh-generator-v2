@@ -124,8 +124,6 @@ std::vector<TestDef> testFunctions({
 	TestDef(27, "meshDensity3DnodeIteratorPreNodes","utilities", (testFunction)meshDensity3DnodeIteratorPreNodes),
 	TestDef(28, "meshDensity2DrefCornerNodes",		"utilities", (testFunction)meshDensity2DrefCornerNodes),
 	
-	
-	
 	TestDef(30, "nodeIterator1D",		"utilities", (testFunction)nodeIterator1D),
 	TestDef(31, "nodeIterator1Dm",		"utilities", (testFunction)nodeIterator1Dm),
 	TestDef(32, "nodeIterator1Dref",	"utilities", (testFunction)nodeIterator1Dref),
@@ -209,6 +207,10 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
  
+
+std::vector<int> linearlyOrderedVector(int iStart, int iEnd, int iStep = 1);
+
+
 /*
 	Tests should be defined in some class and these functions should
 	be defined there.
@@ -1518,10 +1520,18 @@ int cuboidMesherRef(const std::string& fileName) {
 
 	pos.x += 1.2*size.x;
 	//Cuboid 2:
-	nRef = 4;
+	nRef = 3;
 	meshDens.setDir1(std::pow(2, nRef + 1) + 1);
 	meshDens.setDir3(std::pow(2, nRef + 2) + 1);
-	CuboidMesherRef::writeNodes(pos, glCsys, meshDens, size, false, plane::xy);
+	CuboidMesherRef::writeNodes(pos, glCsys, meshDens, size, false, plane::xz);
+	CuboidMesherRef::writeElements(meshDens);
+
+	pos.x += 1.2*size.x;
+	//Cuboid 3:
+	nRef = 3;
+	meshDens.setDir1(std::pow(2, nRef + 1) + 1);
+	meshDens.setDir3(std::pow(2, nRef + 2) + 1);
+	CuboidMesherRef::writeNodes(pos, glCsys, meshDens, size, false, plane::yz);
 	CuboidMesherRef::writeElements(meshDens);
 
 	TEST_END
@@ -2355,22 +2365,26 @@ int nodeIterator2D_4(const std::string& fileName) {
 }
 
 /*
-
-	NOT COMPLETED
+Ongoing
 */
 int nodeIterator2Dref(const std::string& fileName) {
 	TEST_START2
 
-	glm::dvec2 size(20.0, 17.0);
-	int nRef = 3;
-	int nNodesDir2 = std::pow(2, nRef + 1) + 1;
-	MeshDensity2Dref meshDens(nRef, nNodesDir2, false);
+	glm::dvec3 size(15.0, 10.0, 40.);
+	int nRef = 2;
+	int nNodesDir12 = 9;
+	MeshDensity3Dref meshDens(nRef, nNodesDir12, nNodesDir12, false);
 
-	PlaneMesherRef::writeNodes(pos, glCsys, meshDens, size, true, plane::xy);
-	PlaneMesherRef::writeElements(meshDens);
+	CuboidMesherRef::writeNodes(pos, glCsys, meshDens, size, true, plane::yz);
+	CuboidMesherRef::writeElements(meshDens);
 	
 	std::vector<int> result;
 	std::vector<int> expectedResult;
+
+	expectedResult = {
+		linearlyOrderedVector(1,81)
+		//by element (next4())
+	};
 
 
 	//From NodeIterator2D example 1
@@ -2379,7 +2393,7 @@ int nodeIterator2Dref(const std::string& fileName) {
 	expectedResult = {  };
 	if (!equalVectors(result, expectedResult)) return 1;
 
-	TEST_END
+	
 	return 1;
 }
 
@@ -2681,11 +2695,15 @@ int extrude2DedgeRef(const std::string& fileName) {
 	mesh2D.extrudeYedgeRef(5.0, 3);	//0.0 - 1.0
 	mesh2D.extrudeYedge(10.0, 2);	//0.0 - 1.0
 
-	//rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
-	//mesh2D.setCsys(csys1);
+	mesh2D.writeNodes();
+	mesh2D.writeElements();
+
+	rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
+	mesh2D.setCsys(csys1);
 
 	mesh2D.writeNodes();
 	mesh2D.writeElements();
+
 
 	TEST_END
 
@@ -2741,4 +2759,14 @@ void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode) {
 		n[1] = i;
 		w->write2nodedBeam(i, n);
 	}
+}
+
+
+std::vector<int> linearlyOrderedVector(int iStart, int iEnd, int iStep) {
+
+	std::vector<int> res;
+	for (int i = iStart; i <= iEnd; i += iStep) {
+		res.push_back(i);
+	}
+	return res;
 }

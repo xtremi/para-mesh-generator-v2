@@ -76,16 +76,23 @@ MESHER_NODE_WRITE_START
 	direction dir1, dir2;
 	getPlaneDirections(pln, dir1, dir2);
 
-	int nRowSkip = skipAlongDir1 ? meshDens.dir1() : meshDens.dir2();
-	int nRowNotSkip = skipAlongDir1 ? meshDens.dir2() : meshDens.dir1();
-	direction skipDir    = skipAlongDir1 ? dir1 : dir2;
-	direction nonSkipDir = skipAlongDir1 ? dir2 : dir1;
-	
+	//Number of rows of nodes including those that are skipped:
+	int nRowSkip			= skipAlongDir1 ? meshDens.dir1() : meshDens.dir2(); 
+	//Number of nodes per node rows:
+	int nRowNotSkip			= skipAlongDir1 ? meshDens.dir2() : meshDens.dir1();
+	//The direction from row to row (in the direction where nodes are skipped):
+	direction skipDir		= skipAlongDir1 ? dir1 : dir2;
+	//The direction of each node rows:
+	direction nonSkipDir	= skipAlongDir1 ? dir2 : dir1;
+	//The index of dsize that holds the step size between rows in the skipDir:
+	size_t local_x			= skipAlongDir1 ? 0 : 1;
+	//The index of dsize that holds the step size between nodes in the nonSkipDir:
+	size_t local_y			= skipAlongDir1 ? 1 : 0;
 
 	for (int i = 0; i < nRowSkip; i++) {
-		curPos[(size_t)skipDir] = pos[(size_t)skipDir] + (double)i*dsize[(size_t)skipDir];
+		curPos[(size_t)skipDir] = pos[(size_t)skipDir] + (double)i*dsize[local_x];
 		if (i % 4) {
-			LineMesher::writeNodesLineQ(curPos, csys, nRowNotSkip, dsize[(size_t)nonSkipDir], nonSkipDir);
+			LineMesher::writeNodesLineQ(curPos, csys, nRowNotSkip, dsize[local_y], nonSkipDir);
 		}
 	}
 MESHER_NODE_WRITE_END

@@ -196,6 +196,29 @@ struct MeshDensity3D : public NodeVec3D {
 /*
 	Extends NodeVec2D with element number functions and closed loop definition,
 	for a 2D structured mesh with refinement in direction 1.
+
+  ^
+  |	         F3 (back)
+  |dir3 (z-dir)
+
+	 [c2]_________e10_______[c6]
+		|\                  |\
+		| \                 | \
+		|  \e2   F5(top)    |  \e6
+		|   \             e7|   \
+	  e3|    \              |    \
+		| [c1]\_______e9__________\[c5]
+F0(F6)->|     |             |     |  <-F2
+	[c3]| _ __| _ _ e11 _ _ |[c7] |
+		 \    |              \    |e5
+		  \   |e1  F1(front)  \e4 |
+  ^ 	 e0\  |                \  |
+   \		\ |                 \ |
+dir2\		 \|__________________\|   -----> dir1 (default = x-dir)
+(y-dir)		  [c0]	  ^   e8          [c4]
+					  |
+				 F4 (bottom)
+
 */
 struct MeshDensity2Dref : public NodeVec2D {
 	MeshDensity2Dref() {}
