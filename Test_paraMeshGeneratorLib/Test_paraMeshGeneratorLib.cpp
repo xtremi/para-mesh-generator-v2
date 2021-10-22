@@ -56,6 +56,7 @@ int meshEdgeExtrusion(const std::string& fileName);
 int meshFaceExtrusion(const std::string& fileName);
 
 int refinementCalc2D(const std::string& fileName);
+int refinementCalc3D(const std::string& fileName);
 
 int lineMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
@@ -105,6 +106,8 @@ int extrude3DfaceArcAndLine(const std::string& fileName);
 
 void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode);
 
+std::vector<int> r({ 1,2 });
+
 std::vector<TestDef> testFunctions({
 #ifndef SKIP
 	TestDef(10, "speedTestAddition",				"speed test", (testFunction)speedTestAddition),
@@ -137,7 +140,9 @@ std::vector<TestDef> testFunctions({
 	TestDef(60, "meshFaceExtrusion",	"utilities", (testFunction)meshFaceExtrusion),
 	
 	TestDef(65, "refinementCalc2D",	"utilities", (testFunction)refinementCalc2D),
+	TestDef(66, "refinementCalc3D",	"utilities", (testFunction)refinementCalc3D),
 	
+
 
 	TestDef(101, "lineMesher",			"basic meshers 1D", (testFunction)lineMesher),	
 	TestDef(102, "arcMesher",			"basic meshers 1D", (testFunction)arcMesher),
@@ -2377,10 +2382,9 @@ int nodeIterator2Dref(const std::string& fileName) {
 
 	CuboidMesherRef::writeNodes(pos, glCsys, meshDens, size, true, plane::yz);
 	CuboidMesherRef::writeElements(meshDens);
-	
-	std::vector<int> result;
-	std::vector<int> expectedResult;
 
+	//Face 1
+	std::vector<std::vector<int>> resFace1;
 	std::vector<std::vector<int>> expFace1 = {
 		{1,136,141,10}, {10,141,146,19},
 		{19,146,151,28}, {28,151,156,37},
@@ -2403,18 +2407,11 @@ int nodeIterator2Dref(const std::string& fileName) {
 		{282,294,297,285},{294,303,306,297},{285,297,306,288}
 	};
 
-	expectedResult = {
-		linearlyOrderedVector(1,81)
-		//by element (next4())
-	};
-
 
 	//From NodeIterator2D example 1
-	NodeIterator2Dref it1(1, 10, 3);
-	result = getNodeIteratorResult(it1);
-	expectedResult = {  };
-	if (!equalVectors(result, expectedResult)) return 1;
-
+	NodeIterator2Dref it1(1, nNodesDir12, nNodesDir12, nRef, NodeIterator2Dref::Type::face1);
+	resFace1 = getNodeIteratorResult_4(it1);
+	if (!equalVecVectors(resFace1, expFace1)) return 1;
 	
 	return 1;
 }
@@ -2619,6 +2616,13 @@ int refinementCalc2D(const std::string& fileName) {
 	if (refinement::nNodesTot_2d(3, 16) != 69) return 1;
 
 
+
+	return 0;
+}
+
+int refinementCalc3D(const std::string& fileName) {
+
+	if (refinement::nNodesLayerB_3d(0, 8, 8) != 81) return 1;
 
 	return 0;
 }

@@ -327,10 +327,12 @@ bool NodeIterator2D::next4(int& n1, int& n2, int& n3, int& n4) {
 
 NodeIterator2Dref::NodeIterator2Dref(
 	int _firstNode,
-	int _nNodesX, int _nRef,
+	int _nNodesX, 
+	int _nNodesY,
+	int _nRef,
 	Type _type,
 	const NodeIterator1D& _preNodes) :
-	NodeIterator2D(_firstNode, _nNodesX, 0, 0, 0, preNodes)
+	NodeIterator2D(_firstNode, _nNodesX, _nNodesY, 0, 0, preNodes)
 {
 	type = _type;
 	nRef = _nRef;
@@ -354,10 +356,29 @@ int NodeIterator2Dref::numberOfNodes() {
 }
 
 bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
+	switch (type)
+	{
+	case NodeIterator2Dref::Type::face1: 
+		currentNodeID = 0;
+		curRowType = RowType::b0m2;	break;
+	case NodeIterator2Dref::Type::face3: 
+		currentNodeID = nNodes.y - 1;
+		curRowType = RowType::b0m2;	break;
+	case NodeIterator2Dref::Type::face4:
+	case NodeIterator2Dref::Type::face5:
+		curRowType = RowType::b0m1m2; break;
+		break;
+	default:
+		break;
+	}
 	return false;
 }
 bool NodeIterator2Dref::next4(int& n1, int& n2, int& n3, int& n4) {
 	
+	if (curRowType == RowType::b0m2) {
+		n1 = currentNodeID;
+		n2 = n1 + 0;
+	}
 
 
 	return false;

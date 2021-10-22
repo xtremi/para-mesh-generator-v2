@@ -75,3 +75,20 @@ int refinement::minNodesEdge0_2d(int nRef) {
 int refinement::nNodesTot_2d(int nRef, int nElementsEdge0) {	
 	return (int)(4.5*(float)nElementsEdge0 * (1 - 1. / (float)twoPow(nRef))) + 2 * nRef;
 }
+
+
+int refinement::nNodesLayerB_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
+	return nNodesLayerB_2d(refLayer, nElementsFace0x) * nNodesLayerB_2d(refLayer, nElementsFace0y);
+}
+int refinement::nNodesLayerM1_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
+	return 0;
+}
+int refinement::nNodesLayerM2_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
+	return 0;
+}
+int refinement::nNodesLayerM3_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
+	return 0;
+}
+int refinement::nNodesLayerT_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
+	return 0;
+}

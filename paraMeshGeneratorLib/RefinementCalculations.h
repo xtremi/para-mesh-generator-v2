@@ -16,5 +16,14 @@ namespace refinement {
 	int minElementsEdge0_2d(int nRef);
 	int minNodesEdge0_2d(int nRef);
 
+	int nNodesLayerB_3d(int refLayer, int nElementsFace0x, int nElementsFace0y);
+	int nNodesLayerM1_3d(int refLayer, int nElementsFace0x, int nElementsFace0y);
+	int nNodesLayerM2_3d(int refLayer, int nElementsFace0x, int nElementsFace0y);
+	int nNodesLayerM3_3d(int refLayer, int nElementsFace0x, int nElementsFace0y);
+	int nNodesLayerT_3d(int refLayer, int nElementsFace0x, int nElementsFace0y);
+
+
+
+
 }
 

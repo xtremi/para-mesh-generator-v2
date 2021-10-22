@@ -219,7 +219,9 @@ public:
 	NodeIterator2Dref() {}
 	NodeIterator2Dref(
 		int _firstNode, 
-		int _nNodesX, 	int _nRef, 
+		int _nNodesX,
+		int _nNodesY,
+		int _nRef, 
 		Type _type,
 		const NodeIterator1D& _preNodes = NodeIterator1D());
 	virtual int next();
@@ -236,8 +238,10 @@ protected:
 		b0m2,   m2m3t0, t0b0, 
 		b0m1m2, m2t0};
 
-	Type type;
-	int nRef;
+	Type	type;
+	RowType curRowType;
+	int		nRef;
+	int		currentNodeID = 0;
 };
 
 /*
