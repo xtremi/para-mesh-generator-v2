@@ -81,14 +81,23 @@ int refinement::nNodesLayerB_3d(int refLayer, int nElementsFace0x, int nElements
 	return nNodesLayerB_2d(refLayer, nElementsFace0x) * nNodesLayerB_2d(refLayer, nElementsFace0y);
 }
 int refinement::nNodesLayerM1_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
-	return 0;
+	return nNodesLayerM_2d(refLayer, nElementsFace0x) * nNodesLayerB_2d(refLayer, nElementsFace0y);
 }
 int refinement::nNodesLayerM2_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
-	return 0;
+	return nNodesLayerB_2d(refLayer + 1, nElementsFace0x) * nNodesLayerB_2d(refLayer, nElementsFace0y);
 }
 int refinement::nNodesLayerM3_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
-	return 0;
+	return nNodesLayerM_2d(refLayer, nElementsFace0y) * nNodesLayerT_2d(refLayer, nElementsFace0x);
 }
 int refinement::nNodesLayerT_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
-	return 0;
+	return nNodesLayerB_3d(refLayer + 1, nElementsFace0x, nElementsFace0y);
+}
+
+int refinement::nNodesLayerBM1_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
+	return nNodesLayerB_3d(refLayer, nElementsFace0x, nElementsFace0y) +
+		nNodesLayerM1_3d(refLayer, nElementsFace0x, nElementsFace0y);
+}
+int refinement::nNodesLayerM1M2_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
+	return nNodesLayerM1_3d(refLayer, nElementsFace0x, nElementsFace0y) +
+		nNodesLayerM2_3d(refLayer, nElementsFace0x, nElementsFace0y);
 }

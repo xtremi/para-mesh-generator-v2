@@ -371,19 +371,94 @@ bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
 	default:
 		break;
 	}
-	return false;
+	localCounter1 = 0;
+	localCounter2 = 0;
+	return next4(n1,n2,n3,n4);
 }
 bool NodeIterator2Dref::next4(int& n1, int& n2, int& n3, int& n4) {
 	
 	if (curRowType == RowType::b0m2) {
 		n1 = currentNodeID;
-		n2 = n1 + 0;
+		int nBedges  = refinement::nNodesLayerB_2d(currentRef, nNodes.y - 1) - localCounter1;
+		int nM2edges = localCounter1++;
+		n2 = n1
+			+ refinement::nNodesLayerB_2d(currentRef, nNodes.x - 1) * nBedges
+			+ refinement::nNodesLayerM1_3d(currentRef, nNodes.x - 1, nNodes.y - 1)
+			+ refinement::nNodesLayerT_2d(currentRef, nNodes.x - 1) * nM2edges;
+		n3 = n2 + refinement::nNodesLayerT_2d(currentRef, nNodes.x - 1);
+		n4 = n1 + refinement::nNodesLayerB_2d(currentRef, nNodes.x - 1);
+		currentNodeID = n4;
+		if (nBedges == 0) {
+			curRowType = RowType::m2m3t0;
+			localCounter1 = 0;
+			currentNodeID = refinement::nNodesLayerBM1_3d(currentRef, nNodes.x - 1, nNodes.y - 1);
+		}
 	}
+	else if (curRowType == RowType::m2m3t0) {
+		if (localCounter1 == 0) {
+			int nx = refinement::nNodesLayerT_2d(currentRef, nNodes.x - 1);
+			int ny = refinement::nNodesLayerB_2d(currentRef, nNodes.y - 1);
+			
+			int nM2edges = ny - localCounter2;
+			int nM3edges = (localCounter2 + 1) / 2;
+			int nTedges = nM3edges;
+
+			refSectionNodeBuffer[0] = currentNodeID;
+			for (int i = 1; i < 5; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + nx;
+
+			refSectionNodeBuffer[5] = currentNodeID + nx * (nM2edges + nM3edges);
+			for (int i = 5; i < 8; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + nx;
+
+			refSectionNodeBuffer[8] = currentNodeID + nx * (nM3edges + nTedges);
+			for (int i = 8; i < 11; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + nx;
+		}
+		/*
+		   4x---------x10
+			|  e6   / |
+		   3x-----x7  |
+			|  e4 | e5|
+		   2x-----x6--x9
+			|  e3 | e2|
+		   1x-----x5  |
+			|   e1  \ |
+		   0x---------x8
+		*/
+		switch (localCounter1)
+		{
+		case 0: setRefSectionNodeNumbers(0, 8, 5, 1, n1, n2, n3, n4); break;
+		case 1: setRefSectionNodeNumbers(5, 8, 9, 6, n1, n2, n3, n4); break;
+		case 2: setRefSectionNodeNumbers(1, 5, 6, 2, n1, n2, n3, n4); break;
+		case 3: setRefSectionNodeNumbers(2, 6, 7, 3, n1, n2, n3, n4); break;
+		case 4: setRefSectionNodeNumbers(6, 9, 10, 7, n1, n2, n3, n4); break;
+		case 5: setRefSectionNodeNumbers(3, 7, 10, 4, n1, n2, n3, n4); break;
+		default:
+			throw("Invalid localCounter1 (current element in ref section) in NodeIterator2Dref::next4");
+		}
+
+		localCounter1++;
+		localCounter2 += 5;
+
+		if (localCounter1 == 6){
+			localCounter1 = 0;
+		}
+
+		
+
+
+	}
+
 
 
 	return false;
 }
 
+
+void NodeIterator2Dref::setRefSectionNodeNumbers(int i1, int i2, int i3, int i4, int& n1, int& n2, int& n3, int& n4) {
+	n1 = refSectionNodeBuffer[i1];
+	n2 = refSectionNodeBuffer[i2];
+	n3 = refSectionNodeBuffer[i3];
+	n4 = refSectionNodeBuffer[i4];
+}
 
 /*
 

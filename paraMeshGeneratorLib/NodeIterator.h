@@ -240,8 +240,33 @@ protected:
 
 	Type	type;
 	RowType curRowType;
-	int		nRef;
+	int nRef = 0;
+	int currentRef = 0;
 	int		currentNodeID = 0;
+
+	int localCounter1 = 0; //counter used for counting f.ex. number of M1 layers that have been iterated during node iteration
+	int localCounter2 = 0;
+
+	/*
+		
+	   4x---------x10
+		|  e6   / |
+	   3x-----x7  | 
+		|  e4 | e5|
+	   2x-----x6--x8
+		|  e3 | e2|
+	   1x-----x5  |
+		|   e1  \ |
+	   0x---------x8
+
+	   When iterating with first4/next4 and reaching a section as above,
+	   the nodes of the 6 elements are calculated together, but
+	   retreived one by one from the buffer.
+	   - Index by each "x" indicates the position in the buffer
+	   - eN indicates the order of element iteration
+	*/
+	int refSectionNodeBuffer[11];
+	void setRefSectionNodeNumbers(int i1, int i2, int i3, int i4, int& n1, int& n2, int& n3, int& n4);
 };
 
 /*

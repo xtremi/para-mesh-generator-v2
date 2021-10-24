@@ -2410,6 +2410,13 @@ int nodeIterator2Dref(const std::string& fileName) {
 
 	//From NodeIterator2D example 1
 	NodeIterator2Dref it1(1, nNodesDir12, nNodesDir12, nRef, NodeIterator2Dref::Type::face1);
+
+	int n1, n2, n3, n4;
+	it1.first4(n1, n2, n3, n4);
+	for (int i = 0; i < 20; i++) {
+		it1.next4(n1, n2, n3, n4);
+	}
+
 	resFace1 = getNodeIteratorResult_4(it1);
 	if (!equalVecVectors(resFace1, expFace1)) return 1;
 	
@@ -2622,7 +2629,37 @@ int refinementCalc2D(const std::string& fileName) {
 
 int refinementCalc3D(const std::string& fileName) {
 
+	TEST_START2
+	MeshDensity3Dref meshDens(2, 9, 17);	
+	CuboidMesherRef::writeNodes(pos, glCsys, meshDens, glm::dvec3(20., 20., 40.), false, plane::yz);
+	CuboidMesherRef::writeElements(meshDens);
+	writer.close();
+
+
 	if (refinement::nNodesLayerB_3d(0, 8, 8) != 81) return 1;
+	if (refinement::nNodesLayerM1_3d(0, 8, 8) != 54) return 1;
+	if (refinement::nNodesLayerM2_3d(0, 8, 8) != 45) return 1;
+	if (refinement::nNodesLayerM3_3d(0, 8, 8) != 30) return 1;
+	if (refinement::nNodesLayerT_3d(0, 8, 8) != 25) return 1;
+
+	if (refinement::nNodesLayerB_3d(1, 8, 8) != 25) return 1;
+	if (refinement::nNodesLayerM1_3d(1, 8, 8) != 15) return 1;
+	if (refinement::nNodesLayerM2_3d(1, 8, 8) != 15) return 1;
+	if (refinement::nNodesLayerM3_3d(1, 8, 8) != 9) return 1;
+	if (refinement::nNodesLayerT_3d(1, 8, 8) != 9) return 1;
+
+
+	if (refinement::nNodesLayerB_3d(0, 8, 16) != 153) return 1;
+	if (refinement::nNodesLayerM1_3d(0, 8, 16) != 102) return 1;
+	if (refinement::nNodesLayerM2_3d(0, 8, 16) != 85) return 1;
+	if (refinement::nNodesLayerM3_3d(0, 8, 16) != 60) return 1;
+	if (refinement::nNodesLayerT_3d(0, 8, 16) != 45) return 1;
+
+	if (refinement::nNodesLayerB_3d(1, 8, 16) != 45) return 1;
+	if (refinement::nNodesLayerM1_3d(1, 8, 16) != 27) return 1;
+	if (refinement::nNodesLayerM2_3d(1, 8, 16) != 27) return 1;
+	if (refinement::nNodesLayerM3_3d(1, 8, 16) != 18) return 1;
+	if (refinement::nNodesLayerT_3d(1, 8, 16) != 15) return 1;
 
 	return 0;
 }
