@@ -359,10 +359,12 @@ bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
 	switch (type)
 	{
 	case NodeIterator2Dref::Type::face1: 
-		currentNodeID = 0;
+		currentNodeID1 = 0;
+		currentNodeID2 = refinement::nNodesLayerBM1_3d(0, nNodes.x - 1, nNodes.y - 1);
 		curRowType = RowType::b0m2;	break;
 	case NodeIterator2Dref::Type::face3: 
-		currentNodeID = nNodes.y - 1;
+		currentNodeID1 = nNodes.y - 1;
+		currentNodeID2 = 0;
 		curRowType = RowType::b0m2;	break;
 	case NodeIterator2Dref::Type::face4:
 	case NodeIterator2Dref::Type::face5:
@@ -378,21 +380,24 @@ bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
 bool NodeIterator2Dref::next4(int& n1, int& n2, int& n3, int& n4) {
 	
 	if (curRowType == RowType::b0m2) {
-		n1 = currentNodeID;
-		int nBedges  = refinement::nNodesLayerB_2d(currentRef, nNodes.y - 1) - localCounter1;
-		int nM2edges = localCounter1++;
-		n2 = n1
-			+ refinement::nNodesLayerB_2d(currentRef, nNodes.x - 1) * nBedges
-			+ refinement::nNodesLayerM1_3d(currentRef, nNodes.x - 1, nNodes.y - 1)
-			+ refinement::nNodesLayerT_2d(currentRef, nNodes.x - 1) * nM2edges;
+
+		n1 = currentNodeID1;
+		n2 = currentNodeID2;
 		n3 = n2 + refinement::nNodesLayerT_2d(currentRef, nNodes.x - 1);
 		n4 = n1 + refinement::nNodesLayerB_2d(currentRef, nNodes.x - 1);
-		currentNodeID = n4;
-		if (nBedges == 0) {
+		localCounter1++;
+
+		currentNodeID1 = n4;
+		currentNodeID2 = n3;
+		incrementFirstNodeID(n1, n2, n3, n4);
+
+		if (localCounter1 == (refinement::nNodesLayerB_2d(currentRef, nNodes.y) - 2)) {
 			curRowType = RowType::m2m3t0;
 			localCounter1 = 0;
-			currentNodeID = refinement::nNodesLayerBM1_3d(currentRef, nNodes.x - 1, nNodes.y - 1);
+			currentNodeID1 = refinement::nNodesLayerBM1_3d(currentRef, nNodes.x - 1, nNodes.y - 1);
+			currentNodeID2 = currentNodeID1 + refinement::nNodesLayerM2M3_3d(currentRef, nNodes.x - 1, nNodes.y - 1);
 		}
+
 	}
 	else if (curRowType == RowType::m2m3t0) {
 		if (localCounter1 == 0) {
@@ -403,13 +408,13 @@ bool NodeIterator2Dref::next4(int& n1, int& n2, int& n3, int& n4) {
 			int nM3edges = (localCounter2 + 1) / 2;
 			int nTedges = nM3edges;
 
-			refSectionNodeBuffer[0] = currentNodeID;
+			refSectionNodeBuffer[0] = currentNodeID1;
 			for (int i = 1; i < 5; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + nx;
 
-			refSectionNodeBuffer[5] = currentNodeID + nx * (nM2edges + nM3edges);
+			refSectionNodeBuffer[5] = currentNodeID1 + nx * (nM2edges + nM3edges);
 			for (int i = 5; i < 8; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + nx;
 
-			refSectionNodeBuffer[8] = currentNodeID + nx * (nM3edges + nTedges);
+			refSectionNodeBuffer[8] = currentNodeID1 + nx * (nM3edges + nTedges);
 			for (int i = 8; i < 11; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + nx;
 		}
 		/*
@@ -452,6 +457,13 @@ bool NodeIterator2Dref::next4(int& n1, int& n2, int& n3, int& n4) {
 	return false;
 }
 
+
+void NodeIterator2Dref::incrementFirstNodeID(int& n1, int& n2, int& n3, int& n4) {
+	n1 += firstNodeID;
+	n2 += firstNodeID;
+	n3 += firstNodeID;
+	n4 += firstNodeID;
+}
 
 void NodeIterator2Dref::setRefSectionNodeNumbers(int i1, int i2, int i3, int i4, int& n1, int& n2, int& n3, int& n4) {
 	n1 = refSectionNodeBuffer[i1];

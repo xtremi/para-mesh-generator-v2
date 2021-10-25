@@ -2413,10 +2413,12 @@ int nodeIterator2Dref(const std::string& fileName) {
 
 	int n1, n2, n3, n4;
 	it1.first4(n1, n2, n3, n4);
+	std::cout << std::endl;
 	for (int i = 0; i < 20; i++) {
 		it1.next4(n1, n2, n3, n4);
+		std::cout << n1 << " - " << n2 << " - " << n3 << " - " << n4 << std::endl;
 	}
-
+	
 	resFace1 = getNodeIteratorResult_4(it1);
 	if (!equalVecVectors(resFace1, expFace1)) return 1;
 	

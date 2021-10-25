@@ -242,10 +242,13 @@ protected:
 	RowType curRowType;
 	int nRef = 0;
 	int currentRef = 0;
-	int		currentNodeID = 0;
+	int	currentNodeID1 = 0;
+	int currentNodeID2 = 0;
 
 	int localCounter1 = 0; //counter used for counting f.ex. number of M1 layers that have been iterated during node iteration
 	int localCounter2 = 0;
+
+	void incrementFirstNodeID(int& n1, int& n2, int& n3, int& n4);
 
 	/*
 		

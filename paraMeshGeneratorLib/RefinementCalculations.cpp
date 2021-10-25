@@ -101,3 +101,7 @@ int refinement::nNodesLayerM1M2_3d(int refLayer, int nElementsFace0x, int nEleme
 	return nNodesLayerM1_3d(refLayer, nElementsFace0x, nElementsFace0y) +
 		nNodesLayerM2_3d(refLayer, nElementsFace0x, nElementsFace0y);
 }
+int refinement::nNodesLayerM2M3_3d(int refLayer, int nElementsFace0x, int nElementsFace0y) {
+	return nNodesLayerM2_3d(refLayer, nElementsFace0x, nElementsFace0y) +
+		nNodesLayerM3_3d(refLayer, nElementsFace0x, nElementsFace0y);
+}
