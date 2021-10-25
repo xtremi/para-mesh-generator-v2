@@ -2395,7 +2395,7 @@ int nodeIterator2Dref(const std::string& fileName) {
 		{146,186,191,151},{186,216,221,191},{151,191,221,156},
 
 		{156,221,196,161},{196,221,226,201},{161,196,201,166},
-		{166,201,240,171},{201,226,231,206},{171,206,231,176},
+		{166,201,206,171},{201,226,231,206},{171,206,231,176},
 
 		{211,236,241,216},{216,241,246,221},
 		{221,246,251,226},{226,251,256,231},
@@ -2411,18 +2411,26 @@ int nodeIterator2Dref(const std::string& fileName) {
 	//From NodeIterator2D example 1
 	NodeIterator2Dref it1(1, nNodesDir12, nNodesDir12, nRef, NodeIterator2Dref::Type::face1);
 
+	/********************************************************************/
+	//Test in test for stepping through iterations:
 	int n1, n2, n3, n4;
-	it1.first4(n1, n2, n3, n4);
-	std::cout << std::endl;
-	for (int i = 0; i < 20; i++) {
-		it1.next4(n1, n2, n3, n4);
-		std::cout << n1 << " - " << n2 << " - " << n3 << " - " << n4 << std::endl;
+	int counter = 0;
+	for (bool moreNodes = it1.first4(n1, n2, n3, n4); moreNodes; moreNodes = it1.next4(n1, n2, n3, n4)) {
+		std::vector<int> curRes({ n1,n2,n3,n4 });
+
+		if (!equalVectors(expFace1[counter++], curRes)) {
+			int tmp = 1;
+			return 1;
+		}
+
 	}
-	
+	/********************************************************************/
+
 	resFace1 = getNodeIteratorResult_4(it1);
-	if (!equalVecVectors(resFace1, expFace1)) return 1;
+	if (!equalVecVectors(resFace1, expFace1)) 
+		return 1;
 	
-	return 1;
+	return 0;
 }
 
 int nodeIterator2Dm(const std::string& fileName) {

@@ -356,6 +356,8 @@ int NodeIterator2Dref::numberOfNodes() {
 }
 
 bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
+	
+	curRefLayer.setData(0, nNodes);
 	switch (type)
 	{
 	case NodeIterator2Dref::Type::face1: 
@@ -375,84 +377,120 @@ bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
 	}
 	localCounter1 = 0;
 	localCounter2 = 0;
+	currentFirstNodeInRefLayer = 0;
 	return next4(n1,n2,n3,n4);
 }
+
+bool NodeIterator2Dref::next4_b0m2(int& n1, int& n2, int& n3, int& n4){
+
+	n1 = currentNodeID1;
+	n2 = currentNodeID2;
+	n3 = n2 + curRefLayer.nx1;
+	n4 = n1 + curRefLayer.nx0;
+	localCounter1++;
+
+	currentNodeID1 = n4;
+	currentNodeID2 = n3;
+	incrementFirstNodeID(n1, n2, n3, n4);
+
+	if (localCounter1 == (curRefLayer.ny0 - 1)) {
+		curRowType = RowType::m2m3t0;
+		localCounter1 = 0;
+		currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nBM1; /*TODO: won't work for next refinement layer*/
+		currentNodeID2 = currentNodeID1 + curRefLayer.nM2M3;
+	}
+	return true;
+}
+bool NodeIterator2Dref::next4_m2m3t0(int& n1, int& n2, int& n3, int& n4) {
+	if (localCounter1 == 0) {
+		int nM2edges = curRefLayer.ny0 - localCounter2;
+		int nM3edges = 3 * localCounter2 / 4;
+
+		refSectionNodeBuffer[0] = currentNodeID1;
+		for (int i = 1; i < 5; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + curRefLayer.nx1;
+
+		refSectionNodeBuffer[8] = currentNodeID2;
+		for (int i = 9; i < 11; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + curRefLayer.nx1;
+
+		refSectionNodeBuffer[5] = currentNodeID1 + curRefLayer.nx1 * (nM2edges + nM3edges);
+		for (int i = 6; i < 8; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + curRefLayer.nx1;
+
+		currentNodeID1 = refSectionNodeBuffer[4];
+		currentNodeID2 = refSectionNodeBuffer[10];
+		localCounter2 += 4;
+		int tmp = 1;
+	}
+
+	switch (localCounter1)
+	{
+	case 0: setRefSectionNodeNumbers(0, 8, 5, 1, n1, n2, n3, n4); break;
+	case 1: setRefSectionNodeNumbers(5, 8, 9, 6, n1, n2, n3, n4); break;
+	case 2: setRefSectionNodeNumbers(1, 5, 6, 2, n1, n2, n3, n4); break;
+	case 3: setRefSectionNodeNumbers(2, 6, 7, 3, n1, n2, n3, n4); break;
+	case 4: setRefSectionNodeNumbers(6, 9, 10, 7, n1, n2, n3, n4); break;
+	case 5: setRefSectionNodeNumbers(3, 7, 10, 4, n1, n2, n3, n4); break;
+	default:
+		throw("Invalid localCounter1 (current element in ref section) in NodeIterator2Dref::next4");
+	}
+	incrementFirstNodeID(n1, n2, n3, n4);
+
+	localCounter1++;
+
+	//If last iterated element in ref section:
+	static const int N_ELEMENTS_PER_REF_SECTION = 6;
+	if (localCounter1 == N_ELEMENTS_PER_REF_SECTION) {
+		localCounter1 = 0;
+	
+		if ((localCounter2) == (curRefLayer.ny0 - 1)) {
+			curRowType = RowType::t0b0;
+			localCounter2 = 0;
+			currentNodeID2 = currentFirstNodeInRefLayer + curRefLayer.nTot;
+			currentNodeID1 = currentNodeID2 - curRefLayer.nT;
+		}
+	}
+
+	return true;
+}
+bool NodeIterator2Dref::next4_t0b0(int& n1, int& n2, int& n3, int& n4) {
+	
+	if (curRefLayer.ref == (nRef - 1)) {
+		return false;
+	}
+
+	//int dx = refinement::nNodesLayerT_2d(currentRef, nNodes.x - 1);
+	n1 = currentNodeID1;
+	n2 = currentNodeID2;
+	n3 = n2 + curRefLayer.nx1;
+	n4 = n1 + curRefLayer.nx1;
+	
+	currentNodeID1 = n4;
+	currentNodeID2 = n3;
+	localCounter1++;
+	incrementFirstNodeID(n1, n2, n3, n4);
+
+	if (localCounter1 == (curRefLayer.nx1 - 1)) {
+		curRowType = RowType::b0m2;
+		localCounter1 = 0;
+		currentFirstNodeInRefLayer += curRefLayer.nTot;
+		curRefLayer.setData(curRefLayer.ref + 1, nNodes);
+		currentNodeID1 = currentFirstNodeInRefLayer;
+		currentNodeID2 = currentNodeID1 + curRefLayer.nBM1;
+	}
+
+	return true;
+}
+
 bool NodeIterator2Dref::next4(int& n1, int& n2, int& n3, int& n4) {
 	
 	if (curRowType == RowType::b0m2) {
-
-		n1 = currentNodeID1;
-		n2 = currentNodeID2;
-		n3 = n2 + refinement::nNodesLayerT_2d(currentRef, nNodes.x - 1);
-		n4 = n1 + refinement::nNodesLayerB_2d(currentRef, nNodes.x - 1);
-		localCounter1++;
-
-		currentNodeID1 = n4;
-		currentNodeID2 = n3;
-		incrementFirstNodeID(n1, n2, n3, n4);
-
-		if (localCounter1 == (refinement::nNodesLayerB_2d(currentRef, nNodes.y) - 2)) {
-			curRowType = RowType::m2m3t0;
-			localCounter1 = 0;
-			currentNodeID1 = refinement::nNodesLayerBM1_3d(currentRef, nNodes.x - 1, nNodes.y - 1);
-			currentNodeID2 = currentNodeID1 + refinement::nNodesLayerM2M3_3d(currentRef, nNodes.x - 1, nNodes.y - 1);
-		}
-
+		return next4_b0m2(n1, n2, n3, n4);
 	}
 	else if (curRowType == RowType::m2m3t0) {
-		if (localCounter1 == 0) {
-			int nx = refinement::nNodesLayerT_2d(currentRef, nNodes.x - 1);
-			int ny = refinement::nNodesLayerB_2d(currentRef, nNodes.y - 1);
-			
-			int nM2edges = ny - localCounter2;
-			int nM3edges = (localCounter2 + 1) / 2;
-			int nTedges = nM3edges;
-
-			refSectionNodeBuffer[0] = currentNodeID1;
-			for (int i = 1; i < 5; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + nx;
-
-			refSectionNodeBuffer[5] = currentNodeID1 + nx * (nM2edges + nM3edges);
-			for (int i = 5; i < 8; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + nx;
-
-			refSectionNodeBuffer[8] = currentNodeID1 + nx * (nM3edges + nTedges);
-			for (int i = 8; i < 11; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + nx;
-		}
-		/*
-		   4x---------x10
-			|  e6   / |
-		   3x-----x7  |
-			|  e4 | e5|
-		   2x-----x6--x9
-			|  e3 | e2|
-		   1x-----x5  |
-			|   e1  \ |
-		   0x---------x8
-		*/
-		switch (localCounter1)
-		{
-		case 0: setRefSectionNodeNumbers(0, 8, 5, 1, n1, n2, n3, n4); break;
-		case 1: setRefSectionNodeNumbers(5, 8, 9, 6, n1, n2, n3, n4); break;
-		case 2: setRefSectionNodeNumbers(1, 5, 6, 2, n1, n2, n3, n4); break;
-		case 3: setRefSectionNodeNumbers(2, 6, 7, 3, n1, n2, n3, n4); break;
-		case 4: setRefSectionNodeNumbers(6, 9, 10, 7, n1, n2, n3, n4); break;
-		case 5: setRefSectionNodeNumbers(3, 7, 10, 4, n1, n2, n3, n4); break;
-		default:
-			throw("Invalid localCounter1 (current element in ref section) in NodeIterator2Dref::next4");
-		}
-
-		localCounter1++;
-		localCounter2 += 5;
-
-		if (localCounter1 == 6){
-			localCounter1 = 0;
-		}
-
-		
-
-
+		return next4_m2m3t0(n1, n2, n3, n4);
 	}
-
-
+	else if (curRowType == RowType::t0b0) {
+		return next4_t0b0(n1, n2, n3, n4);
+	}
 
 	return false;
 }
@@ -470,6 +508,19 @@ void NodeIterator2Dref::setRefSectionNodeNumbers(int i1, int i2, int i3, int i4,
 	n2 = refSectionNodeBuffer[i2];
 	n3 = refSectionNodeBuffer[i3];
 	n4 = refSectionNodeBuffer[i4];
+}
+
+
+void NodeIterator2Dref::RefLayerData::setData(int currLayer, const glm::ivec2& nNodesXY) {
+	ref = currLayer;
+	nx0 = refinement::nNodesLayerB_2d(ref, nNodesXY.x - 1);
+	nx1 = refinement::nNodesLayerT_2d(ref, nNodesXY.x - 1);
+	ny0 = refinement::nNodesLayerB_2d(ref, nNodesXY.y - 1);
+	ny1 = refinement::nNodesLayerT_2d(ref, nNodesXY.y - 1);
+	nBM1 = refinement::nNodesLayerBM1_3d(ref, nNodesXY.x - 1, nNodesXY.y - 1);
+	nM2M3 = refinement::nNodesLayerM2M3_3d(ref, nNodesXY.x - 1, nNodesXY.y - 1);
+	nTot = refinement::nNodesTot_3d(ref, nNodesXY.x - 1, nNodesXY.y - 1);
+	nT = refinement::nNodesLayerT_3d(ref, nNodesXY.x - 1, nNodesXY.y - 1);
 }
 
 /*

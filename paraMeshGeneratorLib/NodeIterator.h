@@ -241,14 +241,37 @@ protected:
 	Type	type;
 	RowType curRowType;
 	int nRef = 0;
-	int currentRef = 0;
 	int	currentNodeID1 = 0;
 	int currentNodeID2 = 0;
+	int currentFirstNodeInRefLayer = 0;
+
+	struct RefLayerData {
+		/*Sets the values for the layer currLayer*/
+		void setData(int currLayer, const glm::ivec2& nNodesXY);
+		int ref;	/*The current ref layer (first is 0)*/
+		int nx0;	/*number of nodes in x-direction at start of refinement*/
+		int nx1;	/*number of nodes in x-direction at end of refinement*/
+		int ny0;	/*number of nodes in y-direction at start of refinement*/
+		int ny1;	/*number of nodes in y-direction at end of refinement*/
+		int nBM1;   /*total nodes in sub-layers B+M1*/
+		int nM2M3;  /*total nodes in sub-layers M2+M3*/
+		int nT;		/*total nodes in sub-layer T*/
+		int nTot;	/*Total nodes in layer (B+M1+M2+M3+T)*/
+	};
+	RefLayerData curRefLayer;
 
 	int localCounter1 = 0; //counter used for counting f.ex. number of M1 layers that have been iterated during node iteration
 	int localCounter2 = 0;
 
+	bool next4_b0m2(int& n1, int& n2, int& n3, int& n4);
+	bool next4_m2m3t0(int& n1, int& n2, int& n3, int& n4);
+	bool next4_t0b0(int& n1, int& n2, int& n3, int& n4);
+
 	void incrementFirstNodeID(int& n1, int& n2, int& n3, int& n4);
+	void setRefSectionNodeNumbers(int i1, int i2, int i3, int i4, int& n1, int& n2, int& n3, int& n4);
+
+
+
 
 	/*
 		
@@ -269,7 +292,6 @@ protected:
 	   - eN indicates the order of element iteration
 	*/
 	int refSectionNodeBuffer[11];
-	void setRefSectionNodeNumbers(int i1, int i2, int i3, int i4, int& n1, int& n2, int& n3, int& n4);
 };
 
 /*
