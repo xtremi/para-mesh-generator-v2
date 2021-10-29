@@ -1,0 +1,258 @@
+html {
+  font-family: arial;
+  font-size: 100%;
+  background-color:151515;
+  color: white;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.filterGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, auto)); /*auto-fit auto-fill*/
+	grid-gap: 1em;
+}
+
+.filterTile {
+	background-color:252525;
+	position: relative;
+	width: auto;
+	padding-left: 10px;
+	border-radius: 5px;
+}
+
+.filterTile input[type="checkbox"]{
+  width: 30px;
+  height: 30px;
+  vertical-align: middle
+}
+
+.filterGrid input[type="button"]{
+  height: 30px;
+  vertical-align: middle
+}
+
+.meshersGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /*auto-fit auto-fill*/
+	grid-gap: 1em;
+	/*grid-auto-flow: dense;
+	overflow: scroll;
+	height: 1000px;*/
+}
+
+.meshersTile {
+  background-color:252525;
+  position: relative;
+  width: 100%;
+    
+  border: 1px solid grey;  
+  border-radius: 15px 15px 0px 0px;
+  box-shadow: 8px 8px #202020;
+    
+  display: grid; 
+  grid-template-rows: 10px 1fr auto;
+  align-items: center;
+}
+
+/*.tile a {
+  grid-row: 1; 	
+  grid-column: 1;
+}*/
+
+.meshersTile h4 {
+	grid-row: 1; 
+	grid-column: 1; 
+	width: 100%;
+	background-color: #000;
+	padding: 10px 14px;
+	margin: 0;   
+	opacity: .8;
+	border-radius: 15px 15px 0px 0px;
+	align-self: flex-start; /* take auto-width */  
+}
+
+.meshersTile img {
+	grid-row: 2; 
+	grid-column: 1;
+	max-width: 100%;
+	margin-left: auto;
+	margin-right: auto;	
+	display: block;
+	object-fit: contain;  /*contain cover fill none scale-down*/	
+}
+
+.meshersTile h5 {
+	grid-row: 3;
+	grid-column: 1;
+	width: 100%;  
+	background-color:404040;
+	padding: 10px 14px;
+	margin: 0;
+	border: 1px solid black;    
+}
+
+.meshersTile:hover {
+  border: 4px solid white;
+  opacity: .55;
+}
+/*******************************/
+
+.meshGeneratorWindow {
+	background-color:252525;
+	width: 100%;
+
+	border: 1px solid grey;  
+	border-radius: 15px 15px 0px 0px;
+	box-shadow: 8px 8px #202020;
+
+	display: grid; 
+	grid-template-rows: 10px 1fr;
+	align-items: center;	
+}
+
+.meshGeneratorWindow h4 {
+	grid-row: 1; 
+	grid-column: 1; 
+	width: 100%;
+	
+	background-color: #000;
+	padding: 10px 14px;
+	margin: 0;   
+	opacity: .8;
+	border-radius: 15px 15px 0px 0px;
+	align-self: flex-start; /* take auto-width */  
+	
+}
+
+.meshGeneratorWindow h3 {
+	grid-row: 1; 
+	grid-column: 1; 
+	margin: 0;  
+	padding: 10px 14px;
+	text-align: right;
+	align-self: flex-start; /* take auto-width */  
+    z-index: 1;
+	
+}
+
+.meshGeneratorWindow section {
+	grid-row: 2; 
+	grid-column: 1;
+	max-width: 100%;
+	margin-top:50px;
+	margin-left: 20px;
+	margin-right: 20px;	
+}
+
+.inputForm {
+	
+}
+	
+
+
+/*******************************/
+
+.main-head {
+  grid-area: header;
+}
+.content {
+  grid-area: content;
+}
+.main-nav {
+  grid-area: nav;
+  background-color:222222;
+  border-radius: 15px;
+}
+.side {
+  grid-area: sidebar;
+}
+.ad {
+  grid-area: ad;
+}
+.main-footer {
+  grid-area: footer;
+}
+
+.wrapper {
+	display: grid;
+	gap: 20px;
+	grid-template-areas:
+		"header"
+		"nav"
+		"content"
+		"sidebar"
+		"ad"
+		"footer";
+	grid-template-columns: minmax(100px, 1fr) 6fr 1fr;
+    grid-template-areas:
+      "header header  header"
+      "nav    content sidebar"
+      "nav    content ad"
+      "footer footer  footer"
+   }
+   nav ul {
+     flex-direction: column;
+   }
+}
+
+/***********************************
+https://stackoverflow.com/questions/18611195/x-close-button-only-using-css
+***********************************/
+.close {
+  position: relative;
+  right: 32px;
+  top: 32px;
+  width: 32px;
+  height: 32px;
+  opacity: 1.0;
+}
+.close:hover {
+  opacity: 1;
+}
+.close:before, .close:after {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 33px;
+  width: 2px;
+  background-color: #333;
+}
+.close:before {
+  transform: rotate(45deg);
+}
+.close:after {
+  transform: rotate(-45deg);
+}
+/************************************/
+
+/*@media (min-width: 500px) {
+  .wrapper {
+    grid-template-columns: 1fr 3fr;
+    grid-template-areas:
+      "header  header"
+      "nav     nav"
+      "sidebar content"
+      "ad      footer";
+  }
+  nav ul {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: 700px) {
+  .wrapper {
+    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-areas:
+      "header header  header"
+      "nav    content sidebar"
+      "nav    content ad"
+      "footer footer  footer"
+   }
+   nav ul {
+     flex-direction: column;
+   }
+}*/
