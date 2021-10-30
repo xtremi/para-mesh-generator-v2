@@ -366,7 +366,8 @@ bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
 		curRowType = RowType::b0m2;	break;
 	case NodeIterator2Dref::Type::face3: 
 		currentNodeID1 = nNodes.y - 1;
-		currentNodeID2 = 0;
+		currentNodeID2 = refinement::nNodesLayerBM1_3d(0, nNodes.x - 1, nNodes.y - 1);
+		currentNodeID2 += refinement::nNodesLayerT_2d(0, nNodes.x - 1) - 1;
 		curRowType = RowType::b0m2;	break;
 	case NodeIterator2Dref::Type::face4:
 	case NodeIterator2Dref::Type::face5:
@@ -380,7 +381,19 @@ bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
 	currentFirstNodeInRefLayer = 0;
 	return next4(n1,n2,n3,n4);
 }
+/*
 
+   x---------x
+   |    4    | 
+   x---------x
+   |    3    |
+   x---------x
+   |    2    |
+   x---------x
+   |    1    |
+   x---------x
+   b   m1    m2  
+*/
 bool NodeIterator2Dref::next4_b0m2(int& n1, int& n2, int& n3, int& n4){
 
 	n1 = currentNodeID1;
@@ -396,11 +409,40 @@ bool NodeIterator2Dref::next4_b0m2(int& n1, int& n2, int& n3, int& n4){
 	if (localCounter1 == (curRefLayer.ny0 - 1)) {
 		curRowType = RowType::m2m3t0;
 		localCounter1 = 0;
-		currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nBM1; /*TODO: won't work for next refinement layer*/
-		currentNodeID2 = currentNodeID1 + curRefLayer.nM2M3;
+		if(type == Type::face1){
+			currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nBM1; 
+			currentNodeID2 = currentNodeID1 + curRefLayer.nM2M3;
+		}
+		else if (type == Type::face3) {
+			currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nBM1 + curRefLayer.nx1 - 1;
+			currentNodeID2 = currentNodeID1 + curRefLayer.nM2M3;
+		}
+
 	}
 	return true;
 }
+
+/*
+
+		x---------x   ---
+		|   6   / |	   |
+		x-----x   |	   |
+		|   4 | 5 |	   |
+		x-----x---x	   |  2
+		|   3 | 2 |	   |
+		x-----x   |	   |
+		|    1  \ |	   |
+	    x---------x   ---
+		|   6   / |    |
+	    x-----x/  |    |
+		|   4 | 5 |    |  1
+	    x-----x---x    |  
+		|   3 | 2 |    |
+	    x-----x   |    |
+		|    1  \ |    |
+	    x---------x   ---
+       m2    m3   t     
+*/
 bool NodeIterator2Dref::next4_m2m3t0(int& n1, int& n2, int& n3, int& n4) {
 	if (localCounter1 == 0) {
 		int nM2edges = curRefLayer.ny0 - localCounter2;
@@ -444,13 +486,33 @@ bool NodeIterator2Dref::next4_m2m3t0(int& n1, int& n2, int& n3, int& n4) {
 		if ((localCounter2) == (curRefLayer.ny0 - 1)) {
 			curRowType = RowType::t0b0;
 			localCounter2 = 0;
-			currentNodeID2 = currentFirstNodeInRefLayer + curRefLayer.nTot;
-			currentNodeID1 = currentNodeID2 - curRefLayer.nT;
+			if(type == Type::face1){
+				currentNodeID2 = currentFirstNodeInRefLayer + curRefLayer.nTot;
+				currentNodeID1 = currentNodeID2 - curRefLayer.nT;
+			}
+			else if (type == Type::face3) {
+				currentNodeID2 = currentFirstNodeInRefLayer + curRefLayer.nTot + curRefLayer.nx1 - 1;
+				currentNodeID1 = currentNodeID2 - curRefLayer.nT;
+			}
 		}
 	}
 
 	return true;
 }
+
+/*
+
+   x---------x
+   |    4    |
+   x---------x
+   |    3    |
+   x---------x
+   |    2    |
+   x---------x
+   |    1    |
+   x---------x
+   t         b
+*/
 bool NodeIterator2Dref::next4_t0b0(int& n1, int& n2, int& n3, int& n4) {
 	
 	if (curRefLayer.ref == (nRef - 1)) {
@@ -473,8 +535,14 @@ bool NodeIterator2Dref::next4_t0b0(int& n1, int& n2, int& n3, int& n4) {
 		localCounter1 = 0;
 		currentFirstNodeInRefLayer += curRefLayer.nTot;
 		curRefLayer.setData(curRefLayer.ref + 1, nNodes);
-		currentNodeID1 = currentFirstNodeInRefLayer;
-		currentNodeID2 = currentNodeID1 + curRefLayer.nBM1;
+		if (type == Type::face1) {
+			currentNodeID1 = currentFirstNodeInRefLayer;
+			currentNodeID2 = currentNodeID1 + curRefLayer.nBM1;
+		}
+		else if (type == Type::face3) {
+			currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nx0 - 1;
+			currentNodeID2 = currentNodeID1 + curRefLayer.nBM1 - 1; //hmmmm
+		}
 	}
 
 	return true;
