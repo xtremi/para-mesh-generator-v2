@@ -25,6 +25,7 @@ namespace refinement {
 	int nNodesLayerBM1_3d(int refLayer, int nElementsFace0x, int nElementsFace0y);
 	int nNodesLayerM1M2_3d(int refLayer, int nElementsFace0x, int nElementsFace0y);
 	int nNodesLayerM2M3_3d(int refLayer, int nElementsFace0x, int nElementsFace0y);
+	int nNodesTotSection_3d(int nRef, int nElementsFace0x, int nElementsFace0y);
 	int nNodesTot_3d(int nRef, int nElementsFace0x, int nElementsFace0y);
 
 

@@ -591,7 +591,7 @@ void NodeIterator2Dref::RefLayerData::setData(int currLayer, const glm::ivec2& n
 	ny1 = refinement::nNodesLayerT_2d(ref, nNodesXY.y - 1);
 	nBM1 = refinement::nNodesLayerBM1_3d(ref, nNodesXY.x - 1, nNodesXY.y - 1);
 	nM2M3 = refinement::nNodesLayerM2M3_3d(ref, nNodesXY.x - 1, nNodesXY.y - 1);
-	nTot = refinement::nNodesTot_3d(ref, nNodesXY.x - 1, nNodesXY.y - 1);
+	nTot = refinement::nNodesTotSection_3d(ref, nNodesXY.x - 1, nNodesXY.y - 1);
 	nT = refinement::nNodesLayerT_3d(ref, nNodesXY.x - 1, nNodesXY.y - 1);
 }
 

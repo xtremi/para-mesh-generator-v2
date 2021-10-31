@@ -177,11 +177,9 @@ void MeshDensity2DrecTube::cornerNodes(int n[4], int layer) const {
 
 int MeshDensity2Dref::nElRowB(int refLayer) const {
 	return refinement::nElementsLayerB_2d(refLayer, nElDir2());
-	//return nElDir2() / std::pow(2, refLayer);
 }
 int MeshDensity2Dref::nElRowT(int refLayer) const {
 	return refinement::nElementsLayerT_2d(refLayer, nElDir2());
-	//return nElRowB(refLayer + 1);
 }
 
 int MeshDensity2Dref::nNodesRowB(int refLayer) const {
@@ -198,4 +196,69 @@ int MeshDensity2Dref::nNodes() const {
 }
 int MeshDensity2Dref::nElements() const {
 	throw("MeshDensity2Dref::nElements() - is not implemented");
+}
+
+int MeshDensity3Dref::dir1ref(){
+	return refinement::nNodesLayerT_2d(nRefs() - 1, dir1());
+}
+int MeshDensity3Dref::dir3ref() {
+	return refinement::nNodesLayerT_2d(nRefs() - 1, dir3());
+}
+int MeshDensity3Dref::nElDir2ref() {
+	return closedLoop ? dir1ref() : dir1ref() - 1;
+}
+int MeshDensity3Dref::nElDir3ref() {
+	return dir3ref() - 1;
+}
+
+int MeshDensity3Dref::cornerNode(int cornerID) {
+	switch (cornerID)
+	{
+
+	case 0: return -1;			break;
+	case 1: return dir1();		break;
+	case 2: return -1;	break;
+	case 3: return -1;	break;
+	case 4: return (cornerNode(6) - refinement::nNodesLayerT_3d(nRefs() - 1, nElDir1(), nElDir3()) + 1);	break;
+	case 5: return -1;	break;
+	case 6: return (refinement::nNodesTot_3d(nRefs(), nElDir1(), nElDir3()) - 1);	break;
+	case 7: return -1;	break;
+	default:
+		throw("Invalid corner ID in MeshDensity3D::cornerNode");
+		break;
+	}
+}
+
+
+NodeIterator2Dref MeshDensity3Dref::faceNodeIteratorRefDir(
+	int faceID, 
+	int firstNodeID, 
+	const NodeIterator1D& preNodes) 
+{
+	if (faceID == 1) {
+		return NodeIterator2Dref(firstNodeID, dir1(), dir3(), nRefs(), NodeIterator2Dref::Type::face1, preNodes);
+	}
+	else if (faceID == 3) {
+		return NodeIterator2Dref(firstNodeID, dir1(), dir3(), nRefs(), NodeIterator2Dref::Type::face3, preNodes);
+	}
+	else if (faceID == 4) {
+		return NodeIterator2Dref(firstNodeID, dir1(), dir3(), nRefs(), NodeIterator2Dref::Type::face4, preNodes);
+	}
+	else if (faceID == 5) {
+		return NodeIterator2Dref(firstNodeID, dir1(), dir3(), nRefs(), NodeIterator2Dref::Type::face5, preNodes);
+	}
+	else {
+		throw("Invalid edge ID in MeshDensity3Dref::faceNodeIteratorRefDir");
+	}
+}
+NodeIterator2D MeshDensity3Dref::faceNodeIterator(int faceID, int firstNodeID, const NodeIterator1D& preNodes) {
+	if (faceID == 0) {
+		return NodeIterator2D(firstNodeID, dir1(), dir3(), 1, dir1(), preNodes);
+	}
+	else if (faceID == 2) {
+		return NodeIterator2D(firstNodeID + cornerNode(4), dir1ref(), dir3ref(), 1, dir1ref(), preNodes);
+	}
+	else {
+		throw("Invalid edge ID in MeshDensity3Dref::faceNodeIterator");
+	}
 }

@@ -197,28 +197,6 @@ struct MeshDensity3D : public NodeVec3D {
 	Extends NodeVec2D with element number functions and closed loop definition,
 	for a 2D structured mesh with refinement in direction 1.
 
-  ^
-  |	         F3 (back)
-  |dir3 (z-dir)
-
-	 [c2]_________e10_______[c6]
-		|\                  |\
-		| \                 | \
-		|  \e2   F5(top)    |  \e6
-		|   \             e7|   \
-	  e3|    \              |    \
-		| [c1]\_______e9__________\[c5]
-F0(F6)->|     |             |     |  <-F2
-	[c3]| _ __| _ _ e11 _ _ |[c7] |
-		 \    |              \    |e5
-		  \   |e1  F1(front)  \e4 |
-  ^ 	 e0\  |                \  |
-   \		\ |                 \ |
-dir2\		 \|__________________\|   -----> dir1 (default = x-dir)
-(y-dir)		  [c0]	  ^   e8          [c4]
-					  |
-				 F4 (bottom)
-
 */
 struct MeshDensity2Dref : public NodeVec2D {
 	MeshDensity2Dref() {}
@@ -277,6 +255,15 @@ struct MeshDensity3Dref : public NodeVec3D {
 	int nElDir3() const { return dir3() - 1; }
 	int nElCirc() const { return nElDir1(); }
 
+	/*!number of nodes in dir1 after refinement*/
+	int dir1ref();
+	/*!number of nodes in dir1 after refinement*/
+	int dir3ref();
+	/*!number of elements in dir1/3 after refinement*/
+	int nElDir2ref();
+	/*!number of elements in dir1/3 after refinement*/
+	int nElDir3ref();
+
 	MeshDensity2D meshDensD12B(int refLayer) const {
 		int n1 = nElDir1() / std::pow(2, refLayer);
 		if (!closedLoop) n1++;
@@ -306,5 +293,9 @@ struct MeshDensity3Dref : public NodeVec3D {
 	int nnodesPlaneD13() const { return dir1() * dir3(); }
 
 	int setNrefs(int n) { setDir1(n); }
+
+	int cornerNode(int cornerID);
+	NodeIterator2Dref faceNodeIteratorRefDir(int faceID, int firstNodeID, const NodeIterator1D& preNodes = NodeIterator1D());
+	NodeIterator2D    faceNodeIterator(int faceID, int firstNodeID, const NodeIterator1D& preNodes = NodeIterator1D());
 
 };

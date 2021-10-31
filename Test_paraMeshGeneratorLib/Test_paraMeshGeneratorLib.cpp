@@ -44,6 +44,7 @@ int meshDensity2DnodeIteratorPreNodes(const std::string& fileName);
 int meshDensity2DrefNodeIterator(const std::string& fileName);
 int meshDensity3DnodeIterator(const std::string& fileName);
 int meshDensity3DnodeIteratorPreNodes(const std::string& fileName);
+int meshDensity3DnodeIteratorRef(const std::string& fileName);
 
 int nodeIterator1D(const std::string& fileName);
 int nodeIterator1Dref(const std::string& fileName);
@@ -127,7 +128,11 @@ std::vector<TestDef> testFunctions({
 	TestDef(26, "meshDensity3DnodeIterator",		"utilities", (testFunction)meshDensity3DnodeIterator),
 	TestDef(27, "meshDensity3DnodeIteratorPreNodes","utilities", (testFunction)meshDensity3DnodeIteratorPreNodes),
 	TestDef(28, "meshDensity2DrefCornerNodes",		"utilities", (testFunction)meshDensity2DrefCornerNodes),
+	TestDef(29, "meshDensity3DnodeIteratorRef",		"utilities", (testFunction)meshDensity3DnodeIteratorRef),
 	
+
+
+
 	TestDef(30, "nodeIterator1D",		"utilities", (testFunction)nodeIterator1D),
 	TestDef(31, "nodeIterator1Dm",		"utilities", (testFunction)nodeIterator1Dm),
 	TestDef(32, "nodeIterator1Dref",	"utilities", (testFunction)nodeIterator1Dref),
@@ -2009,6 +2014,8 @@ int meshDensity2DrefCornerNodes(const std::string& fileName) {
 	return 0;
 }
 
+
+
 int meshDensity2DnodeIterator(const std::string& fileName) {
 
 	MeshDensity2D meshDens(3, 4);
@@ -2371,9 +2378,6 @@ int nodeIterator2D_4(const std::string& fileName) {
 	return 0;
 }
 
-/*
-Ongoing
-*/
 int nodeIterator2Dref(const std::string& fileName) {
 	TEST_START2
 
@@ -2448,6 +2452,103 @@ int nodeIterator2Dref(const std::string& fileName) {
 	
 	return 0;
 }
+
+/*
+	Partly similar to test nodeIterator2Dref()
+*/
+int meshDensity3DnodeIteratorRef(const std::string& fileName) {
+
+	TEST_START2
+
+	glm::dvec3 size(15.0, 10.0, 40.);
+	int nRef = 2;
+	int nNodesDir12 = 9;
+	MeshDensity3Dref meshDens(nRef, nNodesDir12, nNodesDir12, false);
+
+	//Face 1
+	std::vector<std::vector<int>> expFace1 = {
+		{1,136,141,10}, {10,141,146,19},
+		{19,146,151,28}, {28,151,156,37},
+		{37,156,161,46}, {46,161,166,55},
+		{55,166,171,64}, {64,171,176,73},
+
+		{136,211,181,141},{181,211,216,186},{141,181,186,146},
+		{146,186,191,151},{186,216,221,191},{151,191,221,156},
+
+		{156,221,196,161},{196,221,226,201},{161,196,201,166},
+		{166,201,206,171},{201,226,231,206},{171,206,231,176},
+
+		{211,236,241,216},{216,241,246,221},
+		{221,246,251,226},{226,251,256,231},
+
+		{236,276,279,241},{241,279,282,246},
+		{246,282,285,251},{251,285,288,256},
+
+		{276,300,291,279},{291,300,303,294},{279,291,294,282},
+		{282,294,297,285},{294,303,306,297},{285,297,306,288}
+	};
+
+	//Face 3
+	std::vector<std::vector<int>> expFace3 = {
+		{9,140,145,18}, {18,145,150,27},
+		{27,150,155,36}, {36,155,160,45},
+		{45,160,165,54}, {54,165,170,63},
+		{63,170,175,72}, {72,175,180,81}, //0-7
+
+		{140,215,185,145},{185,215,220,190},{145,185,190,150},
+		{150,190,195,155},{190,220,225,195},{155,195,225,160}, //8-13
+
+		{160,225,200,165},{200,225,230,205},{165,200,205,170},
+		{170,205,210,175},{205,230,235,210},{175,210,235,180},//14-18
+
+		{215,240,245,220},{220,245,250,225}, //20-24
+		{225,250,255,230},{230,255,260,235},
+
+		{240,278,281,245},{245,281,284,250},
+		{250,284,287,255},{255,287,290,260}, //25-28
+
+		{278,302,293,281},{293,302,305,296},{281,293,296,284},
+		{284,296,299,287},{296,305,308,299},{287,299,308,290}//29-34
+	};
+
+	//Face0:
+	std::vector<int> expFace0 = linearlyOrderedVector(1, 81, 1);
+	std::vector<int> expFace2 = linearlyOrderedVector(300, 308, 1);
+
+
+	std::vector<std::vector<int>> resFace1, resFace3, resFace4, resFace5;
+	std::vector<int> resFace0, resFace2;
+
+	//Face 0
+	NodeIterator2D it0(meshDens.faceNodeIterator(0, 1));
+	resFace0 = getNodeIteratorResult(it0);
+	if (!equalVectors(resFace0, expFace0))
+		return 1;
+
+	//Face1
+	NodeIterator2Dref it1(meshDens.faceNodeIteratorRefDir(1, 1));
+	resFace1 = getNodeIteratorResult_4(it1);
+	if (!equalVecVectors(resFace1, expFace1))
+		return 1;
+
+	//Face 2
+	NodeIterator2D it2(meshDens.faceNodeIterator(2, 1));
+	resFace2 = getNodeIteratorResult(it2);
+	if (!equalVectors(resFace2, expFace2))
+		return 1;
+
+	//Face3
+	NodeIterator2Dref it3(meshDens.faceNodeIteratorRefDir(3, 1));
+	resFace3 = getNodeIteratorResult_4(it3);
+	if (!equalVecVectors(resFace3, expFace3))
+		return 1;
+
+
+
+	return 0;
+
+}
+
 
 int nodeIterator2Dm(const std::string& fileName) {
 	return 1;
