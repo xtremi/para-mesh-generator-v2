@@ -95,7 +95,6 @@ int refinement3dHeight(const std::string& fileName);
 int refinementCone2dHeight(const std::string& fileName);
 int refinementCone3dHeight(const std::string& fileName);
 
-
 int extrude2DedgeLine(const std::string& fileName);
 int extrude2DedgeArc(const std::string& filename);
 int extrude2DedgeArcAndLine(const std::string& filename);
@@ -103,6 +102,8 @@ int extrude2DedgeRef(const std::string& filename);
 int extrude3DfaceLine(const std::string& fileName);
 int extrude3DfaceArc(const std::string& fileName);
 int extrude3DfaceArcAndLine(const std::string& fileName);
+
+int connectCuboidMeshRef(const std::string& fileName);
 
 void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode);
 
@@ -189,9 +190,10 @@ std::vector<TestDef> testFunctions({
 
 	TestDef(600, "extrude3DfaceLine",		"extrusion", (testFunction)extrude3DfaceLine),
 	TestDef(620, "extrude3DfaceArc",		"extrusion", (testFunction)extrude3DfaceArc),
-	TestDef(640, "extrude3DfaceArcAndLine",		"extrusion", (testFunction)extrude3DfaceArcAndLine),
+	TestDef(640, "extrude3DfaceArcAndLine",	"extrusion", (testFunction)extrude3DfaceArcAndLine),
 
-	
+	TestDef(710, "connectCuboidMeshRef",	"connection", (testFunction)connectCuboidMeshRef)
+
 });
 
 
@@ -2838,6 +2840,41 @@ int extrude3DfaceArcAndLine(const std::string& fileName) {
 
 
 
+int connectCuboidMeshRef(const std::string& fileName) {
+	TEST_START2
+	std::vector<MeshDensity3Dref> meshDensities({
+		MeshDensity3Dref(2, 9, 9),
+		MeshDensity3Dref(2, 9, 17),
+		MeshDensity3Dref(2, 17, 17),
+		});
+	std::vector<glm::dvec3> sizes({
+		{10., 10., 30.},
+		{10., 20., 30.},
+		{20., 10., 30.}
+		});
+
+	int i = 0;
+	for (MeshDensity3Dref& meshDens : meshDensities) {
+		pos.y = 0.;
+
+		int nodeID1_1 = writer.getNextNodeID();
+		CuboidMesherRef::writeNodes(pos, glCsys, meshDens, sizes[i], true, plane::yz);
+		CuboidMesherRef::writeElements(meshDens);
+		pos.y += sizes[i].x * 1.3;
+
+		int nodeID1_2 = writer.getNextNodeID();
+		CuboidMesherRef::writeNodes(pos, glCsys, meshDens, sizes[i], true, plane::yz);
+		CuboidMesherRef::writeElements(meshDens);
+		NodeIterator2Dref it1(nodeID1_1, meshDens.dir1(), meshDens.dir3(), meshDens.nRefs(), NodeIterator2Dref::Type::face3);
+		NodeIterator2Dref it2(nodeID1_2, meshDens.dir1(), meshDens.dir3(), meshDens.nRefs(), NodeIterator2Dref::Type::face1);
+
+		RowMesher3D::writeElements(&it1, &it2);
+
+		pos.z += sizes[i++].y * 1.25;
+	}
+
+	TEST_END
+}
 
 
 void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode) {

@@ -40,9 +40,9 @@ struct NodeVec3D {
 	NodeVec3D(int _dir1, int _dir2, int _dir3) : nnodes{ glm::ivec3(_dir1, _dir2, _dir3) } {}
 
 	glm::ivec3& nodes() { return nnodes; }
-	int dir1() const { return nnodes.x; }
-	int dir2() const { return nnodes.y; }
-	int dir3() const { return nnodes.z; }
+	virtual int dir1() const { return nnodes.x; }
+	virtual int dir2() const { return nnodes.y; }
+	virtual int dir3() const { return nnodes.z; }
 	/*
 		Circular direction, around cicumference (for cone/cylinder)
 	*/
@@ -262,7 +262,7 @@ struct MeshDensity2Dref : public NodeVec2D {
 
 /*
 	Extends NodeVec3D with element number functions and closed loop definition,
-	for a 3D structured mesh with refinement in direction 3
+	for a 3D structured mesh with refinement in direction 2
 */
 struct MeshDensity3Dref : public NodeVec3D {
 	MeshDensity3Dref() {}

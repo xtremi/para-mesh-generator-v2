@@ -364,7 +364,7 @@ bool NodeIterator2Dref::first4(int& n1, int& n2, int& n3, int& n4) {
 		currentNodeID2 = curRefLayer.nBM1;
 		curRowType = RowType::b0m2;	break;
 	case NodeIterator2Dref::Type::face3: 
-		currentNodeID1 = nNodes.y - 1;
+		currentNodeID1 = nNodes.x - 1;
 		currentNodeID2 = curRefLayer.nBM1 + curRefLayer.nx1 - 1;
 		curRowType = RowType::b0m2;	break;
 	case NodeIterator2Dref::Type::face4:
