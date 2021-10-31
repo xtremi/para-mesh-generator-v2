@@ -2407,54 +2407,39 @@ int nodeIterator2Dref(const std::string& fileName) {
 		{282,294,297,285},{294,303,306,297},{285,297,306,288}
 	};
 
-
-	NodeIterator2Dref it1(1, nNodesDir12, nNodesDir12, nRef, NodeIterator2Dref::Type::face1);
-	resFace1 = getNodeIteratorResult_4(it1);
-	if (!equalVecVectors(resFace1, expFace1)) 
-		return 1;
-
 	//Face 3
 	std::vector<std::vector<int>> resFace3;
 	std::vector<std::vector<int>> expFace3 = {
 		{9,140,145,18}, {18,145,150,27},
 		{27,150,155,36}, {36,155,160,45},
 		{45,160,165,54}, {54,165,170,63},
-		{63,170,175,72}, {72,175,180,81},
+		{63,170,175,72}, {72,175,180,81}, //0-7
 
 		{140,215,185,145},{185,215,220,190},{145,185,190,150},
-		{150,190,195,155},{190,220,225,195},{155,195,225,160},
+		{150,190,195,155},{190,220,225,195},{155,195,225,160}, //8-13
 
 		{160,225,200,165},{200,225,230,205},{165,200,205,170},
-		{170,205,210,175},{205,230,235,210},{175,210,235,180},
-		//Below is still face1
-		{215,240,245,220},{220,245,250,225},
+		{170,205,210,175},{205,230,235,210},{175,210,235,180},//14-18
+		
+		{215,240,245,220},{220,245,250,225}, //20-24
 		{225,250,255,230},{230,255,260,235},
 
 		{240,278,281,245},{245,281,284,250},
-		{250,284,287,255},{255,287,290,260},
+		{250,284,287,255},{255,287,290,260}, //25-28
 
 		{278,302,293,281},{293,302,305,296},{281,293,296,284},
-		{284,296,299,287},{296,305,308,299},{287,299,308,290}
+		{284,296,299,287},{296,305,308,299},{287,299,308,290}//29-34
 	};
 
 
+	//Face1
+	NodeIterator2Dref it1(1, nNodesDir12, nNodesDir12, nRef, NodeIterator2Dref::Type::face1);
+	resFace1 = getNodeIteratorResult_4(it1);
+	if (!equalVecVectors(resFace1, expFace1))
+		return 1;
+
+	//Face3
 	NodeIterator2Dref it2(1, nNodesDir12, nNodesDir12, nRef, NodeIterator2Dref::Type::face3);
-
-	/********************************************************************/
-	//Test in test for stepping through iterations:
-	int n1, n2, n3, n4;
-	int counter = 0;
-	for (bool moreNodes = it2.first4(n1, n2, n3, n4); moreNodes; moreNodes = it2.next4(n1, n2, n3, n4)) {
-		std::vector<int> curRes({ n1,n2,n3,n4 });
-
-		if (!equalVectors(expFace3[counter++], curRes)) {
-			int tmp = 1;
-			//return 1;
-		}
-
-	}
-	/********************************************************************/
-
 	resFace3 = getNodeIteratorResult_4(it2);
 	if (!equalVecVectors(resFace3, expFace3))
 		return 1;
