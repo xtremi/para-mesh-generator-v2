@@ -2488,11 +2488,25 @@ int nodeIterator2Dref(const std::string& fileName) {
 		return 1;
 
 	//Face3
-	NodeIterator2Dref it2(1, nNodesDir12, nNodesDir12, nRef, NodeIterator2Dref::Type::face3);
-	resFace3 = getNodeIteratorResult_4(it2);
+	NodeIterator2Dref it3(1, nNodesDir12, nNodesDir12, nRef, NodeIterator2Dref::Type::face3);
+	resFace3 = getNodeIteratorResult_4(it3);
 	if (!equalVecVectors(resFace3, expFace3))
 		return 1;
 	
+	//Face5
+	NodeIterator2Dref it5(1, nNodesDir12, nNodesDir12, nRef, NodeIterator2Dref::Type::face5);
+	resFace5 = getNodeIteratorResult_4(it5);
+
+	
+	for (int i = 0; i < resFace5.size(); i++) {
+		if (!equalVectors(resFace5[i], expFace5[i])) {
+			return false;
+		}
+	}
+
+	if (!equalVecVectors(resFace5, expFace5))
+		return 1;
+
 	return 0;
 }
 

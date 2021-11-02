@@ -253,7 +253,9 @@ protected:
 		int nx1;	/*number of nodes in x-direction at end of refinement*/
 		int ny0;	/*number of nodes in y-direction at start of refinement*/
 		int ny1;	/*number of nodes in y-direction at end of refinement*/
+		int nB;     /*total nodes in sub-layers B*/
 		int nBM1;   /*total nodes in sub-layers B+M1*/
+		int nBM1M2; /*total nodes in sub-layers B+M1+M2*/
 		int nM2M3;  /*total nodes in sub-layers M2+M3*/
 		int nT;		/*total nodes in sub-layer T*/
 		int nTot;	/*Total nodes in layer (B+M1+M2+M3+T)*/
@@ -265,10 +267,13 @@ protected:
 
 	bool next4_b0m2(int& n1, int& n2, int& n3, int& n4);
 	bool next4_m2m3t0(int& n1, int& n2, int& n3, int& n4);
+	bool next4_b0m1m2(int& n1, int& n2, int& n3, int& n4);
 	bool next4_t0b0(int& n1, int& n2, int& n3, int& n4);
+	bool next4_m2t0(int& n1, int& n2, int& n3, int& n4);
 
 	void incrementFirstNodeID(int& n1, int& n2, int& n3, int& n4);
 	void setRefSectionNodeNumbers(int i1, int i2, int i3, int i4, int& n1, int& n2, int& n3, int& n4);
+	void setRefSectionNodeNumbers(int elementIndex, int& n1, int& n2, int& n3, int& n4);
 
 
 
