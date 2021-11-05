@@ -427,6 +427,18 @@ bool NodeIterator2Dref::next4_b0m2(int& n1, int& n2, int& n3, int& n4){
 	return true;
 }
 
+/*
+   x---------x
+   |    4    |
+   x---------x
+   |    3    |
+   x---------x
+   |    2    |
+   x---------x
+   |    1    |
+   x---------x
+  m2    m3   t
+*/
 bool NodeIterator2Dref::next4_m2t0(int& n1, int& n2, int& n3, int& n4) {
 
 	n1 = currentNodeID1;

@@ -105,6 +105,7 @@ int extrude3DfaceArc(const std::string& fileName);
 int extrude3DfaceArcAndLine(const std::string& fileName);
 
 int connectCuboidMeshRef(const std::string& fileName);
+int connectCuboidMeshRef2(const std::string& fileName);
 
 void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode);
 
@@ -197,7 +198,9 @@ std::vector<TestDef> testFunctions({
 	TestDef(620, "extrude3DfaceArc",		"extrusion", (testFunction)extrude3DfaceArc),
 	TestDef(640, "extrude3DfaceArcAndLine",	"extrusion", (testFunction)extrude3DfaceArcAndLine),
 
-	TestDef(710, "connectCuboidMeshRef",	"connection", (testFunction)connectCuboidMeshRef)
+	TestDef(710, "connectCuboidMeshRef",	"connection", (testFunction)connectCuboidMeshRef),
+	TestDef(711, "connectCuboidMeshRef2",	"connection", (testFunction)connectCuboidMeshRef2)
+	
 
 });
 
@@ -3002,6 +3005,7 @@ int connectCuboidMeshRef(const std::string& fileName) {
 		{20., 10., 30.}
 		});
 
+
 	int i = 0;
 	for (MeshDensity3Dref& meshDens : meshDensities) {
 		pos.y = 0.;
@@ -3014,6 +3018,7 @@ int connectCuboidMeshRef(const std::string& fileName) {
 		int nodeID1_2 = writer.getNextNodeID();
 		CuboidMesherRef::writeNodes(pos, glCsys, meshDens, sizes[i], true, plane::yz);
 		CuboidMesherRef::writeElements(meshDens);
+
 		NodeIterator2Dref it1(nodeID1_1, meshDens.dir1(), meshDens.dir3(), meshDens.nRefs(), NodeIterator2Dref::Type::face3);
 		NodeIterator2Dref it2(nodeID1_2, meshDens.dir1(), meshDens.dir3(), meshDens.nRefs(), NodeIterator2Dref::Type::face1);
 
@@ -3021,6 +3026,79 @@ int connectCuboidMeshRef(const std::string& fileName) {
 
 		pos.z += sizes[i++].y * 1.25;
 	}
+
+	TEST_END
+}
+
+/*
+     4.     15.     4.
+	<---|---------|--->
+
+        x---------x          ^        
+        |   1     |          |   5.        ^
+	x---x---------x---x     ---            | Z
+	|   |         |   |      |  10.		   |
+	| 4 |   0     | 2 |      |         <----			   
+	x---x---------x---x     ---         Y 
+	    |   3     |          |   5. 
+		x---------x          v     
+
+5,9,17,33,65
+
+      size     |  nodes   |  pos0
+_______________|__________|_______
+0 : 15. x 10.  |  33 x 17 |  (0., -15./2.,        -10./2)
+1 : 15. x  5.  |  33 x  9 |  (0., -15./2.,         10./2 + s)
+2 :  4. x 10.  |   9 x 17 |  (0., -15./2. -4. -s, -10./2)
+3 : 15. x  5.  |  33 x  9 |  (0., -15./2.,        -10./2 - 5. - s)
+4 :  4. x 10.  |   9 x 17 |  (0.,  15./2. +       -10./2)
+*/
+int connectCuboidMeshRef2(const std::string& fileName) {
+	TEST_START2
+	float w = 15., h = 10., dw = 4., dh = 5.;
+	float L = 20.;
+
+	int nW = 33, nH = 17, nd = 9;
+	int nRef = 2;
+
+	float s = w / (float)nW;
+
+	std::vector<glm::dvec3> sizes({
+		glm::dvec3(w,   h, L),
+		glm::dvec3(w,  dh, L),
+		glm::dvec3(dw,  h, L),
+		glm::dvec3(w,  dh, L),
+		glm::dvec3(dw,  h, L)
+	});
+
+	std::vector<MeshDensity3Dref> meshDensities({
+		MeshDensity3Dref(nRef, nW, nH),
+		MeshDensity3Dref(nRef, nW, nd),
+		MeshDensity3Dref(nRef, nd, nH),
+		MeshDensity3Dref(nRef, nW, nd),
+		MeshDensity3Dref(nRef, nd, nH),
+		});
+	std::vector<glm::dvec3> positions({
+		{0., -w/2.,         -h/2.},
+		{0., -w/2.,          h/2. + s},
+		{0., -w/2. - dw -s, -h/2.},
+		{0., -w/2.,         -h/2. - dh - s},
+		{0.,  w/2. +s,      -h/2.},
+		});
+	
+
+	std::vector<int> firstNodeIDs;
+	for (int i = 0; i < 5; i++) {
+		firstNodeIDs.push_back(writer.getNextNodeID());
+		CuboidMesherRef::writeNodes(positions[i], glCsys, meshDensities[i], sizes[i], true, plane::yz);
+		CuboidMesherRef::writeElements(meshDensities[i]);
+	}
+
+	
+	//NodeIterator2Dref it0_1(firstNodeID, meshDensities[i].dir1(), meshDensities[i].dir3(), meshDensities[i].nRefs(), NodeIterator2Dref::Type::face3);
+	//NodeIterator2Dref it2(firstNodeID, meshDensities[i].dir1(), meshDensities[i].dir3(), meshDensities[i].nRefs(), NodeIterator2Dref::Type::face1);
+	//
+	//RowMesher3D::writeElements(&it1, &it2);
 
 	TEST_END
 }
