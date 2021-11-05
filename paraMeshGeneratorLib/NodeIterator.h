@@ -231,6 +231,11 @@ public:
 	virtual int numberOfNodes();
 
 	virtual bool first4(int& n1, int& n2, int& n3, int& n4);
+
+	/*
+		Face 1 and 3: b0m2   -> m2m3t0 -> t0b0 -> repeat
+		Face 4 and 5: b0m1m2 -> m2t0   -> t0b0 -> repeat
+	*/
 	virtual bool next4(int& n1, int& n2, int& n3, int& n4);
 
 protected:
@@ -265,11 +270,18 @@ protected:
 	int localCounter1 = 0; //counter used for counting f.ex. number of M1 layers that have been iterated during node iteration
 	int localCounter2 = 0;
 
+	/*
+		Face 1 and 3: b0m2   -> m2m3t0 -> t0b0 -> repeat
+	*/
 	bool next4_b0m2(int& n1, int& n2, int& n3, int& n4);
-	bool next4_m2m3t0(int& n1, int& n2, int& n3, int& n4);
+	bool next4_m2m3t0(int& n1, int& n2, int& n3, int& n4);	
+	/*
+		Face 4 and 5: b0m1m2 -> m2t0   -> t0b0 -> repeat
+	*/
 	bool next4_b0m1m2(int& n1, int& n2, int& n3, int& n4);
-	bool next4_t0b0(int& n1, int& n2, int& n3, int& n4);
 	bool next4_m2t0(int& n1, int& n2, int& n3, int& n4);
+
+	bool next4_t0b0(int& n1, int& n2, int& n3, int& n4);
 
 	void incrementFirstNodeID(int& n1, int& n2, int& n3, int& n4);
 	void setRefSectionNodeNumbers(int i1, int i2, int i3, int i4, int& n1, int& n2, int& n3, int& n4);
