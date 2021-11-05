@@ -444,7 +444,7 @@ bool NodeIterator2Dref::next4_m2t0(int& n1, int& n2, int& n3, int& n4) {
 		localCounter1 = 0;
 		curRowType = RowType::t0b0;
 		if (type == Type::face4) {
-			currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nTot - curRefLayer.nx1;
+			currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nTot - curRefLayer.nT;
 			currentNodeID2 = currentNodeID1 + curRefLayer.nT;
 		}
 		else if (type == Type::face5) {
@@ -540,10 +540,10 @@ bool NodeIterator2Dref::next4_b0m1m2(int& n1, int& n2, int& n3, int& n4) {
 		for (int i = 9; i < 11; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + 1;
 
 		if (type == Type::face4) {//continue here
-			refSectionNodeBuffer[5] = currentNodeID1 + (curRefLayer.nB - nBnodes) + curRefLayer.ny0 * nM1nodes - 1;
+			refSectionNodeBuffer[5] = currentNodeID1 + (curRefLayer.nB - localCounter2) + (nM1nodes - 1) * curRefLayer.ny0;
 		}
 		else if(type == Type::face5){
-			refSectionNodeBuffer[5] = currentNodeID1 + nBnodes + curRefLayer.ny0 * nM1nodes - 1;
+			refSectionNodeBuffer[5] = currentNodeID1 + nBnodes + curRefLayer.ny0 * nM1nodes  - 1;
 		}
 		for (int i = 6; i < 8; i++) refSectionNodeBuffer[i] = refSectionNodeBuffer[i - 1] + curRefLayer.ny0;
 
@@ -566,8 +566,8 @@ bool NodeIterator2Dref::next4_b0m1m2(int& n1, int& n2, int& n3, int& n4) {
 			curRowType = RowType::m2t0;
 			localCounter2 = 0;
 			if (type == Type::face4) {
-				currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nBM1M2 - curRefLayer.nx1;
-				currentNodeID2 = currentFirstNodeInRefLayer + curRefLayer.nTot - curRefLayer.nx1;
+				currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nBM1;
+				currentNodeID2 = currentFirstNodeInRefLayer + curRefLayer.nTot - curRefLayer.nT;
 			}
 			else if (type == Type::face5) {
 				currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nBM1M2 - curRefLayer.nx1;
@@ -633,6 +633,11 @@ bool NodeIterator2Dref::next4_t0b0(int& n1, int& n2, int& n3, int& n4) {
 			curRowType = RowType::b0m2;
 			currentNodeID1 = currentFirstNodeInRefLayer + curRefLayer.nx0 - 1;
 			currentNodeID2 = currentFirstNodeInRefLayer + curRefLayer.nBM1 + curRefLayer.nx1 - 1;
+		}
+		else if (type == Type::face4) {
+			curRowType = RowType::b0m1m2;
+			currentNodeID1 = currentFirstNodeInRefLayer;
+			currentNodeID2 = currentFirstNodeInRefLayer + curRefLayer.nBM1;
 		}
 		else if (type == Type::face5) {
 			curRowType = RowType::b0m1m2;
