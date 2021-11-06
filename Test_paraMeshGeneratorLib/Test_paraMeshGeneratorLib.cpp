@@ -190,7 +190,7 @@ std::vector<TestDef> testFunctions({
 
 	TestDef(500, "extrude2DedgeLine",		"extrusion", (testFunction)extrude2DedgeLine),
 	TestDef(520, "extrude2DedgeArc",		"extrusion", (testFunction)extrude2DedgeArc),
-	TestDef(540, "extrude2DedgeArcAndLine",		"extrusion", (testFunction)extrude2DedgeArcAndLine),
+	TestDef(540, "extrude2DedgeArcAndLine",	"extrusion", (testFunction)extrude2DedgeArcAndLine),
 	TestDef(550, "extrude2DedgeRef",		"extrusion", (testFunction)extrude2DedgeRef),
 
 

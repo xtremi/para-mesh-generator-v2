@@ -341,6 +341,11 @@ protected:
 	void initFaces(const MeshDensity2D& face0nodes, int firstNodeID, MeshFaceExtrusion* previousExtrusion);
 };
 
+class MeshFaceExtrusion_ref : public MeshFaceExtrusion, public MeshExtrusion_refProp {
+
+
+};
+
 
 class MeshFaceExtrusionLinear : public MeshFaceExtrusion_noRef, public MeshExtrusion_linearProp {
 public:
@@ -368,6 +373,11 @@ public:
 
 	double spacing();
 	void writeNodes(ExtrudeStepData* curStepData);
+
+};
+
+class MesFaceExtrusionLinearRef : public MeshFaceExtrusion_ref, public MeshExtrusion_linearProp {
+
 
 };
 
