@@ -452,7 +452,7 @@ bool NodeIterator2Dref::next4_m2t0(int& n1, int& n2, int& n3, int& n4) {
 	incrementFirstNodeID(n1, n2, n3, n4);
 
 	//Prepare for next RowType:
-	if (localCounter1 == (curRefLayer.ny1 - 1)) {
+	if (localCounter1 == (curRefLayer.nx1 - 1)) {
 		localCounter1 = 0;
 		curRowType = RowType::t0b0;
 		if (type == Type::face4) {
@@ -574,7 +574,7 @@ bool NodeIterator2Dref::next4_b0m1m2(int& n1, int& n2, int& n3, int& n4) {
 		localCounter1 = 0;
 
 		//Prepare for next RowType:
-		if ((localCounter2) == (curRefLayer.ny0 - 1)) {
+		if ((localCounter2) == (curRefLayer.nx0 - 1)) {
 			curRowType = RowType::m2t0;
 			localCounter2 = 0;
 			if (type == Type::face4) {
@@ -631,7 +631,8 @@ bool NodeIterator2Dref::next4_t0b0(int& n1, int& n2, int& n3, int& n4) {
 	incrementFirstNodeID(n1, n2, n3, n4);
 
 	//Prepare for next rowType:
-	if (localCounter1 == (curRefLayer.nx1 - 1)) {
+	int stopAt = (type == Type::face1 || type == Type::face3) ? curRefLayer.ny1 - 1 : curRefLayer.nx1 - 1;
+	if (localCounter1 == stopAt) {
 		
 		localCounter1 = 0;
 		currentFirstNodeInRefLayer += curRefLayer.nTot;

@@ -3010,6 +3010,8 @@ int connectCuboidMeshRef(const std::string& fileName) {
 	for (MeshDensity3Dref& meshDens : meshDensities) {
 		pos.y = 0.;
 
+		if(true){
+
 		int nodeID1_1 = writer.getNextNodeID();
 		CuboidMesherRef::writeNodes(pos, glCsys, meshDens, sizes[i], true, plane::yz);
 		CuboidMesherRef::writeElements(meshDens);
@@ -3025,6 +3027,7 @@ int connectCuboidMeshRef(const std::string& fileName) {
 		RowMesher3D::writeElements(&it1, &it2);
 
 		pos.z += sizes[i++].y * 1.25;
+		}
 	}
 
 	TEST_END
@@ -3056,12 +3059,15 @@ _______________|__________|_______
 int connectCuboidMeshRef2(const std::string& fileName) {
 	TEST_START2
 	float w = 15., h = 10., dw = 4., dh = 5.;
-	float L = 20.;
+	float L = 10.;
 
-	int nW = 33, nH = 17, nd = 9;
 	int nRef = 2;
+	int nW = refinement::minNodesEdge0_2d(nRef + 2);
+	int nH = refinement::minNodesEdge0_2d(nRef + 1);
+	int nd = refinement::minNodesEdge0_2d(nRef + 0);
+	
 
-	float s = w / (float)nW;
+	float s = 1.* w / (float)nW;
 
 	std::vector<glm::dvec3> sizes({
 		glm::dvec3(w,   h, L),
@@ -3094,11 +3100,23 @@ int connectCuboidMeshRef2(const std::string& fileName) {
 		CuboidMesherRef::writeElements(meshDensities[i]);
 	}
 
+	//Top = 5, right = 1, bottom = 4, left = 3 
+	NodeIterator2Dref cube0_faceTop(firstNodeIDs[0], meshDensities[0].dir1(), meshDensities[0].dir3(), meshDensities[0].nRefs(), NodeIterator2Dref::Type::face5);
+	NodeIterator2Dref cube0_faceRight(firstNodeIDs[0], meshDensities[0].dir1(), meshDensities[0].dir3(), meshDensities[0].nRefs(), NodeIterator2Dref::Type::face1);
+	NodeIterator2Dref cube0_faceBot(firstNodeIDs[0], meshDensities[0].dir1(), meshDensities[0].dir3(), meshDensities[0].nRefs(), NodeIterator2Dref::Type::face4);
+	NodeIterator2Dref cube0_faceLeft(firstNodeIDs[0], meshDensities[0].dir1(), meshDensities[0].dir3(), meshDensities[0].nRefs(), NodeIterator2Dref::Type::face3);
 	
-	//NodeIterator2Dref it0_1(firstNodeID, meshDensities[i].dir1(), meshDensities[i].dir3(), meshDensities[i].nRefs(), NodeIterator2Dref::Type::face3);
-	//NodeIterator2Dref it2(firstNodeID, meshDensities[i].dir1(), meshDensities[i].dir3(), meshDensities[i].nRefs(), NodeIterator2Dref::Type::face1);
-	//
-	//RowMesher3D::writeElements(&it1, &it2);
+	NodeIterator2Dref cube1_faceBot(firstNodeIDs[1], meshDensities[1].dir1(), meshDensities[1].dir3(), meshDensities[1].nRefs(), NodeIterator2Dref::Type::face4);
+	NodeIterator2Dref cube2_faceLeft(firstNodeIDs[2], meshDensities[2].dir1(), meshDensities[2].dir3(), meshDensities[2].nRefs(), NodeIterator2Dref::Type::face3);
+	NodeIterator2Dref cube3_faceTop(firstNodeIDs[3], meshDensities[3].dir1(), meshDensities[3].dir3(), meshDensities[3].nRefs(), NodeIterator2Dref::Type::face5);
+	NodeIterator2Dref cube4_faceRight(firstNodeIDs[4], meshDensities[4].dir1(), meshDensities[4].dir3(), meshDensities[4].nRefs(), NodeIterator2Dref::Type::face1);
+	
+	RowMesher3D::writeElements(&cube0_faceTop,		&cube1_faceBot);
+	RowMesher3D::writeElements(&cube0_faceRight,	&cube2_faceLeft);
+	RowMesher3D::writeElements(&cube0_faceBot,		&cube3_faceTop);
+	RowMesher3D::writeElements(&cube0_faceLeft,		&cube4_faceRight);
+	
+
 
 	TEST_END
 }
