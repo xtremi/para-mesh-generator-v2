@@ -268,6 +268,21 @@ void MeshFaceExtrusion_noRef::writeElements(){
 	CuboidMesher::writeElements(meshDens);
 }
 
+MeshFaceExtrusion_ref::MeshFaceExtrusion_ref(
+	int					  _nRef,
+	const  MeshDensity2D& face0nodes,
+	int					  firstNodeID,
+	MeshFaceExtrusion*	  previousExtrusion)
+	: MeshFaceExtrusion(0, face0nodes, firstNodeID, previousExtrusion), MeshExtrusion_refProp(_nRef)
+{
+	initFaces(face0nodes, firstNodeID, previousExtrusion);
+}
+
+void MeshFaceExtrusion_ref::writeElements() {
+	CuboidMesherRef::writeElements(meshDens);
+}
+
+
 /************************************************
 	MeshFaceExtrusionLinear
 ************************************************/
@@ -435,3 +450,36 @@ void MeshFaceExtrusion_noRef::initFaces(
 	endEdgeIterators[3] = NodeIterator1D(endEdgeIterators[0].last(), nD2, nFace4);
 
 }
+
+/************************************************
+	MeshFaceExtrusionLinearRef
+************************************************/
+MeshFaceExtrusionLinearRef::MeshFaceExtrusionLinearRef(
+	double				 _length,
+	int					 _nRef,
+	const MeshDensity2D& face0nodes,
+	int					 firstNodeID,
+	MeshFaceExtrusion*	 previousExtrusion) :
+	MeshFaceExtrusion_ref(_nRef, face0nodes, firstNodeID, previousExtrusion), MeshExtrusion_linearProp(_length)
+{
+
+}
+
+double MeshFaceExtrusionLinearRef::spacing() {}
+void MeshFaceExtrusionLinearRef::writeNodes(ExtrudeStepData* curStepData) {}
+
+/************************************************
+	MeshFaceExtrusionArcRef
+************************************************/
+MeshFaceExtrusionArcRef::MeshFaceExtrusionArcRef(
+	double				 _radiusInner,
+	double				 _endAngle,
+	int					 _nRef,
+	const MeshDensity2D& face0nodes,
+	int					 firstNodeID,
+	MeshFaceExtrusion*	 previousExtrusion) :
+	MeshFaceExtrusion_ref(_nRef, face0nodes, firstNodeID, previousExtrusion), MeshExtrusion_arcProp(_radiusInner, _endAngle)
+{}
+
+double MeshFaceExtrusionArcRef::spacing() {}
+void MeshFaceExtrusionArcRef::writeNodes(ExtrudeStepData* curStepData) {}

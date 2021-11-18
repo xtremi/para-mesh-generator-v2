@@ -329,10 +329,10 @@ protected:
 class MeshFaceExtrusion_noRef : public MeshFaceExtrusion {
 public:
 	MeshFaceExtrusion_noRef(
-		int	   _nElements,
-		const  MeshDensity2D& face0nodes,
-		int	   firstNodeID,
-		MeshFaceExtrusion* previousExtrusion = nullptr);
+		int						_nElements,
+		const  MeshDensity2D&	face0nodes,
+		int						firstNodeID,
+		MeshFaceExtrusion*		previousExtrusion = nullptr);
 
 	virtual void writeElements();
 
@@ -342,8 +342,16 @@ protected:
 };
 
 class MeshFaceExtrusion_ref : public MeshFaceExtrusion, public MeshExtrusion_refProp {
-
-
+public:
+	MeshFaceExtrusion_ref(
+		int					  _nRef,
+		const  MeshDensity2D& face0nodes,
+		int					  firstNodeID,
+		MeshFaceExtrusion*	  previousExtrusion = nullptr);
+	virtual void writeElements();
+protected:
+	MeshDensity3Dref meshDens;
+	void initFaces(const MeshDensity2D& face0nodes, int firstNodeID, MeshFaceExtrusion* previousExtrusion);
 };
 
 
@@ -376,8 +384,31 @@ public:
 
 };
 
-class MesFaceExtrusionLinearRef : public MeshFaceExtrusion_ref, public MeshExtrusion_linearProp {
+class MeshFaceExtrusionLinearRef : public MeshFaceExtrusion_ref, public MeshExtrusion_linearProp {
+public:
+	MeshFaceExtrusionLinearRef(
+		double				 _length,
+		int					 _nRef,
+		const MeshDensity2D& face0nodes,
+		int					 firstNodeID,
+		MeshFaceExtrusion*	 previousExtrusion = nullptr);
 
+	double spacing();
+	void writeNodes(ExtrudeStepData* curStepData);
 
+};
+
+class MeshFaceExtrusionArcRef : public MeshFaceExtrusion_ref, public MeshExtrusion_arcProp {
+public:
+	MeshFaceExtrusionArcRef(
+		double				 _radiusInner,
+		double				 _endAngle,
+		int					 _nRef,
+		const MeshDensity2D& face0nodes,
+		int					 firstNodeID,
+		MeshFaceExtrusion*	 previousExtrusion = nullptr);
+
+	double spacing();
+	void writeNodes(ExtrudeStepData* curStepData);
 };
 
