@@ -100,9 +100,11 @@ int extrude2DedgeLine(const std::string& fileName);
 int extrude2DedgeArc(const std::string& filename);
 int extrude2DedgeArcAndLine(const std::string& filename);
 int extrude2DedgeRef(const std::string& filename);
+
 int extrude3DfaceLine(const std::string& fileName);
 int extrude3DfaceArc(const std::string& fileName);
 int extrude3DfaceArcAndLine(const std::string& fileName);
+int extrude3DfaceRef(const std::string& filename);
 
 int connectCuboidMeshRef(const std::string& fileName);
 int connectCuboidMeshRef2(const std::string& fileName);
@@ -193,10 +195,10 @@ std::vector<TestDef> testFunctions({
 	TestDef(540, "extrude2DedgeArcAndLine",	"extrusion", (testFunction)extrude2DedgeArcAndLine),
 	TestDef(550, "extrude2DedgeRef",		"extrusion", (testFunction)extrude2DedgeRef),
 
-
 	TestDef(600, "extrude3DfaceLine",		"extrusion", (testFunction)extrude3DfaceLine),
 	TestDef(620, "extrude3DfaceArc",		"extrusion", (testFunction)extrude3DfaceArc),
 	TestDef(640, "extrude3DfaceArcAndLine",	"extrusion", (testFunction)extrude3DfaceArcAndLine),
+	TestDef(650, "extrude3DfaceRef",		"extrusion", (testFunction)extrude3DfaceRef),
 
 	TestDef(710, "connectCuboidMeshRef",	"connection", (testFunction)connectCuboidMeshRef),
 	TestDef(711, "connectCuboidMeshRef2",	"connection", (testFunction)connectCuboidMeshRef2)
@@ -2985,6 +2987,16 @@ int extrude3DfaceArcAndLine(const std::string& fileName) {
 	mesh3D.extrudeYZface(10., 4);
 	mesh3D.extrudeYZedgeArc(1.0 * GLMPI, 6.0, 6);
 	mesh3D.extrudeYZface(20., 4);
+	mesh3D.writeNodes();
+	mesh3D.writeElements();
+	TEST_END
+}
+
+int extrude3DfaceRef(const std::string& fileName){
+	TEST_START2
+	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(17, 17), glm::dvec2(5.0, 5.0));
+	mesh3D.extrudeYZfaceRef(10., 3);
+
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END

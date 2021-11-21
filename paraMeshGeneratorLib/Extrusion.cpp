@@ -411,9 +411,10 @@ NodeIterator1D MeshFaceExtrusion::getEndEdgeIterator3(){
 
 
 void MeshFaceExtrusion_noRef::initFaces(
-	const MeshDensity2D& face0nodes, 
-	int firstNodeID, 
-	MeshFaceExtrusion* prevExtr) {
+	const MeshDensity2D&	face0nodes, 
+	int						firstNodeID, 
+	MeshFaceExtrusion*		prevExtr) 
+{
 	int nExtr = nNodes();
 
 	meshDens = MeshDensity3D(nExtr, face0nodes.dir1(), face0nodes.dir2());
@@ -451,6 +452,46 @@ void MeshFaceExtrusion_noRef::initFaces(
 
 }
 
+
+void MeshFaceExtrusion_ref::initFaces(const MeshDensity2D& face0nodes, int firstNodeID, MeshFaceExtrusion* prevExtr) {
+
+	int nExtr = nNodes();
+
+	meshDens = MeshDensity3Dref(nRef, face0nodes.dir1(), face0nodes.dir2());
+
+	NodeIterator1D prevIterEdg0, prevIterEdg1, prevIterEdg2, prevIterEdg3;
+	if (prevExtr) {
+		prevIterEdg0 = ((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator0();
+		prevIterEdg1 = ((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator1();
+		prevIterEdg2 = ((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator2();
+		prevIterEdg3 = ((MeshFaceExtrusion*)prevExtr)->getEndEdgeIterator3();
+	}
+
+
+	faces[6] = MeshFace(meshDens.faceNodeIterator(0, firstNodeID));
+	faces[1] = MeshFace(meshDens.faceNodeIteratorRefDir(1, firstNodeID, prevIterEdg1));
+	faces[2] = MeshFace(meshDens.faceNodeIterator(2, firstNodeID));
+	faces[3] = MeshFace(meshDens.faceNodeIteratorRefDir(3, firstNodeID, prevIterEdg3));
+	faces[4] = MeshFace(meshDens.faceNodeIteratorRefDir(4, firstNodeID, prevIterEdg0));
+	faces[5] = MeshFace(meshDens.faceNodeIteratorRefDir(5, firstNodeID, prevIterEdg2));
+
+	if (isStart()) {
+		faces[0] = faces[6];
+	}
+	else {
+		faces[0] = ((MeshFaceExtrusion*)prevExtr)->faces[2];
+	}
+
+	int nD1 = face0nodes.dir1();
+	int nD2 = face0nodes.dir2();
+	int nFace4 = nExtr * nD1;
+	endEdgeIterators[0] = NodeIterator1D(firstNodeID + nExtr - 1, nD1, nExtr);
+	endEdgeIterators[1] = NodeIterator1D(firstNodeID + nExtr - 1, nD2, nFace4);
+	endEdgeIterators[2] = NodeIterator1D(endEdgeIterators[1].last(), nD1, nExtr);
+	endEdgeIterators[3] = NodeIterator1D(endEdgeIterators[0].last(), nD2, nFace4);
+}
+
+
 /************************************************
 	MeshFaceExtrusionLinearRef
 ************************************************/
@@ -460,13 +501,22 @@ MeshFaceExtrusionLinearRef::MeshFaceExtrusionLinearRef(
 	const MeshDensity2D& face0nodes,
 	int					 firstNodeID,
 	MeshFaceExtrusion*	 previousExtrusion) :
-	MeshFaceExtrusion_ref(_nRef, face0nodes, firstNodeID, previousExtrusion), MeshExtrusion_linearProp(_length)
-{
+	MeshFaceExtrusion_ref(_nRef, face0nodes, firstNodeID, previousExtrusion), MeshExtrusion_linearProp(_length){}
+
+double MeshFaceExtrusionLinearRef::spacing() {
+	return -1.;
+}
+void MeshFaceExtrusionLinearRef::writeNodes(ExtrudeStepData* curExtrData) {
+	curExtrData->pos = glm::dvec3(curExtrData->startSpace, 0., 0.);
+	CuboidMesherRef::writeNodes(
+		curExtrData->pos,
+		curExtrData->csys,
+		meshDens,
+		((ExtrudeFaceStepData*)curExtrData)->dxyz, false, plane::yz);
+
+	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));
 
 }
-
-double MeshFaceExtrusionLinearRef::spacing() {}
-void MeshFaceExtrusionLinearRef::writeNodes(ExtrudeStepData* curStepData) {}
 
 /************************************************
 	MeshFaceExtrusionArcRef
@@ -481,5 +531,7 @@ MeshFaceExtrusionArcRef::MeshFaceExtrusionArcRef(
 	MeshFaceExtrusion_ref(_nRef, face0nodes, firstNodeID, previousExtrusion), MeshExtrusion_arcProp(_radiusInner, _endAngle)
 {}
 
-double MeshFaceExtrusionArcRef::spacing() {}
+double MeshFaceExtrusionArcRef::spacing() {
+	return -1.0;
+}
 void MeshFaceExtrusionArcRef::writeNodes(ExtrudeStepData* curStepData) {}

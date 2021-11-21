@@ -64,8 +64,8 @@ void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner,
 }
 void Mesh3D_volumeExtrusion::extrudeYZfaceRef(double length, int nRef) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
-	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionRef>(
-		length, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion.get()));
+	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionLinearRef>(
+		length, nRef, meshDensity.meshDensD23(), nNodes, prevExtrusion.get()));
 	calculateNumberOfNodes();
 	calculateNumberOfElements();
 }
