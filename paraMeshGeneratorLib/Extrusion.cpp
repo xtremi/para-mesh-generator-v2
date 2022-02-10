@@ -246,6 +246,9 @@ void MeshEdgeExtrusionArcRef::writeNodes(ExtrudeStepData* curStepData) {
 
 }
 
+/************************************************
+	MeshFaceExtrusion
+************************************************/
 MeshFaceExtrusion::MeshFaceExtrusion(
 	int					 _nElements,
 	const MeshDensity2D& face0nodes,
@@ -254,6 +257,10 @@ MeshFaceExtrusion::MeshFaceExtrusion(
 	: MeshExtrusion(_nElements, previousExtrusion)
 {}
 
+
+/************************************************
+	MeshFaceExtrusion_noRef
+************************************************/
 MeshFaceExtrusion_noRef::MeshFaceExtrusion_noRef(
 	int	   _nElements,
 	const  MeshDensity2D& face0nodes,
@@ -268,6 +275,21 @@ void MeshFaceExtrusion_noRef::writeElements(){
 	CuboidMesher::writeElements(meshDens);
 }
 
+/*!
+	Returns the number of nodes in the two directions
+	of the end face (normal to extrusion direction)
+
+	For a noref extrusion this is the same as a the start face.
+*/
+MeshDensity2D MeshFaceExtrusion_noRef::meshDensFaceEnd() {
+	return meshDens.meshDensD23();
+}
+
+
+
+/************************************************
+	MeshFaceExtrusion_ref
+************************************************/
 MeshFaceExtrusion_ref::MeshFaceExtrusion_ref(
 	int					  _nRef,
 	const  MeshDensity2D& face0nodes,
@@ -281,6 +303,17 @@ MeshFaceExtrusion_ref::MeshFaceExtrusion_ref(
 void MeshFaceExtrusion_ref::writeElements() {
 	CuboidMesherRef::writeElements(meshDens);
 }
+
+/*
+	Returns the number of nodes in the two directions
+	of the end face (normal to extrusion direction)
+
+	For a ref extrusion this is not the same as a the start face.
+*/
+MeshDensity2D MeshFaceExtrusion_ref::meshDensFaceEnd() {
+	return meshDens.meshDensD12end();
+}
+
 
 
 /************************************************
@@ -305,7 +338,7 @@ void MeshFaceExtrusionLinear::writeNodes(ExtrudeStepData* curExtrData) {
 		curExtrData->csys,
 		meshDens,
 		((ExtrudeFaceStepData*)curExtrData)->dxyz,
-		plane::xy);
+		plane::xy); //needs to be yz for extruding after ref?
 
 	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));
 }
@@ -512,7 +545,10 @@ void MeshFaceExtrusionLinearRef::writeNodes(ExtrudeStepData* curExtrData) {
 		curExtrData->pos,
 		curExtrData->csys,
 		meshDens,
-		((ExtrudeFaceStepData*)curExtrData)->dxyz, false, plane::yz);
+		//((ExtrudeFaceStepData*)curExtrData)->dxyz, 
+		glm::dvec3(((ExtrudeFaceStepData*)curExtrData)->sizeYZ, length),
+		false, 
+		plane::yz);
 
 	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));
 

@@ -211,6 +211,13 @@ int MeshDensity3Dref::nElDir3ref() {
 	return dir3ref() - 1;
 }
 
+int MeshDensity3Dref::nNodes() const {
+	return refinement::nNodesTot_3d(nRefs(), nElDir1(), nElDir3());
+}
+int MeshDensity3Dref::nElements() const {
+	throw("MeshDensity3Dref::nElements() - is not implemented");
+}
+
 int MeshDensity3Dref::cornerNode(int cornerID) {
 	switch (cornerID)
 	{

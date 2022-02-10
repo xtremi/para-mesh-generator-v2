@@ -121,12 +121,12 @@ protected:
 	std::vector<std::shared_ptr<MeshFaceExtrusion>> extrusionsXdir;
 	void setNodeOffsetOnMeshEdgeExtrusions(int nodeIDoffset);
 
-	void calculateNumberOfNodes();
-	void calculateNumberOfElements();
-	void calculateNumberOfNodesX();
+	//void calculateNumberOfNodes();
+	//void calculateNumberOfElements();
+	//void calculateNumberOfNodesX();
 
 	glm::dvec2 sizeYZ;
-	MeshDensity3D meshDensity;
+	MeshDensity3D meshDensity; //of the face being extruded
 };
 
 

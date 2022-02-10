@@ -257,7 +257,7 @@ struct MeshDensity3Dref : public NodeVec3D {
 
 	/*!number of nodes in dir1 after refinement*/
 	int dir1ref();
-	/*!number of nodes in dir1 after refinement*/
+	/*!number of nodes in dir3 after refinement*/
 	int dir3ref();
 	/*!number of elements in dir1/3 after refinement*/
 	int nElDir2ref();
@@ -290,12 +290,18 @@ struct MeshDensity3Dref : public NodeVec3D {
 	MeshDensity2D meshDensD12T(int refLayer) const {
 		return meshDensD12B(refLayer + 1);
 	}
+	MeshDensity2D meshDensD12end() {
+		return meshDensD12B(nRefs());
+	}
 	int nnodesPlaneD13() const { return dir1() * dir3(); }
 
-	int setNrefs(int n) { setDir1(n); }
+	int setNrefs(int n) { setDir2(n); }
 
 	int cornerNode(int cornerID);
 	NodeIterator2Dref faceNodeIteratorRefDir(int faceID, int firstNodeID, const NodeIterator1D& preNodes = NodeIterator1D());
 	NodeIterator2D    faceNodeIterator(int faceID, int firstNodeID, const NodeIterator1D& preNodes = NodeIterator1D());
 
+
+	int nNodes() const;
+	int nElements() const;
 };

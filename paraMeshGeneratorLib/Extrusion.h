@@ -321,6 +321,8 @@ public:
 	void setNodeOffset(int nOffs);
 	void addToFirstNodeID(int n);
 
+	virtual MeshDensity2D meshDensFaceEnd() = 0;
+
 protected:
 	NodeIterator1D endEdgeIterators[4];	
 };
@@ -335,10 +337,14 @@ public:
 		MeshFaceExtrusion*		previousExtrusion = nullptr);
 
 	virtual void writeElements();
+	virtual int numberOfNodes() { return meshDens.nNodes(); }
+	virtual int numberOfElements() { return meshDens.nElements(); }
+	MeshDensity2D meshDensFaceEnd();
 
 protected:
 	MeshDensity3D meshDens;
 	void initFaces(const MeshDensity2D& face0nodes, int firstNodeID, MeshFaceExtrusion* previousExtrusion);
+
 };
 
 class MeshFaceExtrusion_ref : public MeshFaceExtrusion, public MeshExtrusion_refProp {
@@ -349,9 +355,15 @@ public:
 		int					  firstNodeID,
 		MeshFaceExtrusion*	  previousExtrusion = nullptr);
 	virtual void writeElements();
+	virtual int numberOfNodes() { return meshDens.nNodes(); }
+	virtual int numberOfElements() { return meshDens.nElements(); }
+	MeshDensity2D meshDensFaceEnd();
+
+
 protected:
 	MeshDensity3Dref meshDens;
 	void initFaces(const MeshDensity2D& face0nodes, int firstNodeID, MeshFaceExtrusion* previousExtrusion);
+
 };
 
 

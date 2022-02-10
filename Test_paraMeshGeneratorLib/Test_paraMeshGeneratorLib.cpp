@@ -2996,7 +2996,7 @@ int extrude3DfaceRef(const std::string& fileName){
 	TEST_START2
 	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(17, 17), glm::dvec2(5.0, 5.0));
 	mesh3D.extrudeYZfaceRef(10., 3);
-
+	mesh3D.extrudeYZface(5., 3);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END

@@ -49,9 +49,15 @@ void Mesh2D_planeExtrusion::extrudeYedgeRef(double length, int nRef) {
 void Mesh3D_volumeExtrusion::extrudeYZface(double length, int nElements) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
 	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionLinear>(
-		length, nElements, meshDensity.meshDensD23(), nNodes, prevExtrusion.get()));
-	calculateNumberOfNodes();
-	calculateNumberOfElements();
+		length, nElements, 
+		prevExtrusion ? prevExtrusion->meshDensFaceEnd() : meshDensity.meshDensD23(), 
+		nNodes, prevExtrusion.get()));
+
+	nNodes += extrusionsXdir.back()->numberOfNodes();
+	//nNodesEdgeY = extrusionsXdir.back().get()->edges[2].nodeIter->numberOfNodes();
+
+	//calculateNumberOfNodes();
+	//calculateNumberOfElements();
 }
 void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner, int nElements) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
@@ -59,15 +65,18 @@ void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner,
 		radiusInner, endAng, nElements, MeshDensity2D(meshDensity.axis(),
 		meshDensity.norm()), nNodes, prevExtrusion.get()));
 
-	calculateNumberOfNodes();
-	calculateNumberOfElements();
+	nNodes += extrusionsXdir.back()->numberOfNodes();
+	//calculateNumberOfNodes();
+	//calculateNumberOfElements();
 }
 void Mesh3D_volumeExtrusion::extrudeYZfaceRef(double length, int nRef) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
 	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionLinearRef>(
 		length, nRef, meshDensity.meshDensD23(), nNodes, prevExtrusion.get()));
-	calculateNumberOfNodes();
-	calculateNumberOfElements();
+	
+	nNodes += extrusionsXdir.back()->numberOfNodes();
+	//calculateNumberOfNodes();
+	//calculateNumberOfElements();
 }
 
 
@@ -183,10 +192,12 @@ void Mesh2D_planeExtrusion::writeNodes() {
 		firstExtrusion = false;
 	}
 	
-}
+}	
 void Mesh3D_volumeExtrusion::writeNodes() {
 	bool   firstExtrusion = true;
-	glm::dvec2 spacingYZ(sizeYZ[0] / (double)meshDensity.nElDir2(), sizeYZ[1] / (double)meshDensity.nElDir3());
+	glm::dvec2 spacingYZ(
+		sizeYZ[0] / (double)meshDensity.nElDir2(), 
+		sizeYZ[1] / (double)meshDensity.nElDir3());
 
 	setNodeOffsetOnMeshEdgeExtrusions(Mesher::getWriter()->getNextNodeID()); //to rename function
 	csys.update();
@@ -204,11 +215,18 @@ void Mesh3D_volumeExtrusion::writeNodes() {
 		curExtrData.startSpace = 0.0;
 		curExtrData.nNodesEdgeX = extr->nNodes();
 
-		if (!firstExtrusion)
+		if (!firstExtrusion){
 			curExtrData.startSpace = extr->spacing();
+		}
 
 		extr->writeNodes(&curExtrData);
 		curExtrData.csys.update();
+
+		MeshDensity2D meshDensEnd = extr->meshDensFaceEnd();
+		spacingYZ = glm::dvec2(
+			sizeYZ[0] / (double)meshDensEnd.nElDir1(),
+			sizeYZ[1] / (double)meshDensEnd.nElDir2());
+
 		firstExtrusion = false;
 	}
 
@@ -275,33 +293,24 @@ void Mesh3D_volumeExtrusion::writeElements() {
 	Each non start section reuses one node from the previous section
 
 	Start with nNodesX because first section has correct number of nodes.
+*/
+//void Mesh3D_volumeExtrusion::calculateNumberOfNodesX() {
+//	int nNodesX = 0;
+//	for (std::shared_ptr<MeshFaceExtrusion> extr : extrusionsXdir) {
+//		nNodesX += (extr->nNodes());
+//	}
+//	meshDensity.setDir1(nNodesX);
+//}
 
-void Mesh2D_planeExtrusion::calculateNumberOfNodesX() {
-	int nNodesX = 0;
-	for (std::shared_ptr<MeshEdgeExtrusion> extr : extrusionsXdir) {
-		nNodesX += (extr->nNodes());
-	}
-	meshDensity.setDir1(nNodesX);
-}*/
-//same as Mesh2D_planeExtrusion::calculateNumberOfNodesX
-void Mesh3D_volumeExtrusion::calculateNumberOfNodesX() {
-	int nNodesX = 0;
-	for (std::shared_ptr<MeshFaceExtrusion> extr : extrusionsXdir) {
-		nNodesX += (extr->nNodes());
-	}
-	meshDensity.setDir1(nNodesX);
-}
+//void Mesh3D_volumeExtrusion::calculateNumberOfNodes() {
+//	//This is only correct for only non-ref extrusions:
+//	//calculateNumberOfNodesX();
+//	//nNodes = meshDensity.nNodes();
+//
+//	nNodes += extrusionsXdir.back()->numberOfNodes();
+//	nNodesEdgeY = extrusionsXdir.back().get()->edges[2].nodeIter->numberOfNodes();
+//}
 
-/*void Mesh2D_planeExtrusion::calculateNumberOfNodes() {
-	calculateNumberOfNodesX();
-	nNodes = meshDensity.nNodes();
-}*/
-void Mesh3D_volumeExtrusion::calculateNumberOfNodes() {
-	calculateNumberOfNodesX();
-	nNodes = meshDensity.nNodes();
-}
-
-/*void Mesh2D_planeExtrusion::calculateNumberOfElements() {
-	nElements = meshDensity.nElements();
-}*/
-void Mesh3D_volumeExtrusion::calculateNumberOfElements() {}
+//void Mesh3D_volumeExtrusion::calculateNumberOfElements() {
+//
+//}
