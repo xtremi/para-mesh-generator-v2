@@ -4,6 +4,7 @@
 #include "LineMesher.h"
 #include "math_utilities.h"
 #include "glm/gtc/constants.hpp"
+#include "RefinementCalculations.h"
 
 /*
 	Cone around X,Y or Z-axis
@@ -174,7 +175,7 @@ void ConeMesherRef::writeNodes(
 
 	RefLayerData rlData;
 	rlData.curPos = pos;	
-	rlData.curElSize.x = initialRefElSize2D(rsData.coneLength, meshDens.nRefs(), startWithOffset);
+	rlData.curElSize.x = refinement::initialRefElSize2D(rsData.coneLength, meshDens.nRefs(), startWithOffset);
 	rlData.curRadius = radius.start();
 	rlData.curConeLength = 0.0;
 

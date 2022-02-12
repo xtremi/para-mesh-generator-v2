@@ -6,7 +6,7 @@
 #include "ArcMesher.h"
 #include "glm/gtc/constants.hpp"
 #include "math_utilities.h"
-
+#include "RefinementCalculations.h"
 
 void Cone3Dmesher::writeNodes(
 	const glm::dvec3&		pos,
@@ -109,7 +109,7 @@ void Cone3DmesherRef::writeNodes(
 
 	RefLayerData rlData;
 	rlData.curPos = pos;
-	rlData.curElSizeRefDir = initialRefElSize3D(rsData.coneLengthOuter, meshDens.nRefs(), startWithOffset);
+	rlData.curElSizeRefDir = refinement::initialRefElSize3D(rsData.coneLengthOuter, meshDens.nRefs(), startWithOffset);
 	rlData.curRadius = radius.start;
 	rlData.curConeLength = 0.0;
 

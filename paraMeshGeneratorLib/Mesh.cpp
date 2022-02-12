@@ -3,6 +3,7 @@
 #include "ConeMesher.h"
 #include "CuboidMesher.h"
 #include "Cone3Dmesher.h"
+#include "Mesher.h"
 
 Mesh2D_planeExtrusion::Mesh2D_planeExtrusion(int nElementsY, double lengthY)
 	: MeshPrimitive2D(){
@@ -72,7 +73,9 @@ void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner,
 void Mesh3D_volumeExtrusion::extrudeYZfaceRef(double length, int nRef) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
 	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionLinearRef>(
-		length, nRef, meshDensity.meshDensD23(), nNodes, prevExtrusion.get()));
+		length, nRef, 
+		prevExtrusion ? prevExtrusion->meshDensFaceEnd() : meshDensity.meshDensD23(),
+		nNodes, prevExtrusion.get()));
 	
 	nNodes += extrusionsXdir.back()->numberOfNodes();
 	//calculateNumberOfNodes();
@@ -193,6 +196,8 @@ void Mesh2D_planeExtrusion::writeNodes() {
 	}
 	
 }	
+
+
 void Mesh3D_volumeExtrusion::writeNodes() {
 	bool   firstExtrusion = true;
 	glm::dvec2 spacingYZ(
@@ -209,8 +214,9 @@ void Mesh3D_volumeExtrusion::writeNodes() {
 	curExtrData.arcAngle = 0.0;
 	curExtrData.sizeYZ = sizeYZ;
 
+	int extrCounter = 1;
 	for (std::shared_ptr<MeshFaceExtrusion> extr : extrusionsXdir) {
-
+		Mesher::getWriter()->writeComment("Extrusion " + std::to_string(extrCounter++));
 		curExtrData.dxyz = glm::dvec3(extr->spacing(), spacingYZ);
 		curExtrData.startSpace = 0.0;
 		curExtrData.nNodesEdgeX = extr->nNodes();
@@ -219,7 +225,7 @@ void Mesh3D_volumeExtrusion::writeNodes() {
 			curExtrData.startSpace = extr->spacing();
 		}
 
-		extr->writeNodes(&curExtrData);
+ 		extr->writeNodes(&curExtrData);
 		curExtrData.csys.update();
 
 		MeshDensity2D meshDensEnd = extr->meshDensFaceEnd();
@@ -277,8 +283,10 @@ void Mesh2D_planeExtrusion::writeElements() {
 void Mesh3D_volumeExtrusion::writeElements() {
 
 	MeshFaceExtrusion* extr = nullptr;
-
+	
+	int extrCounter = 1;
 	for (std::shared_ptr<MeshFaceExtrusion> extr : extrusionsXdir) {
+		Mesher::getWriter()->writeComment("Extrusion " + std::to_string(extrCounter++));
 		if (!extr->isStart()) {
 			RowMesher3D::writeElements(&extr->faces[0].nodeIter, &extr->faces[6].nodeIter);
 		}

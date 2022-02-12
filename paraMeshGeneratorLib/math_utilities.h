@@ -16,8 +16,6 @@ glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY);
 glm::dmat3x3 makeCsysMatrix(const glm::dvec3& rotAxis, double angle);
 
 
-double initialRefElSize2D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight);
-double initialRefElSize3D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight);
 
 /*
 	returns val^2

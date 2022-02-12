@@ -4,6 +4,7 @@
 #include "LineMesher.h"
 #include "ConeMesher.h"
 #include "PlaneMesher.h"
+#include "RefinementCalculations.h"
 
 /*
            \               /
@@ -168,7 +169,7 @@ void RecToEllipseMesherRef::writeNodes(
 
 	RefLayerData rlData;
 	rlData.curPos = pos;
-	rlData.curElSize.x = initialRefElSize2D(rsData.maxLength, meshDens.nRefs(), startWithOffset);
+	rlData.curElSize.x = refinement::initialRefElSize2D(rsData.maxLength, meshDens.nRefs(), startWithOffset);
 	rlData.curElSize.y = radius.perimeter() / (double)meshDens.nElCirc();
 	rlData.curRadius = radius;
 	rlData.curLength = 0.0;

@@ -1,6 +1,8 @@
 #include "RecTubeMesher.h"
 #include "RecEdgeMesher.h"
 #include "PlaneMesher.h"
+#include "RefinementCalculations.h"
+
 
 /*
 Creates nodes in a rectangular shape.
@@ -239,7 +241,7 @@ void RecTubeMesherRef::writeNodes2(
 
 	RefLayerData2 rlData;
 	rlData.curPos = pos;
-	rlData.curElSize.x = initialRefElSize2D(rsData.length, meshDens.nRefs(), false);
+	rlData.curElSize.x = refinement::initialRefElSize2D(rsData.length, meshDens.nRefs(), false);
 	rlData.curSize = size.inner;
 	rlData.curLength = 0.0;
 

@@ -118,3 +118,42 @@ int refinement::nNodesTot_3d(int nRef, int nElementsFace0x, int nElementsFace0y)
 	return nTot;
 }
 
+/*
+
+_______________________________________
+				   |
+skipFirstRowHeight |skipFirstRowHeight
+	= false		   |    = true
+___________________|___________________
+
+		 x = 0.0  ^	1elL
+					1elL ^ x = 0.0
+					1elL
+					2elL
+					2elL
+					2elL
+					4elL
+					4elL
+		 x = L  v	4elL  v x = L
+*/
+double refinement::initialRefElSize2D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight) {
+
+	double denom;
+	if (!skipFirstRowHeight) {
+		denom = 6.0 * std::pow(2.0, (double)(nRefinements - 1)) - 4.0;
+	}
+	else {
+		denom = 3.0 * (std::pow(2.0, (double)nRefinements) - 1.0);
+	}
+	return totalMeshLength / denom;
+}
+double refinement::initialRefElSize3D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight) {
+	double denom;
+	if (!skipFirstRowHeight) {
+		denom = 10.0 * std::pow(2.0, (double)(nRefinements - 1)) - 6.0;
+	}
+	else {
+		denom = 5.0 * (std::pow(2.0, (double)nRefinements) - 1.0);
+	}
+	return totalMeshLength / denom;
+}

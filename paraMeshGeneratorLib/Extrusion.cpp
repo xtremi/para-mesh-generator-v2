@@ -3,6 +3,7 @@
 #include "CuboidMesher.h"
 #include "Cone3Dmesher.h"
 #include "ConeMesher.h"
+#include "RefinementCalculations.h"
 
 MeshExtrusion::MeshExtrusion(int _nElements, MeshExtrusion* previousExtrusion) {
 	nElements = _nElements;
@@ -537,7 +538,7 @@ MeshFaceExtrusionLinearRef::MeshFaceExtrusionLinearRef(
 	MeshFaceExtrusion_ref(_nRef, face0nodes, firstNodeID, previousExtrusion), MeshExtrusion_linearProp(_length){}
 
 double MeshFaceExtrusionLinearRef::spacing() {
-	return -1.;
+	return refinement::initialRefElSize3D(this->length, this->meshDens.nRefs(), false);
 }
 void MeshFaceExtrusionLinearRef::writeNodes(ExtrudeStepData* curExtrData) {
 	curExtrData->pos = glm::dvec3(curExtrData->startSpace, 0., 0.);
@@ -546,8 +547,8 @@ void MeshFaceExtrusionLinearRef::writeNodes(ExtrudeStepData* curExtrData) {
 		curExtrData->csys,
 		meshDens,
 		//((ExtrudeFaceStepData*)curExtrData)->dxyz, 
-		glm::dvec3(((ExtrudeFaceStepData*)curExtrData)->sizeYZ, length),
-		false, 
+		glm::dvec3(((ExtrudeFaceStepData*)curExtrData)->sizeYZ, length - curExtrData->startSpace),
+		false,
 		plane::yz);
 
 	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));

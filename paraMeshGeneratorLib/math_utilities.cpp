@@ -59,41 +59,7 @@ glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
 
 
 
-/*
 
-_______________________________________
-				   |
-skipFirstRowHeight |skipFirstRowHeight
-	= false		   |    = true
-___________________|___________________
-
-		 x = 0.0  ^	1elL
-					1elL ^ x = 0.0
-					1elL
-					2elL
-					2elL
-					2elL
-					4elL
-					4elL
-		 x = L  v	4elL  v x = L
-*/
-double initialRefElSize2D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight) {
-
-	double denom;
-	if (!skipFirstRowHeight)
-		denom = 6.0 * std::pow(2.0, (double)(nRefinements - 1)) - 4.0;
-	else
-		denom = 3.0 * (std::pow(2.0, (double)nRefinements) - 1.0);
-	return totalMeshLength / denom;
-}
-double initialRefElSize3D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight) {
-	double denom;
-	if (!skipFirstRowHeight)
-		denom = 10.0 * std::pow(2.0, (double)(nRefinements - 1)) - 6.0;
-	else
-		denom = 5.0 * (std::pow(2.0, (double)nRefinements) - 1.0);
-	return totalMeshLength / denom;
-}
 
 
 double calcArcIncrement(double startAng, double endAng, int nnodes) {
@@ -103,16 +69,20 @@ double calcArcIncrement(double startAng, double endAng, int nnodes) {
 	if (endAng < 0.0 && startAng < 0.0)
 		fullCircle = true;
 
-	if (startAng < 0.0)
+	if (startAng < 0.0) {
 		startAng = 0.0;
-	if (endAng < 0.0)
+	}
+	if (endAng < 0.0){
 		endAng = 2.0*glm::pi<double>();
+	}
 
 	dang = (endAng - startAng);
-	if (!fullCircle)
+	if (!fullCircle){
 		dang /= (double)(nnodes - 1);
-	else
+	}
+	else{
 		dang /= (double)nnodes;
+	}
 
 	return dang;
 }

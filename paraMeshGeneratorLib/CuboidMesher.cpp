@@ -2,6 +2,8 @@
 #include "PlaneMesher.h"
 #include "LineMesher.h"
 #include "math_utilities.h"
+#include "RefinementCalculations.h"
+
 
 void CuboidMesher::writeNodes(
 	const glm::dvec3&		pos,
@@ -138,7 +140,7 @@ void CuboidMesherRef::writeNodes(
 	RefLayerData rlData;
 	rlData.curPos			= pos;
 	rlData.curElSize		= glm::dvec2(size.x / (double)meshDens.nElDir1(), size.y / (double)meshDens.nElDir3());
-	rlData.curElSizeRefDir  = initialRefElSize3D(size.z, meshDens.nRefs(), startWithOffset);
+	rlData.curElSizeRefDir  = refinement::initialRefElSize3D(size.z, meshDens.nRefs(), startWithOffset);
 	
 	if (startWithOffset) {
 		rlData.curPos[(size_t)rsData.refDir] += rlData.curElSizeRefDir;	

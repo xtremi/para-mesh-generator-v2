@@ -1,6 +1,8 @@
 #include "PlaneMesher.h"
 #include "LineMesher.h"
 #include "math_utilities.h"
+#include "RefinementCalculations.h"
+
 
 void PlaneMesher::writeNodesQ(
 	const glm::dvec3&		pos,
@@ -263,7 +265,7 @@ void PlaneMesherRef::writeNodes(
 	
 	RefLayerData rlData;
 	rlData.curPos = pos;	
-	double elSizeRefDir = initialRefElSize2D(size.x, meshDens.nRefs(), startWithOffset);
+	double elSizeRefDir = refinement::initialRefElSize2D(size.x, meshDens.nRefs(), startWithOffset);
 	rlData.curElSize = glm::dvec2(elSizeRefDir, size.y / (double)meshDens.nElCirc());
 
 	if (startWithOffset) {

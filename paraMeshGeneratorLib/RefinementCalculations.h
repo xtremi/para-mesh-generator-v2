@@ -28,6 +28,8 @@ namespace refinement {
 	int nNodesTotSection_3d(int nRef, int nElementsFace0x, int nElementsFace0y);
 	int nNodesTot_3d(int nRef, int nElementsFace0x, int nElementsFace0y);
 
+	double initialRefElSize2D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight);
+	double initialRefElSize3D(double totalMeshLength, int nRefinements, bool skipFirstRowHeight);
 
 
 }
