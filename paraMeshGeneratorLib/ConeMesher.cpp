@@ -230,3 +230,82 @@ void ConeMesher::writeElements(const MeshDensity2D& meshDens){
 void ConeMesherRef::writeElements(const MeshDensity2Dref& meshDens){
 	PlaneMesherRef::writeElements(meshDens);
 }
+
+
+/*
+
+	In the code X-dir refers to refinement direction (along height)
+	Y-dir refers to around the perimeter
+*/
+void ConeMesherRef2::writeNodes(
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
+	const MeshDensity2Dref& meshDens,
+	const Cone2Dradius&		radius,
+	const ArcAngles&		angle,
+	double					height,
+	bool					startWithOffset,
+	direction				rotaxis)
+{
+	int firstNodeID = writer->getNextNodeID();
+
+	RefShapeData rsData;
+	rsData.csys = &csys;
+	rsData.meshDens = &meshDens;
+	rsData.radius = &radius;
+	rsData.angle = &angle;
+	rsData.height = height;
+	rsData.rotAxis = rotaxis;
+	rsData.coneLength = std::sqrt(pow2(radius.dR()) + pow2(height));
+
+	RefLayerData rlData;
+	rlData.curPos = pos;
+	rlData.curAngle = 0.0;
+	rlData.curAngleStep = refinement::initialRefElSize2D(rsData.angle->angleSize(), 
+		meshDens.nRefs(), startWithOffset);
+
+	double	arcLengthStart = angle.angleSize() * radius.start();
+
+	//TODO: not sure if this is correct
+	if (startWithOffset) {
+		rlData.curAngle += rlData.curAngleStep;
+	}
+
+	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
+		writeNodes_layerB(rsData, rlData, refLayer);
+		writeNodes_layerM(rsData, rlData, refLayer);
+		writeNodes_layerT(rsData, rlData, refLayer);
+	}
+
+	Mesher::nodeID1 = firstNodeID;
+}
+
+void ConeMesherRef2::updateLayerData(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+	glm::dvec3 lineStart, lineEnd, line;
+	lineStart = coordsOnCircle(rlData.curAngle, rsData.radius->rad1(), rsData.rotAxis);
+	lineEnd = coordsOnCircle(rlData.curAngle, rsData.radius->rad2(), rsData.rotAxis);
+	lineEnd[(size_t)rsData.rotAxis] += rsData.height;
+	line = lineEnd - lineStart;
+
+	int nElsOnLine = rsData.meshDens->nElRowB(refLayer);
+	rlData.curConeLineStep = line / (double)nElsOnLine;
+	rlData.curAngle += rlData.curAngleStep;
+	rlData.curLineStartPos = rlData.curPos + lineStart;
+}
+void ConeMesherRef2::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+	updateLayerData(rsData, rlData, refLayer);
+	LineMesher::writeNodesLineQ(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curConeLineStep);
+}
+void ConeMesherRef2::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+	updateLayerData(rsData, rlData, refLayer);
+	LineMesher::writeNodesLineQ_nth(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curConeLineStep, 4);
+	rlData.curAngleStep *= 2.0;
+}
+void ConeMesherRef2::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
+	updateLayerData(rsData, rlData, refLayer + 1);
+	LineMesher::writeNodesLineQ(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowT(refLayer), rlData.curConeLineStep);
+}
+
+void ConeMesherRef2::writeElements(const MeshDensity2Dref& meshDens) {
+	PlaneMesherRef::writeElements(meshDens);
+}

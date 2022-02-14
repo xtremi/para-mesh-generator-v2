@@ -82,3 +82,43 @@ private:
 	static void writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
 	static void writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
 };
+
+class ConeMesherRef2 : private Mesher
+{
+public:
+	static void writeNodes(
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
+		const MeshDensity2Dref&	meshDens,
+		const Cone2Dradius&		radius,
+		const ArcAngles&		angle,
+		double					height,
+		bool					startWithOffset,
+		direction				rotaxis);
+
+	static void writeElements(const MeshDensity2Dref& meshDens);
+
+private:
+
+	struct RefShapeData{		
+		MeshCsys*			    csys;
+		const MeshDensity2Dref* meshDens;
+		const Cone2Dradius*		radius;
+		const ArcAngles*		angle;
+		direction				rotAxis;
+		double					height;
+		double					coneLength;
+	};
+	struct RefLayerData{
+		glm::dvec3				curPos;
+		double					curAngle;
+		double					curAngleStep;
+		glm::dvec3				curConeLineStep;
+		glm::dvec3				curLineStartPos;
+	};
+
+	static void updateLayerData(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+	static void writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);
+};

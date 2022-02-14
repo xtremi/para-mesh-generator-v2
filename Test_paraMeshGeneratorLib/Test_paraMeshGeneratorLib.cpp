@@ -73,6 +73,8 @@ int planeMesher(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
+int coneMesherRef2(const std::string& fileName);
+int coneMesherRef2_2(const std::string& fileName);
 int diskMesher(const std::string& fileName);
 int diskMesherRef(const std::string& fileName);
 int cylinderMesher(const std::string& fileName);
@@ -177,7 +179,9 @@ std::vector<TestDef> testFunctions({
 	TestDef(212, "recToEllipseMesherRef",	"basic meshers 2D", (testFunction)recToEllipseMesherRef),
 	TestDef(213, "recTubeMesher",			"basic meshers 2D", (testFunction)recTubeMesher),
 	TestDef(214, "recTubeMesherRef",		"basic meshers 2D", (testFunction)recTubeMesherRef),
-	
+	TestDef(230, "coneMesherRef2",			"basic meshers 2D", (testFunction)coneMesherRef2),
+	TestDef(231, "coneMesherRef2_2",		"basic meshers 2D", (testFunction)coneMesherRef2_2),
+
 	TestDef(319, "cuboidMesherSimple",	"basic meshers 3D", (testFunction)cuboidMesherSimple),
 	TestDef(320, "cuboidMesher",	    "basic meshers 3D", (testFunction)cuboidMesher),
 	TestDef(321, "cuboidMesherRef",	    "basic meshers 3D", (testFunction)cuboidMesherRef),
@@ -205,6 +209,7 @@ std::vector<TestDef> testFunctions({
 
 	TestDef(710, "connectCuboidMeshRef",	"connection", (testFunction)connectCuboidMeshRef),
 	TestDef(711, "connectCuboidMeshRef2",	"connection", (testFunction)connectCuboidMeshRef2)
+	
 	
 
 });
@@ -1062,6 +1067,49 @@ int coneMesherRef(const std::string& fileName) {
 
 	TEST_END
 
+}
+
+
+int coneMesherRef2(const std::string& fileName) {
+	TEST_START2
+
+	int nRef = 4;
+	int nNodesEdge = refinement::minNodesEdge0_2d(5);// std::pow(2, nRef + 3) + 1;
+	MeshDensity2Dref meshDens(nRef, nNodesEdge, false);
+	double height = 8.;
+	ArcAngles angle(0.0, GLMPI / 4.0);
+	Cone2Dradius radius(4.0, 4.0);
+
+	ConeMesherRef2::writeNodes(pos, glCsys, meshDens, radius, angle, height, false, direction::x);
+	ConeMesherRef2::writeElements(meshDens);
+
+	pos.y += radius.rad1()*2.2;
+	ConeMesherRef2::writeNodes(pos, glCsys, meshDens, radius, angle, height, false, direction::x);
+	ConeMesherRef2::writeElements(meshDens);
+
+	//writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
+	TEST_END
+}
+
+int coneMesherRef2_2(const std::string& fileName) {
+	TEST_START2
+
+	int nRef = 4;
+	int nNodesEdge = refinement::minNodesEdge0_2d(5);// std::pow(2, nRef + 3) + 1;
+	MeshDensity2Dref meshDens(nRef, nNodesEdge, false);
+	double height = 5.;
+	ArcAngles angle(0.0, GLMPI / 4.0);
+	Cone2Dradius radius(4.0, 2.0);
+
+	ConeMesherRef2::writeNodes(pos, glCsys, meshDens, radius, angle, height, false, direction::x);
+	ConeMesherRef2::writeElements(meshDens);
+
+	pos.y += radius.rad1() * 2.2;
+	ConeMesherRef2::writeNodes(pos, glCsys, meshDens, radius, angle, height, false, direction::x);
+	ConeMesherRef2::writeElements(meshDens);
+
+	//writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
+	TEST_END
 }
 
 int diskMesher(const std::string& fileName){
@@ -3007,11 +3055,11 @@ int extrude3DfaceRef(const std::string& fileName){
 
 int extrude3DfaceRef_2(const std::string& fileName) {
 	TEST_START2
-	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(17, 17), glm::dvec2(5.0, 5.0));
+	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(33, 33), glm::dvec2(5.0, 5.0));
 	mesh3D.extrudeYZface(1., 5);
 	mesh3D.extrudeYZfaceRef(2., 2);
 	mesh3D.extrudeYZface(1., 3);
-	mesh3D.extrudeYZfaceRef(3., 1);
+	mesh3D.extrudeYZfaceRef(3., 2);
 	mesh3D.extrudeYZface(6., 3);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();

@@ -74,7 +74,7 @@ protected:
 	//std::stringstream buffer;
 	std::string buffer;
 	int nWritesToBuffer = 0;
-	int maxWritesToBuffer = 1e5;
+	int maxWritesToBuffer = (int)1e5;
 	void processWriteBuffer();
 	void dumpBuffer();
 

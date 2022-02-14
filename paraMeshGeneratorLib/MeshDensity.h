@@ -265,26 +265,26 @@ struct MeshDensity3Dref : public NodeVec3D {
 	int nElDir3ref();
 
 	MeshDensity2D meshDensD12B(int refLayer) const {
-		int n1 = nElDir1() / std::pow(2, refLayer);
+		int n1 = nElDir1() / (int)std::pow(2, refLayer);
 		if (!closedLoop) n1++;
-		int n2 = nElDir3() / std::pow(2, refLayer) + 1;
+		int n2 = nElDir3() / (int)std::pow(2, refLayer) + 1;
 		return MeshDensity2D(n1, n2, closedLoop);
 	}
 	MeshDensity2D meshDensD12M1(int refLayer) const {
-		int n1 = 3 * (nElDir1() / std::pow(2, refLayer)) / 4;
-		int n2 = nElDir3() / std::pow(2, refLayer) + 1;
+		int n1 = 3 * (nElDir1() / (int)std::pow(2, refLayer)) / 4;
+		int n2 = nElDir3() / (int)std::pow(2, refLayer) + 1;
 		return MeshDensity2D(n1, n2, closedLoop);
 	}
 	MeshDensity2D meshDensD12M2(int refLayer) const {
-		int n1 = nElDir1() / std::pow(2, refLayer + 1);
+		int n1 = nElDir1() / (int)std::pow(2, refLayer + 1);
 		if (!closedLoop) n1++;
-		int n2 = nElDir3() / std::pow(2, refLayer) + 1;
+		int n2 = nElDir3() / (int)std::pow(2, refLayer) + 1;
 		return MeshDensity2D(n1, n2, closedLoop);
 	}
 	MeshDensity2D meshDensD12M3(int refLayer) const {
-		int n1 = nElDir1() / std::pow(2, refLayer + 1);
+		int n1 = nElDir1() / (int)std::pow(2, refLayer + 1);
 		if (!closedLoop) n1++;
-		int n2 = 3 * (nElDir3() / std::pow(2, refLayer)) / 4;// +1;
+		int n2 = 3 * (nElDir3() / (int)std::pow(2, refLayer)) / 4;// +1;
 		return MeshDensity2D(n1, n2, closedLoop);
 	}
 	MeshDensity2D meshDensD12T(int refLayer) const {

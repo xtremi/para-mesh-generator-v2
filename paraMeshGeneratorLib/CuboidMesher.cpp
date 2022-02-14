@@ -189,7 +189,6 @@ void CuboidMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData
 
 void CuboidMesherRef::writeElements(const MeshDensity3Dref& meshDens)
 {
-	int n[8];	
 	int currentRefFactor = 1;
 	MeshDensity2D curMeshDens12 = meshDens.meshDensD12B(0);
 	MeshDensity2D nextMeshDens12(curMeshDens12);
@@ -304,7 +303,6 @@ void CuboidMesherRef::writeElements_layerB(const MeshDensity3Dref& meshDens, int
 
 		int m2f[5], m3f[3], tf[3];
 		int m2b[5], m3b[3], tb[3];
-		int* elNodes[6];
 
 		for (int i1 = 0; i1 < meshDensM2.nElDir1(); i1++) {
 			for (int i2 = 0; i2 < meshDensM2.nElDir2(); i2 += 4) {
