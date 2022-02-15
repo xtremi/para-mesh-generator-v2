@@ -3,6 +3,7 @@
 
 class Geometry {};
 
+
 class RecGeometry2D : public Geometry {
 protected:
 	glm::dvec2 size;
@@ -11,6 +12,11 @@ class RecGeometry3D : public RecGeometry2D {
 protected:
 	double height;
 };
+class QuadGeometry2D : public Geometry {
+protected:
+	glm::dvec3 corners[4];
+};
+
 
 class CircularGeometry2D : public Geometry {
 protected:

@@ -44,6 +44,20 @@ public:
 		int						skipNth,
 		bool					skipAlongDir1);
 
+	static void writeNodesQ(
+		const glm::dvec3&	 pos,
+		MeshCsys&			 csys,
+		const MeshDensity2D& meshDens,
+		const Quad&			 quad);
+
+	static void writeNodesQ_nth(
+		const glm::dvec3&		pos,
+		MeshCsys&				csys,
+		const MeshDensity2D&	meshDens,
+		const Quad&				quad,
+		int						skipNth,
+		bool					skipAlongDir1);
+
 	static void writeNodesXZq(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& dxz);
 	static void writeNodesXYq(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& dxy);
 	static void writeNodesYZq(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& dyz);

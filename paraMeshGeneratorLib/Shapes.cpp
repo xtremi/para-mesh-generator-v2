@@ -23,6 +23,26 @@ glm::dvec2 Rectangle::getCornerCoord(int corner) {
 	}
 }
 
+Quad::Quad(const glm::dvec3& c1, const glm::dvec3& c2, const glm::dvec3& c3, const glm::dvec3& c4) {
+	corners[0] = c1; corners[1] = c2; corners[2] = c3; corners[3] = c4;
+}
+
+
+glm::dvec3 Quad::corner(int i) const {
+	if (i < 0 || i > 3) {
+		throw("Invalid corner ID in Quad::coners");
+	}
+	return corners[i];
+}
+glm::dvec3 Quad::dir12() const { return glm::normalize(corners[1] - corners[0]); }
+glm::dvec3 Quad::dir14() const { return glm::normalize(corners[3] - corners[0]); }
+glm::dvec3 Quad::dir43() const { return glm::normalize(corners[3] - corners[2]); }
+glm::dvec3 Quad::c1() const { return corners[0]; }
+glm::dvec3 Quad::c2() const { return corners[1]; }
+glm::dvec3 Quad::c3() const { return corners[2]; }
+glm::dvec3 Quad::c4() const { return corners[3]; }
+
+
 double EllipseRadius::perimeter() const {
 	double h = pow2(rad1 - rad2) / pow2(rad1 + rad2);
 

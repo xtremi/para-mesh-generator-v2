@@ -2,7 +2,7 @@
 #include "LineMesher.h"
 #include "math_utilities.h"
 #include "RefinementCalculations.h"
-
+#include "Shapes.h"
 
 void PlaneMesher::writeNodesQ(
 	const glm::dvec3&		pos,
@@ -87,13 +87,13 @@ MESHER_NODE_WRITE_START
 	//The direction of each node rows:
 	direction nonSkipDir	= skipAlongDir1 ? dir2 : dir1;
 	//The index of dsize that holds the step size between rows in the skipDir:
-	size_t local_x			= skipAlongDir1 ? 0 : 1;
+	int local_x			= skipAlongDir1 ? 0 : 1;
 	//The index of dsize that holds the step size between nodes in the nonSkipDir:
-	size_t local_y			= skipAlongDir1 ? 1 : 0;
+	int local_y			= skipAlongDir1 ? 1 : 0;
 
 	for (int i = 0; i < nRowSkip; i++) {
-		curPos[(size_t)skipDir] = pos[(size_t)skipDir] + (double)i*dsize[local_x];
-		if (i % 4) {
+		curPos[(int)skipDir] = pos[(int)skipDir] + (double)i*dsize[local_x];
+		if (i % skipNth) {
 			LineMesher::writeNodesLineQ(curPos, csys, nRowNotSkip, dsize[local_y], nonSkipDir);
 		}
 	}
@@ -130,7 +130,39 @@ void PlaneMesher::writeNodesYZ(const glm::dvec3& pos, MeshCsys& csys, const Mesh
 	writeNodes(pos, csys, meshDens, size, plane::yz);
 }
 
+void PlaneMesher::writeNodesQ(
+	const glm::dvec3&	 pos,
+	MeshCsys&			 csys,
+	const MeshDensity2D& meshDens,
+	const Quad&			 quad)
+{
+	MESHER_NODE_WRITE_START
 
+	curPos					= quad.c1() + pos;
+	glm::dvec3 endPos		= quad.c2() + pos;
+	glm::dvec3 stepD2_start = (quad.c4() - quad.c1()) / (double)meshDens.nElDir2();
+	glm::dvec3 stepD2_end	= (quad.c3() - quad.c2()) / (double)meshDens.nElDir2();
+	glm::dvec3 stepD1;
+
+	for (int i2 = 0; i2 < meshDens.dir2(); i2++) {
+		stepD1 = (endPos - curPos)/(double)meshDens.nElDir1();
+		LineMesher::writeNodesLineQ(curPos, csys, meshDens.dir1(), stepD1);
+		curPos += stepD2_start;
+		endPos += stepD2_end;
+	}
+	MESHER_NODE_WRITE_END
+}
+
+void PlaneMesher::writeNodesQ_nth(
+	const glm::dvec3&	 pos,
+	MeshCsys&			 csys,
+	const MeshDensity2D& meshDens,
+	const Quad&			 quad,
+	int					 skipNth,
+	bool				 skipAlongDir1)
+{
+
+}
 
 /*
 

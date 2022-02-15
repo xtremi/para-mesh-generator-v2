@@ -4,9 +4,11 @@
 #include "DiskMesher.h"
 #include "LineMesher.h"
 #include "ArcMesher.h"
+#include "PlaneMesher.h"
 #include "glm/gtc/constants.hpp"
 #include "math_utilities.h"
 #include "RefinementCalculations.h"
+
 
 void Cone3Dmesher::writeNodes(
 	const glm::dvec3&		pos,
@@ -191,3 +193,89 @@ void Cone3DmesherRef::writeElements(const MeshDensity3Dref& meshDens)
 	CuboidMesherRef::writeElements(meshDens);
 }
 
+void Cone3DmesherRef2::writeNodes(
+	const glm::dvec3&		pos,
+	MeshCsys&				csys,
+	const MeshDensity3Dref& meshDens,
+	const Pipe3Dradius&		radius,
+	const ArcAngles&		angle,
+	double					height,
+	bool					startWithOffset,
+	direction				rotaxis)
+{
+	int firstNode = writer->getNextNodeID();
+
+	MeshDensity2D curMeshDensD12 = meshDens.meshDensD12B(0);
+	
+	RefShapeData rsData;
+	rsData.csys = &csys;
+	rsData.meshDens = &meshDens;
+	rsData.radius = &radius;
+	rsData.angle = &angle;
+	rsData.height = height;
+	rsData.rotAxis = rotaxis;
+	rsData.coneLengthInner = std::sqrt(pow2(radius.dRi()) + pow2(height));
+	rsData.coneLengthOuter = std::sqrt(pow2(radius.dRo()) + pow2(height));
+
+	RefLayerData rlData;
+	rlData.curPos = pos;
+	rlData.curAngleStep = refinement::initialRefElSize3D(rsData.angle->angleSize(),
+		meshDens.nRefs(), startWithOffset);
+	rlData.curAngle = 0.;
+	
+	if (startWithOffset) {
+		rlData.curAngle += rlData.curAngleStep;
+	}
+
+	for (int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++) {
+		writeNodes_layerB(rsData, rlData, refLayer);		
+		writeNodes_layerM1(rsData, rlData, refLayer);
+		writeNodes_layerM2(rsData, rlData, refLayer);
+		writeNodes_layerM3(rsData, rlData, refLayer);
+		writeNodes_layerT(rsData, rlData, refLayer);
+	}
+
+	MESHER_NODE_WRITE_END
+}
+
+
+void Cone3DmesherRef2::updateLayerData(const RefShapeData& rsData, RefLayerData& rlData, int RefLayer) {
+	/*glm::dvec3 lineStart, lineEnd, line;
+	lineStart = coordsOnCircle(rlData.curAngle, rsData.radius->rad1(), rsData.rotAxis);
+	lineEnd = coordsOnCircle(rlData.curAngle, rsData.radius->rad2(), rsData.rotAxis);
+	lineEnd[(size_t)rsData.rotAxis] += rsData.height;
+	line = lineEnd - lineStart;
+
+	int nElsOnLine = rsData.meshDens->nElRowB(refLayer);
+	rlData.curConeLineStep = line / (double)nElsOnLine;
+	rlData.curAngle += rlData.curAngleStep;
+	rlData.curLineStartPos = rlData.curPos + lineStart;*/
+}
+void Cone3DmesherRef2::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+	updateLayerData(rsData, rlData, refLayer);
+	//PlaneMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12B(refLayer), rlData.curElSize, rsData.pln);
+}
+void Cone3DmesherRef2::writeNodes_layerM1(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+	updateLayerData(rsData, rlData, refLayer);
+	//PlaneMesher::writeNodesQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12B(refLayer), rlData.curElSize, rsData.pln, 4, true);
+}
+void Cone3DmesherRef2::writeNodes_layerM2(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+	updateLayerData(rsData, rlData, refLayer);
+	//rlData.curElSize.x *= 2.0;
+	//PlaneMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12M2(refLayer), rlData.curElSize, rsData.pln);
+}
+void Cone3DmesherRef2::writeNodes_layerM3(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+	updateLayerData(rsData, rlData, refLayer);
+	//PlaneMesher::writeNodesQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12M2(refLayer), rlData.curElSize, rsData.pln, 4, false);
+}
+void Cone3DmesherRef2::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
+	updateLayerData(rsData, rlData, refLayer);
+	//rlData.curElSize.y *= 2.0;
+	//PlaneMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12T(refLayer), rlData.curElSize, rsData.pln);
+	//rlData.curElSizeRefDir *= 2.0;
+}
+
+void Cone3DmesherRef2::writeElements(const MeshDensity3Dref& meshDens)
+{
+	CuboidMesherRef::writeElements(meshDens);
+}

@@ -16,7 +16,21 @@ public:
 	static const glm::dvec2 recDirs[4];
 };
 
+class Quad {
+public:
+	Quad(const glm::dvec3& c1, const glm::dvec3& c2, const glm::dvec3& c3, const glm::dvec3& c4);
+	Quad() {}
 
+	glm::dvec3 dir12() const;
+	glm::dvec3 dir14() const;
+	glm::dvec3 dir43() const;
+	glm::dvec3 c1() const;
+	glm::dvec3 c2() const;
+	glm::dvec3 c3() const;
+	glm::dvec3 c4() const;
+	glm::dvec3 corner(int i) const;
+	glm::dvec3 corners[4];
+};
 
 
 class EllipseRadius {
