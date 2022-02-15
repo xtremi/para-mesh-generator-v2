@@ -137,7 +137,6 @@ void PlaneMesher::writeNodesQ(
 	const Quad&			 quad)
 {
 	MESHER_NODE_WRITE_START
-
 	curPos					= quad.c1() + pos;
 	glm::dvec3 endPos		= quad.c2() + pos;
 	glm::dvec3 stepD2_start = (quad.c4() - quad.c1()) / (double)meshDens.nElDir2();
@@ -161,7 +160,46 @@ void PlaneMesher::writeNodesQ_nth(
 	int					 skipNth,
 	bool				 skipAlongDir1)
 {
+	MESHER_NODE_WRITE_START
 
+	curPos = quad.c1() + pos;
+	glm::dvec3 endPos;
+	glm::dvec3 stepSkipDir_start;
+	glm::dvec3 stepSkipDir_end;
+	glm::dvec3 stepNotSkipDir;
+	int nNodesSkipDir, nElSkipDir;
+	int nNodesNotSkipDir, nElNotSkipDir;
+
+	//Number of rows of nodes including those that are skipped:
+	nNodesSkipDir = skipAlongDir1 ? meshDens.dir1() : meshDens.dir2();
+	nElSkipDir = skipAlongDir1 ? meshDens.nElDir1() : meshDens.nElDir2();
+	//Number of nodes per node rows:
+	nNodesNotSkipDir = skipAlongDir1 ? meshDens.dir2() : meshDens.dir1();
+	nElNotSkipDir = skipAlongDir1 ? meshDens.nElDir2() : meshDens.nElDir1();
+
+
+	if (skipAlongDir1) {
+		endPos = quad.c4() + pos;
+		stepSkipDir_start = (quad.c2() - quad.c1()) / (double)nElSkipDir;
+		stepSkipDir_end = (quad.c3() - quad.c4()) / (double)nElSkipDir;
+	}
+	else {
+		endPos = quad.c2() + pos;
+		stepSkipDir_start = (quad.c4() - quad.c1()) / (double)nElSkipDir;
+		stepSkipDir_end = (quad.c3() - quad.c2()) / (double)nElSkipDir;
+	}
+
+	for (int i = 0; i < nNodesSkipDir; i++) {
+		stepNotSkipDir = (endPos - curPos) / (double)nElNotSkipDir;
+
+		if (i % skipNth) {
+			LineMesher::writeNodesLineQ(curPos, csys, nNodesNotSkipDir, stepNotSkipDir);
+		}
+		curPos += stepSkipDir_start;
+		endPos += stepSkipDir_end;
+	}
+
+	MESHER_NODE_WRITE_END
 }
 
 /*

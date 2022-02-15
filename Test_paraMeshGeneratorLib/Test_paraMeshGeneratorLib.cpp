@@ -71,6 +71,7 @@ int meshCsys3(const std::string& fileName);
 int planeMesherSimple(const std::string& fileName);
 int planeMesher(const std::string& fileName);
 int planeMesherQuad(const std::string& fileName);
+int planeMesherQuadNth(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
@@ -184,6 +185,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(231, "coneMesherRef2_2",		"basic meshers 2D", (testFunction)coneMesherRef2_2),
 	
 	TestDef(240, "planeMesherQuad",		"basic meshers 2D", (testFunction)planeMesherQuad),
+	TestDef(242, "planeMesherQuadNth",	"basic meshers 2D", (testFunction)planeMesherQuadNth),
 
 	
 
@@ -938,6 +940,36 @@ int planeMesherQuad(const std::string& fileName) {
 
 	TEST_END
 }
+
+int planeMesherQuadNth(const std::string& fileName) {
+	TEST_START2
+
+	MeshDensity2D meshDens(24, 16);
+	Quad quad(glm::dvec3(0.0, 0.0, 0.0),
+		glm::dvec3(1.0, 0.0, 0.0),
+		glm::dvec3(1.0, 1.0, 0.0),
+		glm::dvec3(0.0, 1.0, 0.0));
+
+	PlaneMesher::writeNodesQ_nth(pos, glCsys, meshDens, quad, 4, true);
+
+	pos.x += 2.;
+	quad.corners[2] += glm::dvec3(0.5, 0., 0.);
+	PlaneMesher::writeNodesQ_nth(pos, glCsys, meshDens, quad, 4, false);
+
+	pos.x += 2.;
+	quad.corners[3] += glm::dvec3(0.1, 0.3, 0.);
+	PlaneMesher::writeNodesQ_nth(pos, glCsys, meshDens, quad, 4, true);
+
+	pos.x += 2.;
+	quad.corners[1] += glm::dvec3(0.0, 0.0, 0.4);
+	PlaneMesher::writeNodesQ_nth(pos, glCsys, meshDens, quad, 4, false);
+	
+	writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
+
+	TEST_END
+}
+
+
 int planeMesherRef(const std::string& fileName) {
 	TEST_START2
 
