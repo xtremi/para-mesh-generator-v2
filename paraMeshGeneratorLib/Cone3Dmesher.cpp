@@ -208,12 +208,12 @@ void Cone3DmesherRef2::writeNodes(
 	MeshDensity2D curMeshDensD12 = meshDens.meshDensD12B(0);
 	
 	RefShapeData rsData;
-	rsData.csys = &csys;
+	rsData.csys		= &csys;
 	rsData.meshDens = &meshDens;
-	rsData.radius = &radius;
-	rsData.angle = &angle;
-	rsData.height = height;
-	rsData.rotAxis = rotaxis;
+	rsData.radius	= &radius;
+	rsData.angle	= &angle;
+	rsData.height	= height;
+	rsData.rotAxis	= rotaxis;
 	rsData.coneLengthInner = std::sqrt(pow2(radius.dRi()) + pow2(height));
 	rsData.coneLengthOuter = std::sqrt(pow2(radius.dRo()) + pow2(height));
 
@@ -238,41 +238,50 @@ void Cone3DmesherRef2::writeNodes(
 	MESHER_NODE_WRITE_END
 }
 
+/*
+	   c3   c2
+		x---x
+	   /    |
+	  /     |
+	 /      |
+	/       |
+ c4x--------xc1
 
+*/
 void Cone3DmesherRef2::updateLayerData(const RefShapeData& rsData, RefLayerData& rlData, int RefLayer) {
-	/*glm::dvec3 lineStart, lineEnd, line;
-	lineStart = coordsOnCircle(rlData.curAngle, rsData.radius->rad1(), rsData.rotAxis);
-	lineEnd = coordsOnCircle(rlData.curAngle, rsData.radius->rad2(), rsData.rotAxis);
-	lineEnd[(size_t)rsData.rotAxis] += rsData.height;
-	line = lineEnd - lineStart;
 
-	int nElsOnLine = rsData.meshDens->nElRowB(refLayer);
-	rlData.curConeLineStep = line / (double)nElsOnLine;
+	glm::dvec3 centerTop(0.);
+	centerTop[(int)rsData.rotAxis] = rsData.height;
+
+	rlData.curQuad.corners[0] = coordsOnCircle(rlData.curAngle, rsData.radius->start.inner(), rsData.rotAxis);
+	rlData.curQuad.corners[1] = coordsOnCircle(rlData.curAngle, rsData.radius->end.inner(), rsData.rotAxis) + centerTop;
+	rlData.curQuad.corners[2] = coordsOnCircle(rlData.curAngle, rsData.radius->end.outer(), rsData.rotAxis) + centerTop;
+	rlData.curQuad.corners[3] = coordsOnCircle(rlData.curAngle, rsData.radius->start.outer(), rsData.rotAxis);
+
 	rlData.curAngle += rlData.curAngleStep;
-	rlData.curLineStartPos = rlData.curPos + lineStart;*/
 }
+
+
 void Cone3DmesherRef2::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
-	updateLayerData(rsData, rlData, refLayer);
-	//PlaneMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12B(refLayer), rlData.curElSize, rsData.pln);
+	updateLayerData(rsData, rlData, refLayer);	
+	PlaneMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12B(refLayer), rlData.curQuad);
 }
 void Cone3DmesherRef2::writeNodes_layerM1(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
 	updateLayerData(rsData, rlData, refLayer);
-	//PlaneMesher::writeNodesQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12B(refLayer), rlData.curElSize, rsData.pln, 4, true);
+	PlaneMesher::writeNodesQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12B(refLayer), rlData.curQuad, 4, true);
 }
 void Cone3DmesherRef2::writeNodes_layerM2(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
 	updateLayerData(rsData, rlData, refLayer);
-	//rlData.curElSize.x *= 2.0;
-	//PlaneMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12M2(refLayer), rlData.curElSize, rsData.pln);
+	PlaneMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12M2(refLayer), rlData.curQuad);
 }
 void Cone3DmesherRef2::writeNodes_layerM3(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
 	updateLayerData(rsData, rlData, refLayer);
-	//PlaneMesher::writeNodesQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12M2(refLayer), rlData.curElSize, rsData.pln, 4, false);
+	PlaneMesher::writeNodesQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12M2(refLayer), rlData.curQuad, 4, false);
 }
 void Cone3DmesherRef2::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
-	updateLayerData(rsData, rlData, refLayer);
-	//rlData.curElSize.y *= 2.0;
-	//PlaneMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12T(refLayer), rlData.curElSize, rsData.pln);
-	//rlData.curElSizeRefDir *= 2.0;
+	rlData.curAngleStep *= 2.0;
+	updateLayerData(rsData, rlData, refLayer);	
+	PlaneMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->meshDensD12T(refLayer), rlData.curQuad);
 }
 
 void Cone3DmesherRef2::writeElements(const MeshDensity3Dref& meshDens)

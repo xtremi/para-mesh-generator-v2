@@ -106,8 +106,7 @@ private:
 		glm::dvec3				curPos;
 		double					curAngle;
 		double					curAngleStep;
-		glm::dvec3				curConeLineStep;
-		glm::dvec3				curLineStartPos;
+		Quad					curQuad;
 	};
 
 	static void updateLayerData(const RefShapeData& rsData, RefLayerData& rlData, int RefLayer);

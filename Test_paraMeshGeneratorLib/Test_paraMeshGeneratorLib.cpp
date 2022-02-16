@@ -92,6 +92,7 @@ int cuboidMesherRef(const std::string& fileName);
 int cone3DmesherSimple(const std::string& fileName);
 int cone3Dmesher(const std::string& fileName);
 int cone3DmesherRef(const std::string& fileName);
+int cone3DmesherRef2(const std::string& fileName);
 int recToEllipse3Dmesher(const std::string& fileName);
 
 
@@ -196,6 +197,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(322, "cone3Dmesher",	    "basic meshers 3D", (testFunction)cone3Dmesher),	
 	TestDef(323, "cone3DmesherRef",	    "basic meshers 3D", (testFunction)cone3DmesherRef),
 	TestDef(324, "recToEllipse3Dmesher","basic meshers 3D", (testFunction)recToEllipse3Dmesher),
+	TestDef(330 , "cone3DmesherRef2",	"basic meshers 3D", (testFunction)cone3DmesherRef2),
+
 
 	TestDef(430, "refinement2dHeight",		"basic meshers 2D", (testFunction)refinement2dHeight),
 	TestDef(431, "refinement3dHeight",		"basic meshers 3D", (testFunction)refinement3dHeight),
@@ -1754,6 +1757,31 @@ int cone3DmesherRef(const std::string& fileName) {
 	TEST_END
 }
 
+
+
+int cone3DmesherRef2(const std::string& fileName) {
+	TEST_START2
+	
+	int nRef = 5;
+	int nNodesEdgeH = std::pow(2, nRef + 2) + 1;
+	int nNodesEdgeR = std::pow(2, nRef + 1) + 1;
+	MeshDensity3Dref meshDens(nRef, nNodesEdgeH, nNodesEdgeR);
+	Pipe3Dradius  radius(5.0, 9.0, 5.0, 9.0);
+	ArcAngles	  angle(0.0, GLMPI/2.0);
+	double		  height = 8.0;
+
+	
+	Cone3DmesherRef2::writeNodes(pos, glCsys, meshDens, radius, angle, height, false, direction::z);
+	Cone3DmesherRef2::writeElements(meshDens);
+
+	pos.y += 13.;
+	radius = Pipe3Dradius(5.0, 9.0, 2.0, 4.0);
+	Cone3DmesherRef2::writeNodes(pos, glCsys, meshDens, radius, angle, height, false, direction::x);
+	Cone3DmesherRef2::writeElements(meshDens);
+
+	TEST_END
+
+}
 int recToEllipse3Dmesher(const std::string& fileName) {
 	TEST_START2
 	
