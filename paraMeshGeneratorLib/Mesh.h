@@ -79,6 +79,7 @@ public:
 	void extrudeYedge(double length, int nElements);
 	void extrudeYedgeRef(double length, int nRef);
 	void extrudeYedgeArc(double endAng, double radius, int nElements);
+	void extrudeYedgeArcRef(double endAng, double radius, int nRef);
 
 	virtual void writeNodes();
 	virtual void writeElements();

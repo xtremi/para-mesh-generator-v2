@@ -263,6 +263,7 @@ public:
 	void writeNodes(ExtrudeStepData* curStepData);
 };
 class MeshEdgeExtrusionArcRef : public MeshEdgeExtrusion_ref, public MeshExtrusion_arcProp {
+public:
 	MeshEdgeExtrusionArcRef(
 		double _radius,
 		double _endAngle,

@@ -260,8 +260,8 @@ void ConeMesherRef2::writeNodes(
 
 	RefLayerData rlData;
 	rlData.curPos = pos;
-	rlData.curAngle = 0.0;
-	rlData.curAngleStep = refinement::initialRefElSize2D(rsData.angle->angleSize(), 
+	rlData.curAngle = angle.start;
+	rlData.curAngleStep = refinement::initialRefElSize2D(rsData.angle->angleSize(false), 
 		meshDens.nRefs(), startWithOffset);
 
 	double	arcLengthStart = angle.angleSize() * radius.start();

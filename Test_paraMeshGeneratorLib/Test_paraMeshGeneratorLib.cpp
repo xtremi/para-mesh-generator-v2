@@ -105,6 +105,7 @@ int extrude2DedgeLine(const std::string& fileName);
 int extrude2DedgeArc(const std::string& filename);
 int extrude2DedgeArcAndLine(const std::string& filename);
 int extrude2DedgeRef(const std::string& filename);
+int extrude2DedgeArcRef(const std::string& filename);
 
 int extrude3DfaceLine(const std::string& fileName);
 int extrude3DfaceArc(const std::string& fileName);
@@ -209,7 +210,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(520, "extrude2DedgeArc",		"extrusion", (testFunction)extrude2DedgeArc),
 	TestDef(540, "extrude2DedgeArcAndLine",	"extrusion", (testFunction)extrude2DedgeArcAndLine),
 	TestDef(550, "extrude2DedgeRef",		"extrusion", (testFunction)extrude2DedgeRef),
-
+	TestDef(555, "extrude2DedgeArcRef",		"extrusion", (testFunction)extrude2DedgeArcRef),
+	
 	TestDef(600, "extrude3DfaceLine",		"extrusion", (testFunction)extrude3DfaceLine),
 	TestDef(620, "extrude3DfaceArc",		"extrusion", (testFunction)extrude3DfaceArc),
 	TestDef(640, "extrude3DfaceArcAndLine",	"extrusion", (testFunction)extrude3DfaceArcAndLine),
@@ -228,14 +230,39 @@ std::vector<TestDef> testFunctions({
 int main(int argc, char* argv[]) {
 
 	std::set<int> testsToRun;
+	int testSmallerThan = -1;
+	int testLargerThan = -1;	
+
 	if (argc > 2 && !strcmp(argv[1], "-only")) {
 		for (int i = 2; i < argc; i++) {
-			testsToRun.insert(std::stoi(argv[i]));
+			if (argv[i][0] == '<') {
+				testSmallerThan = std::stoi(argv[i] + 1);
+			}
+			else if (argv[i][0] == '>') {
+				testLargerThan = std::stoi(argv[i] + 1);
+			}
+			else {
+				testsToRun.insert(std::stoi(argv[i]));
+			}
+			
 		}
 	}
 	
 	for (TestDef& testDef : testFunctions) {
-		if (testsToRun.empty() || (testsToRun.find(testDef.id) != testsToRun.end())) {
+
+		bool runTest = false;
+		if (testsToRun.find(testDef.id) != testsToRun.end()){
+			runTest = true;
+		}
+		else if ((testDef.id >= testLargerThan || testLargerThan == -1) && (testDef.id <= testSmallerThan || testSmallerThan == -1)) {
+			runTest = true;
+		}
+		else if (testsToRun.empty() && testSmallerThan == -1 && testLargerThan == -1){
+			runTest = true;
+		}
+
+		if (runTest)
+		{
 			testDef.run();
 		}
 	}
@@ -3092,6 +3119,34 @@ int extrude2DedgeRef(const std::string& fileName) {
 	mesh2D.writeElements();
 
 
+	TEST_END
+
+}
+
+
+int extrude2DedgeArcRef(const std::string& fileName) {
+	TEST_START
+	glm::dmat3x3 rotM1 = makeCsysMatrix(X_DIR, Y_DIR);
+	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), &rotM1);
+
+	//ConeMesher::writeNodesY(glm::dvec3(0., 10., 0.), csys1, MeshDensity2D(8, 4), Cone2Dradius(5.0, 5.0), ArcAngles(0., GLMPI/3.0), 3.0);
+	//ConeMesher::writeElements(MeshDensity2D(8, 4));
+	//
+	//ConeMesherRef2::writeNodes(glm::dvec3(0.,20.,0.), csys1, MeshDensity2Dref(3, 33), Cone2Dradius(5.0, 5.0), ArcAngles(0., GLMPI / 3.0), 3.0, false, direction::y);
+	//ConeMesherRef2::writeElements(MeshDensity2Dref(3, 33));
+
+	Mesh2D_planeExtrusion mesh2D(128, 4.0);
+	mesh2D.extrudeYedgeArc(GLMPI/16.0, 6., 4);
+	//mesh2D.extrudeYedgeArc(GLMPI/4.0, 5.0, 10);
+	mesh2D.extrudeYedgeArcRef(GLMPI/2.0, 3.0, 5);
+	mesh2D.extrudeYedgeArc(GLMPI / 4.0, 5.0, 5);
+	mesh2D.extrudeYedgeRef(5.0, 1);
+	//mesh2D.extrudeYedge(3.0, 4);
+	//mesh2D.extrudeYedgeArcRef(GLMPI / 4.0, 4.0, 1);
+	
+	mesh2D.writeNodes();
+	mesh2D.writeElements();
+	
 	TEST_END
 
 }

@@ -178,8 +178,7 @@ double MeshEdgeExtrusionArc::spacing() {
 	return endAngle / (double)(nElements);
 }
 void MeshEdgeExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
-	ExtrudeEdgeStepData* curExtrData = (ExtrudeEdgeStepData*)_curExtrData;
-	
+	ExtrudeEdgeStepData* curExtrData = (ExtrudeEdgeStepData*)_curExtrData;	
 	curExtrData->pos = glm::dvec3(0., 0., radius);
 
 	ArcAngles ang;
@@ -243,8 +242,24 @@ MeshEdgeExtrusionArcRef::MeshEdgeExtrusionArcRef(
 double MeshEdgeExtrusionArcRef::spacing() {
 	return 0.0;
 }
-void MeshEdgeExtrusionArcRef::writeNodes(ExtrudeStepData* curStepData) {
+void MeshEdgeExtrusionArcRef::writeNodes(ExtrudeStepData* _curExtrData) {
+	ExtrudeEdgeStepData* curExtrData = (ExtrudeEdgeStepData*)_curExtrData;
+	curExtrData->pos = glm::dvec3(0., 0., radius);
 
+	ArcAngles ang;
+	ang.setStart(-curExtrData->startSpace - GLMPI);
+	ang.setEnd(-(GLMPI + endAngle));
+
+	ConeMesherRef2::writeNodes(
+		curExtrData->pos,
+		curExtrData->csys,
+		meshDens,
+		Cone2Dradius(radius, radius),
+		ang, curExtrData->lengthY, true, direction::y);
+
+	curExtrData->arcAngle += endAngle;
+	curExtrData->csys.moveInLocalCsys(coordsOnCircle(ang.end, radius, direction::y) + glm::dvec3(0, 0, radius));
+	(*curExtrData->csys.csys) = makeCsysMatrix(Y_DIR, curExtrData->arcAngle);
 }
 
 /************************************************

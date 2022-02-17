@@ -46,6 +46,14 @@ void Mesh2D_planeExtrusion::extrudeYedgeRef(double length, int nRef) {
 	nNodes += extrusionsXdir.back()->numberOfNodes();
 	nNodesEdgeY = extrusionsXdir.back().get()->edges[2].nodeIter->numberOfNodes();
 }
+void Mesh2D_planeExtrusion::extrudeYedgeArcRef(double endAng, double radius, int nRef) {
+	std::shared_ptr<MeshEdgeExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
+	extrusionsXdir.push_back(std::make_shared<MeshEdgeExtrusionArcRef>(
+		radius, endAng, nRef, nNodesEdgeY, nNodes, prevExtrusion.get()));
+	nNodes += extrusionsXdir.back()->numberOfNodes();
+	nNodesEdgeY = extrusionsXdir.back().get()->edges[2].nodeIter->numberOfNodes();
+}
+
 
 void Mesh3D_volumeExtrusion::extrudeYZface(double length, int nElements) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;

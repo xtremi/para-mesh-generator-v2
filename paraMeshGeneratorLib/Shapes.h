@@ -107,7 +107,9 @@ public:
 	}
 
 	double start, end;
-	double angleSize() const { return std::abs(end - start); }
+	double angleSize(bool absolute = true) const { 
+		return absolute ? std::abs(end - start) : end - start;
+	}
 	bool fullCircle() const { return m_fullCircle; }
 
 	void setFullCircle();
