@@ -110,7 +110,8 @@ public:
 
 	void extrudeYZface(double length, int nElements);
 	void extrudeYZfaceRef(double length, int nRef);
-	void extrudeYZedgeArc(double endAng, double radiusInner, int nElements);
+	void extrudeYZfaceArc(double endAng, double radiusInner, int nElements);
+	void extrudeYZfaceArcRef(double endAng, double radiusInner, int nRef);
 
 	virtual void writeNodes();
 	virtual void writeElements();

@@ -219,10 +219,10 @@ void Cone3DmesherRef2::writeNodes(
 
 	RefLayerData rlData;
 	rlData.curPos = pos;
-	rlData.curAngleStep = refinement::initialRefElSize3D(rsData.angle->angleSize(),
+	rlData.curAngleStep = refinement::initialRefElSize3D(rsData.angle->angleSize(false),
 		meshDens.nRefs(), startWithOffset);
-	rlData.curAngle = 0.;
-	
+	rlData.curAngle = angle.start;
+
 	if (startWithOffset) {
 		rlData.curAngle += rlData.curAngleStep;
 	}

@@ -584,6 +584,28 @@ MeshFaceExtrusionArcRef::MeshFaceExtrusionArcRef(
 {}
 
 double MeshFaceExtrusionArcRef::spacing() {
-	return -1.0;
+	return 0.0;
 }
-void MeshFaceExtrusionArcRef::writeNodes(ExtrudeStepData* curStepData) {}
+void MeshFaceExtrusionArcRef::writeNodes(ExtrudeStepData* _curExtrData) {
+
+	ExtrudeFaceStepData* curExtrData = (ExtrudeFaceStepData*)_curExtrData;
+	curExtrData->pos = glm::dvec3(0., 0., radius);
+
+	ArcAngles ang;
+	ang.setStart(-curExtrData->startSpace - GLMPI);
+	ang.setEnd(-(GLMPI + endAngle));
+
+	Cone3DmesherRef2::writeNodes(
+		curExtrData->pos,
+		curExtrData->csys,
+		meshDens,
+		Pipe3Dradius(
+			radius, radius - curExtrData->sizeYZ[1],//curFextr->radiusOuter, 
+			radius, radius - curExtrData->sizeYZ[1]),//curFextr->radiusOuter),
+		ang, curExtrData->sizeYZ[0], true, direction::y);
+
+	curExtrData->arcAngle += endAngle;
+	curExtrData->csys.moveInLocalCsys(coordsOnCircle(ang.end, radius, direction::y) + glm::dvec3(0, 0, radius));
+	(*curExtrData->csys.csys) = makeCsysMatrix(Y_DIR, curExtrData->arcAngle);
+
+}

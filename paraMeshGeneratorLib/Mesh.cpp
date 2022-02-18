@@ -68,11 +68,16 @@ void Mesh3D_volumeExtrusion::extrudeYZface(double length, int nElements) {
 	//calculateNumberOfNodes();
 	//calculateNumberOfElements();
 }
-void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner, int nElements) {
+void Mesh3D_volumeExtrusion::extrudeYZfaceArc(double endAng, double radiusInner, int nElements) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
 	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionArc>(
-		radiusInner, endAng, nElements, MeshDensity2D(meshDensity.axis(),
-		meshDensity.norm()), nNodes, prevExtrusion.get()));
+		radiusInner, 
+		endAng, 
+		nElements, 
+		prevExtrusion ? prevExtrusion->meshDensFaceEnd() : meshDensity.meshDensD23(),
+		//MeshDensity2D(meshDensity.axis(), meshDensity.norm()), 
+		nNodes, 
+		prevExtrusion.get()));
 
 	nNodes += extrusionsXdir.back()->numberOfNodes();
 	//calculateNumberOfNodes();
@@ -81,13 +86,27 @@ void Mesh3D_volumeExtrusion::extrudeYZedgeArc(double endAng, double radiusInner,
 void Mesh3D_volumeExtrusion::extrudeYZfaceRef(double length, int nRef) {
 	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
 	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionLinearRef>(
-		length, nRef, 
+		length, 
+		nRef, 
 		prevExtrusion ? prevExtrusion->meshDensFaceEnd() : meshDensity.meshDensD23(),
-		nNodes, prevExtrusion.get()));
+		nNodes, 
+		prevExtrusion.get()));
 	
 	nNodes += extrusionsXdir.back()->numberOfNodes();
 	//calculateNumberOfNodes();
 	//calculateNumberOfElements();
+}
+
+void Mesh3D_volumeExtrusion::extrudeYZfaceArcRef(double endAng, double radiusInner, int nRef) {
+	std::shared_ptr<MeshFaceExtrusion> prevExtrusion = extrusionsXdir.size() > 0 ? extrusionsXdir[extrusionsXdir.size() - 1] : nullptr;
+	extrusionsXdir.push_back(std::make_shared<MeshFaceExtrusionArcRef>(
+		radiusInner,
+		endAng,
+		nRef,
+		prevExtrusion ? prevExtrusion->meshDensFaceEnd() : meshDensity.meshDensD23(),
+		nNodes, prevExtrusion.get()));
+
+	nNodes += extrusionsXdir.back()->numberOfNodes();
 }
 
 

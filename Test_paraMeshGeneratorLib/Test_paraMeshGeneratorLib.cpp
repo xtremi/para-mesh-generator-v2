@@ -112,6 +112,7 @@ int extrude3DfaceArc(const std::string& fileName);
 int extrude3DfaceArcAndLine(const std::string& fileName);
 int extrude3DfaceRef(const std::string& filename);
 int extrude3DfaceRef_2(const std::string& filename);
+int extrude3DfaceArcRef(const std::string& filename);
 
 int connectCuboidMeshRef(const std::string& fileName);
 int connectCuboidMeshRef2(const std::string& fileName);
@@ -217,7 +218,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(640, "extrude3DfaceArcAndLine",	"extrusion", (testFunction)extrude3DfaceArcAndLine),
 	TestDef(650, "extrude3DfaceRef",		"extrusion", (testFunction)extrude3DfaceRef),
 	TestDef(651, "extrude3DfaceRef_2",		"extrusion", (testFunction)extrude3DfaceRef_2),
-	
+	TestDef(655, "extrude3DfaceArcRef",		"extrusion", (testFunction)extrude3DfaceArcRef),
+
 
 	TestDef(710, "connectCuboidMeshRef",	"connection", (testFunction)connectCuboidMeshRef),
 	TestDef(711, "connectCuboidMeshRef2",	"connection", (testFunction)connectCuboidMeshRef2)
@@ -3129,12 +3131,6 @@ int extrude2DedgeArcRef(const std::string& fileName) {
 	glm::dmat3x3 rotM1 = makeCsysMatrix(X_DIR, Y_DIR);
 	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), &rotM1);
 
-	//ConeMesher::writeNodesY(glm::dvec3(0., 10., 0.), csys1, MeshDensity2D(8, 4), Cone2Dradius(5.0, 5.0), ArcAngles(0., GLMPI/3.0), 3.0);
-	//ConeMesher::writeElements(MeshDensity2D(8, 4));
-	//
-	//ConeMesherRef2::writeNodes(glm::dvec3(0.,20.,0.), csys1, MeshDensity2Dref(3, 33), Cone2Dradius(5.0, 5.0), ArcAngles(0., GLMPI / 3.0), 3.0, false, direction::y);
-	//ConeMesherRef2::writeElements(MeshDensity2Dref(3, 33));
-
 	Mesh2D_planeExtrusion mesh2D(128, 4.0);
 	mesh2D.extrudeYedgeArc(GLMPI/16.0, 6., 4);
 	//mesh2D.extrudeYedgeArc(GLMPI/4.0, 5.0, 10);
@@ -3168,10 +3164,10 @@ int extrude3DfaceArc(const std::string& fileName) {
 
 	TEST_START2
 	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(7, 10), glm::dvec2(5.0, 2.0));
-	mesh3D.extrudeYZedgeArc(-0.1* GLMPI, -100.0, 30);
-	mesh3D.extrudeYZedgeArc(0.9 * GLMPI, 4.0, 20);	
-	mesh3D.extrudeYZedgeArc(0.3 * GLMPI, 10.0,  10);
-	mesh3D.extrudeYZedgeArc(-1.0* GLMPI, -6, 18);
+	mesh3D.extrudeYZfaceArc(-0.1* GLMPI, -100.0, 30);
+	mesh3D.extrudeYZfaceArc(0.9 * GLMPI, 4.0, 20);	
+	mesh3D.extrudeYZfaceArc(0.3 * GLMPI, 10.0,  10);
+	mesh3D.extrudeYZfaceArc(-1.0* GLMPI, -6, 18);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END
@@ -3179,12 +3175,12 @@ int extrude3DfaceArc(const std::string& fileName) {
 int extrude3DfaceArcAndLine(const std::string& fileName) {
 	TEST_START2
 	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(3, 4), glm::dvec2(5.0, 2.0));		
-	mesh3D.extrudeYZedgeArc(-0.1 * GLMPI, -100.0, 8);
-	mesh3D.extrudeYZedgeArc(1.0 * GLMPI, 6.0, 7);
-	mesh3D.extrudeYZedgeArc(0.3 * GLMPI, 10.0, 6);
-	mesh3D.extrudeYZedgeArc(-1.0 * GLMPI, -6, 7);
+	mesh3D.extrudeYZfaceArc(-0.1 * GLMPI, -100.0, 8);
+	mesh3D.extrudeYZfaceArc(1.0 * GLMPI, 6.0, 7);
+	mesh3D.extrudeYZfaceArc(0.3 * GLMPI, 10.0, 6);
+	mesh3D.extrudeYZfaceArc(-1.0 * GLMPI, -6, 7);
 	mesh3D.extrudeYZface(10., 4);
-	mesh3D.extrudeYZedgeArc(1.0 * GLMPI, 6.0, 6);
+	mesh3D.extrudeYZfaceArc(1.0 * GLMPI, 6.0, 6);
 	mesh3D.extrudeYZface(20., 4);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
@@ -3214,6 +3210,19 @@ int extrude3DfaceRef_2(const std::string& fileName) {
 	TEST_END
 }
 
+int extrude3DfaceArcRef(const std::string& fileName) {
+	TEST_START2
+	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(33, 33), glm::dvec2(5.0, 5.0));
+	mesh3D.extrudeYZface(1., 5);
+	mesh3D.extrudeYZfaceArcRef(GLMPI/4.0, 10., 3);
+	mesh3D.extrudeYZface(8., 8);
+	mesh3D.extrudeYZfaceArc(GLMPI, 10., 16);
+	mesh3D.extrudeYZface(8., 8);
+	mesh3D.extrudeYZfaceArc(-GLMPI, -10., 16);
+	mesh3D.writeNodes();
+	mesh3D.writeElements();
+	TEST_END
+}
 
 int connectCuboidMeshRef(const std::string& fileName) {
 	TEST_START2
