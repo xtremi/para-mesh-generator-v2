@@ -2,6 +2,7 @@
 #include "ParaMeshGenCommon.h"
 #include "MeshDensity.h"
 #include "MeshCsys.h"
+#include "Shapes.h"
 #include  <memory>
 
 enum class ExtrusionType {
@@ -104,6 +105,9 @@ class MeshExtrusion_arcProp {
 protected:
 	MeshExtrusion_arcProp(double _radius, double _endAngle) : radius{_radius}, endAngle{_endAngle}{}
 	double radius, endAngle;
+
+	Pipe3Dradius getPipeRadiusForArc3Dextrusion(double edgeLength);
+
 };
 
 /*

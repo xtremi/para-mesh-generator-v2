@@ -110,6 +110,7 @@ int extrude2DedgeArcRef(const std::string& filename);
 int extrude3DfaceLine(const std::string& fileName);
 int extrude3DfaceArc(const std::string& fileName);
 int extrude3DfaceArcAndLine(const std::string& fileName);
+int extrude3DfaceArcAndLine_2(const std::string& fileName);
 int extrude3DfaceRef(const std::string& filename);
 int extrude3DfaceRef_2(const std::string& filename);
 int extrude3DfaceArcRef(const std::string& filename);
@@ -216,6 +217,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(600, "extrude3DfaceLine",		"extrusion", (testFunction)extrude3DfaceLine),
 	TestDef(620, "extrude3DfaceArc",		"extrusion", (testFunction)extrude3DfaceArc),
 	TestDef(640, "extrude3DfaceArcAndLine",	"extrusion", (testFunction)extrude3DfaceArcAndLine),
+	TestDef(641, "extrude3DfaceArcAndLine_2","extrusion", (testFunction)extrude3DfaceArcAndLine_2),
 	TestDef(650, "extrude3DfaceRef",		"extrusion", (testFunction)extrude3DfaceRef),
 	TestDef(651, "extrude3DfaceRef_2",		"extrusion", (testFunction)extrude3DfaceRef_2),
 	TestDef(655, "extrude3DfaceArcRef",		"extrusion", (testFunction)extrude3DfaceArcRef),
@@ -256,8 +258,10 @@ int main(int argc, char* argv[]) {
 		if (testsToRun.find(testDef.id) != testsToRun.end()){
 			runTest = true;
 		}
-		else if ((testDef.id >= testLargerThan || testLargerThan == -1) && (testDef.id <= testSmallerThan || testSmallerThan == -1)) {
-			runTest = true;
+		else if(testLargerThan > -1 || testSmallerThan > -1){
+			if ((testDef.id >= testLargerThan || testLargerThan == -1) && (testDef.id <= testSmallerThan || testSmallerThan == -1)) {
+				runTest = true;
+			}
 		}
 		else if (testsToRun.empty() && testSmallerThan == -1 && testLargerThan == -1){
 			runTest = true;
@@ -3164,10 +3168,10 @@ int extrude3DfaceArc(const std::string& fileName) {
 
 	TEST_START2
 	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(7, 10), glm::dvec2(5.0, 2.0));
-	mesh3D.extrudeYZfaceArc(-0.1* GLMPI, -100.0, 30);
+	mesh3D.extrudeYZfaceArc(-0.1* GLMPI, 100.0, 30);
 	mesh3D.extrudeYZfaceArc(0.9 * GLMPI, 4.0, 20);	
 	mesh3D.extrudeYZfaceArc(0.3 * GLMPI, 10.0,  10);
-	mesh3D.extrudeYZfaceArc(-1.0* GLMPI, -6, 18);
+	mesh3D.extrudeYZfaceArc(-1.0* GLMPI, 6, 18);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END
@@ -3175,13 +3179,28 @@ int extrude3DfaceArc(const std::string& fileName) {
 int extrude3DfaceArcAndLine(const std::string& fileName) {
 	TEST_START2
 	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(3, 4), glm::dvec2(5.0, 2.0));		
-	mesh3D.extrudeYZfaceArc(-0.1 * GLMPI, -100.0, 8);
+	mesh3D.extrudeYZfaceArc(-0.1 * GLMPI, 100.0, 8);
 	mesh3D.extrudeYZfaceArc(1.0 * GLMPI, 6.0, 7);
 	mesh3D.extrudeYZfaceArc(0.3 * GLMPI, 10.0, 6);
-	mesh3D.extrudeYZfaceArc(-1.0 * GLMPI, -6, 7);
+	mesh3D.extrudeYZfaceArc(-1.0 * GLMPI, 6, 7);
 	mesh3D.extrudeYZface(10., 4);
 	mesh3D.extrudeYZfaceArc(1.0 * GLMPI, 6.0, 6);
 	mesh3D.extrudeYZface(20., 4);
+	mesh3D.writeNodes();
+	mesh3D.writeElements();
+	TEST_END
+}
+
+int extrude3DfaceArcAndLine_2(const std::string& fileName) {
+	TEST_START2
+	Mesh3D_volumeExtrusion mesh3D(MeshDensity2D(6, 10), glm::dvec2(5.0, 10.0));
+	mesh3D.extrudeYZface(10., 10);	
+	mesh3D.extrudeYZfaceArc(GLMPI/2.0,	10.0, 8);
+	mesh3D.extrudeYZfaceArc(-GLMPI,		10.0, 16);
+	mesh3D.extrudeYZface(20.0, 10.);
+	mesh3D.extrudeYZfaceArc(GLMPI, 10.0, 16);
+	mesh3D.extrudeYZface(20.0, 10.);
+
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END
@@ -3218,7 +3237,8 @@ int extrude3DfaceArcRef(const std::string& fileName) {
 	mesh3D.extrudeYZface(8., 8);
 	mesh3D.extrudeYZfaceArc(GLMPI, 10., 16);
 	mesh3D.extrudeYZface(8., 8);
-	mesh3D.extrudeYZfaceArc(-GLMPI, -10., 16);
+	mesh3D.extrudeYZfaceArc(-GLMPI, 10., 16);
+	mesh3D.extrudeYZfaceArcRef(GLMPI/5.0, 10., 1);
 	mesh3D.writeNodes();
 	mesh3D.writeElements();
 	TEST_END

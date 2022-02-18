@@ -359,6 +359,25 @@ void MeshFaceExtrusionLinear::writeNodes(ExtrudeStepData* curExtrData) {
 	curExtrData->csys.moveInLocalCsys(glm::dvec3(length, 0., 0.));
 }
 
+Pipe3Dradius MeshExtrusion_arcProp::getPipeRadiusForArc3Dextrusion(double edgeLength) {
+
+	Pipe3Dradius rad;
+	double radInner, radOuter;
+	if (endAngle > 0.0) {
+		radInner = radius + edgeLength;
+		radOuter = radius;
+	}
+	else {
+		radInner = -radius;
+		radOuter = -radius - edgeLength;
+	}
+	rad.start.setInner(radInner);
+	rad.end.setInner(radInner);
+	rad.start.setOuter(radOuter);
+	rad.end.setOuter(radOuter);
+	
+	return rad;
+}
 
 /************************************************
 	MeshFaceExtrusionArc
@@ -379,8 +398,10 @@ double MeshFaceExtrusionArc::spacing() {
 void MeshFaceExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
 
 	ExtrudeFaceStepData* curExtrData = (ExtrudeFaceStepData*)_curExtrData;
+	Pipe3Dradius rad = getPipeRadiusForArc3Dextrusion(curExtrData->sizeYZ[1]);
+	double radInner = rad.start.inner();
 
-	curExtrData->pos = glm::dvec3(0., 0., radius);
+	curExtrData->pos = glm::dvec3(0., 0., radInner);
 
 	ArcAngles ang;
 	ang.setStart(-curExtrData->startSpace - GLMPI);
@@ -390,13 +411,13 @@ void MeshFaceExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
 		curExtrData->pos,
 		curExtrData->csys,
 		meshDens,
-		Pipe3Dradius(
-			radius, radius - curExtrData->sizeYZ[1],//curFextr->radiusOuter, 
-			radius, radius - curExtrData->sizeYZ[1]),//curFextr->radiusOuter),
-		ang, curExtrData->sizeYZ[0], direction::y);
+		rad,
+		ang, 
+		curExtrData->sizeYZ[0], 
+		direction::y);
 
 	curExtrData->arcAngle += endAngle;
-	curExtrData->csys.moveInLocalCsys(coordsOnCircle(ang.end, radius, direction::y) + glm::dvec3(0, 0, radius));
+	curExtrData->csys.moveInLocalCsys(coordsOnCircle(ang.end, radInner, direction::y) + glm::dvec3(0, 0, radInner));
 	(*curExtrData->csys.csys) = makeCsysMatrix(Y_DIR, curExtrData->arcAngle);
 }
 
@@ -589,7 +610,10 @@ double MeshFaceExtrusionArcRef::spacing() {
 void MeshFaceExtrusionArcRef::writeNodes(ExtrudeStepData* _curExtrData) {
 
 	ExtrudeFaceStepData* curExtrData = (ExtrudeFaceStepData*)_curExtrData;
-	curExtrData->pos = glm::dvec3(0., 0., radius);
+	Pipe3Dradius rad = getPipeRadiusForArc3Dextrusion(curExtrData->sizeYZ[1]);
+	double radInner = rad.start.inner();
+	
+	curExtrData->pos = glm::dvec3(0., 0., radInner);
 
 	ArcAngles ang;
 	ang.setStart(-curExtrData->startSpace - GLMPI);
@@ -599,13 +623,11 @@ void MeshFaceExtrusionArcRef::writeNodes(ExtrudeStepData* _curExtrData) {
 		curExtrData->pos,
 		curExtrData->csys,
 		meshDens,
-		Pipe3Dradius(
-			radius, radius - curExtrData->sizeYZ[1],//curFextr->radiusOuter, 
-			radius, radius - curExtrData->sizeYZ[1]),//curFextr->radiusOuter),
+		rad,
 		ang, curExtrData->sizeYZ[0], true, direction::y);
 
 	curExtrData->arcAngle += endAngle;
-	curExtrData->csys.moveInLocalCsys(coordsOnCircle(ang.end, radius, direction::y) + glm::dvec3(0, 0, radius));
+	curExtrData->csys.moveInLocalCsys(coordsOnCircle(ang.end, radInner, direction::y) + glm::dvec3(0, 0, radInner));
 	(*curExtrData->csys.csys) = makeCsysMatrix(Y_DIR, curExtrData->arcAngle);
 
 }
