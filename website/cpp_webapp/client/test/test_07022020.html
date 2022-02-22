@@ -1,0 +1,354 @@
+
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+	  
+	* {
+	  box-sizing: border-box;
+	}
+
+	body {
+	  font-family: Arial, Helvetica, sans-serif;
+	}
+
+	/* Style the header */
+	header {
+	  background-color: #666;
+	  padding: 30px;
+	  text-align: center;
+	  font-size: 35px;
+	  color: white;
+	}
+
+	/* Create two columns/boxes that floats next to each other */
+	nav {
+	  float: left;
+	  width: 200px;
+
+	  background: #ccc;
+	  padding: 20px;
+	}
+
+	/* Style the list inside the menu */
+	nav ul {
+	  list-style-type: none;
+	  padding: 0;
+	  
+	}
+
+	article {
+	  float: left;
+	  padding: 20px;
+	  width: 70%;
+	  background-color: #f1f1f1;
+
+	}
+
+	/* Clear floats after the columns */
+	section:after {
+	  content: "";
+	  display: table;
+	  clear: both;
+	}
+
+	/* Style the footer */
+	footer {
+	  background-color: #777;
+	  padding: 10px;
+	  text-align: center;
+	  color: white;
+	}
+
+	/* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
+	@media (max-width: 600px) {
+	  nav, article {
+		width: 100%;
+		height: auto;
+	  }
+	}
+	  
+    .slidecontainer {
+      width: 100%;
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      width: 50%;
+      height: 25px;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+    }
+
+    .slider:hover {
+      opacity: 1;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      background: #4CAF50;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      background: #4CAF50;
+      cursor: pointer;
+    }
+	
+	.button {
+	  background-color: #4CAF50; /* Green */
+	  border: none;
+	  color: white;
+	  padding: 10px 0px;
+	  text-align: center;
+	  text-decoration: none;
+	  display: inline-block;
+	  font-size: 16px;
+	  width: 140px;	  
+	  border-radius: 8px;
+	  border: 4px solid #008CBA;
+	  cursor: pointer;
+	}
+	
+	.button:after {
+		
+	}
+	
+	.button:active:after{
+	
+	}
+	
+	li.buttonlist{
+		margin-bottom: 15px;
+	}
+	
+	canvas { display: block; }
+	
+  </style>
+</head>
+
+<body>
+
+<script type="text/javascript" src="js/data.js"></script>
+<script type="text/javascript" src="js/three.js"></script>
+
+<header>
+	<h2>Mesh generator</h2>
+</header>
+
+<section>
+	
+	<nav>
+		<ul>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateIbeamInputForm()">I beam</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateCbeamInputForm()">C beam</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateIbeamInputForm()">T beam</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateIbeamInputForm()">Pipe</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateCbeamInputForm()">Primitives</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateCbeamInputForm()">Holed plate</button></li>
+
+		</ul>
+	</nav>
+	
+	<article>
+		<div id="input_form">
+		  <p id="p1">This is a paragraph.</p>
+		  <p id="p2">This is another paragraph.</p>
+		  <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+		</div>
+	</article>
+
+</section>
+
+<footer>
+	<h4>About</h4>
+</footer>
+
+
+<script>
+
+
+
+function imposeMinMax(el){
+  if(el.value != ""){
+    if(parseInt(el.value) < parseInt(el.min)){
+      el.value = el.min;
+    }
+    if(parseInt(el.value) > parseInt(el.max)){
+      el.value = el.max;
+    }
+  }
+}
+
+function generateIbeamInputForm(){
+	generateInputForm("I_BEAM");
+}
+function generateCbeamInputForm(){
+	generateInputForm("C_BEAM");
+}
+
+function getInputForm(){
+	return document.getElementById("input_form");
+}
+
+function clearInputForm(){
+  var inputForm = getInputForm();
+  inputForm.innerHTML = "";;
+}
+
+function generateInputForm(modelType){
+	clearInputForm();
+	var inputForm = getInputForm();
+    
+	var model_types      = data.model_types;
+	var model_input_spec = model_types[modelType];
+	var title            = model_input_spec.title;
+	var inputs           = model_input_spec.inputs;
+	
+	var titleP = document.createElement("p");
+	titleP.appendChild(document.createTextNode(title));
+	inputForm.appendChild(titleP);
+
+	inputs.forEach(function(item, index){
+		var p = document.createElement("p");
+		var n = document.createTextNode(item.name);
+		p.appendChild(n);
+		inputForm.appendChild(p);
+		
+		if(item.type === "slider"){
+		
+			var minVal = 1.0;
+			var maxVal = 10.0;
+			var defaultVal = 5.0;
+			var step = 0.25;
+			
+			
+			var valbox = document.createElement("INPUT");
+			valbox.setAttribute("type", 	"number");
+			valbox.setAttribute("min", 		minVal);
+			valbox.setAttribute("max", 		maxVal);
+			valbox.setAttribute("value",	defaultVal);
+			valbox.setAttribute("step", 	step);
+			valbox.setAttribute("onkeyup", 	"imposeMinMax(this)");
+			valbox.id = item.name + "-valbox";
+			
+					
+			var slider = document.createElement("INPUT");
+			slider.setAttribute("type", 	"range");
+			slider.setAttribute("min", 		minVal);
+			slider.setAttribute("max", 		maxVal);
+			slider.setAttribute("value", 	defaultVal);
+			slider.setAttribute("step", 	step);
+			slider.id = item.name + "-slider";
+			slider.classList.add("slider");
+			
+			valbox.setAttribute("onchange", "updateTextInput(this.value,\"" + valbox.id + "\");");
+			
+			valbox.addEventListener("input", function(e){
+				var val = parseFloat(e.target.value).toFixed(2);
+				slider.value = val;
+			})
+			slider.addEventListener("input", function(e){				
+				var val = parseFloat(e.target.value).toFixed(2);
+				valbox.value = val;
+			})
+			
+			inputForm.appendChild(slider);
+			inputForm.appendChild(valbox);
+		}
+		else if(item.type === "check"){
+			var checkBox = document.createElement("INPUT");
+			checkBox.setAttribute("type", "checkbox");
+			checkBox.setAttribute("checked", "checked");
+			inputForm.appendChild(checkBox);
+		}		
+		
+	});
+	
+	var scene = new THREE.Scene();
+	var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+	var renderer = new THREE.WebGLRenderer();
+	renderer.setSize( 350, 250 );
+	inputForm.appendChild( renderer.domElement );
+		
+	var material = new THREE.MeshBasicMaterial( {color: 0xff00ff} );
+
+	var shape = new THREE.Shape();
+	var L = 1.0;
+	var W = 0.6;
+	var D = 5.0;
+	shape.moveTo(-W/2.0, -L/2.0);
+	shape.lineTo(W/2.0, -L/2.0);
+	shape.lineTo(W/2.0, L/2.0);
+	shape.lineTo(-W/2.0, L/2.0);
+	shape.lineTo(-W/2.0, -L/2.0);
+	
+	var extrudeSettings = {
+		steps : 1,
+		depth : D,
+		bevelEnabled : false		
+	};
+
+	var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+	var mesh = new THREE.Mesh(geometry, material);
+	
+	var edges = new THREE.EdgesGeometry( mesh.geometry );
+	var wmat = new THREE.LineBasicMaterial( { color: 0xf0ff00, linewidth: 2 } );
+	var wireframe = new THREE.LineSegments( edges, wmat );
+	
+	scene.add(mesh);
+	scene.add( wireframe );
+	
+	camera.position.z = 10;
+	function animate() {
+		requestAnimationFrame( animate );
+		renderer.render( scene, camera );
+		mesh.rotation.x += 0.01;
+		mesh.rotation.y += 0.01;
+		wireframe.rotation.x += 0.01;
+		wireframe.rotation.y += 0.01;
+	}
+	
+	
+	
+	/*var geometry = new THREE.BoxGeometry();
+	var cube = new THREE.Mesh( geometry, material );
+	
+	var edges = new THREE.EdgesGeometry( cube.geometry );
+	var wmat = new THREE.LineBasicMaterial( { color: 0xf0ff00, linewidth: 2 } );
+	var wireframe = new THREE.LineSegments( edges, wmat );
+	
+	
+	scene.add( cube );
+	scene.add( wireframe );
+
+	camera.position.z = 5;
+	
+	function animate() {
+		requestAnimationFrame( animate );
+		renderer.render( scene, camera );
+		cube.rotation.x += 0.01;
+		cube.rotation.y += 0.01;
+		wireframe.rotation.x += 0.01;
+		wireframe.rotation.y += 0.01;
+	}
+	var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+	scene.add( light );*/
+	
+	animate();
+	
+}
+
+</script>
+
+</body>
+</html>

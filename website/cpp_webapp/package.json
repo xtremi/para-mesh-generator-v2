@@ -1,0 +1,21 @@
+{
+  "name": "cpp_webapp",
+  "version": "1.0.0",
+  "description": "Express webapp hosting client webpage and allows to call server side CPP executable.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "mesh",
+    "generator",
+    "fea"
+  ],
+  "author": "Remi Lanza",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "express": "^4.17.1",
+    "jquery": "^3.4.1",
+    "three": "^0.113.2"
+  }
+}

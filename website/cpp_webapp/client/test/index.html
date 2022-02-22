@@ -1,0 +1,52 @@
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<script type="text/javascript" src="js/data.js"></script>
+<script type="text/javascript" src="js/three.js"></script>
+<script type="text/javascript" src="js/formGeneration.js"></script>
+<script type="text/javascript" src="js/modelGeneration.js"></script>
+<script type="text/javascript" src="js/OrbitControls.js"></script>
+
+<header>
+	<h2>Mesh generator</h2>
+</header>
+
+<section>
+	
+	<nav>
+		<ul>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateIbeamInputForm()">I beam</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateCbeamInputForm()">C beam</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateIbeamInputForm()">T beam</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateIbeamInputForm()">Pipe</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateCbeamInputForm()">Primitives</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateCbeamInputForm()">Holed plate</button></li>
+
+		</ul>
+	</nav>
+	
+	<article>
+		<div id="input_form">
+		  <p id="p1">This is a paragraph.</p>
+		  <p id="p2">This is another paragraph.</p>
+		  <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+		</div>
+	</article>
+
+</section>
+
+<footer>
+	<h4>About</h4>
+</footer>
+
+
+
+</body>
+</html>

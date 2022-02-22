@@ -1,0 +1,98 @@
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<script type="text/javascript" src="js/data.js"></script>
+<script type="text/javascript" src="js/three.js"></script>
+<script type="text/javascript" src="js/formGeneration.js"></script>
+<script type="text/javascript" src="js/modelGeneration.js"></script>
+<script type="text/javascript" src="js/OrbitControls.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+		const $form = $('#input_form')
+
+		$form.on('submit', submitHandler)
+		
+		var type = "GENERIC";
+		function submitHandler (e) {
+		  e.preventDefault()
+		  	
+		  $.ajax({
+			url 		: '/generate',
+			type		:'POST',
+			method		: 'POST',
+			data		: $form.serialize() + "&type=" + type,
+			beforeSend	: function(){
+				document.getElementById("loader").style.display = "block";
+			},
+			complete	: function(data){
+				document.getElementById("loader").style.display = "none";
+			}
+			//timeout: 600000
+		  }).done(response => {
+			console.log(response);
+			//document.location.assign(response);
+			
+			var a = document.createElement('a');
+			a.href = response;
+			// Give filename you wish to download
+			a.download = "result.txt"; //document.getElementById("input3").value;
+			a.style.display = 'none';
+			document.body.appendChild(a);
+			a.click();
+		  })
+
+		}		
+</script>
+
+
+
+<header>
+	<h2>Mesh generator</h2>
+</header>
+
+<section>
+	
+	<nav>
+		<ul>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateIbeamInputForm()">I beam</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateCbeamInputForm()">C beam</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateIbeamInputForm()">T beam</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateIbeamInputForm()">Pipe</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateCbeamInputForm()">Primitives</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateCbeamInputForm()">Holed plate</button></li>
+			<li class="buttonlist"><button class="button" type="button" onclick="generateGenericInputForm()">Generic (debug)</button></li>
+		</ul>
+	</nav>
+	
+	<article>
+		
+	
+		<form id="input_form" method="post">
+		  <p id="p1">This is a paragraph.</p>
+		  <p id="p2">This is another paragraph.</p>
+		  <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+		</form>
+		
+		<div id="loader" style="display: none;">
+			<img src='media/reload.gif' width='32px' height='32px'>
+		</div>
+	</article>
+
+</section>
+
+<footer>
+	<h4>About</h4>
+</footer>
+
+
+
+</body>
+</html>

@@ -1,0 +1,395 @@
+
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>	
+  </style>
+</head>
+
+<body>
+
+<script type="text/javascript" src="js/three.js"></script>
+<script type="text/javascript" src="js/OrbitControls.js"></script>
+
+<div id="mydiv1"></div>
+<div id="mydiv2"></div>
+<div id="mydiv3"></div>
+
+<script>
+
+function imposeMinMax(el){
+  if(el.value != ""){
+    if(parseInt(el.value) < parseInt(el.min)){
+      el.value = el.min;
+    }
+    if(parseInt(el.value) > parseInt(el.max)){
+      el.value = el.max;
+    }
+  }
+}
+
+function getMyDiv1(){
+	return document.getElementById("mydiv1");
+}
+function getMyDiv2(){
+	return document.getElementById("mydiv2");
+}
+function getMyDiv3(){
+	return document.getElementById("mydiv3");
+}
+function clearMyDiv1(){
+  var myDiv = getMyDiv1();
+  myDiv.innerHTML = "";;
+}
+function clearMyDiv2(){
+  var myDiv = getMyDiv2();
+  myDiv.innerHTML = "";;
+}
+function clearMyDiv3(){
+  var myDiv = getMyDiv3();
+  myDiv.innerHTML = "";;
+}
+
+var scene1; 	
+var camera1; 	
+var renderer1;
+var mesh1;
+var geom1;
+
+var scene2; 	
+var camera2; 	
+var renderer2;
+var mesh2;
+var geom2;
+
+var scene3; 	
+var camera3; 	
+var renderer3;
+var mesh3 = [];
+var geom3 = [];
+
+function modifyGeom1(e){
+	var vpos = geom1.vertices;	
+	for(var i = 4; i < 8; i++){		
+		vpos[i].z = e.target.value;
+	}
+	geom1.verticesNeedUpdate = true;
+}
+function modifyGeom2(e){
+	
+	var vpos = geom2.attributes.position;	
+	for(var i = 0; i < 24; i++){
+		var x = vpos.getX(i);
+		var y = vpos.getY(i);
+		var z = e.target.value;
+		vpos.setXYZ(i, x,y,z);
+	}
+	geom2.attributes.position.needsUpdate = true;	
+}
+
+function modifyGeom3(e){
+	
+	var scale = e.target.value;	
+	for(var i = 0; i < 3; i++){
+		mesh3[i].scale.z = scale;
+	}
+	
+	
+}
+
+function generate1(){
+	clearMyDiv1();
+	var myDiv = getMyDiv1();
+    			
+	var minVal 		= 1.0;
+	var maxVal 		= 10.0;
+	var defaultVal 	= 5.0;
+	var step 		= 0.25;
+	
+	var valbox = document.createElement("INPUT");
+	var slider = document.createElement("INPUT");
+	
+	valbox.setAttribute("type", 	"number");
+	valbox.setAttribute("min", 		minVal);
+	valbox.setAttribute("max", 		maxVal);
+	valbox.setAttribute("value",	defaultVal);
+	valbox.setAttribute("step", 	step);
+	valbox.setAttribute("onkeyup", 	"imposeMinMax(this)");
+	valbox.id = "valbox1";
+				
+	slider.setAttribute("type", 	"range");
+	slider.setAttribute("min", 		minVal);
+	slider.setAttribute("max", 		maxVal);
+	slider.setAttribute("value", 	defaultVal);
+	slider.setAttribute("step", 	step);
+	slider.id = "slider1";
+	slider.classList.add("slider");
+	
+
+	valbox.addEventListener("input", function(e){
+		var val = parseFloat(e.target.value).toFixed(2);
+		slider.value = val;
+	})
+	slider.addEventListener("input", function(e){				
+		var val = parseFloat(e.target.value).toFixed(2);
+		valbox.value = val;
+	})
+	
+	
+	slider.addEventListener("input", modifyGeom1);
+	
+	myDiv.appendChild(slider);
+	myDiv.appendChild(valbox);
+
+
+
+	scene1 		= new THREE.Scene();
+	camera1 	= new THREE.PerspectiveCamera( 75, 350 / 250, 0.1, 1000 );
+	renderer1 	= new THREE.WebGLRenderer();
+	renderer1.setSize( 350, 250 );
+	myDiv.appendChild( renderer1.domElement );
+		
+	//var material = new THREE.MeshBasicMaterial( {color: 0xff00ff} );
+	var L = 2;
+	geom1 = new THREE.Geometry();
+	geom1.vertices.push(new THREE.Vector3(-L, -L, -L));
+	geom1.vertices.push(new THREE.Vector3( L, -L, -L));
+	geom1.vertices.push(new THREE.Vector3( L,  L, -L));
+	geom1.vertices.push(new THREE.Vector3(-L,  L, -L));
+	geom1.vertices.push(new THREE.Vector3(-L, -L,  L));
+	geom1.vertices.push(new THREE.Vector3( L, -L,  L));
+	geom1.vertices.push(new THREE.Vector3( L,  L,  L));
+	geom1.vertices.push(new THREE.Vector3(-L,  L,  L));	
+
+	geom1.faces.push(new THREE.Face3(2,1,0)); //F
+	geom1.faces.push(new THREE.Face3(0,3,2));
+	geom1.faces.push(new THREE.Face3(4,5,6)); //B
+	geom1.faces.push(new THREE.Face3(4,6,7)); 
+	geom1.faces.push(new THREE.Face3(2,3,6)); //T
+	geom1.faces.push(new THREE.Face3(3,7,6)); 
+	geom1.faces.push(new THREE.Face3(4,1,5)); //B
+	geom1.faces.push(new THREE.Face3(4,0,1)); 
+	geom1.faces.push(new THREE.Face3(1,6,5)); //R
+	geom1.faces.push(new THREE.Face3(1,2,6)); 
+	geom1.faces.push(new THREE.Face3(4,3,0)); //L
+	geom1.faces.push(new THREE.Face3(4,7,3)); 
+	
+	geom1.computeFaceNormals();	
+	geom1.verticesNeedUpdate = true;
+	
+	
+	mesh1 = new THREE.Mesh(geom1, new THREE.MeshNormalMaterial());
+	scene1.add(mesh1);
+	
+	camera1.position.z = 10;
+	
+	var controls = new THREE.OrbitControls(camera1, renderer1.domElement); 
+	
+
+	function animate1() {
+		requestAnimationFrame( animate1 );
+		//controls.update();
+		renderer1.render( scene1, camera1 );
+	}
+	
+	
+	animate1();
+	
+}
+
+function generate2(){
+	clearMyDiv2();
+	var myDiv = getMyDiv2();
+    			
+	var minVal 		= 1.0;
+	var maxVal 		= 10.0;
+	var defaultVal 	= 5.0;
+	var step 		= 0.25;
+	
+	var valbox = document.createElement("INPUT");
+	var slider = document.createElement("INPUT");
+	
+	valbox.setAttribute("type", 	"number");
+	valbox.setAttribute("min", 		minVal);
+	valbox.setAttribute("max", 		maxVal);
+	valbox.setAttribute("value",	defaultVal);
+	valbox.setAttribute("step", 	step);
+	valbox.setAttribute("onkeyup", 	"imposeMinMax(this)");
+	valbox.id = "valbox2";
+				
+	slider.setAttribute("type", 	"range");
+	slider.setAttribute("min", 		minVal);
+	slider.setAttribute("max", 		maxVal);
+	slider.setAttribute("value", 	defaultVal);
+	slider.setAttribute("step", 	step);
+	slider.id = "slider2";
+	slider.classList.add("slider");
+	
+
+	valbox.addEventListener("input", function(e){
+		var val = parseFloat(e.target.value).toFixed(2);
+		slider.value = val;
+	})
+	slider.addEventListener("input", function(e){				
+		var val = parseFloat(e.target.value).toFixed(2);
+		valbox.value = val;
+	})
+	
+	
+	slider.addEventListener("input", modifyGeom2);
+	
+	myDiv.appendChild(slider);
+	myDiv.appendChild(valbox);
+
+
+
+	scene2 		= new THREE.Scene();
+	camera2 	= new THREE.PerspectiveCamera( 75, 350 / 250, 0.1, 1000 );
+	renderer2 	= new THREE.WebGLRenderer();
+	renderer2.setSize( 350, 250 );
+	myDiv.appendChild( renderer2.domElement );
+		
+	//var material = new THREE.MeshBasicMaterial( {color: 0xff00ff} );
+	var L = 2;
+	geom2 = new THREE.BoxBufferGeometry(L,L,L);
+	geom2.attributes.position.needsUpdate = true;	
+	
+	mesh2 = new THREE.Mesh(geom2, new THREE.MeshNormalMaterial());
+	scene2.add(mesh2);
+	
+	camera2.position.z = 10;
+	
+	var controls = new THREE.OrbitControls(camera2, renderer2.domElement); 
+	
+	function animate2() {
+		requestAnimationFrame( animate2 );
+		//controls.update();
+		renderer2.render( scene2, camera2 );
+	}
+	
+	
+	animate2();
+	
+}
+
+
+function generate3(){
+	clearMyDiv3();
+	var myDiv = getMyDiv3();
+    			
+	var minVal 		= 1.0;
+	var maxVal 		= 10.0;
+	var defaultVal 	= 5.0;
+	var step 		= 0.25;
+	
+	var valbox = document.createElement("INPUT");
+	var slider = document.createElement("INPUT");
+	
+	valbox.setAttribute("type", 	"number");
+	valbox.setAttribute("min", 		minVal);
+	valbox.setAttribute("max", 		maxVal);
+	valbox.setAttribute("value",	defaultVal);
+	valbox.setAttribute("step", 	step);
+	valbox.setAttribute("onkeyup", 	"imposeMinMax(this)");
+	valbox.id = "valbox3";
+				
+	slider.setAttribute("type", 	"range");
+	slider.setAttribute("min", 		minVal);
+	slider.setAttribute("max", 		maxVal);
+	slider.setAttribute("value", 	defaultVal);
+	slider.setAttribute("step", 	step);
+	slider.id = "slider3";
+	slider.classList.add("slider");
+	
+
+	valbox.addEventListener("input", function(e){
+		var val = parseFloat(e.target.value).toFixed(2);
+		slider.value = val;
+	})
+	slider.addEventListener("input", function(e){				
+		var val = parseFloat(e.target.value).toFixed(2);
+		valbox.value = val;
+	})
+	
+	
+	slider.addEventListener("input", modifyGeom3);
+	
+	myDiv.appendChild(slider);
+	myDiv.appendChild(valbox);
+
+
+
+	scene3 		= new THREE.Scene();
+	//camera3 	= new THREE.PerspectiveCamera( 75, 350 / 250, 0.1, 1000 );
+	var width  = 350;
+	var height = 250;
+	var aspect = width / height;
+	camera3 	= new THREE.OrthographicCamera(-5.0*aspect, 5.0*aspect, 5.0, -5.0, 0.1, 1000);
+	
+	renderer3 	= new THREE.WebGLRenderer();
+	renderer3.setSize( width, height );
+	myDiv.appendChild( renderer3.domElement );
+		
+	var material = new THREE.MeshNormalMaterial();
+	var L = 1;
+	
+		
+	var g1 = new THREE.BoxGeometry(L,L,L);	
+	var m1 = new THREE.Mesh(g1, material);	
+
+	var g2 = new THREE.BoxGeometry(L,L,L);	
+	var m2 = new THREE.Mesh(g2, material);		
+	
+	var g3 = new THREE.BoxGeometry(L,L,L);	
+	var m3 = new THREE.Mesh(g3, material);		
+	
+	
+	scene3.add(m1);
+	scene3.add(m2);
+	scene3.add(m3);
+	
+	geom3.push(g1);
+	mesh3.push(m1);
+	geom3.push(g2);
+	mesh3.push(m2);
+	geom3.push(g3);
+	mesh3.push(m3);
+	
+	
+	var H  = 8.0;
+	var B  = 6.0; 
+	var t1 = 1.0;
+	var t2 = 2.0;
+	var L  = defaultVal; 
+	
+	mesh3[0].scale.set(B, t1, L); //top
+	mesh3[1].scale.set(B, t1, L); //bottom
+	mesh3[2].scale.set(t2, H - 2*t1, L); //bottom
+		
+	mesh3[0].translateY( (H - t1)/2);
+	mesh3[1].translateY(-(H - t1)/2);
+	
+	camera3.position.z = 100;
+	
+	var controls = new THREE.OrbitControls(camera3, renderer3.domElement); 
+	
+	function animate3() {
+		requestAnimationFrame( animate3 );
+		//controls.update();
+		renderer3.render( scene3, camera3 );
+	}
+	
+	
+	animate3();
+	
+}
+
+generate1();
+generate2();
+generate3();
+
+</script>
+
+</body>
+</html>
