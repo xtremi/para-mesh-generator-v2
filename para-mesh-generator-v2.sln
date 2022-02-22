@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1231
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "para-mesh-generator-v2", "para-mesh-generator-v2\para-mesh-generator-v2.vcxproj", "{DC4AF0F2-B233-4D9E-B31F-35C5DD0A15E7}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test_paraMeshGeneratorLib", "Test_paraMeshGeneratorLib\Test_paraMeshGeneratorLib.vcxproj", "{C4DE38CF-44A8-4450-976D-CE03AFDF815D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test_random", "Test_random\Test_random.vcxproj", "{C81DB106-33C5-40E8-BA25-CF22093847AC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "paraMeshGeneratorDll", "paraMeshGeneratorDll\paraMeshGeneratorDll.vcxproj", "{17B53F96-682E-4664-BEED-E0349567729C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,14 @@ Global
 		{C81DB106-33C5-40E8-BA25-CF22093847AC}.Release|x64.Build.0 = Release|x64
 		{C81DB106-33C5-40E8-BA25-CF22093847AC}.Release|x86.ActiveCfg = Release|Win32
 		{C81DB106-33C5-40E8-BA25-CF22093847AC}.Release|x86.Build.0 = Release|Win32
+		{17B53F96-682E-4664-BEED-E0349567729C}.Debug|x64.ActiveCfg = Debug|x64
+		{17B53F96-682E-4664-BEED-E0349567729C}.Debug|x64.Build.0 = Debug|x64
+		{17B53F96-682E-4664-BEED-E0349567729C}.Debug|x86.ActiveCfg = Debug|Win32
+		{17B53F96-682E-4664-BEED-E0349567729C}.Debug|x86.Build.0 = Debug|Win32
+		{17B53F96-682E-4664-BEED-E0349567729C}.Release|x64.ActiveCfg = Release|x64
+		{17B53F96-682E-4664-BEED-E0349567729C}.Release|x64.Build.0 = Release|x64
+		{17B53F96-682E-4664-BEED-E0349567729C}.Release|x86.ActiveCfg = Release|Win32
+		{17B53F96-682E-4664-BEED-E0349567729C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
