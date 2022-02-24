@@ -1,4 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommandArguments>-m PlaneMesher -a1 0.123 -a2 12.3 -b1 100 -b2 102 -v1 "0.1, 0.2, 0.3" -v2 "10.0, 0.1, 0.5" -nNodes "10,23"</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>-m PlaneMesher -a1 0.123 -a2 12.3 -b1 100 -b2 102 -v1 "0.1, 0.2, 0.3" -v2 "10.0, 0.1, 0.5" -nNodes "10,23"</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerCommandArguments>-m PlaneMesher -a1 0.123 -a2 12.3 -b1 100 -b2 102 -v1 "0.1, 0.2, 0.3" -v2 "10.0, 0.1, 0.5" -nNodes "10,23"</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerCommandArguments>-m PlaneMesher -a1 0.123 -a2 12.3 -b1 100 -b2 102 -v1 "0.1, 0.2, 0.3" -v2 "10.0, 0.1, 0.5" -nNodes "10,23"</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

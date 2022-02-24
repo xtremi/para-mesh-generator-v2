@@ -74,7 +74,7 @@ void PlaneMesher::writeNodesQ_nth(
 	bool					skipAlongDir1)
 {
 MESHER_NODE_WRITE_START
-	
+
 	direction dir1, dir2;
 	getPlaneDirections(pln, dir1, dir2);
 

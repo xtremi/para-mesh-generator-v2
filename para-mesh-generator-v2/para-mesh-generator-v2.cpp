@@ -1,12 +1,36 @@
-#include "paraMeshGeneratorDll.h"
+#include "PlaneMesher.h"
+#include "ConeMesher.h"
+#include "ArgumentParser/ArgumentParser.h"
+
+using namespace ArgParse;
+
 
 
 int main(int argc, char* argv[]) {
 
-	int32_t res = test1(1, 2);
-	if (res != 3) return 1;
-	res = test2(1, 2);
-	if (res != -1) return 1;
+	ArgumentParser argParser;
+	argParser.options.argCaseInsensitive = true;
+	argParser.readInput(argc, argv);
+	
+
+	std::string mesherType = argParser.getArg("-m");
+
+	glm::dvec3 csysX, csysY, pos;
+	glm::dvec2 size;
+	glm::ivec2 nNodes;
+	argParser.getArg("-csysx",  csysX,	X_DIR);
+	argParser.getArg("-csysy",  csysY,	Y_DIR);
+	argParser.getArg("-pos",    pos,	NULL_POS);
+	argParser.getArg("-nnodes", nNodes,	glm::ivec2(10,10));
+	argParser.getArg("-size",	size,	glm::ivec2(10.0,10.0));
+
+
+
+	if (mesherType == "planemesher") {
+		
+	}
+	
+
 
 	return 0;
 }
