@@ -126,7 +126,7 @@ public:
 	//	return false;
 	//}
 
-	bool getArg(const std::string& arg, std::string& value, const std::string& defaultValue) {
+	bool getArg(const std::string& arg, std::string& value, const std::string& defaultValue = "") {
 		value = getArg(arg);
 		if (value.empty()) {
 			value = defaultValue;
