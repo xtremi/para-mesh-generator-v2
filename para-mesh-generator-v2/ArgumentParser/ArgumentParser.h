@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #ifdef USING_GLM
+#include "glm/vec4.hpp"
 #include "glm/vec3.hpp"
 #include "glm/vec2.hpp"
 #endif
@@ -190,6 +191,16 @@ public:
 			return false;
 		}
 		value = StringManip::stringToGlmVec<glm::ivec3>(strVal, ',', 0.0);
+		return true;
+	}
+
+	bool getArg(const std::string& arg, glm::dvec4& value, const glm::dvec4& defaultValue) {
+		std::string strVal;
+		if (!getArg(arg, strVal, "")) {
+			value = defaultValue;
+			return false;
+		}
+		value = StringManip::stringToGlmVec<glm::dvec4>(strVal, ',', 0.0);
 		return true;
 	}
 
