@@ -114,8 +114,11 @@
     <ClInclude Include="MeshPartExtrusion.h">
       <Filter>MeshParts\header</Filter>
     </ClInclude>
-    <ClInclude Include="MeshIbeam3D.h">
+    <ClInclude Include="MeshHbeam3D.h">
       <Filter>MeshParts\header</Filter>
+    </ClInclude>
+    <ClInclude Include="BeamSection.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -200,8 +203,11 @@
     <ClCompile Include="MeshPartExtrusion.cpp">
       <Filter>MeshParts\source</Filter>
     </ClCompile>
-    <ClCompile Include="MeshIbeam3D.cpp">
+    <ClCompile Include="MeshHbeam3D.cpp">
       <Filter>MeshParts\source</Filter>
+    </ClCompile>
+    <ClCompile Include="BeamSection.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

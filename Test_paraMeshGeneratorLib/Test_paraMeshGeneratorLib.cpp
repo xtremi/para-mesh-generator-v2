@@ -25,6 +25,9 @@
 //Extruded mesh
 #include "MeshPartExtrusion.h"
 
+//Parts
+#include "MeshHbeam3D.h"
+
 #include "math_utilities.h"
 #include "RefinementCalculations.h"
 
@@ -117,6 +120,9 @@ int extrude3DfaceArcRef(const std::string& filename);
 
 int connectCuboidMeshRef(const std::string& fileName);
 int connectCuboidMeshRef2(const std::string& fileName);
+
+int meshHbeam3D(const std::string& fileName);
+int meshCbeam3D(const std::string& fileName);
 
 void writeDebugBeamElements(FEAwriter* w, int firstNode, int lastNode);
 
@@ -224,9 +230,11 @@ std::vector<TestDef> testFunctions({
 
 
 	TestDef(710, "connectCuboidMeshRef",	"connection", (testFunction)connectCuboidMeshRef),
-	TestDef(711, "connectCuboidMeshRef2",	"connection", (testFunction)connectCuboidMeshRef2)
+	TestDef(711, "connectCuboidMeshRef2",	"connection", (testFunction)connectCuboidMeshRef2),
 	
-	
+	TestDef(1000, "meshHbeam3D",			"parts",	  (testFunction)meshHbeam3D),
+	TestDef(1005, "meshCbeam3D",			"parts",	  (testFunction)meshCbeam3D),
+
 
 });
 
@@ -3370,6 +3378,22 @@ int connectCuboidMeshRef2(const std::string& fileName) {
 	
 
 
+	TEST_END
+}
+
+int meshHbeam3D(const std::string& fileName) {
+	TEST_START2
+	Hbeam3Dsection section(10.0, 8.0, 6.0, 2.0, 1.0, 1.5);
+	MeshHbeam3D hbeam(section, 10.0, 20, 10);	
+	hbeam.write();
+	TEST_END
+}
+
+int meshCbeam3D(const std::string& fileName) {
+	TEST_START2
+	Cbeam3Dsection section(10.0, 8.0, 6.0, 2.0, 1.0, 1.5);
+	MeshCbeam3D cbeam(section, 10.0, 20, 10);
+	cbeam.write();
 	TEST_END
 }
 

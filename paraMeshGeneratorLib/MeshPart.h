@@ -13,6 +13,7 @@ public:
 public:
 	virtual void writeNodes() = 0;
 	virtual void writeElements() = 0;
+	void write();
 	int numberOfNodes() { return nNodes; }
 	int numberOfElements() { return nElements; }
 
