@@ -1,5 +1,5 @@
 #include "TestDef.h"
-//#include "Mesh.h"
+//#include "MeshPart.h"
 #include <vector>
 #include <set>
 
@@ -22,8 +22,8 @@
 #include "Cone3Dmesher.h"
 #include "RecToEllipse3Dmesher.h"
 
-//Mesh extruder and meshes : to be fixed (2021.08.14)
-#include "Mesh.h"
+//Extruded mesh
+#include "MeshPartExtrusion.h"
 
 #include "math_utilities.h"
 #include "RefinementCalculations.h"

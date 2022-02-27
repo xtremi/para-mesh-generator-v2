@@ -22,12 +22,18 @@
     <Filter Include="Meshers\source">
       <UniqueIdentifier>{dbe38044-7aaf-4b33-8088-cebaadd95250}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MeshParts">
+      <UniqueIdentifier>{d173761f-d33d-4525-882e-3aa2dbcbcbfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MeshParts\header">
+      <UniqueIdentifier>{102f35f1-4c76-44c5-93e1-65a2366bdaf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MeshParts\source">
+      <UniqueIdentifier>{3e3ea781-cbc4-41d0-8859-29c349ff82fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math_utilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParaMeshGenCommon.h">
@@ -102,6 +108,15 @@
     <ClInclude Include="RefinementCalculations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MeshPart.h">
+      <Filter>MeshParts\header</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshPartExtrusion.h">
+      <Filter>MeshParts\header</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshIbeam3D.h">
+      <Filter>MeshParts\header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -111,9 +126,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="math_utilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParaMeshGenCommon.cpp">
@@ -181,6 +193,15 @@
     </ClCompile>
     <ClCompile Include="RefinementCalculations.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshPart.cpp">
+      <Filter>MeshParts\source</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshPartExtrusion.cpp">
+      <Filter>MeshParts\source</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshIbeam3D.cpp">
+      <Filter>MeshParts\source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

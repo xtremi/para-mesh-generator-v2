@@ -31,10 +31,12 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="LineMesher.h" />
     <ClInclude Include="math_utilities.h" />
-    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshIbeam3D.h" />
+    <ClInclude Include="MeshPart.h" />
     <ClInclude Include="MeshCsys.h" />
     <ClInclude Include="MeshDensity.h" />
     <ClInclude Include="Mesher.h" />
+    <ClInclude Include="MeshPartExtrusion.h" />
     <ClInclude Include="NodeIterator.h" />
     <ClInclude Include="ParaMeshGenCommon.h" />
     <ClInclude Include="PlaneMesher.h" />
@@ -59,7 +61,8 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="LineMesher.cpp" />
     <ClCompile Include="math_utilities.cpp" />
-    <ClCompile Include="Mesh.cpp">
+    <ClCompile Include="MeshIbeam3D.cpp" />
+    <ClCompile Include="MeshPart.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -68,6 +71,7 @@
     <ClCompile Include="MeshCsys.cpp" />
     <ClCompile Include="MeshDensity.cpp" />
     <ClCompile Include="Mesher.cpp" />
+    <ClCompile Include="MeshPartExtrusion.cpp" />
     <ClCompile Include="NodeIterator.cpp" />
     <ClCompile Include="ParaMeshGenCommon.cpp" />
     <ClCompile Include="PlaneMesher.cpp" />
