@@ -54,7 +54,7 @@ Cbeam3Dsection::Cbeam3Dsection(
 	double _widthBot,
 	double _thkWeb,
 	double thkFlangeTop,
-	double thkFlangeBot) : Hbeam3Dsection(_height, widthTop, widthBot, _thkWeb, thkFlangeTop, thkFlangeBot)
+	double thkFlangeBot) : Hbeam3Dsection(_height, _widthTop, _widthBot, _thkWeb, thkFlangeTop, thkFlangeBot)
 {
 	_isCbeam = true;
 }
