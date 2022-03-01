@@ -1,6 +1,6 @@
 #pragma once
 #include "glm/glm.hpp"
-
+#include <vector>
 class Geometry {};
 
 
@@ -35,3 +35,4 @@ class PipeGeometry3D : public PipeGeometry2D {
 protected:
 	double height;
 };
+

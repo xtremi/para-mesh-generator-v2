@@ -2,6 +2,20 @@
 #include "math_utilities.h"
 #include <vector>
 
+
+class LineStrip {
+public:
+	LineStrip() {}
+	LineStrip(const std::vector<glm::dvec3>& points);
+
+	int nLines() const;
+	int nPoints() const;
+	bool getLineEndPoints(int line_i, glm::dvec3& p1, glm::dvec3& p2) const;
+	void addPoint(const glm::dvec3& p);
+
+	std::vector<glm::dvec3> points;
+};
+
 class Rectangle {
 public:
 	Rectangle(const glm::dvec2& _size) : size{ _size } {}
@@ -42,7 +56,9 @@ public:
 	QuadStrip(const std::vector<QuadStripSection>& _sectionPoints) : sectionPoints{ _sectionPoints } {}
 	int nQuads() const;
 	Quad quad(int i) const;
-
+	LineStrip getLineStripBot() const;
+	LineStrip getLineStripTop() const;
+	std::vector<glm::dvec3>
 
 private:
 	std::vector<QuadStripSection> sectionPoints;

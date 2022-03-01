@@ -14,7 +14,7 @@ MeshDensity1DlineStrip::MeshDensity1DlineStrip(const std::vector<int>& nodeDistr
 	: MeshDensity1D(0, _closedLoop)
 {
 	nodesDistribution = nodeDistr;
-	nnodes = stdVecSum(nodesDistribution) - (nodesDistribution.size() - 2);
+	nnodes = stdVecSum(nodesDistribution) - (nodesDistribution.size() - 1);
 }
 
 
@@ -55,8 +55,13 @@ MeshDensity2DquadStrip::MeshDensity2DquadStrip(const std::vector<int>& dir1, int
 	: MeshDensity2D(0, dir2, closedLoop)
 {
 	dir1nodes = dir1;
-	setDir1(stdVecSum(dir1nodes));
+	setDir1(stdVecSum(dir1nodes) - (dir1nodes.size() - 1));
 }
+
+MeshDensity1DlineStrip MeshDensity2DquadStrip::getMeshDensDir1() const {
+	return MeshDensity1DlineStrip(dir1nodes);
+}
+
 
 int MeshDensity2DquadStrip::nQuads() const {
 	return dir1nodes.size();

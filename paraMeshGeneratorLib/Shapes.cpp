@@ -43,6 +43,21 @@ glm::dvec3 Quad::c3() const { return corners[2]; }
 glm::dvec3 Quad::c4() const { return corners[3]; }
 
 
+LineStrip QuadStrip::getLineStripBot() const {
+	LineStrip ls;
+	for (QuadStripSection section : sectionPoints) {
+		ls.addPoint(section.p1);
+	}
+	return ls;
+}
+LineStrip QuadStrip::getLineStripTop() const {
+	LineStrip ls;
+	for (QuadStripSection section : sectionPoints) {
+		ls.addPoint(section.p2);
+	}
+	return ls;
+}
+
 int QuadStrip::nQuads() const {
 	return sectionPoints.size() - 1;
 }

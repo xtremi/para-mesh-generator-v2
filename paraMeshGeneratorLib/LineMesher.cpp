@@ -4,7 +4,12 @@ LineStrip::LineStrip(const std::vector<glm::dvec3>& _points) : points{ _points }
 
 }
 
+void LineStrip::addPoint(const glm::dvec3& p) {
+	points.push_back(p);
+}
+
 int LineStrip::nLines() const { return points.size() - 1; }
+int LineStrip::nPoints() const { return points.size(); }
 bool LineStrip::getLineEndPoints(int line_i, glm::dvec3& p1, glm::dvec3& p2) const {
 	if (line_i < nLines()) {
 		p1 = points[line_i]; p2 = points[line_i + 1];
@@ -138,7 +143,7 @@ void LineStripMesher::writeNodesLine(
 }
 
 void LineStripMesher::writeElements(const MeshDensity1DlineStrip& meshDens) {
-	LineMesher::writeElementsLine(meshDens.nEl(), meshDens.closedLoop);
+	LineMesher::writeElementsLine(meshDens.nnodes, meshDens.closedLoop);
 }
 
 

@@ -123,6 +123,8 @@ struct MeshDensity2DquadStrip : public MeshDensity2D {
 	MeshDensity2DquadStrip(const std::vector<int>& dir1, int dir2, bool closedLoop = false);
 	MeshDensity2D meshDensQ(int i) const;
 	int nQuads() const;
+	MeshDensity1DlineStrip getMeshDensDir1() const;
+
 protected:
 	std::vector<int> dir1nodes;
 };

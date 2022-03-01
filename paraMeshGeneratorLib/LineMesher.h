@@ -12,16 +12,7 @@ private:
 	direction dir;
 };*/
 
-class LineStrip {
-public:
-	LineStrip(){}
-	LineStrip(const std::vector<glm::dvec3>& points);
-	
-	int nLines() const;
-	bool getLineEndPoints(int line_i, glm::dvec3& p1, glm::dvec3& p2) const;
 
-	std::vector<glm::dvec3> points;
-};
 
 class LineMesher : private Mesher {
 
