@@ -2,6 +2,7 @@
 //#include "MeshPart.h"
 #include <vector>
 #include <set>
+#include "general_utilities.h"
 
 //1d elements
 #include "LineMesher.h"
@@ -64,6 +65,7 @@ int refinementCalc2D(const std::string& fileName);
 int refinementCalc3D(const std::string& fileName);
 
 int lineMesher(const std::string& fileName);
+int lineStripMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
 int recEdgeMesher(const std::string& fileName);
 int ellipseMesher(const std::string& fileName);
@@ -174,7 +176,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(102, "arcMesher",			"basic meshers 1D", (testFunction)arcMesher),
 	TestDef(103, "recEdgeMesher",		"basic meshers 1D", (testFunction)recEdgeMesher),
 	TestDef(104, "ellipseMesher",		"basic meshers 1D", (testFunction)ellipseMesher),
-
+	TestDef(110, "lineStripMesher",		"basic meshers 1D", (testFunction)lineStripMesher),
+	
 	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
 	TestDef(151, "meshCsys2",			"transformations",  (testFunction)meshCsys2),
 	TestDef(152, "meshCsys3",			"transformations",  (testFunction)meshCsys3),
@@ -708,6 +711,16 @@ int lineMesher(const std::string& fileName) {
 	}
 
 
+	TEST_END
+}
+
+int lineStripMesher(const std::string& fileName) {
+	TEST_START2
+	LineStrip lineStrip({ {0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {1.5, 0.5, 0.0}, {0.0, 1.0, -0.6} });
+	std::vector<int> nNodes({ 5,10, 12 });
+	MeshDensity1DlineStrip meshDens({ 5,10, 12 });
+	LineStripMesher::writeNodesLine(pos, glCsys, lineStrip, meshDens);
+	LineStripMesher::writeElements(meshDens);
 	TEST_END
 }
 

@@ -78,6 +78,11 @@ struct MeshDensity1D {
 	int nnodes;
 };
 
+struct MeshDensity1DlineStrip : public MeshDensity1D{
+	MeshDensity1DlineStrip(const std::vector<int>& nodeDistr, bool _closedLoop = false);
+	std::vector<int> nodesDistribution;
+};
+
 /*
 	Extends NodeVec2D with element number functions and closed loop definition
 

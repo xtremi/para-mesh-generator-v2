@@ -16,6 +16,9 @@ class LineStrip {
 public:
 	LineStrip(){}
 	LineStrip(const std::vector<glm::dvec3>& points);
+	
+	int nLines() const;
+	bool getLineEndPoints(int line_i, glm::dvec3& p1, glm::dvec3& p2) const;
 
 	std::vector<glm::dvec3> points;
 };
@@ -56,12 +59,7 @@ public:
 		int						skipNth,
 		bool					skipFirst = false);
 
-	static void writeNodesLine(
-		const glm::dvec3&		pos,
-		MeshCsys&				spos,
-		const LineStrip&		lineStrip,
-		int						nnodes,
-		bool					skipFirst = false);
+
 
 	static void writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length,  direction dir, bool skipFirst = false);
 	static void writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, const glm::dvec3& sposEnd, bool skipFirst = false);
@@ -77,5 +75,20 @@ public:
 	static void writeNodes(const std::vector<glm::dvec2>& xycoords, double zcoord);
 
 	static NodeIterator1D nodeIterator(int nnodes);
+
+};
+
+class LineStripMesher : private Mesher {
+
+public:
+
+	static void writeNodesLine(
+		const glm::dvec3&			  pos,
+		MeshCsys&					  csys,
+		const LineStrip&			  lineStrip,
+		const MeshDensity1DlineStrip& meshDens,
+		bool				          skipFirst = false);
+
+	static void writeElements(const MeshDensity1DlineStrip& meshDens);
 
 };

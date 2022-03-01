@@ -3,6 +3,21 @@
 #include "RefinementCalculations.h"
 #include "general_utilities.h"
 
+/*
+
+     nnodes[0]  nnodes[1] nnodes[2]
+	x---x---x---x---x---x----x----x
+	|-----------|-------|---------|
+	       
+*/
+MeshDensity1DlineStrip::MeshDensity1DlineStrip(const std::vector<int>& nodeDistr, bool _closedLoop)
+	: MeshDensity1D(0, _closedLoop)
+{
+	nodesDistribution = nodeDistr;
+	nnodes = stdVecSum(nodesDistribution) - (nodesDistribution.size() - 2);
+}
+
+
 int MeshDensity2D::cornerNode(int cornerID) {
 	switch (cornerID)
 	{

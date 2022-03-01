@@ -4,6 +4,16 @@ LineStrip::LineStrip(const std::vector<glm::dvec3>& _points) : points{ _points }
 
 }
 
+int LineStrip::nLines() const { return points.size() - 1; }
+bool LineStrip::getLineEndPoints(int line_i, glm::dvec3& p1, glm::dvec3& p2) const {
+	if (line_i < nLines()) {
+		p1 = points[line_i]; p2 = points[line_i + 1];
+		return true;
+	}
+	return false;
+}
+
+
 void LineMesher::writeNodesLineXq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dx, bool skipFirst) {
 	writeNodesLineQ(pos, csys, nnodes, dx, direction::x, skipFirst);
 }
@@ -107,17 +117,28 @@ MESHER_NODE_WRITE_START
 MESHER_NODE_WRITE_END
 }
 
-void LineMesher::writeNodesLine(
-	const glm::dvec3&		pos,
-	MeshCsys&				spos,
-	const LineStrip&		lineStrip,
-	int						nnodes,
-	bool					skipFirst)
+void LineStripMesher::writeNodesLine(
+	const glm::dvec3&			  pos,
+	MeshCsys&					  csys,
+	const LineStrip&			  lineStrip,
+	const MeshDensity1DlineStrip& meshDens,
+	bool					      skipFirst)
 {
-MESHER_NODE_WRITE_START
-	
+	MESHER_NODE_WRITE_START
+	int nLineStrips = lineStrip.nLines();	
+	bool skipFirstNode = skipFirst;
+	glm::dvec3 p1, p2;
 
-MESHER_NODE_WRITE_END
+	for (int i = 0; i < nLineStrips; i++) {
+		lineStrip.getLineEndPoints(i, p1, p2);				
+		LineMesher::writeNodesLine(pos + p1, csys, meshDens.nodesDistribution[i], pos + p2, skipFirstNode);
+		skipFirstNode = true;
+	}
+	MESHER_NODE_WRITE_END
+}
+
+void LineStripMesher::writeElements(const MeshDensity1DlineStrip& meshDens) {
+	LineMesher::writeElementsLine(meshDens.nEl(), meshDens.closedLoop);
 }
 
 
