@@ -113,6 +113,16 @@ struct MeshDensity2D : public NodeVec2D {
 };
 
 
+struct MeshDensity2DquadStrip : public MeshDensity2D {
+	MeshDensity2DquadStrip(){}
+	MeshDensity2DquadStrip(const std::vector<int>& dir1, int dir2, bool closedLoop = false);
+	MeshDensity2D meshDensQ(int i) const;
+	int nQuads() const;
+protected:
+	std::vector<int> dir1nodes;
+};
+
+
 struct MeshDensity2DrecTube : public MeshDensity2D {
 	MeshDensity2DrecTube() {}
 	MeshDensity2DrecTube(int nNodePerimeterInner, int nNodeLayers, const glm::dvec2& sizeInner)

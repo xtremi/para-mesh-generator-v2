@@ -1,6 +1,7 @@
 #include "MeshDensity.h"
 #include "Shapes.h"
 #include "RefinementCalculations.h"
+#include "general_utilities.h"
 
 int MeshDensity2D::cornerNode(int cornerID) {
 	switch (cornerID)
@@ -33,6 +34,26 @@ NodeIterator1D MeshDensity2D::edgeNodeIterator(int edgeID, int firstNodeID, int 
 		throw("Invalid edge ID in MeshDensity2D::edgeNodeIterator");
 	}
 }
+
+
+MeshDensity2DquadStrip::MeshDensity2DquadStrip(const std::vector<int>& dir1, int dir2, bool closedLoop)
+	: MeshDensity2D(0, dir2, closedLoop)
+{
+	dir1nodes = dir1;
+	setDir1(stdVecSum(dir1nodes));
+}
+
+int MeshDensity2DquadStrip::nQuads() const {
+	return dir1nodes.size();
+}
+MeshDensity2D MeshDensity2DquadStrip::meshDensQ(int i) const {
+	if (i < dir1nodes.size()) {
+		return MeshDensity2D(dir1nodes[i]/*i == 0 ? dir1nodes[i] : dir1nodes[i] - 1*/, dir2());
+	}
+	throw("MeshDensity2DquadStrip::meshDensQ out of range");
+	return MeshDensity2D();
+}
+
 
 int MeshDensity3D::cornerNode(int cornerID) {
 	switch (cornerID)

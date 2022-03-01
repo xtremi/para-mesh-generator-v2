@@ -43,6 +43,23 @@ glm::dvec3 Quad::c3() const { return corners[2]; }
 glm::dvec3 Quad::c4() const { return corners[3]; }
 
 
+int QuadStrip::nQuads() const {
+	return sectionPoints.size() - 1;
+}
+Quad QuadStrip::quad(int i) const {
+	if (i < nQuads()) {
+		Quad q;
+		q.corners[0] = sectionPoints[i + 0].p1;
+		q.corners[1] = sectionPoints[i + 1].p1;
+		q.corners[2] = sectionPoints[i + 1].p2;
+		q.corners[3] = sectionPoints[i + 0].p2;
+		return q;
+	}
+	throw("QuadStrip::quad out of range");
+	return Quad();
+}
+
+
 double EllipseRadius::perimeter() const {
 	double h = pow2(rad1 - rad2) / pow2(rad1 + rad2);
 

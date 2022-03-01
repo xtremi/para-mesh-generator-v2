@@ -1,6 +1,6 @@
 #pragma once
 #include "math_utilities.h"
-
+#include <vector>
 
 class Rectangle {
 public:
@@ -30,6 +30,22 @@ public:
 	glm::dvec3 c4() const;
 	glm::dvec3 corner(int i) const;
 	glm::dvec3 corners[4];
+};
+
+class QuadStrip {
+public:
+	struct QuadStripSection {
+		glm::dvec3 p1, p2;
+	};
+
+	QuadStrip() {}
+	QuadStrip(const std::vector<QuadStripSection>& _sectionPoints) : sectionPoints{ _sectionPoints } {}
+	int nQuads() const;
+	Quad quad(int i) const;
+
+
+private:
+	std::vector<QuadStripSection> sectionPoints;
 };
 
 

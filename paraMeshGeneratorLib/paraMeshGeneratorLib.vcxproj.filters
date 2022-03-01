@@ -120,6 +120,12 @@
     <ClInclude Include="BeamSection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="QuadStripMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="general_utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -207,6 +213,12 @@
       <Filter>MeshParts\source</Filter>
     </ClCompile>
     <ClCompile Include="BeamSection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadStripMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="general_utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

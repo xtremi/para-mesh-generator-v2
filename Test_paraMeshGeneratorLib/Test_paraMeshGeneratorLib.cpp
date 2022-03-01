@@ -16,6 +16,7 @@
 #include "CylinderMesher.h"
 #include "RecToEllipseMesher.h"
 #include "RecTubeMesher.h"
+#include "QuadStripMesher.h"
 
 //3d elements
 #include "CuboidMesher.h"
@@ -75,6 +76,7 @@ int planeMesherSimple(const std::string& fileName);
 int planeMesher(const std::string& fileName);
 int planeMesherQuad(const std::string& fileName);
 int planeMesherQuadNth(const std::string& fileName);
+int quadStripMesher(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
@@ -196,6 +198,7 @@ std::vector<TestDef> testFunctions({
 	
 	TestDef(240, "planeMesherQuad",		"basic meshers 2D", (testFunction)planeMesherQuad),
 	TestDef(242, "planeMesherQuadNth",	"basic meshers 2D", (testFunction)planeMesherQuadNth),
+	TestDef(250, "quadStripMesher",		"basic meshers 2D", (testFunction)quadStripMesher),
 
 	
 
@@ -300,12 +303,12 @@ std::vector<int> linearlyOrderedVector(int iStart, int iEnd, int iStep = 1);
 				   MeshCsys pos(glm::dvec3(0.0));
 
 #define TEST_START2 std::ofstream file; \
-				   file.open(fileName); \
-				   if (!file.is_open()) return 1; \
-				   NastranFEAwriter writer(&file); \
-				   Mesher::setFEAwriter(&writer); \
-				   MeshCsys glCsys(glm::dvec3(0.0)); \
-				   glm::dvec3 pos(NULL_POS);
+					file.open(fileName); \
+					if (!file.is_open()) return 1; \
+					NastranFEAwriter writer(&file); \
+					Mesher::setFEAwriter(&writer); \
+					MeshCsys glCsys(glm::dvec3(0.0)); \
+					glm::dvec3 pos(NULL_POS);
 
 #define TEST_END writer.close(); \
 				 return 0;
@@ -1010,6 +1013,21 @@ int planeMesherQuadNth(const std::string& fileName) {
 	
 	writeDebugBeamElements(&writer, 1, writer.getNextNodeID());
 
+	TEST_END
+}
+
+int quadStripMesher(const std::string& fileName) {
+	TEST_START2
+	MeshDensity2DquadStrip meshDens({ 5, 8, 6 }, 5);
+	QuadStrip quadStrip({
+		{glm::dvec3(0.00,  0.00, 0.00), glm::dvec3(0.0,   0.10, 0.00)}, 
+		{glm::dvec3(0.30, -0.10, 0.00), glm::dvec3(0.35,  0.12, 0.00)}, 
+		{glm::dvec3(0.60, -0.20, 0.00), glm::dvec3(0.60,  0.08, 0.00)},
+		{glm::dvec3(0.90, -0.10, 0.00), glm::dvec3(0.94,  0.12, 0.00)},
+		});
+
+	QuadStripMesher::writeNodes(pos, glCsys, meshDens, quadStrip);
+	QuadStripMesher::writeElements(meshDens);
 	TEST_END
 }
 
