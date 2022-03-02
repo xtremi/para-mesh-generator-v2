@@ -10,8 +10,11 @@ bool skip(int i, int last, node_skip nskip) {
 	else if (i == (last - 1) && ((int)nskip < 2)) {
 		return nskip == node_skip::last || nskip == node_skip::first_and_last;
 	}
-	else {
+	else if((int)nskip >= 2) {
 		return !(bool)(i%(int)nskip);
+	}
+	else {
+		return false;
 	}
 }
 

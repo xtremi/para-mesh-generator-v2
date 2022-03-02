@@ -78,7 +78,9 @@ LineStrip QuadStrip::getLineStripTop() const {
 	}
 	return ls;
 }
-
+void QuadStrip::addSection(const QuadStripSection& section) {
+	sectionPoints.push_back(section);
+}
 int QuadStrip::nQuads() const {
 	return sectionPoints.size() - 1;
 }

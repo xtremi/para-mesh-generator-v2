@@ -54,6 +54,7 @@ public:
 
 	QuadStrip() {}
 	QuadStrip(const std::vector<QuadStripSection>& _sectionPoints) : sectionPoints{ _sectionPoints } {}
+	void addSection(const QuadStripSection& section);
 	int nQuads() const;
 	Quad quad(int i) const;
 	LineStrip getLineStripBot() const;

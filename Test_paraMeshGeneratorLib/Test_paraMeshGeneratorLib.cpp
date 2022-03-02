@@ -80,6 +80,7 @@ int planeMesherQuad(const std::string& fileName);
 int planeMesherQuadNth(const std::string& fileName);
 int quadStripMesher(const std::string& fileName);
 int quadStripMesher2(const std::string& fileName);
+int quadStripMesher3(const std::string& fileName);
 int quadStripMesher_type2(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
@@ -204,7 +205,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(240, "planeMesherQuad",			"basic meshers 2D", (testFunction)planeMesherQuad),
 	TestDef(242, "planeMesherQuadNth",		"basic meshers 2D", (testFunction)planeMesherQuadNth),
 	TestDef(250, "quadStripMesher",			"basic meshers 2D", (testFunction)quadStripMesher),
-	TestDef(251, "quadStripMesher",			"basic meshers 2D", (testFunction)quadStripMesher2),
+	TestDef(251, "quadStripMesher2",		"basic meshers 2D", (testFunction)quadStripMesher2),
+	TestDef(253, "quadStripMesher3",		"basic meshers 2D", (testFunction)quadStripMesher3),
 	TestDef(252, "quadStripMesher_type2",	"basic meshers 2D", (testFunction)quadStripMesher_type2),
 
 
@@ -1059,6 +1061,27 @@ int quadStripMesher2(const std::string& fileName) {
 		{glm::dvec3(0.0,  1.0, 0.0), glm::dvec3(0.0,  2.0, 0.0)},
 		});
 
+	QuadStripMesher::writeNodes(pos, glCsys, meshDens, quadStrip);
+	QuadStripMesher::writeElements(meshDens);
+	TEST_END
+}
+
+int quadStripMesher3(const std::string& fileName) {
+	TEST_START2
+	MeshDensity2DquadStrip meshDens({ 
+		8, 8, 8, 8, 8, 8, 8, 8, 8, 8 }, 5, true);
+	
+	int nsections = 10;
+	double ang = 0.0;
+	QuadStrip quadStrip;
+	for (int i = 0; i < nsections + 1; i++) {
+		glm::dvec3 p1 = coordsOnCircle(ang, 10.0, direction::z);
+		glm::dvec3 p2 = coordsOnCircle(ang, 18.0, direction::z);
+		quadStrip.addSection({ p1, p2 });
+		ang += GLM2PI / (double)nsections;
+	}
+	
+	
 	QuadStripMesher::writeNodes(pos, glCsys, meshDens, quadStrip);
 	QuadStripMesher::writeElements(meshDens);
 	TEST_END
