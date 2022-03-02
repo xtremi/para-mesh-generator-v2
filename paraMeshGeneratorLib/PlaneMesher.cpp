@@ -358,7 +358,7 @@ void PlaneMesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData&
 }
 //row m:  |  x--x--x  |  x--x--x  |
 void PlaneMesherRef::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
-	LineMesher::writeNodesLineQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curElSize.y, 4, rsData.edgeDir);
+	LineMesher::writeNodesLineQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curElSize.y, rsData.edgeDir, node_skip::every_4);
 	rlData.curPos[(size_t)rsData.refDir] += rlData.curElSize.x;
 }
 //row t: x----x----x----x----x

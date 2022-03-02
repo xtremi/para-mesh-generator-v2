@@ -80,6 +80,7 @@ int planeMesherQuad(const std::string& fileName);
 int planeMesherQuadNth(const std::string& fileName);
 int quadStripMesher(const std::string& fileName);
 int quadStripMesher2(const std::string& fileName);
+int quadStripMesher_type2(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
@@ -200,10 +201,11 @@ std::vector<TestDef> testFunctions({
 	TestDef(230, "coneMesherRef2",			"basic meshers 2D", (testFunction)coneMesherRef2),
 	TestDef(231, "coneMesherRef2_2",		"basic meshers 2D", (testFunction)coneMesherRef2_2),
 	
-	TestDef(240, "planeMesherQuad",		"basic meshers 2D", (testFunction)planeMesherQuad),
-	TestDef(242, "planeMesherQuadNth",	"basic meshers 2D", (testFunction)planeMesherQuadNth),
-	TestDef(250, "quadStripMesher",		"basic meshers 2D", (testFunction)quadStripMesher),
-	TestDef(252, "quadStripMesher2",	"basic meshers 2D", (testFunction)quadStripMesher2),
+	TestDef(240, "planeMesherQuad",			"basic meshers 2D", (testFunction)planeMesherQuad),
+	TestDef(242, "planeMesherQuadNth",		"basic meshers 2D", (testFunction)planeMesherQuadNth),
+	TestDef(250, "quadStripMesher",			"basic meshers 2D", (testFunction)quadStripMesher),
+	TestDef(251, "quadStripMesher",			"basic meshers 2D", (testFunction)quadStripMesher2),
+	TestDef(252, "quadStripMesher_type2",	"basic meshers 2D", (testFunction)quadStripMesher_type2),
 
 
 
@@ -1047,6 +1049,22 @@ int quadStripMesher(const std::string& fileName) {
 }
 
 int quadStripMesher2(const std::string& fileName) {
+	TEST_START2
+	MeshDensity2DquadStrip meshDens({ 5, 8, 6, 7 }, 5, true);
+	QuadStrip quadStrip({
+		{glm::dvec3(0.0,  1.0, 0.0), glm::dvec3(0.0,  2.0, 0.0)},
+		{glm::dvec3(1.0,  0.0, 0.0), glm::dvec3(2.0,  0.0, 0.0)},
+		{glm::dvec3(0.0, -1.0, 0.0), glm::dvec3(0.0, -2.0, 0.0)},
+		{glm::dvec3(-1.0, 0.0, 0.0), glm::dvec3(-2.0, 0.0, 0.0)},
+		{glm::dvec3(0.0,  1.0, 0.0), glm::dvec3(0.0,  2.0, 0.0)},
+		});
+
+	QuadStripMesher::writeNodes(pos, glCsys, meshDens, quadStrip);
+	QuadStripMesher::writeElements(meshDens);
+	TEST_END
+}
+
+int quadStripMesher_type2(const std::string& fileName) {
 	TEST_START2
 	MeshDensity2DquadStrip meshDens({ 5, 8, 6 }, 5);
 	QuadStrip quadStrip({

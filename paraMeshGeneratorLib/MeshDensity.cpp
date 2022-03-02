@@ -51,15 +51,18 @@ NodeIterator1D MeshDensity2D::edgeNodeIterator(int edgeID, int firstNodeID, int 
 }
 
 
-MeshDensity2DquadStrip::MeshDensity2DquadStrip(const std::vector<int>& dir1, int dir2, bool closedLoop)
-	: MeshDensity2D(0, dir2, closedLoop)
+MeshDensity2DquadStrip::MeshDensity2DquadStrip(const std::vector<int>& d1, int d2, bool closedLoop)
+	: MeshDensity2D(0, d2, closedLoop)
 {
-	dir1nodes = dir1;
+	dir1nodes = d1;
 	setDir1(stdVecSum(dir1nodes) - (dir1nodes.size() - 1));
+	if (closedLoop) {
+		setDir1(dir1() - 1);
+	}
 }
 
 MeshDensity1DlineStrip MeshDensity2DquadStrip::getMeshDensDir1() const {
-	return MeshDensity1DlineStrip(dir1nodes);
+	return MeshDensity1DlineStrip(dir1nodes, closedLoop);
 }
 
 

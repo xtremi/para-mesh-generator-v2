@@ -1,53 +1,49 @@
 #include "LineMesher.h"
 
-LineStrip::LineStrip(const std::vector<glm::dvec3>& _points) : points{ _points } {
-
-}
-
-void LineStrip::addPoint(const glm::dvec3& p) {
-	points.push_back(p);
-}
-
-int LineStrip::nLines() const { return points.size() - 1; }
-int LineStrip::nPoints() const { return points.size(); }
-bool LineStrip::getLineEndPoints(int line_i, glm::dvec3& p1, glm::dvec3& p2) const {
-	if (line_i < nLines()) {
-		p1 = points[line_i]; p2 = points[line_i + 1];
-		return true;
+bool skip(int i, int last, node_skip nskip) {
+	if (nskip == node_skip::none) {
+		return false;
 	}
-	return false;
+	if (i == 0) {
+		return nskip == node_skip::first || nskip == node_skip::first_and_last || ((int)nskip >= 2);
+	}
+	else if (i == (last - 1) && ((int)nskip < 2)) {
+		return nskip == node_skip::last || nskip == node_skip::first_and_last;
+	}
+	else {
+		return !(bool)(i%(int)nskip);
+	}
 }
 
+void LineMesher::writeNodesLineXq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dx, node_skip nskip) {
+	writeNodesLineQ(pos, csys, nnodes, dx, direction::x, nskip);
+}
+void LineMesher::writeNodesLineYq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dy, node_skip nskip) {
+	writeNodesLineQ(pos, csys, nnodes, dy, direction::y, nskip);
+}
+void LineMesher::writeNodesLineZq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dz, node_skip nskip) {
+	writeNodesLineQ(pos, csys, nnodes, dz, direction::z, nskip);
+}
+void LineMesher::writeNodesLineX(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, node_skip nskip) {
+	writeNodesLine(pos, csys, nnodes, length, direction::x, nskip);
+}
+void LineMesher::writeNodesLineY(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, node_skip nskip) {
+	writeNodesLine(pos, csys, nnodes, length, direction::y, nskip);
+}
+void LineMesher::writeNodesLineZ(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, node_skip nskip) {
+	writeNodesLine(pos, csys, nnodes, length, direction::z, nskip);
+}
 
-void LineMesher::writeNodesLineXq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dx, bool skipFirst) {
-	writeNodesLineQ(pos, csys, nnodes, dx, direction::x, skipFirst);
-}
-void LineMesher::writeNodesLineYq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dy, bool skipFirst) {
-	writeNodesLineQ(pos, csys, nnodes, dy, direction::y, skipFirst);
-}
-void LineMesher::writeNodesLineZq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dz, bool skipFirst) {
-	writeNodesLineQ(pos, csys, nnodes, dz, direction::z, skipFirst);
-}
-void LineMesher::writeNodesLineX(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, bool skipFirst) {
-	writeNodesLine(pos, csys, nnodes, length, direction::x, skipFirst);
-}
-void LineMesher::writeNodesLineY(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, bool skipFirst) {
-	writeNodesLine(pos, csys, nnodes, length, direction::y, skipFirst);
-}
-void LineMesher::writeNodesLineZ(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, bool skipFirst) {
-	writeNodesLine(pos, csys, nnodes, length, direction::z, skipFirst);
-}
-
-void LineMesher::writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, direction dir, bool skipFirst)
+void LineMesher::writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, direction dir, node_skip nskip)
 {
 	double ds = length / (double)(nnodes - 1);
-	writeNodesLineQ(pos, csys, nnodes, ds, dir, skipFirst);
+	writeNodesLineQ(pos, csys, nnodes, ds, dir, nskip);
 }
 
-void LineMesher::writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, const glm::dvec3& sposEnd, bool skipFirst)
+void LineMesher::writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, const glm::dvec3& sposEnd, node_skip nskip)
 {
 	glm::dvec3 ds = (sposEnd - pos) / (double)(nnodes - 1);
-	writeNodesLineQ(pos, csys, nnodes, ds, skipFirst);
+	writeNodesLineQ(pos, csys, nnodes, ds, nskip);
 }
 
 void LineMesher::writeNodesLineQ(
@@ -56,11 +52,11 @@ void LineMesher::writeNodesLineQ(
 	int				  nnodes,
 	double			  ds,	
 	direction		  dir,
-	bool			  skipFirst)
+	node_skip		  nskip)
 {
 MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {
-		if(!(skipFirst && i == 0)){
+		if(!skip(i, nnodes, nskip)){
 			writer->writeNode(curPos, glm::dvec3(0.), nullptr, &spos);
 		}
 		curPos[(size_t)dir] += ds;
@@ -73,11 +69,11 @@ void LineMesher::writeNodesLineQ(
 	MeshCsys&			csys,
 	int					nnodes,
 	const glm::dvec3&	ds,
-	bool			    skipFirst)			/*any direction*/
+	node_skip			nskip)			/*any direction*/
 {
 MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {
-		if (!(skipFirst && i == 0)) {
+		if (!skip(i, nnodes, nskip)) {
 			writer->writeNode(curPos, glm::dvec3(0.), nullptr, &csys);
 		}
 		curPos += ds;
@@ -90,13 +86,13 @@ void LineMesher::writeNodesLineQ_nth(
 	MeshCsys&			spos,
 	int					nnodes,
 	double				ds,	
-	int					skipNth,
+	//int				skipNth,
 	direction			dir,
-	bool			    skipFirst)
+	node_skip			nskip)
 {
 MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {		
-		if (i%skipNth && !(skipFirst && i == 0)) {
+		if (!skip(i, nnodes, nskip)) {
 			writer->writeNode(curPos, glm::dvec3(0.), nullptr, &spos);
 		}
 		curPos[(size_t)dir] += ds;
@@ -109,12 +105,12 @@ void LineMesher::writeNodesLineQ_nth(
 	MeshCsys&			spos,
 	int					nnodes,
 	const glm::dvec3&	ds,	
-	int					skipNth,
-	bool			    skipFirst)
+	//int					skipNth,
+	node_skip			nskip)
 {
 MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {
-		if (i%skipNth && !(skipFirst && i == 0)) {
+		if (!skip(i, nnodes, nskip)) {
 			writer->writeNode(curPos, glm::dvec3(0.), nullptr, &spos);
 		}
 		curPos += ds;
@@ -127,17 +123,22 @@ void LineStripMesher::writeNodesLine(
 	MeshCsys&					  csys,
 	const LineStrip&			  lineStrip,
 	const MeshDensity1DlineStrip& meshDens,
-	bool					      skipFirst)
+	node_skip					  nskip)
 {
 	MESHER_NODE_WRITE_START
 	int nLineStrips = lineStrip.nLines();	
-	bool skipFirstNode = skipFirst;
+	node_skip nskipNode = nskip;
 	glm::dvec3 p1, p2;
 
 	for (int i = 0; i < nLineStrips; i++) {
 		lineStrip.getLineEndPoints(i, p1, p2);				
-		LineMesher::writeNodesLine(pos + p1, csys, meshDens.nodesDistribution[i], pos + p2, skipFirstNode);
-		skipFirstNode = true;
+		if (meshDens.closedLoop) {
+			if (i == (nLineStrips - 1)) {
+				nskipNode = node_skip::first_and_last;
+			}
+		}
+		LineMesher::writeNodesLine(pos + p1, csys, meshDens.nodesDistribution[i], pos + p2, nskipNode);
+		nskipNode = node_skip::first;
 	}
 	MESHER_NODE_WRITE_END
 }

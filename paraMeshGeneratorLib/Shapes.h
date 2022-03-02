@@ -58,7 +58,7 @@ public:
 	Quad quad(int i) const;
 	LineStrip getLineStripBot() const;
 	LineStrip getLineStripTop() const;
-	std::vector<glm::dvec3>
+	
 
 private:
 	std::vector<QuadStripSection> sectionPoints;

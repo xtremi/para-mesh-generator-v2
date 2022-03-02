@@ -296,7 +296,7 @@ void ConeMesherRef2::writeNodes_layerB(const RefShapeData& rsData, RefLayerData&
 }
 void ConeMesherRef2::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	updateLayerData(rsData, rlData, refLayer);
-	LineMesher::writeNodesLineQ_nth(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curConeLineStep, 4);
+	LineMesher::writeNodesLineQ_nth(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curConeLineStep, node_skip::every_4);
 	rlData.curAngleStep *= 2.0;
 }
 void ConeMesherRef2::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
