@@ -91,7 +91,47 @@ void ArcMesher::writeNodesCircular_nth(
 	writeNodesCircularQ_nth(pos, csys, nnodes, radius, arcAngles.start, dang, skipNth, rotAxis);
 }
 
+void ArcMesher::writeNodes(
+	const glm::dvec3&	pos,
+	MeshCsys&			csys,
+	int					nnodes,
+	double				radius,
+	const ArcAngles&	angle,
+	const glm::dvec3&	xdir,
+	const glm::dvec3&	ydir,
+	node_skip			nskip)
+{
+	MESHER_NODE_WRITE_START
+	double dAng = angle.angStep(nnodes);
+	double ang = angle.start;
+	for (int i = 0; i < nnodes; i++) {
+		writer->writeNode(coordsOnCircleQ(ang, radius, xdir, ydir), pos, nullptr, &csys);
+		ang += dAng;
+	}
+	MESHER_NODE_WRITE_END
+}
 
+void ArcMesher::writeNodes(
+	const glm::dvec3& pos,
+	MeshCsys&		  csys,
+	int				  nnodes,
+	double			  radius,
+	const glm::dvec3& p1,
+	const glm::dvec3& p2,
+	node_skip		  nskip)
+{
+	//MESHER_NODE_WRITE_START
+	glm::dvec3 center = circleCenter(p1, p2, radius);	
+	glm::dvec3 normal = glm::cross(p1 - center, p2 - center);
+	normal = glm::normalize(normal);
+	glm::dvec3 dirX = glm::normalize(p1 - center);
+	glm::dvec3 dirY = glm::normalize(glm::cross(normal, dirX));
+	ArcAngles angles(angleOfPointOnCircle(p1, center), angleOfPointOnCircle(p2, center));
+	ArcMesher::writeNodes(pos, csys, nnodes, radius, angles, dirX, dirY, nskip);
+
+
+	//MESHER_NODE_WRITE_END
+}
 
 void ArcMesher::writeElementsLine(
 	int			nnodes,

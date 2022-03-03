@@ -5,6 +5,17 @@
 
 class ArcMesher : private Mesher {
 public:
+
+	static void writeNodes(
+		const glm::dvec3&	pos,
+		MeshCsys&			csys,
+		int					nnodes,
+		double				radius,
+		const ArcAngles&	angle,
+		const glm::dvec3&	xdir,
+		const glm::dvec3&	ydir,
+		node_skip			nskip = node_skip::none);
+
 	static void writeNodesCircular(
 		const glm::dvec3&	pos,
 		MeshCsys&			csys,
@@ -47,6 +58,17 @@ public:
 		double				dAng,
 		int					skipNth,
 		direction			rotAxis);
+
+
+
+	static void writeNodes(
+		const glm::dvec3&	pos,
+		MeshCsys&			csys,
+		int					nnodes,
+		double				radius,
+		const glm::dvec3&	p1,
+		const glm::dvec3&	p2,
+		node_skip			nskip = node_skip::none);
 
 	static void writeElementsLine(int nnodes, bool closedLoop = false);
 };

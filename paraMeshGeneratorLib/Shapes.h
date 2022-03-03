@@ -3,6 +3,8 @@
 #include <vector>
 
 
+
+
 class LineStrip {
 public:
 	LineStrip() {}

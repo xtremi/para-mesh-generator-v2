@@ -12,7 +12,6 @@ private:
 	direction dir;
 };*/
 
-enum class node_skip{none = 0, first = 1, last = -1, first_and_last = -2, every_2 = 2, every_3 = 3, every_4 = 4, every_5 = 5, every_6 = 6};
 
 class LineMesher : private Mesher {
 

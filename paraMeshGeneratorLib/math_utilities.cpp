@@ -109,9 +109,42 @@ bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes) 
 }
 
 glm::dvec2 coordsOnEllipseXY(double angle, double rad1, double rad2) {
-	return glm::dvec2(rad1 * glm::sin(angle), rad2 * glm::cos(angle));
+	//return glm::dvec2(rad1 * glm::sin(angle), rad2 * glm::cos(angle));
+	return glm::dvec2(rad1 * glm::cos(angle), rad2 * glm::sin(angle));
 }
 
 glm::dvec2 coordsOnCircleXY(double angle, double rad) {
-	return rad * glm::dvec2(glm::sin(angle), glm::cos(angle));
+	//return rad * glm::dvec2(glm::sin(angle), glm::cos(angle));
+	return rad * glm::dvec2(glm::cos(angle), glm::sin(angle));
+}
+
+/*!
+	Returns the center of an arc going through p1 and p2 given a radius.
+	This results in two possible results.
+	One solution is given with passing positive radius, the other by
+	passing a negative radius.
+
+	Based on https://stackoverflow.com/a/4914148/4572356
+*/
+glm::dvec3 circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, double radius) {
+
+	double q = glm::distance(p1, p2);
+	glm::dvec3 p3 = (p1 + p2) / 2.0;		//Point in the center of p1 and p2
+
+	double d = radius < 0. ? -1. : 1.;
+	radius = std::abs(radius);
+
+	glm::dvec3 center;
+	center.x = p3.x + d * std::sqrt(pow2(radius) + pow2(q / 2.)) * (p1.y - p2.y) / q;
+	center.y = p3.y + d * std::sqrt(pow2(radius) + pow2(q / 2.)) * (p2.x - p1.x) / q;
+	return center;
+}
+/*!
+	Given a circle with center \p center returns the angle in the circle
+	to the point \p p.
+	This assume the x-axis is 0 deg 
+	(Offset passed is added to resulting angle.)
+*/
+double angleOfPointOnCircle(const glm::dvec3& p, const glm::dvec3& center, double offset) {
+	return std::atan2(p.y - center.y, p.x - center.x) + offset;
 }
