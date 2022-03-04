@@ -67,6 +67,7 @@ int refinementCalc3D(const std::string& fileName);
 int lineMesher(const std::string& fileName);
 int lineStripMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
+int arcMesher2(const std::string& fileName);
 int recEdgeMesher(const std::string& fileName);
 int ellipseMesher(const std::string& fileName);
 
@@ -181,6 +182,9 @@ std::vector<TestDef> testFunctions({
 	TestDef(104, "ellipseMesher",		"basic meshers 1D", (testFunction)ellipseMesher),
 	TestDef(110, "lineStripMesher",		"basic meshers 1D", (testFunction)lineStripMesher),
 	
+	TestDef(120, "arcMesher2",			"basic meshers 1D", (testFunction)arcMesher2),
+
+
 	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
 	TestDef(151, "meshCsys2",			"transformations",  (testFunction)meshCsys2),
 	TestDef(152, "meshCsys3",			"transformations",  (testFunction)meshCsys3),
@@ -783,6 +787,45 @@ int arcMesher(const std::string& fileName) {
 	ArcMesher::writeNodesCircular_nth(pos, glCsys, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 7, direction::x);
 	ArcMesher::writeElementsLine(nnodes - 1-1);
 	
+	TEST_END
+}
+
+int arcMesher2(const std::string& fileName) {
+	TEST_START2
+	int nnodes = 10;
+	double radius = 10.;
+	glm::dvec3 dirX(X_DIR);
+	glm::dvec3 dirY(Y_DIR);
+	ArcAngles angles(0.0, GLMPI / 2.0);
+
+	//From X- and Y- dir specifying the plane of the circle:
+	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, angles, dirX, dirY);
+	ArcMesher::writeElementsLine(nnodes);
+
+	pos.z += radius / 2.0;
+	//From two points on on arc + radius:
+	glm::dvec3 p1(10., 0., 0.);
+	glm::dvec3 p2(0., 10., 0.);
+	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2);
+	ArcMesher::writeElementsLine(nnodes);
+
+	pos.z += radius / 2.0;
+	//From two points on on arc + radius:
+	p1 = glm::dvec3(0., 10., 0.);
+	p2 = glm::dvec3(10., 0., 0.);
+	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2);
+	ArcMesher::writeElementsLine(nnodes);
+
+	pos.z += radius / 2.0;
+	//From enum direction of circle normal:
+	ArcMesher::writeNodesCircular(pos, glCsys, nnodes, radius, angles, direction::z);
+	ArcMesher::writeElementsLine(nnodes);
+
+	pos.z += radius / 2.0;
+	//From enum direction of circle normal:
+	ArcMesher::writeNodesCircularQ(pos, glCsys, nnodes, radius, angles.start, angles.angStep(nnodes), direction::z);
+	ArcMesher::writeElementsLine(nnodes);
+
 	TEST_END
 }
 

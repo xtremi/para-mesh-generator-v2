@@ -33,3 +33,6 @@ double calcArcIncrement(double startAng, double endAng, int nnodes);
 
 glm::dvec2 coordsOnEllipseXY(double angle, double rad1, double rad2);
 glm::dvec2 coordsOnCircleXY(double angle, double rad);
+
+glm::dvec3 circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, double radius);
+double angleOfPointOnCircle(const glm::dvec3& p, const glm::dvec3& center, double offset = 0.0);
