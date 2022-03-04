@@ -83,31 +83,3 @@ glm::dvec3 coordsOnCircle(double angle, double radius, direction rotAxis) {
 		break;
 	}
 }
-
-/*!
-	Given an the normal and x-axis of a circle, calculates the coord
-	on the circle at an angle.
-
-	normal and dirX are normalized
-
-	Based on: https://math.stackexchange.com/a/73242/464816
-*/
-glm::dvec3 coordsOnCircle(double angle, double radius,
-	const glm::dvec3& normal, const glm::dvec3& dirX) 
-{
-	glm::dvec3 dx = glm::normalize(dirX);
-	glm::dvec3 n = glm::normalize(n);
-	glm::dvec3 dy = glm::cross(n, dx);
-	dy = glm::normalize(dy);
-	return coordsOnCircleQ(angle, radius, dx, dy);
-}
-/*!
-	Similar to coordsOnCircle() but can be used when dirX and dirY are known.
-	dirX and dirY are assumed to already be normalized
-
-*/
-glm::dvec3 coordsOnCircleQ(double angle, double radius,
-	const glm::dvec3& dirX, const glm::dvec3& dirY)
-{
-	return radius * glm::cos(angle) * dirX + radius * glm::sin(angle) * dirY;
-}

@@ -12,7 +12,3 @@ glm::dvec3 coordsOnEllipse(double angle, double rad1, double rad2, direction rot
 glm::dvec3 coordsOnCircle(double angle, double radius, direction rotAxis);
 
 
-glm::dvec3 coordsOnCircle(double angle, double radius, 
-	const glm::dvec3& normal, const glm::dvec3& dirX);
-glm::dvec3 coordsOnCircleQ(double angle, double radius,
-	const glm::dvec3& dirX, const glm::dvec3& dirY);
