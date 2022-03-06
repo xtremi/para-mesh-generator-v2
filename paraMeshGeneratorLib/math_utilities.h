@@ -16,14 +16,8 @@ glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY);
 glm::dmat3x3 makeCsysMatrix(const glm::dvec3& rotAxis, double angle);
 
 
-
-/*
-	returns val^2
-*/
 double pow2(double val);
-/*
-	returns 2^exponent
-*/
+
 int twoPow(int exponent);
 
 
@@ -33,6 +27,11 @@ double calcArcIncrement(double startAng, double endAng, int nnodes);
 
 glm::dvec2 coordsOnEllipseXY(double angle, double rad1, double rad2);
 glm::dvec2 coordsOnCircleXY(double angle, double rad);
+glm::dvec3 coordsOnCircleQ(double angle, double radius,
+	const glm::dvec3& dirX, const glm::dvec3& dirY);
+glm::dvec3 coordsOnCircle(double angle, double radius,
+	const glm::dvec3& normal, const glm::dvec3& dirX);
 
-glm::dvec3 circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, double radius);
+glm::dvec3 circleCenterXY(const glm::dvec3& p1, const glm::dvec3& p2, double radius);
+glm::dvec3 circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, const glm::dvec3 normal, double radius);
 double angleOfPointOnCircle(const glm::dvec3& p, const glm::dvec3& center, double offset = 0.0);

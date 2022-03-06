@@ -806,14 +806,14 @@ int arcMesher2(const std::string& fileName) {
 	//From two points on on arc + radius:
 	glm::dvec3 p1(10., 0., 0.);
 	glm::dvec3 p2(0., 10., 0.);
-	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2);
+	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2, Z_DIR);
 	ArcMesher::writeElementsLine(nnodes);
 
 	pos.z += radius / 2.0;
 	//From two points on on arc + radius:
 	p1 = glm::dvec3(0., 10., 0.);
 	p2 = glm::dvec3(10., 0., 0.);
-	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2);
+	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2, Z_DIR);
 	ArcMesher::writeElementsLine(nnodes);
 
 	pos.z += radius / 2.0;
@@ -3197,20 +3197,22 @@ int extrude2DedgeArc(const std::string& fileName)
 	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), &rotM1);
 	
 	Mesh2D_planeExtrusion mesh2D(8, 4.0);
-	mesh2D.extrudeYedgeArc(GLMPI/3.0, 10.0, 10);	//0.0 - 1.0
-	mesh2D.extrudeYedgeArc(GLMPI/3.0, 2.0, 5);	//0.0 - 1.0
-	mesh2D.extrudeYedgeArc(GLMPI/1.0, 1.0, 10);	//0.0 - 1.0
-	mesh2D.extrudeYedgeArc(-GLMPI/1.0, -1.0, 8);	//0.0 - 1.0
-	mesh2D.setCsys(csys1);
-	mesh2D.writeNodes();
-	mesh2D.writeElements();
-
+	//mesh2D.extrudeYedge(5.0, 3);
+	//mesh2D.extrudeYedgeArc(GLMPI/2.0, 10.0, 10);
 	
-	rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
+	mesh2D.extrudeYedgeArc(GLMPI/3.0, 10.0, 10);
+	mesh2D.extrudeYedgeArc(GLMPI/3.0, 2.0, 5);	
+	mesh2D.extrudeYedgeArc(GLMPI/1.0, 1.0, 10);	
+	mesh2D.extrudeYedgeArc(-GLMPI/1.0, -1.0, 8);
 	mesh2D.setCsys(csys1);
-
 	mesh2D.writeNodes();
 	mesh2D.writeElements();
+
+	//rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
+	//mesh2D.setCsys(csys1);
+	//
+	//mesh2D.writeNodes();
+	//mesh2D.writeElements();
 
 	TEST_END
 }

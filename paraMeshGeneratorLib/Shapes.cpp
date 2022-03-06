@@ -16,10 +16,11 @@ void Rectangle::elementsPerSides(int nNodesPerimeter, int& nElWidthX, int& nElHe
 glm::dvec2 Rectangle::getCornerCoord(int corner) {
 	switch (corner)
 	{
-	case 1: return  0.5*size * glm::dvec2(-1.0, 1.0); break;
-	case 2: return  0.5*size * glm::dvec2(1.0, 1.0); break;
-	case 3: return  0.5*size * glm::dvec2(1.0, -1.0); break;
-	default: return 0.5*size * glm::dvec2(-1.0, -1.0); break;
+	case 0: return  0.5*size * glm::dvec2(1.0, -1.0); break;
+	case 1: return  0.5*size * glm::dvec2(1.0, 1.0); break;
+	case 2: return  0.5*size * glm::dvec2(-1.0, 1.0); break;
+	case 3: return  0.5*size * glm::dvec2(-1.0, -1.0); break;
+	default: return glm::dvec2(0.0); break;
 	}
 }
 
@@ -124,10 +125,10 @@ double ArcAngles::angStep(int nnodes) const {
 }
 
 const glm::dvec2 Rectangle::recDirs[4] = {
-	glm::dvec2(1.0, 0.0),
-	glm::dvec2(0.0, -1.0),
+	glm::dvec2(0.0, 1.0),
 	glm::dvec2(-1.0, 0.0),
-	glm::dvec2(0.0, 1.0) };
+	glm::dvec2(0.0, -1.0),
+	glm::dvec2(1.0, 0.0) };
 
 glm::dvec2 RecTubeSize::calculateOuterSize(int nNodesEdge, int nPerimeterNodeLayers) {
 	return inner + 2.* (double)(nPerimeterNodeLayers - 1)*inner / (double)nNodesEdge;

@@ -59,8 +59,6 @@ public:
 		int					skipNth,
 		direction			rotAxis);
 
-
-
 	static void writeNodes(
 		const glm::dvec3&	pos,
 		MeshCsys&			csys,
@@ -68,6 +66,7 @@ public:
 		double				radius,
 		const glm::dvec3&	p1,
 		const glm::dvec3&	p2,
+		const glm::dvec3&   normal,
 		node_skip			nskip = node_skip::none);
 
 	static void writeElementsLine(int nnodes, bool closedLoop = false);

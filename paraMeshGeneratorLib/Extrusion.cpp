@@ -182,8 +182,8 @@ void MeshEdgeExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
 	curExtrData->pos = glm::dvec3(0., 0., radius);
 
 	ArcAngles ang;
-	ang.setStart(-curExtrData->startSpace - GLMPI);
-	ang.setEnd(-(GLMPI + endAngle));
+	ang.setStart(curExtrData->startSpace - GLMPI / 2.0);
+	ang.setEnd(endAngle - GLMPI / 2.0);
 
 	ConeMesher::writeNodesY(
 		curExtrData->pos,
@@ -247,8 +247,8 @@ void MeshEdgeExtrusionArcRef::writeNodes(ExtrudeStepData* _curExtrData) {
 	curExtrData->pos = glm::dvec3(0., 0., radius);
 
 	ArcAngles ang;
-	ang.setStart(-curExtrData->startSpace - GLMPI);
-	ang.setEnd(-(GLMPI + endAngle));
+	ang.setStart(curExtrData->startSpace - GLMPI / 2.0);
+	ang.setEnd(endAngle - GLMPI / 2.0);
 
 	ConeMesherRef2::writeNodes(
 		curExtrData->pos,
@@ -403,9 +403,12 @@ void MeshFaceExtrusionArc::writeNodes(ExtrudeStepData* _curExtrData) {
 
 	curExtrData->pos = glm::dvec3(0., 0., radInner);
 
+	//ArcAngles ang;
+	//ang.setStart(-curExtrData->startSpace - GLMPI);
+	//ang.setEnd(-(GLMPI + endAngle));
 	ArcAngles ang;
-	ang.setStart(-curExtrData->startSpace - GLMPI);
-	ang.setEnd(-(GLMPI + endAngle));
+	ang.setStart(curExtrData->startSpace - GLMPI / 2.0);
+	ang.setEnd(endAngle - GLMPI / 2.0);
 
 	Cone3Dmesher::writeNodes(
 		curExtrData->pos,
@@ -615,9 +618,13 @@ void MeshFaceExtrusionArcRef::writeNodes(ExtrudeStepData* _curExtrData) {
 	
 	curExtrData->pos = glm::dvec3(0., 0., radInner);
 
+	//ArcAngles ang;
+	//ang.setStart(-curExtrData->startSpace - GLMPI);
+	//ang.setEnd(-(GLMPI + endAngle));
 	ArcAngles ang;
-	ang.setStart(-curExtrData->startSpace - GLMPI);
-	ang.setEnd(-(GLMPI + endAngle));
+	ang.setStart(curExtrData->startSpace - GLMPI / 2.0);
+	ang.setEnd(endAngle - GLMPI / 2.0);
+
 
 	Cone3DmesherRef2::writeNodes(
 		curExtrData->pos,
