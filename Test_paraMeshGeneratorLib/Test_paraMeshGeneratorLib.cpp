@@ -9,6 +9,7 @@
 #include "ArcMesher.h"
 #include "RecEdgeMesher.h"
 #include "EllipseMesher.h"
+#include "PathMesher.h"
 
 //2d elements
 #include "PlaneMesher.h"
@@ -23,6 +24,7 @@
 #include "CuboidMesher.h"
 #include "Cone3Dmesher.h"
 #include "RecToEllipse3Dmesher.h"
+#include "QuadStrip3Dmesher.h"
 
 //Extruded mesh
 #include "MeshPartExtrusion.h"
@@ -70,6 +72,7 @@ int arcMesher(const std::string& fileName);
 int arcMesher2(const std::string& fileName);
 int recEdgeMesher(const std::string& fileName);
 int ellipseMesher(const std::string& fileName);
+int pathMesher(const std::string& fileName);
 
 int meshCsys1(const std::string& fileName);
 int meshCsys2(const std::string& fileName);
@@ -82,7 +85,6 @@ int planeMesherQuadNth(const std::string& fileName);
 int quadStripMesher(const std::string& fileName);
 int quadStripMesher2(const std::string& fileName);
 int quadStripMesher3(const std::string& fileName);
-int quadStripMesher_type2(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
@@ -105,7 +107,7 @@ int cone3Dmesher(const std::string& fileName);
 int cone3DmesherRef(const std::string& fileName);
 int cone3DmesherRef2(const std::string& fileName);
 int recToEllipse3Dmesher(const std::string& fileName);
-
+int quadStripMesher3D(const std::string& fileName);
 
 int refinement2dHeight(const std::string& fileName);
 int refinement3dHeight(const std::string& fileName);
@@ -183,6 +185,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(110, "lineStripMesher",		"basic meshers 1D", (testFunction)lineStripMesher),
 	
 	TestDef(120, "arcMesher2",			"basic meshers 1D", (testFunction)arcMesher2),
+	TestDef(125, "pathMesher",			"basic meshers 1D", (testFunction)pathMesher),
 
 
 	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
@@ -211,7 +214,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(250, "quadStripMesher",			"basic meshers 2D", (testFunction)quadStripMesher),
 	TestDef(251, "quadStripMesher2",		"basic meshers 2D", (testFunction)quadStripMesher2),
 	TestDef(253, "quadStripMesher3",		"basic meshers 2D", (testFunction)quadStripMesher3),
-	TestDef(252, "quadStripMesher_type2",	"basic meshers 2D", (testFunction)quadStripMesher_type2),
+	//TestDef(252, "quadStripMesher_type2",	"basic meshers 2D", (testFunction)quadStripMesher_type2),
 
 
 
@@ -223,6 +226,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(323, "cone3DmesherRef",	    "basic meshers 3D", (testFunction)cone3DmesherRef),
 	TestDef(324, "recToEllipse3Dmesher","basic meshers 3D", (testFunction)recToEllipse3Dmesher),
 	TestDef(330 , "cone3DmesherRef2",	"basic meshers 3D", (testFunction)cone3DmesherRef2),
+	TestDef(340 , "quadStripMesher3D",	"basic meshers 3D", (testFunction)quadStripMesher3D),
 
 
 	TestDef(430, "refinement2dHeight",		"basic meshers 2D", (testFunction)refinement2dHeight),
@@ -829,6 +833,27 @@ int arcMesher2(const std::string& fileName) {
 	TEST_END
 }
 
+int pathMesher(const std::string& fileName) {
+	TEST_START2
+	int nnodes = 100;
+	PathMesher::writeNodes(pos, glCsys, nnodes, PathAxis(direction::x, 10.));
+	PathMesher::writeElements(nnodes);
+
+	PathMesher::writeNodes(pos, glCsys, nnodes, PathAxis(direction::y, 10.));
+	PathMesher::writeElements(nnodes);
+
+	PathMesher::writeNodes(pos, glCsys, nnodes, PathAxis(direction::z, 10.));
+	PathMesher::writeElements(nnodes);
+
+	PathMesher::writeNodes(pos, glCsys, nnodes, PathSine(X_DIR, Y_DIR, 10., 2., 5.));
+	PathMesher::writeElements(nnodes);
+
+	PathMesher::writeNodes(pos, glCsys, nnodes, PathSine(glm::dvec3(1., 1., 1.), Y_DIR, 10., 2., 5.));
+	PathMesher::writeElements(nnodes);
+
+	TEST_END
+}
+
 int recEdgeMesher(const std::string& fileName) {
 	TEST_START2
 
@@ -1130,20 +1155,7 @@ int quadStripMesher3(const std::string& fileName) {
 	TEST_END
 }
 
-int quadStripMesher_type2(const std::string& fileName) {
-	TEST_START2
-	MeshDensity2DquadStrip meshDens({ 5, 8, 6 }, 5);
-	QuadStrip quadStrip({
-		{glm::dvec3(0.00,  0.00, 0.00), glm::dvec3(0.0,   0.10, 0.00)},
-		{glm::dvec3(0.30, -0.10, 0.00), glm::dvec3(0.35,  0.12, 0.00)},
-		{glm::dvec3(0.60, -0.20, 0.00), glm::dvec3(0.60,  0.08, 0.00)},
-		{glm::dvec3(0.90, -0.10, 0.00), glm::dvec3(0.94,  0.12, 0.00)},
-		});
 
-	QuadStripMesher::writeNodes2(pos, glCsys, meshDens, quadStrip);
-	QuadStripMesher::writeElements2(meshDens);
-	TEST_END
-}
 int planeMesherRef(const std::string& fileName) {
 	TEST_START2
 
@@ -2015,6 +2027,19 @@ int recToEllipse3Dmesher(const std::string& fileName) {
 TEST_END
 }
 
+int quadStripMesher3D(const std::string& fileName) {
+	TEST_START2
+	MeshDensity3DquadStrip meshDens({5, 8}, 5, 10, false);
+	QuadStrip3D quadStrip({
+		{glm::dvec3(0., 0., -0.5),	glm::dvec3(0., 1., -0.5)},
+		{glm::dvec3(1., -0.5, 0.),	glm::dvec3(1., 1.5, 0.)},
+		{glm::dvec3(2., 0., -0.5),	glm::dvec3(2., 1., -0.5)} }, 10.*Z_DIR);
+
+	QuadStrip3Dmesher::writeNodes(pos, glCsys, meshDens, quadStrip);
+	QuadStrip3Dmesher::writeElements(meshDens);
+
+	TEST_END
+}
 
 int refinement2dHeight(const std::string& fileName) {
 	TEST_START2

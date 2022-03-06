@@ -50,6 +50,12 @@ NodeIterator1D MeshDensity2D::edgeNodeIterator(int edgeID, int firstNodeID, int 
 	}
 }
 
+MeshDensity1DlineStrip MeshDensityQuadStrip::getMesh1DlineStrip(bool closedLoop) const {
+	return MeshDensity1DlineStrip(dir1nodes, closedLoop);
+}
+int MeshDensityQuadStrip::nQuads() const {
+	return dir1nodes.size();
+}
 
 MeshDensity2DquadStrip::MeshDensity2DquadStrip(const std::vector<int>& d1, int d2, bool closedLoop)
 	: MeshDensity2D(0, d2, closedLoop)
@@ -60,23 +66,25 @@ MeshDensity2DquadStrip::MeshDensity2DquadStrip(const std::vector<int>& d1, int d
 		setDir1(dir1() - 1);
 	}
 }
-
 MeshDensity1DlineStrip MeshDensity2DquadStrip::getMeshDensDir1() const {
-	return MeshDensity1DlineStrip(dir1nodes, closedLoop);
+	return getMesh1DlineStrip(closedLoop);
 }
 
 
-int MeshDensity2DquadStrip::nQuads() const {
-	return dir1nodes.size();
-}
-MeshDensity2D MeshDensity2DquadStrip::meshDensQ(int i) const {
-	if (i < dir1nodes.size()) {
-		return MeshDensity2D(dir1nodes[i]/*i == 0 ? dir1nodes[i] : dir1nodes[i] - 1*/, dir2());
+MeshDensity3DquadStrip::MeshDensity3DquadStrip(
+	const std::vector<int>& d1,
+	int d2, int d3, bool closedLoop)
+	: MeshDensity3D(0, d2, d3, closedLoop)
+{
+	dir1nodes = d1;
+	setDir1(stdVecSum(dir1nodes) - (dir1nodes.size() - 1));
+	if (closedLoop) {
+		setDir1(dir1() - 1);
 	}
-	throw("MeshDensity2DquadStrip::meshDensQ out of range");
-	return MeshDensity2D();
 }
-
+MeshDensity1DlineStrip MeshDensity3DquadStrip::getMeshDensDir1() const {
+	return getMesh1DlineStrip(closedLoop);
+}
 
 int MeshDensity3D::cornerNode(int cornerID) {
 	switch (cornerID)

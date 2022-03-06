@@ -43,7 +43,7 @@ void QuadStripMesher::writeNodes(
 	Writes quad by quad
 		Not correct - overlapping nodes
 */
-void QuadStripMesher::writeNodes2(
+/*void QuadStripMesher::writeNodes2(
 	const glm::dvec3& pos,
 	MeshCsys& csys,
 	const MeshDensity2DquadStrip& meshDens,
@@ -62,7 +62,7 @@ void QuadStripMesher::writeNodes2(
 		PlaneMesher::writeNodesQ(pos, csys, quadMeshDens, q);
 	}
 	MESHER_NODE_WRITE_END
-}
+}*/
 
 
 void QuadStripMesher::writeElements(const MeshDensity2DquadStrip& meshDens)
@@ -73,7 +73,7 @@ void QuadStripMesher::writeElements(const MeshDensity2DquadStrip& meshDens)
 /*!
 	Not correct - overlapping nodes
 */
-void QuadStripMesher::writeElements2(const MeshDensity2DquadStrip& meshDens)
+/*void QuadStripMesher::writeElements2(const MeshDensity2DquadStrip& meshDens)
 {
 	int nQuads = meshDens.nQuads();
 	MeshDensity2D quadMeshDens;
@@ -83,4 +83,4 @@ void QuadStripMesher::writeElements2(const MeshDensity2DquadStrip& meshDens)
 		Mesher::nodeID1 += quadMeshDens.nNodes();
 	}
 
-}
+}*/
