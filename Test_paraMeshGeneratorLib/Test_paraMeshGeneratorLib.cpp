@@ -836,21 +836,19 @@ int arcMesher2(const std::string& fileName) {
 int pathMesher(const std::string& fileName) {
 	TEST_START2
 	int nnodes = 100;
-	PathMesher::writeNodes(pos, glCsys, nnodes, PathAxis(direction::x, 10.));
-	PathMesher::writeElements(nnodes);
 
-	PathMesher::writeNodes(pos, glCsys, nnodes, PathAxis(direction::y, 10.));
-	PathMesher::writeElements(nnodes);
+	std::vector<std::shared_ptr<Path>> paths({
+		std::make_shared<PathAxis>(direction::x, 10.),
+		std::make_shared<PathAxis>(direction::y, 10.),
+		std::make_shared<PathAxis>(direction::z, 10.),
+		std::make_shared<PathSine>(X_DIR, Y_DIR, 10., 2., 5.),
+		std::make_shared<PathCircular>(10., glm::dvec3(0.5, 1., 0.), glm::dvec3(1., 0.5, 1.))
+	});
 
-	PathMesher::writeNodes(pos, glCsys, nnodes, PathAxis(direction::z, 10.));
-	PathMesher::writeElements(nnodes);
-
-	PathMesher::writeNodes(pos, glCsys, nnodes, PathSine(X_DIR, Y_DIR, 10., 2., 5.));
-	PathMesher::writeElements(nnodes);
-
-	PathMesher::writeNodes(pos, glCsys, nnodes, PathSine(glm::dvec3(1., 1., 1.), Y_DIR, 10., 2., 5.));
-	PathMesher::writeElements(nnodes);
-
+	for (auto path : paths) {
+		PathMesher::writeNodes(pos, glCsys, nnodes, *path.get());
+		PathMesher::writeElements(nnodes);
+	}
 	TEST_END
 }
 
