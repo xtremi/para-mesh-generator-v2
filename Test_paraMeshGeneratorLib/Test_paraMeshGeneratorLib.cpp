@@ -421,8 +421,8 @@ void writeXYZplanes(MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dv
 	PlaneMesher::writeElements(meshDens);
 }
 
-static const int nCubesSpeedTest = 10;
-static const int nNodesCubeSpeedTest = 10;
+static const int nCubesSpeedTest = 50;
+static const int nNodesCubeSpeedTest = 30;
 int speedTestWriteCubes(const std::string& fileName) {
 	TEST_START
 
@@ -442,14 +442,14 @@ int speedTestWriteRotatedCubes(const std::string& fileName) {
 	glm::dvec3 v(1., 1., 1.);
 	v = glm::normalize(v);
 
-	glm::dmat3x3 rotMF2 = makeCsysMatrix(v, 0.);
+	glm::dmat3x3 rotMF2 = makeCsysMatrix(v, GLMPI/2.);
 
 	MeshCsys csysF0(10.*Z_DIR);
 	MeshCsys csysF1(R*Z_DIR, &rotMF2);
 	MeshCsys csysF2(-R * Z_DIR);
 	csysF1.setParentCsys(&csysF0);
 	csysF2.setParentCsys(&csysF1);
-
+	csysF2.updateParents();
 	writeXYZlines(csysF0, 2.0, 5);
 	writeXYZlines(csysF1, 2.0, 5);
 	writeXYZlines(csysF2, 2.0, 5);
@@ -462,7 +462,7 @@ int speedTestWriteRotatedCubes(const std::string& fileName) {
 		csysF1.pos += 1.45*v;
 		csysF2.updateParents();
 
-		CuboidMesher::writeNodes(NULL_POS, pos, MeshDensity3D(n, n, n), glm::dvec3(0.5, 0.5, 2.0), plane::xy);
+		CuboidMesher::writeNodes(NULL_POS, csysF2, MeshDensity3D(n, n, n), glm::dvec3(0.5, 0.5, 2.0), plane::xy);
 		CuboidMesher::writeElements(MeshDensity3D(n, n, n));
 	}
 
