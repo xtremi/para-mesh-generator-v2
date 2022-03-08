@@ -842,7 +842,9 @@ int pathMesher(const std::string& fileName) {
 		std::make_shared<PathAxis>(direction::y, 10.),
 		std::make_shared<PathAxis>(direction::z, 10.),
 		std::make_shared<PathSine>(X_DIR, Y_DIR, 10., 2., 5.),
-		std::make_shared<PathCircular>(10., glm::dvec3(0.5, 1., 0.), glm::dvec3(1., 0.5, 1.))
+		std::make_shared<PathCircular>(10., glm::dvec3(0.5, 1., 0.), glm::dvec3(1., 0.5, 1.)),
+		std::make_shared<PathLineStrip>(
+			std::vector<glm::dvec3>({glm::dvec3(0.0), glm::dvec3(1., 0., 0.), glm::dvec3(2., 1., 0.), glm::dvec3(2., 2., 0.) }))
 	});
 
 	for (auto path : paths) {

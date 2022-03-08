@@ -14,7 +14,6 @@ public:
 	int nPoints() const;
 	bool getLineEndPoints(int line_i, glm::dvec3& p1, glm::dvec3& p2) const;
 	void addPoint(const glm::dvec3& p);
-
 	std::vector<glm::dvec3> points;
 };
 
