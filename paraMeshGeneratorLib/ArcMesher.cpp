@@ -118,12 +118,11 @@ void ArcMesher::writeNodes(
 	double			  radius,
 	const glm::dvec3& p1,
 	const glm::dvec3& p2,
+	const glm::dvec3& normal,
 	node_skip		  nskip)
 {
 	//MESHER_NODE_WRITE_START
-	glm::dvec3 center = circleCenter(p1, p2, radius);	
-	glm::dvec3 normal = glm::cross(p1 - center, p2 - center);
-	normal = glm::normalize(normal);
+	glm::dvec3 center = circleCenter(p1, p2, normal, radius);
 	glm::dvec3 dirX = glm::normalize(p1 - center);
 	glm::dvec3 dirY = glm::normalize(glm::cross(normal, dirX));
 	ArcAngles angles(angleOfPointOnCircle(p1, center), angleOfPointOnCircle(p2, center));

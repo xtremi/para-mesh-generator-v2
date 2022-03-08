@@ -117,17 +117,22 @@ struct MeshDensity2D : public NodeVec2D {
 	NodeIterator1D edgeNodeIterator(int edgeID, int firstNodeID, int preNode = 0);
 };
 
-
-struct MeshDensity2DquadStrip : public MeshDensity2D {
-	MeshDensity2DquadStrip(){}
-	MeshDensity2DquadStrip(const std::vector<int>& dir1, int dir2, bool closedLoop = false);
-	MeshDensity2D meshDensQ(int i) const;
+/*!
+	Inherited by MeshDensity2DquadStrip and MeshDensity3DquadStrip
+*/
+struct MeshDensityQuadStrip {
 	int nQuads() const;
-	MeshDensity1DlineStrip getMeshDensDir1() const;
-
 protected:
 	std::vector<int> dir1nodes;
+	MeshDensity1DlineStrip getMesh1DlineStrip(bool closedLoop) const;
 };
+
+struct MeshDensity2DquadStrip : public MeshDensity2D, public MeshDensityQuadStrip {
+	MeshDensity2DquadStrip(){}
+	MeshDensity2DquadStrip(const std::vector<int>& dir1, int dir2, bool closedLoop = false);
+	MeshDensity1DlineStrip getMeshDensDir1() const;
+};
+
 
 
 struct MeshDensity2DrecTube : public MeshDensity2D {
@@ -209,6 +214,17 @@ struct MeshDensity3D : public NodeVec3D {
 	int cornerNode(int cornerID);
 	NodeIterator2D faceNodeIterator(int faceID, int firstNodeID, const NodeIterator1D& preNodes = NodeIterator1D());
 };
+
+
+struct MeshDensity3DquadStrip : public MeshDensity3D, public MeshDensityQuadStrip {
+	MeshDensity3DquadStrip() {}
+	MeshDensity3DquadStrip(const std::vector<int>& dir1, int dir2, int dir3, bool closedLoop = false);
+	MeshDensity1DlineStrip getMeshDensDir1() const;
+	MeshDensity2DquadStrip getMeshDensD12q() const {
+		return MeshDensity2DquadStrip(dir1nodes, dir2(), closedLoop);
+	}
+};
+
 
 /*
 	Extends NodeVec2D with element number functions and closed loop definition,

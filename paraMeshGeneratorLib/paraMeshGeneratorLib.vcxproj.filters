@@ -126,6 +126,15 @@
     <ClInclude Include="general_utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="QuadStrip3Dmesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="Path.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PathMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -220,6 +229,15 @@
     </ClCompile>
     <ClCompile Include="general_utilities.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadStrip3Dmesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Path.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PathMesher.cpp">
+      <Filter>Meshers\source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

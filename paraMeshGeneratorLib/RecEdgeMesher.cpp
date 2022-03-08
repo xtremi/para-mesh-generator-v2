@@ -116,7 +116,7 @@ void RecEdgeMesher::getOrWriteCoords_nth(
 	double elSizeRecW = size.x / (double)nNodesWidth;
 	double elSizeRecH = size.y / (double)nNodesHeight;
 
-	int nNodesEdges[4] = { nNodesWidth, nNodesHeight, nNodesWidth, nNodesHeight };
+	int nNodesEdges[4] = { nNodesHeight, nNodesWidth, nNodesHeight, nNodesWidth };
 	glm::dvec2 curCornerCoord;
 	glm::dvec2 curStep;
 	glm::dvec2 curCoordLocal;
@@ -131,8 +131,8 @@ void RecEdgeMesher::getOrWriteCoords_nth(
 	
 	Rectangle rec(size);
 	for (int edge = 0; edge < 4; edge++) {
-		curCornerCoord = glm::dvec2(rec.getCornerCoord(edge + 1));
-		curElSize = edge == 0 || edge == 2 ? elSizeRecW : elSizeRecH;
+		curCornerCoord = glm::dvec2(rec.getCornerCoord(edge));
+		curElSize = edge == 0 || edge == 2 ? elSizeRecH : elSizeRecW;
 		curStep = Rectangle::recDirs[edge] * curElSize;
 
 

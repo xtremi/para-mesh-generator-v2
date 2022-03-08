@@ -9,6 +9,7 @@
 #include "ArcMesher.h"
 #include "RecEdgeMesher.h"
 #include "EllipseMesher.h"
+#include "PathMesher.h"
 
 //2d elements
 #include "PlaneMesher.h"
@@ -23,6 +24,7 @@
 #include "CuboidMesher.h"
 #include "Cone3Dmesher.h"
 #include "RecToEllipse3Dmesher.h"
+#include "QuadStrip3Dmesher.h"
 
 //Extruded mesh
 #include "MeshPartExtrusion.h"
@@ -70,6 +72,7 @@ int arcMesher(const std::string& fileName);
 int arcMesher2(const std::string& fileName);
 int recEdgeMesher(const std::string& fileName);
 int ellipseMesher(const std::string& fileName);
+int pathMesher(const std::string& fileName);
 
 int meshCsys1(const std::string& fileName);
 int meshCsys2(const std::string& fileName);
@@ -82,7 +85,6 @@ int planeMesherQuadNth(const std::string& fileName);
 int quadStripMesher(const std::string& fileName);
 int quadStripMesher2(const std::string& fileName);
 int quadStripMesher3(const std::string& fileName);
-int quadStripMesher_type2(const std::string& fileName);
 int planeMesherRef(const std::string& fileName);
 int coneMesher(const std::string& fileName);
 int coneMesherRef(const std::string& fileName);
@@ -105,7 +107,7 @@ int cone3Dmesher(const std::string& fileName);
 int cone3DmesherRef(const std::string& fileName);
 int cone3DmesherRef2(const std::string& fileName);
 int recToEllipse3Dmesher(const std::string& fileName);
-
+int quadStripMesher3D(const std::string& fileName);
 
 int refinement2dHeight(const std::string& fileName);
 int refinement3dHeight(const std::string& fileName);
@@ -183,6 +185,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(110, "lineStripMesher",		"basic meshers 1D", (testFunction)lineStripMesher),
 	
 	TestDef(120, "arcMesher2",			"basic meshers 1D", (testFunction)arcMesher2),
+	TestDef(125, "pathMesher",			"basic meshers 1D", (testFunction)pathMesher),
 
 
 	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
@@ -211,7 +214,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(250, "quadStripMesher",			"basic meshers 2D", (testFunction)quadStripMesher),
 	TestDef(251, "quadStripMesher2",		"basic meshers 2D", (testFunction)quadStripMesher2),
 	TestDef(253, "quadStripMesher3",		"basic meshers 2D", (testFunction)quadStripMesher3),
-	TestDef(252, "quadStripMesher_type2",	"basic meshers 2D", (testFunction)quadStripMesher_type2),
+	//TestDef(252, "quadStripMesher_type2",	"basic meshers 2D", (testFunction)quadStripMesher_type2),
 
 
 
@@ -223,6 +226,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(323, "cone3DmesherRef",	    "basic meshers 3D", (testFunction)cone3DmesherRef),
 	TestDef(324, "recToEllipse3Dmesher","basic meshers 3D", (testFunction)recToEllipse3Dmesher),
 	TestDef(330 , "cone3DmesherRef2",	"basic meshers 3D", (testFunction)cone3DmesherRef2),
+	TestDef(340 , "quadStripMesher3D",	"basic meshers 3D", (testFunction)quadStripMesher3D),
 
 
 	TestDef(430, "refinement2dHeight",		"basic meshers 2D", (testFunction)refinement2dHeight),
@@ -806,14 +810,14 @@ int arcMesher2(const std::string& fileName) {
 	//From two points on on arc + radius:
 	glm::dvec3 p1(10., 0., 0.);
 	glm::dvec3 p2(0., 10., 0.);
-	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2);
+	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2, Z_DIR);
 	ArcMesher::writeElementsLine(nnodes);
 
 	pos.z += radius / 2.0;
 	//From two points on on arc + radius:
 	p1 = glm::dvec3(0., 10., 0.);
 	p2 = glm::dvec3(10., 0., 0.);
-	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2);
+	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2, Z_DIR);
 	ArcMesher::writeElementsLine(nnodes);
 
 	pos.z += radius / 2.0;
@@ -826,6 +830,25 @@ int arcMesher2(const std::string& fileName) {
 	ArcMesher::writeNodesCircularQ(pos, glCsys, nnodes, radius, angles.start, angles.angStep(nnodes), direction::z);
 	ArcMesher::writeElementsLine(nnodes);
 
+	TEST_END
+}
+
+int pathMesher(const std::string& fileName) {
+	TEST_START2
+	int nnodes = 100;
+
+	std::vector<std::shared_ptr<Path>> paths({
+		std::make_shared<PathAxis>(direction::x, 10.),
+		std::make_shared<PathAxis>(direction::y, 10.),
+		std::make_shared<PathAxis>(direction::z, 10.),
+		std::make_shared<PathSine>(X_DIR, Y_DIR, 10., 2., 5.),
+		std::make_shared<PathCircular>(10., glm::dvec3(0.5, 1., 0.), glm::dvec3(1., 0.5, 1.))
+	});
+
+	for (auto path : paths) {
+		PathMesher::writeNodes(pos, glCsys, nnodes, *path.get());
+		PathMesher::writeElements(nnodes);
+	}
 	TEST_END
 }
 
@@ -1130,20 +1153,7 @@ int quadStripMesher3(const std::string& fileName) {
 	TEST_END
 }
 
-int quadStripMesher_type2(const std::string& fileName) {
-	TEST_START2
-	MeshDensity2DquadStrip meshDens({ 5, 8, 6 }, 5);
-	QuadStrip quadStrip({
-		{glm::dvec3(0.00,  0.00, 0.00), glm::dvec3(0.0,   0.10, 0.00)},
-		{glm::dvec3(0.30, -0.10, 0.00), glm::dvec3(0.35,  0.12, 0.00)},
-		{glm::dvec3(0.60, -0.20, 0.00), glm::dvec3(0.60,  0.08, 0.00)},
-		{glm::dvec3(0.90, -0.10, 0.00), glm::dvec3(0.94,  0.12, 0.00)},
-		});
 
-	QuadStripMesher::writeNodes2(pos, glCsys, meshDens, quadStrip);
-	QuadStripMesher::writeElements2(meshDens);
-	TEST_END
-}
 int planeMesherRef(const std::string& fileName) {
 	TEST_START2
 
@@ -2015,6 +2025,19 @@ int recToEllipse3Dmesher(const std::string& fileName) {
 TEST_END
 }
 
+int quadStripMesher3D(const std::string& fileName) {
+	TEST_START2
+	MeshDensity3DquadStrip meshDens({5, 8}, 5, 10, false);
+	QuadStrip3D quadStrip({
+		{glm::dvec3(0., 0., -0.5),	glm::dvec3(0., 1., -0.5)},
+		{glm::dvec3(1., -0.5, 0.),	glm::dvec3(1., 1.5, 0.)},
+		{glm::dvec3(2., 0., -0.5),	glm::dvec3(2., 1., -0.5)} }, 10.*Z_DIR);
+
+	QuadStrip3Dmesher::writeNodes(pos, glCsys, meshDens, quadStrip);
+	QuadStrip3Dmesher::writeElements(meshDens);
+
+	TEST_END
+}
 
 int refinement2dHeight(const std::string& fileName) {
 	TEST_START2
@@ -3197,20 +3220,22 @@ int extrude2DedgeArc(const std::string& fileName)
 	MeshCsys csys1(glm::dvec3(0.0, 0.0, 0.0), &rotM1);
 	
 	Mesh2D_planeExtrusion mesh2D(8, 4.0);
-	mesh2D.extrudeYedgeArc(GLMPI/3.0, 10.0, 10);	//0.0 - 1.0
-	mesh2D.extrudeYedgeArc(GLMPI/3.0, 2.0, 5);	//0.0 - 1.0
-	mesh2D.extrudeYedgeArc(GLMPI/1.0, 1.0, 10);	//0.0 - 1.0
-	mesh2D.extrudeYedgeArc(-GLMPI/1.0, -1.0, 8);	//0.0 - 1.0
-	mesh2D.setCsys(csys1);
-	mesh2D.writeNodes();
-	mesh2D.writeElements();
-
+	//mesh2D.extrudeYedge(5.0, 3);
+	//mesh2D.extrudeYedgeArc(GLMPI/2.0, 10.0, 10);
 	
-	rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
+	mesh2D.extrudeYedgeArc(GLMPI/3.0, 10.0, 10);
+	mesh2D.extrudeYedgeArc(GLMPI/3.0, 2.0, 5);	
+	mesh2D.extrudeYedgeArc(GLMPI/1.0, 1.0, 10);	
+	mesh2D.extrudeYedgeArc(-GLMPI/1.0, -1.0, 8);
 	mesh2D.setCsys(csys1);
-
 	mesh2D.writeNodes();
 	mesh2D.writeElements();
+
+	//rotM1 = makeCsysMatrix(Z_DIR, GLMPI * 0.7);
+	//mesh2D.setCsys(csys1);
+	//
+	//mesh2D.writeNodes();
+	//mesh2D.writeElements();
 
 	TEST_END
 }

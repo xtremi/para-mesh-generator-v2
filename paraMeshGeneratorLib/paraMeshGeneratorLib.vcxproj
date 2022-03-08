@@ -41,7 +41,10 @@
     <ClInclude Include="MeshPartExtrusion.h" />
     <ClInclude Include="NodeIterator.h" />
     <ClInclude Include="ParaMeshGenCommon.h" />
+    <ClInclude Include="Path.h" />
+    <ClInclude Include="PathMesher.h" />
     <ClInclude Include="PlaneMesher.h" />
+    <ClInclude Include="QuadStrip3Dmesher.h" />
     <ClInclude Include="QuadStripMesher.h" />
     <ClInclude Include="RecEdgeMesher.h" />
     <ClInclude Include="RecTubeMesher.h" />
@@ -79,7 +82,10 @@
     <ClCompile Include="MeshPartExtrusion.cpp" />
     <ClCompile Include="NodeIterator.cpp" />
     <ClCompile Include="ParaMeshGenCommon.cpp" />
+    <ClCompile Include="Path.cpp" />
+    <ClCompile Include="PathMesher.cpp" />
     <ClCompile Include="PlaneMesher.cpp" />
+    <ClCompile Include="QuadStrip3Dmesher.cpp" />
     <ClCompile Include="QuadStripMesher.cpp" />
     <ClCompile Include="RecEdgeMesher.cpp" />
     <ClCompile Include="RecTubeMesher.cpp" />

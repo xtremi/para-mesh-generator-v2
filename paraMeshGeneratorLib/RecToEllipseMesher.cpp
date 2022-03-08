@@ -55,7 +55,7 @@ void RecToEllipseMesher::calculateRecToEllipseDirections(
 	Rectangle rec(recSize);
 	int nElRecW, nElRecH;
 	rec.elementsPerSides(meshDens.circ(), nElRecW, nElRecH);
-	int iEllipse_start = meshDens.circ() - nElRecW / 2;	//ellipse first node start at top center of rec
+	int iEllipse_start = meshDens.circ() - nElRecH / 2;	//ellipse first node start at right center of rec
 	int iEllipse = iEllipse_start;
 
 	for (int i = 0; i < meshDens.circ(); i++) {

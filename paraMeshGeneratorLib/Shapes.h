@@ -61,10 +61,18 @@ public:
 	Quad quad(int i) const;
 	LineStrip getLineStripBot() const;
 	LineStrip getLineStripTop() const;
-	
 
-private:
+protected:
 	std::vector<QuadStripSection> sectionPoints;
+};
+
+class QuadStrip3D : public QuadStrip{
+public:
+	QuadStrip3D() {}
+	QuadStrip3D(const std::vector<QuadStripSection>& _sectionPoints, const glm::dvec3& _lengthVector)
+		: QuadStrip(_sectionPoints), lengthVector{ _lengthVector }{}
+
+	glm::dvec3 lengthVector;
 };
 
 
