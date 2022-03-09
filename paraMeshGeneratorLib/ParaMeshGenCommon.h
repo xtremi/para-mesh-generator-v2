@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 
+
 enum class Dim { DIM1D, DIM2D, DIM3D };
 enum class direction{x,y,z, custom};
 enum class plane {xy, xz, yz, custom};

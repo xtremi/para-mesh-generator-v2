@@ -11,6 +11,7 @@ public:
 		MeshCsys&		  csys,
 		int				  nnodes,
 		const Path&		  path,
+		const VecD&		  requiredNodeLocation = VecD({}),
 		node_skip		  nskip = node_skip::none);
 	static void writeElements(int nnodes, bool closedLoop = false);
 };

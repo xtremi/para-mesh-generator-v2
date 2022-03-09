@@ -2,7 +2,7 @@
 
 
 //template <typename T>
-int stdVecSum(const std::vector<int>& vec) {
+int stdVecSum(const VecI& vec) {
 	int sum = 0;
 	for (int el : vec) sum += el;
 	return sum;

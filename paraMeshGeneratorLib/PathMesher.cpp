@@ -6,8 +6,17 @@ void PathMesher::writeNodes(
 	MeshCsys&		  csys,
 	int				  nnodes,
 	const Path&		  path,
+	const VecD&		  requiredNodeLocation,
 	node_skip		  nskip)
 {
+	std::vector<int> nnodesVec;
+	if (requiredNodeLocation.size() > 0) {
+
+	}
+	else {
+		nnodesVec.push_back(nnodes);
+	}
+
 	MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {
 		if (!skip(i, nnodes, nskip)) {

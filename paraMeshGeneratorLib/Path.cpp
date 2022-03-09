@@ -73,3 +73,11 @@ glm::dvec3 PathLineStrip::position(double pathPercentage) const
 	}
 }
 
+VecGLM3d PathLineStrip::getCornerDistances() {
+	VecGLM3d cornerDist;
+	for (const Segment& segment : segments) {
+		cornerDist.push_back(segment.startFactor * totalLength);
+	}
+	cornerDist.push_back(totalLength);
+	return cornerDist;
+}

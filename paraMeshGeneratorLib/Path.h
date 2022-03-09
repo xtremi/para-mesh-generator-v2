@@ -1,6 +1,7 @@
 #pragma once
 #include "math_utilities.h"
 #include "ParaMeshGenCommon.h"
+#include "general_utilities.h"
 #include <vector>
 
 class Path
@@ -58,6 +59,8 @@ class PathLineStrip : public Path {
 public:
 	PathLineStrip(const std::vector<glm::dvec3>& _points);
 	glm::dvec3 position(double pathPercentage) const;
+
+	VecGLM3d getCornerDistances();
 
 protected:
 	struct Segment {
