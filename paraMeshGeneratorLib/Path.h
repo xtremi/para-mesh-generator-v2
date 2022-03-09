@@ -60,7 +60,7 @@ public:
 	PathLineStrip(const std::vector<glm::dvec3>& _points);
 	glm::dvec3 position(double pathPercentage) const;
 
-	VecGLM3d getCornerDistances();
+	VecD getCornerPathFactors();
 
 protected:
 	struct Segment {

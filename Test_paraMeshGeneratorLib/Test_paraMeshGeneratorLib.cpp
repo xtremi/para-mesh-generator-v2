@@ -73,6 +73,7 @@ int arcMesher2(const std::string& fileName);
 int recEdgeMesher(const std::string& fileName);
 int ellipseMesher(const std::string& fileName);
 int pathMesher(const std::string& fileName);
+int pathMesher_2(const std::string& fileName);
 
 int meshCsys1(const std::string& fileName);
 int meshCsys2(const std::string& fileName);
@@ -186,6 +187,7 @@ std::vector<TestDef> testFunctions({
 	
 	TestDef(120, "arcMesher2",			"basic meshers 1D", (testFunction)arcMesher2),
 	TestDef(125, "pathMesher",			"basic meshers 1D", (testFunction)pathMesher),
+	TestDef(126, "pathMesher_2",		"basic meshers 1D", (testFunction)pathMesher_2),
 
 
 	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
@@ -833,10 +835,26 @@ int arcMesher2(const std::string& fileName) {
 	TEST_END
 }
 
+
+int pathMesher_2(const std::string& fileName) {
+	TEST_START2
+
+	std::shared_ptr<PathLineStrip> pathLS = std::make_shared<PathLineStrip>(
+		std::vector<glm::dvec3>({ glm::dvec3(0.0), glm::dvec3(1., 0., 0.), glm::dvec3(2., 1., 0.), glm::dvec3(2., 2., 0.) }));
+	VecD pathLoc = pathLS->getCornerPathFactors();
+
+	for (int i = 20; i < 55; i++) {
+		PathMesher::writeNodes(pos + (double)i * Z_DIR, glCsys, i, *pathLS.get(), pathLoc);
+		PathMesher::writeElements(i);
+	}
+
+	TEST_END
+}
+
 int pathMesher(const std::string& fileName) {
 	TEST_START2
-	int nnodes = 100;
 
+	int nnodes = 10;
 	std::vector<std::shared_ptr<Path>> paths({
 		std::make_shared<PathAxis>(direction::x, 10.),
 		std::make_shared<PathAxis>(direction::y, 10.),
@@ -844,7 +862,7 @@ int pathMesher(const std::string& fileName) {
 		std::make_shared<PathSine>(X_DIR, Y_DIR, 10., 2., 5.),
 		std::make_shared<PathCircular>(10., glm::dvec3(0.5, 1., 0.), glm::dvec3(1., 0.5, 1.)),
 		std::make_shared<PathLineStrip>(
-			std::vector<glm::dvec3>({glm::dvec3(0.0), glm::dvec3(1., 0., 0.), glm::dvec3(2., 1., 0.), glm::dvec3(2., 2., 0.) }))
+		std::vector<glm::dvec3>({ glm::dvec3(0.0), glm::dvec3(1., 0., 0.), glm::dvec3(2., 1., 0.), glm::dvec3(2., 2., 0.) }))
 	});
 
 	for (auto path : paths) {
