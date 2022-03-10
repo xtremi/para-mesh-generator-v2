@@ -42,6 +42,8 @@ int speedTestMat3Vec3multiplication(const std::string& fileName);
 int speedTestWriteCubes(const std::string& fileName);
 int speedTestWriteRotatedCubes(const std::string& fileName);
 int speedTestWriteNodesAndElements(const std::string& fileName);
+int speedTestWriteLines(const std::string& fileName);
+int speedTestWritePathLineStrip(const std::string& fileName);
 
 int meshDensity2DcornerNodes(const std::string& fileName);
 int meshDensity2DrefCornerNodes(const std::string& fileName);
@@ -74,6 +76,7 @@ int recEdgeMesher(const std::string& fileName);
 int ellipseMesher(const std::string& fileName);
 int pathMesher(const std::string& fileName);
 int pathMesher_2(const std::string& fileName);
+int pathMesher_3(const std::string& fileName);
 
 int meshCsys1(const std::string& fileName);
 int meshCsys2(const std::string& fileName);
@@ -148,6 +151,8 @@ std::vector<TestDef> testFunctions({
 	TestDef(14, "speedTestWriteCubes",				"speed test", (testFunction)speedTestWriteCubes),
 	TestDef(15, "speedTestWriteRotatedCubes",		"speed test", (testFunction)speedTestWriteRotatedCubes),
 	TestDef(16, "speedTestWriteNodesAndElements",	"speed test", (testFunction)speedTestWriteNodesAndElements),
+	TestDef(17, "speedTestWriteLines",				"speed test", (testFunction)speedTestWriteLines),
+	TestDef(18, "speedTestWritePathLineStrip",		"speed test", (testFunction)speedTestWritePathLineStrip),
 	
 	TestDef(20, "meshDensity2DcornerNodes",			"utilities", (testFunction)meshDensity2DcornerNodes),
 	TestDef(21, "meshDensity3DcornerNodes",			"utilities", (testFunction)meshDensity3DcornerNodes),
@@ -188,6 +193,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(120, "arcMesher2",			"basic meshers 1D", (testFunction)arcMesher2),
 	TestDef(125, "pathMesher",			"basic meshers 1D", (testFunction)pathMesher),
 	TestDef(126, "pathMesher_2",		"basic meshers 1D", (testFunction)pathMesher_2),
+	TestDef(127, "pathMesher_3",		"basic meshers 1D", (testFunction)pathMesher_3),
 
 
 	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
@@ -470,6 +476,36 @@ int speedTestWriteRotatedCubes(const std::string& fileName) {
 
 	TEST_END
 }
+
+int nLines = 10;
+int nNodesPerLine = 10000;
+int speedTestWriteLines(const std::string& fileName) {
+	TEST_START2
+		
+	for (int i = 0; i < nLines; i++) {
+		LineMesher::writeNodesLineX(pos, glCsys, nNodesPerLine, 10.);
+		LineMesher::writeElementsLine(nNodesPerLine);
+		pos.z += 1.0;
+	}
+
+
+	TEST_END
+}
+int speedTestWritePathLineStrip(const std::string& fileName) {
+	TEST_START2
+	PathLineStrip pathLS(VecGLM3d({
+		glm::dvec3(0.,0.,0.), glm::dvec3(1.,1.,0.5), glm::dvec3(2., 0.5, 0.5), glm::dvec3(2., 3., 0.)
+	}));
+	
+	for (int i = 0; i < nLines; i++) {
+		PathMesher::writeNodes(pos, glCsys, nNodesPerLine, pathLS, pathLS.getCornerPathFactors());
+		PathMesher::writeElements(nNodesPerLine);
+		pos.z += 1.0;
+	}
+
+	TEST_END
+}
+
 
 int speedTestWriteNodesAndElements(const std::string& fileName) {
 	TEST_START
@@ -843,9 +879,32 @@ int pathMesher_2(const std::string& fileName) {
 		std::vector<glm::dvec3>({ glm::dvec3(0.0), glm::dvec3(1., 0., 0.), glm::dvec3(2., 1., 0.), glm::dvec3(2., 2., 0.) }));
 	VecD pathLoc = pathLS->getCornerPathFactors();
 
-	for (int i = 20; i < 55; i++) {
+	int totalNodes = 0;
+	for (int i = 7; i < 25; i++) {
 		PathMesher::writeNodes(pos + (double)i * Z_DIR, glCsys, i, *pathLS.get(), pathLoc);
 		PathMesher::writeElements(i);
+		totalNodes += i;
+	}
+
+	TEST_END
+}
+
+int pathMesher_3(const std::string& fileName) {
+	TEST_START2
+
+	PathLineStrip pathLS(VecGLM3d({ 
+		glm::dvec3(0.,0.,0.),	glm::dvec3(1., 1., 0.), 
+		glm::dvec3(0., 2., 0.), glm::dvec3(-1., 1., 0.),
+		glm::dvec3(0., 0., 0.)
+	}));
+	VecD pathLoc = pathLS.getCornerPathFactors();
+
+	int totalNodes = 0;
+	int n = 12;
+	for (int i = n; i < n+1; i++) {
+		PathMesher::writeNodes(pos + (double)i * Z_DIR, glCsys, i, pathLS, pathLoc, true);
+		PathMesher::writeElements(i, true);
+		totalNodes += i;
 	}
 
 	TEST_END

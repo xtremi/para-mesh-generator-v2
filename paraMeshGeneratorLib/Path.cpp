@@ -56,6 +56,9 @@ PathLineStrip::PathLineStrip(const std::vector<glm::dvec3>& _points)
 
 glm::dvec3 PathLineStrip::position(double pathPercentage) const 
 {
+	if (pathPercentage < 0.0) pathPercentage = 0.0;
+	if (pathPercentage > 1.0) pathPercentage = 1.0;
+
 	int pointIndex = 0;
 	for (const Segment& segment : segments) {
 		
