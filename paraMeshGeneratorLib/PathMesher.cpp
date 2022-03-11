@@ -1,5 +1,6 @@
 #include "PathMesher.h"
 #include "LineMesher.h"
+#include <algorithm> // std::min_element
 
 /*!
 	This is currently used for PathLineStrip (but could have more use later. TBD.)
@@ -26,43 +27,67 @@ bool calculateNodeSpacing(
 	VecD&		nodeSpacingPerSegemnt	/*!Spacing between nodes for segment*/,
 	bool		closedLoop				/*!Will account for a closed loop*/)
 {
-	VecI nnodesVec;
 	double dpath	  = 0.;			//estimated spacing between nodes based on rest of path length
-	int	   node_i	  = 0;			//the number of nodes accouted for at the iteration
+	int	   element_i  = 0;			//the number of elements accouted for at the iteration
 	double curPathLoc = 0.0;		//the current location (0.0 -> 1.0) at the iteration
-	double remainer  = 0.0;			//the remainer after flooring/rounding the node spacing
+	//int   numberOfAdditonalNodes = 0;
 	int totalElements = totalNodes - 1;
 	double endLoc = 1.0;
 	if (closedLoop) {
 		totalElements++;
 		endLoc -= (1.0 / totalNodes);
 	}
+	double remainder = 0.0;
+	int nElseg;
 
 	for (int j = 0; j < requiredLocations.size(); j++) {
 
 		double pathRemaining     = (endLoc - curPathLoc);
-		int    elementsRemaining = totalElements - node_i;
+		int    elementsRemaining = totalElements - element_i;
 
 		dpath = pathRemaining / (double)elementsRemaining;	//normalized approx. path step
 
 		double segmentLength = requiredLocations[j] - curPathLoc;
 
-		int nElseg = (int)(segmentLength / dpath);						//number of element that fit on segment with dpath size
+		if(remainder <= 0.0){
+			nElseg = std::round(segmentLength / dpath);						//number of element that fit on segment with dpath size
+		}
+		else {
+			nElseg = (int)(segmentLength / dpath);
+		}
+		remainder = segmentLength / dpath - (double)nElseg;
+
+
 		if (nElseg == 0) nElseg = 1;									//cannot have 0 elements
 
-		if (j == (requiredLocations.size() - 1)) {
-			if ((node_i + nElseg + 1) < totalNodes) {
-				nElseg++;
-			}
-		}
 		double actualDpath = segmentLength / (double)nElseg;			//actual normalized dpath with nElSeg on segment
 
 		curPathLoc += (double)nElseg * actualDpath;
-		node_i += nElseg;
+		element_i += nElseg;
 		nodesPerSegment.push_back(nElseg);
 		nodeSpacingPerSegemnt.push_back(actualDpath);
 	}
+	/*
+		If there is a remaining node to add (so that total is equal to the required total)
+		this will find the segment that has the largest node spacing,
+		add a node and calculate the new spacing.
+	*/
+	int numberOfAdditonalNodes = totalNodes - element_i -1;
+	for (int i = 0; i < numberOfAdditonalNodes; i++) {
+		auto it = std::max_element(nodeSpacingPerSegemnt.begin(), nodeSpacingPerSegemnt.end());
+		size_t index = it - nodeSpacingPerSegemnt.begin();
+		double segmentSize = nodeSpacingPerSegemnt[index] * (double)nodesPerSegment[index];
+		double newSpacing = segmentSize / ((double)nodesPerSegment[index] + 1);
+		nodesPerSegment[index]++;
+		nodeSpacingPerSegemnt[index] = newSpacing;
+		element_i++;
+	}
 	nodesPerSegment[nodesPerSegment.size() - 1] += 1;
+
+	if (element_i != totalElements) {
+		//throw("Not expected number of nodes in calculateNodeSpacing()");
+	}
+
 	return true;
 }
 

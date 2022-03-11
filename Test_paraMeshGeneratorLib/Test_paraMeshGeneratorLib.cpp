@@ -871,6 +871,26 @@ int arcMesher2(const std::string& fileName) {
 	TEST_END
 }
 
+int pathMesher(const std::string& fileName) {
+	TEST_START2
+
+		int nnodes = 10;
+	std::vector<std::shared_ptr<Path>> paths({
+		std::make_shared<PathAxis>(direction::x, 10.),
+		std::make_shared<PathAxis>(direction::y, 10.),
+		std::make_shared<PathAxis>(direction::z, 10.),
+		std::make_shared<PathSine>(X_DIR, Y_DIR, 10., 2., 5.),
+		std::make_shared<PathCircular>(10., glm::dvec3(0.5, 1., 0.), glm::dvec3(1., 0.5, 1.)),
+		std::make_shared<PathLineStrip>(
+		std::vector<glm::dvec3>({ glm::dvec3(0.0), glm::dvec3(1., 0., 0.), glm::dvec3(2., 1., 0.), glm::dvec3(2., 2., 0.) }))
+		});
+
+	for (auto path : paths) {
+		PathMesher::writeNodes(pos, glCsys, nnodes, *path.get());
+		PathMesher::writeElements(nnodes);
+	}
+	TEST_END
+}
 
 int pathMesher_2(const std::string& fileName) {
 	TEST_START2
@@ -880,9 +900,9 @@ int pathMesher_2(const std::string& fileName) {
 	VecD pathLoc = pathLS->getCornerPathFactors();
 
 	int totalNodes = 0;
-	for (int i = 7; i < 25; i++) {
-		PathMesher::writeNodes(pos + (double)i * Z_DIR, glCsys, i, *pathLS.get(), pathLoc);
-		PathMesher::writeElements(i);
+	for (int i = 7; i < 250; i++) {
+		PathMesher::writeNodes(pos + (double)(i + 1) * Z_DIR, glCsys, i, *pathLS.get(), pathLoc);
+		PathMesher::writeElements(i);	
 		totalNodes += i;
 	}
 
@@ -910,26 +930,7 @@ int pathMesher_3(const std::string& fileName) {
 	TEST_END
 }
 
-int pathMesher(const std::string& fileName) {
-	TEST_START2
 
-	int nnodes = 10;
-	std::vector<std::shared_ptr<Path>> paths({
-		std::make_shared<PathAxis>(direction::x, 10.),
-		std::make_shared<PathAxis>(direction::y, 10.),
-		std::make_shared<PathAxis>(direction::z, 10.),
-		std::make_shared<PathSine>(X_DIR, Y_DIR, 10., 2., 5.),
-		std::make_shared<PathCircular>(10., glm::dvec3(0.5, 1., 0.), glm::dvec3(1., 0.5, 1.)),
-		std::make_shared<PathLineStrip>(
-		std::vector<glm::dvec3>({ glm::dvec3(0.0), glm::dvec3(1., 0., 0.), glm::dvec3(2., 1., 0.), glm::dvec3(2., 2., 0.) }))
-	});
-
-	for (auto path : paths) {
-		PathMesher::writeNodes(pos, glCsys, nnodes, *path.get());
-		PathMesher::writeElements(nnodes);
-	}
-	TEST_END
-}
 
 int recEdgeMesher(const std::string& fileName) {
 	TEST_START2
