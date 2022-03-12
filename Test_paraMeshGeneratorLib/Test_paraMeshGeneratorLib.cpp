@@ -19,6 +19,7 @@
 #include "RecToEllipseMesher.h"
 #include "RecTubeMesher.h"
 #include "QuadStripMesher.h"
+#include "PathPipeMesher.h"
 
 //3d elements
 #include "CuboidMesher.h"
@@ -102,6 +103,7 @@ int recToEllipseMesher(const std::string& fileName);
 int recToEllipseMesherRef(const std::string& fileName);
 int recTubeMesher(const std::string& fileName);
 int recTubeMesherRef(const std::string& fileName);
+int pathPipeMesher(const std::string& fileName);
 
 int cuboidMesherSimple(const std::string& fileName);
 int cuboidMesher(const std::string& fileName);
@@ -216,14 +218,14 @@ std::vector<TestDef> testFunctions({
 	TestDef(214, "recTubeMesherRef",		"basic meshers 2D", (testFunction)recTubeMesherRef),
 	TestDef(230, "coneMesherRef2",			"basic meshers 2D", (testFunction)coneMesherRef2),
 	TestDef(231, "coneMesherRef2_2",		"basic meshers 2D", (testFunction)coneMesherRef2_2),
-	
+
 	TestDef(240, "planeMesherQuad",			"basic meshers 2D", (testFunction)planeMesherQuad),
 	TestDef(242, "planeMesherQuadNth",		"basic meshers 2D", (testFunction)planeMesherQuadNth),
 	TestDef(250, "quadStripMesher",			"basic meshers 2D", (testFunction)quadStripMesher),
 	TestDef(251, "quadStripMesher2",		"basic meshers 2D", (testFunction)quadStripMesher2),
 	TestDef(253, "quadStripMesher3",		"basic meshers 2D", (testFunction)quadStripMesher3),
 	//TestDef(252, "quadStripMesher_type2",	"basic meshers 2D", (testFunction)quadStripMesher_type2),
-
+	TestDef(260, "pathPipeMesher",			"basic meshers 2D", (testFunction)pathPipeMesher),
 
 
 	TestDef(319, "cuboidMesherSimple",	"basic meshers 3D", (testFunction)cuboidMesherSimple),
@@ -1209,6 +1211,18 @@ int quadStripMesher2(const std::string& fileName) {
 
 	QuadStripMesher::writeNodes(pos, glCsys, meshDens, quadStrip);
 	QuadStripMesher::writeElements(meshDens);
+	TEST_END
+}
+
+
+int pathPipeMesher(const std::string& fileName) {
+	TEST_START2
+	PathCircular pathInner(10., Z_DIR, X_DIR);
+	PathCircular pathOuter(15., Z_DIR, X_DIR);
+	MeshDensity2D meshDens(20, 5, true);
+
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathInner, pathOuter);
+	PathPipeMesher::writeElements(meshDens);
 	TEST_END
 }
 
