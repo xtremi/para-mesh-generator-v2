@@ -900,7 +900,7 @@ int pathMesher_2(const std::string& fileName) {
 	VecD pathLoc = pathLS->getCornerPathFactors();
 
 	int totalNodes = 0;
-	for (int i = 7; i < 250; i++) {
+	for (int i = 7; i < 24; i++) {
 		PathMesher::writeNodes(pos + (double)(i + 1) * Z_DIR, glCsys, i, *pathLS.get(), pathLoc);
 		PathMesher::writeElements(i);	
 		totalNodes += i;
@@ -921,7 +921,7 @@ int pathMesher_3(const std::string& fileName) {
 
 	int totalNodes = 0;
 	int n = 12;
-	for (int i = n; i < n+1; i++) {
+	for (int i = n; i < n+120; i++) {
 		PathMesher::writeNodes(pos + (double)i * Z_DIR, glCsys, i, pathLS, pathLoc, true);
 		PathMesher::writeElements(i, true);
 		totalNodes += i;

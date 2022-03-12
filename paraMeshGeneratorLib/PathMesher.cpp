@@ -28,29 +28,29 @@ bool calculateNodeSpacing(
 	bool		closedLoop				/*!Will account for a closed loop*/)
 {
 	double dpath	  = 0.;			//estimated spacing between nodes based on rest of path length
-	int	   element_i  = 0;			//the number of elements accouted for at the iteration
+	int	   elCount	  = 0;			//element counter 
 	double curPathLoc = 0.0;		//the current location (0.0 -> 1.0) at the iteration
-	//int   numberOfAdditonalNodes = 0;
-	int totalElements = totalNodes - 1;
-	double endLoc = 1.0;
+	int	   totalElements = totalNodes - 1;
+	double endLoc	  = 1.0;		//the normalized end location of the path
 	if (closedLoop) {
-		totalElements++;
-		endLoc -= (1.0 / totalNodes);
+		endLoc -= (1.0 / (totalElements + 1));	//if closeLoop we stop a step a before
 	}
-	double remainder = 0.0;
-	int nElseg;
+	double remainder = 0.0;		//remainer of rounding of flooring or rounding the number of elements along a segment
+	
+	int nElseg;					//number of elements on segment at the iteration
 
 	for (int j = 0; j < requiredLocations.size(); j++) {
 
 		double pathRemaining     = (endLoc - curPathLoc);
-		int    elementsRemaining = totalElements - element_i;
+		int    elementsRemaining = totalElements - elCount;
 
-		dpath = pathRemaining / (double)elementsRemaining;	//normalized approx. path step
+		dpath = pathRemaining / (double)elementsRemaining;			//Approximate the path step size
 
-		double segmentLength = requiredLocations[j] - curPathLoc;
+		double segmentLength = requiredLocations[j] - curPathLoc;	
 
+		/*Switch between rounding and flooring the number of elements based on remainer from previous iteration*/
 		if(remainder <= 0.0){
-			nElseg = std::round(segmentLength / dpath);						//number of element that fit on segment with dpath size
+			nElseg = std::round(segmentLength / dpath);				//number of element that fit on segment with dpath size
 		}
 		else {
 			nElseg = (int)(segmentLength / dpath);
@@ -58,12 +58,12 @@ bool calculateNodeSpacing(
 		remainder = segmentLength / dpath - (double)nElseg;
 
 
-		if (nElseg == 0) nElseg = 1;									//cannot have 0 elements
+		if (nElseg == 0) nElseg = 1; //cannot have 0 elements
 
-		double actualDpath = segmentLength / (double)nElseg;			//actual normalized dpath with nElSeg on segment
+		double actualDpath = segmentLength / (double)nElseg; //actual normalized dpath with nElSeg on segment
 
 		curPathLoc += (double)nElseg * actualDpath;
-		element_i += nElseg;
+		elCount += nElseg;
 		nodesPerSegment.push_back(nElseg);
 		nodeSpacingPerSegemnt.push_back(actualDpath);
 	}
@@ -72,7 +72,7 @@ bool calculateNodeSpacing(
 		this will find the segment that has the largest node spacing,
 		add a node and calculate the new spacing.
 	*/
-	int numberOfAdditonalNodes = totalNodes - element_i -1;
+	int numberOfAdditonalNodes = totalNodes - elCount -1;
 	for (int i = 0; i < numberOfAdditonalNodes; i++) {
 		auto it = std::max_element(nodeSpacingPerSegemnt.begin(), nodeSpacingPerSegemnt.end());
 		size_t index = it - nodeSpacingPerSegemnt.begin();
@@ -80,11 +80,14 @@ bool calculateNodeSpacing(
 		double newSpacing = segmentSize / ((double)nodesPerSegment[index] + 1);
 		nodesPerSegment[index]++;
 		nodeSpacingPerSegemnt[index] = newSpacing;
-		element_i++;
+		elCount++;
 	}
-	nodesPerSegment[nodesPerSegment.size() - 1] += 1;
-
-	if (element_i != totalElements) {
+	if(!closedLoop){
+		nodesPerSegment[nodesPerSegment.size() - 1] += 1;
+	}
+	if (closedLoop) totalElements++;	//there is actually one more element if closeLoop
+	if (elCount != totalElements) {
+		int j = 0;
 		//throw("Not expected number of nodes in calculateNodeSpacing()");
 	}
 
