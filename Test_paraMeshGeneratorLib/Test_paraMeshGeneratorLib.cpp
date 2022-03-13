@@ -19,13 +19,14 @@
 #include "RecToEllipseMesher.h"
 #include "RecTubeMesher.h"
 #include "QuadStripMesher.h"
-#include "PathPipeMesher.h"
+#include "pathToPathMesher.h"
 
 //3d elements
 #include "CuboidMesher.h"
 #include "Cone3Dmesher.h"
 #include "RecToEllipse3Dmesher.h"
 #include "QuadStrip3Dmesher.h"
+#include "PathToPath3Dmesher.h"
 
 //Extruded mesh
 #include "MeshPartExtrusion.h"
@@ -103,7 +104,7 @@ int recToEllipseMesher(const std::string& fileName);
 int recToEllipseMesherRef(const std::string& fileName);
 int recTubeMesher(const std::string& fileName);
 int recTubeMesherRef(const std::string& fileName);
-int pathPipeMesher(const std::string& fileName);
+int pathToPathMesher(const std::string& fileName);
 
 int cuboidMesherSimple(const std::string& fileName);
 int cuboidMesher(const std::string& fileName);
@@ -114,6 +115,8 @@ int cone3DmesherRef(const std::string& fileName);
 int cone3DmesherRef2(const std::string& fileName);
 int recToEllipse3Dmesher(const std::string& fileName);
 int quadStripMesher3D(const std::string& fileName);
+int pathToPath3Dmesher(const std::string& fileName);
+
 
 int refinement2dHeight(const std::string& fileName);
 int refinement3dHeight(const std::string& fileName);
@@ -225,7 +228,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(251, "quadStripMesher2",		"basic meshers 2D", (testFunction)quadStripMesher2),
 	TestDef(253, "quadStripMesher3",		"basic meshers 2D", (testFunction)quadStripMesher3),
 	//TestDef(252, "quadStripMesher_type2",	"basic meshers 2D", (testFunction)quadStripMesher_type2),
-	TestDef(260, "pathPipeMesher",			"basic meshers 2D", (testFunction)pathPipeMesher),
+	TestDef(260, "pathToPathMesher",			"basic meshers 2D", (testFunction)pathToPathMesher),
 
 
 	TestDef(319, "cuboidMesherSimple",	"basic meshers 3D", (testFunction)cuboidMesherSimple),
@@ -237,7 +240,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(324, "recToEllipse3Dmesher","basic meshers 3D", (testFunction)recToEllipse3Dmesher),
 	TestDef(330 , "cone3DmesherRef2",	"basic meshers 3D", (testFunction)cone3DmesherRef2),
 	TestDef(340 , "quadStripMesher3D",	"basic meshers 3D", (testFunction)quadStripMesher3D),
-
+	TestDef(345 , "pathToPath3Dmesher",	"basic meshers 3D", (testFunction)pathToPath3Dmesher),
 
 	TestDef(430, "refinement2dHeight",		"basic meshers 2D", (testFunction)refinement2dHeight),
 	TestDef(431, "refinement3dHeight",		"basic meshers 3D", (testFunction)refinement3dHeight),
@@ -1215,41 +1218,41 @@ int quadStripMesher2(const std::string& fileName) {
 }
 
 
-int pathPipeMesher(const std::string& fileName) {
+int pathToPathMesher(const std::string& fileName) {
 	TEST_START2
 	PathCircular circlePath1(1., Z_DIR, X_DIR);
 	PathCircular circlePath2(1.5, Z_DIR, X_DIR);
 	MeshDensity2D meshDens(20, 5, true);
 
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, circlePath1, circlePath2, glm::dvec3(0., 0., 1.0));
-	PathPipeMesher::writeElements(meshDens);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, circlePath1, circlePath2, glm::dvec3(0., 0., 1.0));
+	PathToPathMesher::writeElements(meshDens);
 	
 	pos.x += 2.;
 	meshDens.setClosedLoop(false);
 	PathLineStrip pathLS1({ glm::dvec3(0.0, 0.0, 0.0), glm::dvec3(1.0, 0.5, 0.0), glm::dvec3(2.0, 0.0, 0.0) });
 	PathLineStrip pathLS2({ glm::dvec3(0.0, 0.0, 1.0), glm::dvec3(1.0, 0.5, 1.0), glm::dvec3(2.0, 0.0, 0.8) });
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathLS2);
-	PathPipeMesher::writeElements(meshDens);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathLS2);
+	PathToPathMesher::writeElements(meshDens);
 	//TEST_END
 
 	pos.x += 2.3;
 	meshDens.setClosedLoop(false);
 	PathAxis pathAxisX(direction::x, 2.0);
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathAxisX, glm::dvec3(0., 0., 1.0));
-	PathPipeMesher::writeElements(meshDens);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathAxisX, glm::dvec3(0., 0., 1.0));
+	PathToPathMesher::writeElements(meshDens);
 
 	pos.x += 2.3;
 	meshDens.setDir1(40);
 	PathSine pathSineXZ(X_DIR, Z_DIR, 2.0, 0.2, 0.5);
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathSineXZ, glm::dvec3(0., 0., 1.0));
-	PathPipeMesher::writeElements(meshDens);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathSineXZ, glm::dvec3(0., 0., 1.0));
+	PathToPathMesher::writeElements(meshDens);
 
 	pos.x += 2.3;
 	meshDens.setDir1(40);
 	meshDens.setDir2(10);
 	PathSine pathSineXY(X_DIR, Y_DIR, 2.0, 0.2, 0.5);
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathSineXY, glm::dvec3(0., 0., 1.0));
-	PathPipeMesher::writeElements(meshDens);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathSineXY, glm::dvec3(0., 0., 1.0));
+	PathToPathMesher::writeElements(meshDens);
 
 	/*
 
@@ -1269,26 +1272,18 @@ int pathPipeMesher(const std::string& fileName) {
 		glm::dvec3(d, -d, 0.0), glm::dvec3(-d, -d, 0.0),
 		glm::dvec3(-d, 0.0, 0.0) });
 	meshDens.setClosedLoop();
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath2);
-	PathPipeMesher::writeElements(meshDens);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath2);
+	PathToPathMesher::writeElements(meshDens);
 
 	pos.x += 4.0;
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath2, glm::dvec3(0., 0., 1.5));
-	PathPipeMesher::writeElements(meshDens);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath2, glm::dvec3(0., 0., 1.5));
+	PathToPathMesher::writeElements(meshDens);
 
 	pos.x += 2.0;
 	PathCircular circlePath3(0.25, Z_DIR, X_DIR);
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3);
-	PathPipeMesher::writeElements(meshDens);
-	pos.x += d * 2;
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3);
-	PathPipeMesher::writeElements(meshDens);
-	pos.y -= d * 2;
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3);
-	PathPipeMesher::writeElements(meshDens);
-	pos.x -= d * 2;
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3);
-	PathPipeMesher::writeElements(meshDens);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3);
+	PathToPathMesher::writeElements(meshDens);
+
 
 	TEST_END
 }
@@ -2199,6 +2194,23 @@ int quadStripMesher3D(const std::string& fileName) {
 
 	TEST_END
 }
+
+int pathToPath3Dmesher(const std::string& fileName) {
+	TEST_START2
+	MeshDensity3D meshDens(20, 5, 6);
+
+	PathLineStrip pathLS1({ glm::dvec3(0.0, 0.0, 0.0), glm::dvec3(1.0, 0.5, 0.0), glm::dvec3(2.0, 0.0, 0.0) });
+	PathLineStrip pathLS2({ glm::dvec3(0.0, 0.0, 1.0), glm::dvec3(1.0, 0.5, 1.0), glm::dvec3(2.0, 0.0, 0.8) });
+	PathAxis pathAxisY(direction::y, 1.0);
+
+	PathToPath3Dmesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathLS2, pathAxisY);
+	PathToPath3Dmesher::writeElements(meshDens);
+	
+	
+	
+	TEST_END
+}
+
 
 int refinement2dHeight(const std::string& fileName) {
 	TEST_START2

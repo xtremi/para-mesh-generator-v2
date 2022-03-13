@@ -43,7 +43,8 @@
     <ClInclude Include="ParaMeshGenCommon.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="PathMesher.h" />
-    <ClInclude Include="PathPipeMesher.h" />
+    <ClInclude Include="PathToPath3Dmesher.h" />
+    <ClInclude Include="PathToPathMesher.h" />
     <ClInclude Include="PlaneMesher.h" />
     <ClInclude Include="QuadStrip3Dmesher.h" />
     <ClInclude Include="QuadStripMesher.h" />
@@ -85,7 +86,8 @@
     <ClCompile Include="ParaMeshGenCommon.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="PathMesher.cpp" />
-    <ClCompile Include="PathPipeMesher.cpp" />
+    <ClCompile Include="PathToPath3Dmesher.cpp" />
+    <ClCompile Include="PathToPathMesher.cpp" />
     <ClCompile Include="PlaneMesher.cpp" />
     <ClCompile Include="QuadStrip3Dmesher.cpp" />
     <ClCompile Include="QuadStripMesher.cpp" />

@@ -135,7 +135,10 @@
     <ClInclude Include="PathMesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
-    <ClInclude Include="PathPipeMesher.h">
+    <ClInclude Include="PathToPathMesher.h">
+      <Filter>Meshers\header</Filter>
+    </ClInclude>
+    <ClInclude Include="PathToPath3Dmesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -242,7 +245,10 @@
     <ClCompile Include="PathMesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
-    <ClCompile Include="PathPipeMesher.cpp">
+    <ClCompile Include="PathToPathMesher.cpp">
+      <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="PathToPath3Dmesher.cpp">
       <Filter>Meshers\source</Filter>
     </ClCompile>
   </ItemGroup>

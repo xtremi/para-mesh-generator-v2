@@ -1,8 +1,8 @@
-#include "PathPipeMesher.h"
+#include "PathToPathMesher.h"
 #include "PathMesher.h"
 #include "PlaneMesher.h"
 
-void PathPipeMesher::writeNodes(
+void PathToPathMesher::writeNodes(
 	const glm::dvec3& pos,
 	MeshCsys&		  csys,
 	MeshDensity2D&	  meshDens,
@@ -12,32 +12,50 @@ void PathPipeMesher::writeNodes(
 	node_skip		  nskip)
 {
 	MESHER_NODE_WRITE_START
-
-	VecGLM3d innerCoords, outerCoords;
-	VecGLM3d outDirs;
+	VecGLM3d innerCoords, outDirs;
 	VecD distances;
 
-	VecI nodesPerSegmentInner;
-	innerCoords = getPathCoordinates(pathInner, meshDens.circ(), meshDens.closedLoop, &nodesPerSegmentInner);
-	outerCoords = getPathCoordinates(pathOuter, nodesPerSegmentInner, meshDens.circ(), meshDens.closedLoop);
-
-	for (int i = 0; i < meshDens.circ(); i++) {
-		//innerCoords.push_back(pathInner.position(i, meshDens.circ()));
-		//outerCoords.push_back(pathOuter.position(i, meshDens.circ()));
-		outerCoords[i] += outerPathTranslation;
-		outDirs.push_back(glm::normalize(outerCoords[i] - innerCoords[i]));
-		distances.push_back(glm::distance(outerCoords[i],innerCoords[i]));
-	}
-
-	PathPipeMesher::writeNodes(pos, csys, meshDens.norm(), innerCoords, outDirs, distances, nskip);
+	getPathToPathData(pathInner, pathOuter, meshDens, innerCoords, outDirs, distances, outerPathTranslation);
+	PathToPathMesher::writeNodes(pos, csys, meshDens.norm(), innerCoords, outDirs, distances, nskip);
 	MESHER_NODE_WRITE_END
 }
+
+/*!
+	Given the mesh density, retreives the node coordinates along \p innerCoords and
+	\p outerCoords. 
+	For each coordinate, this function calculates the directions from from inner and outer path, and 
+	the distances.
+
+	The coordinates for the paths are retreived using Path::getPathCoordinates.
+
+*/
+void getPathToPathData(
+	const Path&			 innerPath				/*!The inner path*/,
+	const Path&			 outerPath				/*!The outer path*/,
+	const MeshDensity2D& meshDens				/*!dir1 is along the paths, dir2 between the paths*/,
+	VecGLM3d&			 innerCoords			/*![out] The coordinates along innerPath*/,
+	VecGLM3d&			 outDirections			/*![out] The directions from innerPath to outerPath*/,
+	VecD&				 distances				/*![out] The distances between the coords on innerPath and outerPath*/,
+	const glm::dvec3&	 outerPathTranslation	/*![in][optional] Is added to the coordinates of outerPath*/)
+{
+	VecI nodesPerSegmentInner;
+	VecGLM3d outerCoords;
+	innerCoords = innerPath.getPathCoordinates(meshDens.circ(), meshDens.closedLoop, &nodesPerSegmentInner);
+	outerCoords = outerPath.getPathCoordinates(nodesPerSegmentInner, meshDens.circ(), meshDens.closedLoop);
+
+	for (int i = 0; i < meshDens.circ(); i++) {
+		outerCoords[i] += outerPathTranslation;
+		outDirections.push_back(glm::normalize(outerCoords[i] - innerCoords[i]));
+		distances.push_back(glm::distance(outerCoords[i], innerCoords[i]));
+	}
+}
+
 
 /*!
 	Writes a \p nElout + 1 layers of nodes between (and including) \p innerCoords coordinates
 	and the outer coords defined by the \p outwardsDirections and \p distances.
 */
-void PathPipeMesher::writeNodes(
+void PathToPathMesher::writeNodes(
 	const glm::dvec3& pos,
 	MeshCsys&		  csys,
 	int				  nNodesOut				/*!number of elements from innerCoords and outwards*/,
@@ -58,7 +76,7 @@ void PathPipeMesher::writeNodes(
 	For each node in \p in startCoords, writes a node at the distance = \p distanceFactor x \p distance[i]
 	away from the node in the direction \p directions[i]
 */
-void PathPipeMesher::writeNodesPerimeter(
+void PathToPathMesher::writeNodesPerimeter(
 	const glm::dvec3&			   pos,
 	MeshCsys&					   csys,
 	const VecGLM3d&				   startCoords 		/*!original coordinates*/,
@@ -79,6 +97,6 @@ void PathPipeMesher::writeNodesPerimeter(
 }
 
 
-void PathPipeMesher::writeElements(const MeshDensity2D& meshDens) {
+void PathToPathMesher::writeElements(const MeshDensity2D& meshDens) {
 	PlaneMesher::writeElements(meshDens);
 }

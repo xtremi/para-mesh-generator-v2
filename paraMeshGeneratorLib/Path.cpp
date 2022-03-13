@@ -107,15 +107,14 @@ bool calculateNodeSpacing(
 	See also calculateNodeSpacing() which is used here to calculate the spacing between nodes for each segments
 	between corners.
 */
-VecGLM3d getPathCoordinates(
-	const Path& path				/*!The path to calculate for*/,
+VecGLM3d Path::getPathCoordinates(
 	int			totalNodes			/*!The total number of nodes along the path*/,
 	bool		closedLoop			/*!True if this the path is a closedLoop*/,
-	VecI*		nodesPerSegmentOut	/*![out][optional] if passed, the nodes per segment will be set to this vector*/)
+	VecI*		nodesPerSegmentOut	/*![out][optional] if passed, the nodes per segment will be set to this vector*/) const
 {
 	VecGLM3d coordinates;
-	if (path.hasCornerNodes()) {
-		VecD pathCorner = path.getCornerPathFactors();
+	if (hasCornerNodes()) {
+		VecD pathCorner = getCornerPathFactors();
 		VecI nodesPerSegment;
 		VecD nodeSpacing;
 		calculateNodeSpacing(totalNodes, pathCorner, nodesPerSegment, nodeSpacing, closedLoop);
@@ -123,7 +122,7 @@ VecGLM3d getPathCoordinates(
 		double currentPathLoc = 0.0;
 		for (int j = 0; j < nodesPerSegment.size(); j++) {
 			for (int i = 0; i < nodesPerSegment[j]; i++) {
-				coordinates.push_back(path.position(currentPathLoc));
+				coordinates.push_back(position(currentPathLoc));
 				currentPathLoc += nodeSpacing[j];
 			}
 		}
@@ -133,7 +132,7 @@ VecGLM3d getPathCoordinates(
 	}
 	else {
 		for (int i = 0; i < totalNodes; i++) {
-			coordinates.push_back(path.position(i, closedLoop ? totalNodes + 1 : totalNodes));
+			coordinates.push_back(position(i, closedLoop ? totalNodes + 1 : totalNodes));
 		}
 	}
 
@@ -150,15 +149,14 @@ VecGLM3d getPathCoordinates(
 	If there are not corner nodes, and nodesPerSegment is empty. \p numberOfNodes will
 	be used.
 */
-VecGLM3d getPathCoordinates(
-	const Path& path,
+VecGLM3d Path::getPathCoordinates(
 	const VecI& nodesPerSegment,
 	int			numberOfNodes,
-	bool		closedLoop)
+	bool		closedLoop) const
 {
 	VecGLM3d coordinates;
-	if (path.hasCornerNodes()) {
-		VecD corners = path.getCornerPathFactors();
+	if (hasCornerNodes()) {
+		VecD corners = getCornerPathFactors();
 		if (corners.size() != nodesPerSegment.size()) {
 			throw("Number of corners not equal number of segments in getPathCoordinates()");
 		}
@@ -167,7 +165,7 @@ VecGLM3d getPathCoordinates(
 		for (int i = 0; i < corners.size(); i++) {
 			dloc = (corners[i] - currentLoc) / (double)(nodesPerSegment[i]);
 			for (int j = 0; j < nodesPerSegment[i]; j++) {
-				coordinates.push_back(path.position(currentLoc));
+				coordinates.push_back(position(currentLoc));
 				currentLoc += dloc;
 			}
 		}
@@ -178,7 +176,7 @@ VecGLM3d getPathCoordinates(
 			totalNodes = numberOfNodes;
 		}
 		for (int i = 0; i < totalNodes; i++) {
-			coordinates.push_back(path.position(i, closedLoop ? totalNodes + 1: totalNodes));
+			coordinates.push_back(position(i, closedLoop ? totalNodes + 1: totalNodes));
 		}
 	}
 

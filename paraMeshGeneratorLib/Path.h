@@ -12,17 +12,7 @@ bool calculateNodeSpacing(
 	VecD&		nodeSpacingPerSegemnt,
 	bool		closedLoop = false);
 
-VecGLM3d getPathCoordinates(
-	const Path& path,
-	int			totalNodes,
-	bool		closedLoop = false,
-	VecI*		nodesPerSegment = nullptr);
 
-VecGLM3d getPathCoordinates(
-	const Path& path,
-	const VecI& nodesPerSegment,
-	int			numberOfNodes,
-	bool		closedLoops);
 
 class Path
 {
@@ -34,6 +24,17 @@ public:
 	double pathFactor(int i, int imax) const;
 	virtual bool hasCornerNodes() const { return false; }
 	virtual VecD getCornerPathFactors() const { return VecD(); }
+
+	VecGLM3d getPathCoordinates(
+		int			totalNodes,
+		bool		closedLoop = false,
+		VecI*		nodesPerSegment = nullptr) const;
+
+	VecGLM3d getPathCoordinates(
+		const VecI& nodesPerSegment,
+		int			numberOfNodes,
+		bool		closedLoops) const;
+
 };
 
 class PathAxis : public Path{

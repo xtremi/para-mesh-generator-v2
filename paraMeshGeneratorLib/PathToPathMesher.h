@@ -3,8 +3,16 @@
 #include "FeaWrite.h"
 #include "Path.h"
 
+void getPathToPathData(
+	const Path&			 innerPath,
+	const Path&			 outerPath,
+	const MeshDensity2D& meshDens,
+	VecGLM3d&			 innerCoords,
+	VecGLM3d&			 outDirections,
+	VecD&				 distances,
+	const glm::dvec3&	 outerPathTranslation = NULL_POS);
 
-class PathPipeMesher : private Mesher {
+class PathToPathMesher : private Mesher {
 public:
 	static void writeNodes(
 		const glm::dvec3& pos,
