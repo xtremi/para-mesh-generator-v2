@@ -4,6 +4,26 @@
 #include "general_utilities.h"
 #include <vector>
 
+class Path;
+bool calculateNodeSpacing(
+	int			totalNodes,
+	const VecD& requiredLocations, 
+	VecI&		nodesPerSegment, 
+	VecD&		nodeSpacingPerSegemnt,
+	bool		closedLoop = false);
+
+VecGLM3d getPathCoordinates(
+	const Path& path,
+	int			totalNodes,
+	bool		closedLoop = false,
+	VecI*		nodesPerSegment = nullptr);
+
+VecGLM3d getPathCoordinates(
+	const Path& path,
+	const VecI& nodesPerSegment,
+	int			numberOfNodes,
+	bool		closedLoops);
+
 class Path
 {
 public:
@@ -12,6 +32,8 @@ public:
 	virtual glm::dvec3 position(double pathPercentage) const = 0;
 
 	double pathFactor(int i, int imax) const;
+	virtual bool hasCornerNodes() const { return false; }
+	virtual VecD getCornerPathFactors() const { return VecD(); }
 };
 
 class PathAxis : public Path{
@@ -60,7 +82,8 @@ public:
 	PathLineStrip(const std::vector<glm::dvec3>& _points);
 	glm::dvec3 position(double pathPercentage) const;
 
-	VecD getCornerPathFactors();
+	bool hasCornerNodes() const { return true; }
+	VecD getCornerPathFactors() const;
 
 protected:
 	struct Segment {

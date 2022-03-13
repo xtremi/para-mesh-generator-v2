@@ -1,4 +1,5 @@
 #include "PathPipeMesher.h"
+#include "PathMesher.h"
 #include "PlaneMesher.h"
 
 void PathPipeMesher::writeNodes(
@@ -7,6 +8,7 @@ void PathPipeMesher::writeNodes(
 	MeshDensity2D&	  meshDens,
 	const Path&		  pathInner,
 	const Path&		  pathOuter,
+	const glm::dvec3& outerPathTranslation,
 	node_skip		  nskip)
 {
 	MESHER_NODE_WRITE_START
@@ -14,12 +16,17 @@ void PathPipeMesher::writeNodes(
 	VecGLM3d innerCoords, outerCoords;
 	VecGLM3d outDirs;
 	VecD distances;
+
+	VecI nodesPerSegmentInner;
+	innerCoords = getPathCoordinates(pathInner, meshDens.circ(), meshDens.closedLoop, &nodesPerSegmentInner);
+	outerCoords = getPathCoordinates(pathOuter, nodesPerSegmentInner, meshDens.circ(), meshDens.closedLoop);
+
 	for (int i = 0; i < meshDens.circ(); i++) {
-		innerCoords.push_back(pathInner.position(i, meshDens.circ()));
-		outerCoords.push_back(pathOuter.position(i, meshDens.circ()));
+		//innerCoords.push_back(pathInner.position(i, meshDens.circ()));
+		//outerCoords.push_back(pathOuter.position(i, meshDens.circ()));
+		outerCoords[i] += outerPathTranslation;
 		outDirs.push_back(glm::normalize(outerCoords[i] - innerCoords[i]));
 		distances.push_back(glm::distance(outerCoords[i],innerCoords[i]));
-
 	}
 
 	PathPipeMesher::writeNodes(pos, csys, meshDens.norm(), innerCoords, outDirs, distances, nskip);
@@ -63,7 +70,7 @@ void PathPipeMesher::writeNodesPerimeter(
 	int nNodes = startCoords.size();
 	glm::dvec3 curCoord, curStep;
 	for (int i = 0; i < nNodes; i++) {
-		if (!skip(i, nNodes, nskip)) {//dont skip any if skipNth == 0
+		if (!skip(i, nNodes, nskip)) {
 			curCoord = startCoords[i] + distanceFactor * distances[i] * directions[i];
 			Mesher::writer->writeNode(pos + curCoord, NULL_POS, nullptr, &csys);
 		}

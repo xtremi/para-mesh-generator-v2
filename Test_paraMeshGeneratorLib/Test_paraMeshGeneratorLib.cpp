@@ -1217,12 +1217,79 @@ int quadStripMesher2(const std::string& fileName) {
 
 int pathPipeMesher(const std::string& fileName) {
 	TEST_START2
-	PathCircular pathInner(10., Z_DIR, X_DIR);
-	PathCircular pathOuter(15., Z_DIR, X_DIR);
+	PathCircular circlePath1(1., Z_DIR, X_DIR);
+	PathCircular circlePath2(1.5, Z_DIR, X_DIR);
 	MeshDensity2D meshDens(20, 5, true);
 
-	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathInner, pathOuter);
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, circlePath1, circlePath2, glm::dvec3(0., 0., 1.0));
 	PathPipeMesher::writeElements(meshDens);
+	
+	pos.x += 2.;
+	meshDens.setClosedLoop(false);
+	PathLineStrip pathLS1({ glm::dvec3(0.0, 0.0, 0.0), glm::dvec3(1.0, 0.5, 0.0), glm::dvec3(2.0, 0.0, 0.0) });
+	PathLineStrip pathLS2({ glm::dvec3(0.0, 0.0, 1.0), glm::dvec3(1.0, 0.5, 1.0), glm::dvec3(2.0, 0.0, 0.8) });
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathLS2);
+	PathPipeMesher::writeElements(meshDens);
+	//TEST_END
+
+	pos.x += 2.3;
+	meshDens.setClosedLoop(false);
+	PathAxis pathAxisX(direction::x, 2.0);
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathAxisX, glm::dvec3(0., 0., 1.0));
+	PathPipeMesher::writeElements(meshDens);
+
+	pos.x += 2.3;
+	meshDens.setDir1(40);
+	PathSine pathSineXZ(X_DIR, Z_DIR, 2.0, 0.2, 0.5);
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathSineXZ, glm::dvec3(0., 0., 1.0));
+	PathPipeMesher::writeElements(meshDens);
+
+	pos.x += 2.3;
+	meshDens.setDir1(40);
+	meshDens.setDir2(10);
+	PathSine pathSineXY(X_DIR, Y_DIR, 2.0, 0.2, 0.5);
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathSineXY, glm::dvec3(0., 0., 1.0));
+	PathPipeMesher::writeElements(meshDens);
+
+	/*
+
+   2x------x3
+	|      |
+   1x      | 
+	|      |
+   5x------x4
+	
+	
+	*/
+	pos.x += 4.0;
+	double d = 0.5;
+	PathLineStrip pathRec({
+		glm::dvec3(-d, 0.0, 0.0),
+		glm::dvec3(-d, d, 0.0), glm::dvec3(d, d, 0.0),
+		glm::dvec3(d, -d, 0.0), glm::dvec3(-d, -d, 0.0),
+		glm::dvec3(-d, 0.0, 0.0) });
+	meshDens.setClosedLoop();
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath2);
+	PathPipeMesher::writeElements(meshDens);
+
+	pos.x += 4.0;
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath2, glm::dvec3(0., 0., 1.5));
+	PathPipeMesher::writeElements(meshDens);
+
+	pos.x += 2.0;
+	PathCircular circlePath3(0.25, Z_DIR, X_DIR);
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3);
+	PathPipeMesher::writeElements(meshDens);
+	pos.x += d * 2;
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3);
+	PathPipeMesher::writeElements(meshDens);
+	pos.y -= d * 2;
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3);
+	PathPipeMesher::writeElements(meshDens);
+	pos.x -= d * 2;
+	PathPipeMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3);
+	PathPipeMesher::writeElements(meshDens);
+
 	TEST_END
 }
 

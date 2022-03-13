@@ -12,6 +12,7 @@ public:
 		MeshDensity2D&	  meshDens,
 		const Path&		  pathInner,
 		const Path&		  pathOuter,
+		const glm::dvec3& outerPathTranslation = NULL_POS,
 		node_skip		  nskip = node_skip::none);
 
 
@@ -25,13 +26,13 @@ public:
 		node_skip		  nskip = node_skip::none);
 
 	static void writeNodesPerimeter(
-		const glm::dvec3&			   pos,
-		MeshCsys&					   csys,
-		const VecGLM3d&				   startCoords,
-		const VecGLM3d&				   directions,
-		const VecD&					   distances,
-		double						   distanceFactor,
-		node_skip					   nskip = node_skip::none);
+		const glm::dvec3& pos,
+		MeshCsys&		  csys,
+		const VecGLM3d&	  startCoords,
+		const VecGLM3d&	  directions,
+		const VecD&		  distances,
+		double			  distanceFactor,
+		node_skip		  nskip = node_skip::none);
 
 	static void writeElements(const MeshDensity2D& meshDens);
 };

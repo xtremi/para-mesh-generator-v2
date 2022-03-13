@@ -1,110 +1,19 @@
 #include "PathMesher.h"
 #include "LineMesher.h"
-#include <algorithm> // std::min_element
-
-/*!
-	This is currently used for PathLineStrip (but could have more use later. TBD.)
-
-	Given a set of normalized locations (\p requiredNodeLocations) (along a path for example), between 0.0 and 1.0:	
-
-  [0.0]  0.15       0.4   0.5                   1.0
-	x-----x----------x-----x---------------------x
-		NOTE: The location 0.0 should not be included in \p requiredNodeLocations
 
 
-	and a number of nodes \totalNodes, this function calculates how many nodes
-	should be between each locations (segments), and what the spacing between each
-	nodes within each segment should be, for correctly distributing the nodes
-	as evenly as possibly along the path (path of segment).
-
-	The returned size of \p nodesPerSegment and \p nodeSpacingPerSegment vectors 
-	are the same size as \p requiredLocations
-*/
-bool calculateNodeSpacing(
-	int			totalNodes				/*!Total number of nodes*/,
-	const VecD& requiredLocations		/*!Required locations [0.0 -> 1.0] where a nodes is required*/,
-	VecI&		nodesPerSegment			/*!Calculated number of nodes between each req. locations (segment)*/,
-	VecD&		nodeSpacingPerSegemnt	/*!Spacing between nodes for segment*/,
-	bool		closedLoop				/*!Will account for a closed loop*/)
-{
-	double dpath	  = 0.;			//estimated spacing between nodes based on rest of path length
-	int	   elCount	  = 0;			//element counter 
-	double curPathLoc = 0.0;		//the current location (0.0 -> 1.0) at the iteration
-	int	   totalElements = totalNodes - 1;
-	double endLoc	  = 1.0;		//the normalized end location of the path
-	if (closedLoop) {
-		endLoc -= (1.0 / (totalElements + 1));	//if closeLoop we stop a step a before
-	}
-	double remainder = 0.0;		//remainer of rounding of flooring or rounding the number of elements along a segment
-	
-	int nElseg;					//number of elements on segment at the iteration
-
-	for (int j = 0; j < requiredLocations.size(); j++) {
-
-		double pathRemaining     = (endLoc - curPathLoc);
-		int    elementsRemaining = totalElements - elCount;
-
-		dpath = pathRemaining / (double)elementsRemaining;			//Approximate the path step size
-
-		double segmentLength = requiredLocations[j] - curPathLoc;	
-
-		/*Switch between rounding and flooring the number of elements based on remainer from previous iteration*/
-		if(remainder <= 0.0){
-			nElseg = std::round(segmentLength / dpath);				//number of element that fit on segment with dpath size
-		}
-		else {
-			nElseg = (int)(segmentLength / dpath);
-		}
-		remainder = segmentLength / dpath - (double)nElseg;
-
-
-		if (nElseg == 0) nElseg = 1; //cannot have 0 elements
-
-		double actualDpath = segmentLength / (double)nElseg; //actual normalized dpath with nElSeg on segment
-
-		curPathLoc += (double)nElseg * actualDpath;
-		elCount += nElseg;
-		nodesPerSegment.push_back(nElseg);
-		nodeSpacingPerSegemnt.push_back(actualDpath);
-	}
-	/*
-		If there is a remaining node to add (so that total is equal to the required total)
-		this will find the segment that has the largest node spacing,
-		add a node and calculate the new spacing.
-	*/
-	int numberOfAdditonalNodes = totalNodes - elCount -1;
-	for (int i = 0; i < numberOfAdditonalNodes; i++) {
-		auto it = std::max_element(nodeSpacingPerSegemnt.begin(), nodeSpacingPerSegemnt.end());
-		size_t index = it - nodeSpacingPerSegemnt.begin();
-		double segmentSize = nodeSpacingPerSegemnt[index] * (double)nodesPerSegment[index];
-		double newSpacing = segmentSize / ((double)nodesPerSegment[index] + 1);
-		nodesPerSegment[index]++;
-		nodeSpacingPerSegemnt[index] = newSpacing;
-		elCount++;
-	}
-	if(!closedLoop){
-		nodesPerSegment[nodesPerSegment.size() - 1] += 1;
-	}
-	if (closedLoop) totalElements++;	//there is actually one more element if closeLoop
-	if (elCount != totalElements) {
-		int j = 0;
-		//throw("Not expected number of nodes in calculateNodeSpacing()");
-	}
-
-	return true;
-}
 
 void PathMesher::writeNodes(
 	const glm::dvec3& pos,
-	MeshCsys& csys,
+	MeshCsys&		  csys,
 	int				  nnodes,
-	const Path& path,
+	const Path&		  path,
 	node_skip		  nskip)
 {
 	MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {
 		if (!skip(i, nnodes, nskip)) {
-			writer->writeNode(pos + path.position(i, nnodes), glm::dvec3(0.), nullptr, &csys);
+			writer->writeNode(pos + path.position(i, nnodes), NULL_POS, nullptr, &csys);
 		}
 	}
 	MESHER_NODE_WRITE_END

@@ -3,12 +3,7 @@
 #include "FeaWrite.h"
 #include "Path.h"
 
-bool calculateNodeSpacing(
-	int			totalNodes,
-	const VecD& requiredLocations, 
-	VecI&		nodesPerSegment, 
-	VecD&		nodeSpacingPerSegemnt,
-	bool		closedLoop = false);
+
 
 class PathMesher : private Mesher {
 public:
