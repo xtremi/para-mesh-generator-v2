@@ -22,14 +22,26 @@ void PathToPath3Dmesher::writeNodes(
 	
 	int nNodesExtrude = meshDens.dir3();
 	VecGLM3d extrudeCoords = extrudePath.getPathCoordinates(nNodesExtrude, false);
+	VecGLM3d extrudeDirs = extrudePath.getPathTangents(nNodesExtrude, false);
 	
 	MeshDensity2D meshDens2D = meshDens.meshDensD12();
 	VecGLM3d innerCoords, outDirs;
 	VecD distances;
 	getPathToPathData(pathInner, pathOuter, meshDens2D, innerCoords, outDirs, distances, outerPathTranslation);
 
+	glm::dmat3x3 rotM = UNIT_MAT_3x3;
+	MeshCsys csysExtrude(NULL_POS, &rotM);
+	csysExtrude.setParentCsys(&csys);
+
+	//MeshCsys csysTemp(NULL_POS);
+
 	for (int i = 0; i < nNodesExtrude; i++) {
-		PathToPathMesher::writeNodes(pos + extrudeCoords[i], csys, meshDens.dir2(), innerCoords, outDirs, distances, nskip);
+		glm::dvec3 xd(X_DIR);
+		glm::dvec3 zd(extrudeDirs[i]);
+		glm::dvec3 yd = glm::cross(zd, xd);
+		rotM  = makeCsysMatrix(xd, yd);
+		csysExtrude.update();
+		PathToPathMesher::writeNodes(pos + extrudeCoords[i], csysExtrude, meshDens.dir2(), innerCoords, outDirs, distances, nskip);
 	}
 
 	MESHER_NODE_WRITE_END

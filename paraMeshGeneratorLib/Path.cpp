@@ -93,6 +93,50 @@ bool calculateNodeSpacing(
 	return true;
 }
 
+
+VecGLM3d Path::getPathCoordsOrTangents(
+	pos_or_tangent	posOrTangent,
+	int				totalNodes,
+	bool			closedLoop,
+	VecI*			nodesPerSegmentOut) const
+{
+	VecGLM3d result;
+	if (hasCornerNodes()) {
+		VecD pathCorner = getCornerPathFactors();
+		VecI nodesPerSegment;
+		VecD nodeSpacing;
+		calculateNodeSpacing(totalNodes, pathCorner, nodesPerSegment, nodeSpacing, closedLoop);
+
+		double currentPathLoc = 0.0;
+		for (int j = 0; j < nodesPerSegment.size(); j++) {
+			for (int i = 0; i < nodesPerSegment[j]; i++) {
+				if (posOrTangent == pos_or_tangent::position) {
+					result.push_back(position(currentPathLoc));
+				}
+				else {
+					result.push_back(tangent(currentPathLoc));
+				}
+				currentPathLoc += nodeSpacing[j];
+			}
+		}
+		if (nodesPerSegmentOut) {
+			*nodesPerSegmentOut = nodesPerSegment;
+		}
+	}
+	else {
+		for (int i = 0; i < totalNodes; i++) {
+			if(posOrTangent == pos_or_tangent::position){
+				result.push_back(position(i, closedLoop ? totalNodes + 1 : totalNodes));
+			}
+			else {
+				result.push_back(tangent(i, closedLoop ? totalNodes + 1 : totalNodes));
+			}
+		}
+	}
+
+	return result;
+}
+
 /*!
 	A path defines the positions along some function.
 	The positions along the path can be retrieved from path::position.
@@ -112,31 +156,15 @@ VecGLM3d Path::getPathCoordinates(
 	bool		closedLoop			/*!True if this the path is a closedLoop*/,
 	VecI*		nodesPerSegmentOut	/*![out][optional] if passed, the nodes per segment will be set to this vector*/) const
 {
-	VecGLM3d coordinates;
-	if (hasCornerNodes()) {
-		VecD pathCorner = getCornerPathFactors();
-		VecI nodesPerSegment;
-		VecD nodeSpacing;
-		calculateNodeSpacing(totalNodes, pathCorner, nodesPerSegment, nodeSpacing, closedLoop);
+	return getPathCoordsOrTangents(pos_or_tangent::position, totalNodes, closedLoop, nodesPerSegmentOut);
+}
 
-		double currentPathLoc = 0.0;
-		for (int j = 0; j < nodesPerSegment.size(); j++) {
-			for (int i = 0; i < nodesPerSegment[j]; i++) {
-				coordinates.push_back(position(currentPathLoc));
-				currentPathLoc += nodeSpacing[j];
-			}
-		}
-		if (nodesPerSegmentOut) {
-			*nodesPerSegmentOut = nodesPerSegment;
-		}
-	}
-	else {
-		for (int i = 0; i < totalNodes; i++) {
-			coordinates.push_back(position(i, closedLoop ? totalNodes + 1 : totalNodes));
-		}
-	}
-
-	return coordinates;
+VecGLM3d Path::getPathTangents(
+	int			totalNodes			/*!The total number of nodes along the path*/,
+	bool		closedLoop			/*!True if this the path is a closedLoop*/,
+	VecI*		nodesPerSegmentOut	/*![out][optional] if passed, the nodes per segment will be set to this vector*/) const
+{
+	return getPathCoordsOrTangents(pos_or_tangent::tangent, totalNodes, closedLoop, nodesPerSegmentOut);
 }
 
 /*!
@@ -191,31 +219,55 @@ double Path::pathFactor(int i, int imax) const {
 glm::dvec3 Path::position(int i, int imax) const {
 	return position(pathFactor(i, imax));
 }
+glm::dvec3 Path::tangent(int i, int imax) const {
+	return tangent(pathFactor(i, imax));
+}
 
+/*PathAxis*/
 glm::dvec3 PathAxis::position(double percentage) const {
 	glm::dvec3 pos(0.);
 	pos[(size_t)pathDirection] = percentage * length;
 	return pos;
 }
+glm::dvec3 PathAxis::tangent(double pathPercentage) const {
+	switch (pathDirection)
+	{
+	case direction::x: return X_DIR;
+	case direction::y: return Y_DIR;
+	case direction::z: return Z_DIR;
+	default: throw("invalid direction in PathAxis::tangent"); break;
+	}
+}
 
-
-
+/*PathSine*/
 glm::dvec3 PathSine::position(double percentage) const {
-
 	double xValue = percentage * length;
 	double sineValue = amplitude * glm::sin(omega * xValue);
 	glm::dvec3 pos(0.);
 	pos = directionX * xValue + directionY * sineValue;
 	return pos;
 }
+glm::dvec3 PathSine::tangent(double percentage) const {
+	double xValue = percentage * length;
+	double sineTangentValue = omega * amplitude * glm::cos(omega * xValue);
 
+	glm::dvec3 pos(0.);
+	pos = directionX * xValue + directionY * sineTangentValue;
+	return pos;
+}
 
+/*PathCircular*/
 glm::dvec3 PathCircular::position(double pathPercentage) const {
 	double angle = pathPercentage * GLM2PI;
 	return coordsOnCircleQ(angle, radius, directionX, directionY);
 }
+glm::dvec3 PathCircular::tangent(double pathPercentage) const
+{
+	double angle = pathPercentage * GLM2PI;
+	return tangetOnCircleQ(angle, radius, directionX, directionY);
+}
 
-
+/*PathLineStrip*/
 PathLineStrip::PathLineStrip(const std::vector<glm::dvec3>& _points)
 	: points{ _points }
 {
@@ -259,6 +311,21 @@ glm::dvec3 PathLineStrip::position(double pathPercentage) const
 		pointIndex++;
 	}
 }
+glm::dvec3 PathLineStrip::tangent(double pathPercentage) const
+{
+	if (pathPercentage < 0.0) pathPercentage = 0.0;
+	if (pathPercentage > 1.0) pathPercentage = 1.0;
+
+	int pointIndex = 0;
+	for (const Segment& segment : segments) {
+
+		if (pathPercentage <= segment.endFactor) {
+			return segment.direction;
+		}
+		pointIndex++;
+	}
+}
+
 
 VecD PathLineStrip::getCornerPathFactors() const {
 	VecD cornerDist;

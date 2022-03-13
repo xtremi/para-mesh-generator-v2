@@ -38,8 +38,11 @@ glm::dvec3 circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, const glm::d
 
 glm::dvec3 coordsOnCircle(double angle, double radius,
 	const glm::dvec3& normal, const glm::dvec3& dirX);
+glm::dvec3 tangetOnCircle(double angle, double radius,
+	const glm::dvec3& normal, const glm::dvec3& dirX);
 glm::dvec3 coordsOnCircleQ(double angle, double radius,
 	const glm::dvec3& dirX, const glm::dvec3& dirY);
-
+glm::dvec3 tangetOnCircleQ(double angle, double radius,
+	const glm::dvec3& dirX, const glm::dvec3& dirY);
 
 double angleOfPointOnCircle(const glm::dvec3& p, const glm::dvec3& center, double offset = 0.);
