@@ -30,18 +30,19 @@ void PathToPath3Dmesher::writeNodes(
 	getPathToPathData(pathInner, pathOuter, meshDens2D, innerCoords, outDirs, distances, outerPathTranslation);
 
 	glm::dmat3x3 rotM = UNIT_MAT_3x3;
-	MeshCsys csysExtrude(NULL_POS, &rotM);
-	csysExtrude.setParentCsys(&csys);
 
+	MeshCsys csysPos(&csys, NULL_POS);
+	MeshCsys csysExtrude(&csysPos, NULL_POS, &rotM);
 	//MeshCsys csysTemp(NULL_POS);
 
 	for (int i = 0; i < nNodesExtrude; i++) {
 		glm::dvec3 xd(X_DIR);
 		glm::dvec3 zd(extrudeDirs[i]);
-		glm::dvec3 yd = glm::cross(zd, xd);
+		glm::dvec3 yd = glm::normalize(glm::cross(zd, xd));
 		rotM  = makeCsysMatrix(xd, yd);
-		csysExtrude.update();
-		PathToPathMesher::writeNodes(pos + extrudeCoords[i], csysExtrude, meshDens.dir2(), innerCoords, outDirs, distances, nskip);
+		csysPos.pos = pos + extrudeCoords[i];
+		csysExtrude.updateParents();
+		PathToPathMesher::writeNodes(NULL_POS, csysExtrude, meshDens.dir2(), innerCoords, outDirs, distances, nskip);
 	}
 
 	MESHER_NODE_WRITE_END

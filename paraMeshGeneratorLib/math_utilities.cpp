@@ -266,5 +266,6 @@ glm::dvec3 coordsOnCircleQ(double angle, double radius,
 glm::dvec3 tangetOnCircleQ(double angle, double radius,
 	const glm::dvec3& dirX, const glm::dvec3& dirY)
 {
-	return radius * glm::sin(angle) * dirX - radius * glm::cos(angle) * dirY;
+	return - glm::sin(angle) * dirX + glm::cos(angle) * dirY;
+	//return radius * glm::sin(angle) * dirX - radius * glm::cos(angle) * dirY;
 }

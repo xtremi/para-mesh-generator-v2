@@ -251,9 +251,9 @@ glm::dvec3 PathSine::tangent(double percentage) const {
 	double xValue = percentage * length;
 	double sineTangentValue = omega * amplitude * glm::cos(omega * xValue);
 
-	glm::dvec3 pos(0.);
-	pos = directionX * xValue + directionY * sineTangentValue;
-	return pos;
+	glm::dvec3 t(0.);
+	t = glm::normalize(directionX + directionY * sineTangentValue);
+	return t;
 }
 
 /*PathCircular*/

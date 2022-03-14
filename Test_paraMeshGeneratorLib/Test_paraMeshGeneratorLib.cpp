@@ -2209,7 +2209,7 @@ int pathToPath3Dmesher(const std::string& fileName) {
 	
 	pos.x += 2.3;
 	PathAxis pathAxisX(direction::x, 2.0);
-	PathToPath3Dmesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathAxisX, pathAxisY, glm::dvec3(0., 0., 1.0));
+	PathToPath3Dmesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathAxisX, pathAxisZ, glm::dvec3(0., 0., 1.0));
 	PathToPath3Dmesher::writeElements(meshDens);
 	
 	pos.x += 2.3;
@@ -2218,7 +2218,7 @@ int pathToPath3Dmesher(const std::string& fileName) {
 	PathSine pathSineXZ(X_DIR, Z_DIR, 2.0, 0.2, 0.5);
 	PathToPath3Dmesher::writeNodes(pos, glCsys, meshDens, pathLS1, pathSineXZ, pathAxisY, glm::dvec3(0., 0., 1.0));
 	PathToPath3Dmesher::writeElements(meshDens);
-	
+	TEST_END
 	pos.x += 2.3;
 	meshDens.setDir1(40);
 	meshDens.setDir2(10);
@@ -2252,8 +2252,12 @@ int pathToPath3Dmesher(const std::string& fileName) {
 	PathToPath3Dmesher::writeElements(meshDens);
 	
 	pos.x += 2.0;
-	PathSine sineZY(Z_DIR, Y_DIR, 1.0, 0.1, 1.0);
-	meshDens.setDir3(12);
+	PathSine sineZY(Z_DIR, Y_DIR, 5.0, 0.5, 3.6);
+
+	PathMesher::writeNodes(pos, glCsys, 50, sineZY);
+	PathMesher::writeElements(50);
+
+	meshDens.setDir3(90);
 	PathToPath3Dmesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3, sineZY);
 	PathToPath3Dmesher::writeElements(meshDens);
 
