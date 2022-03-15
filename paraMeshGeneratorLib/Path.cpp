@@ -239,6 +239,14 @@ glm::dvec3 PathAxis::tangent(double pathPercentage) const {
 	}
 }
 
+/*PathLinear*/
+glm::dvec3 PathLinear::position(double pathPercentage) const {
+	return pathDirection * length * pathPercentage;
+}
+glm::dvec3 PathLinear::tangent(double pathPercentage) const {
+	return pathDirection;
+}
+
 /*PathSine*/
 glm::dvec3 PathSine::position(double percentage) const {
 	double xValue = percentage * length;

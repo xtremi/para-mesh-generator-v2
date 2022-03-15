@@ -63,6 +63,16 @@ protected:
 	double length = 1.0;
 };
 
+class PathLinear : public Path {
+public:
+	PathLinear(const glm::dvec3& dir, double _length) : pathDirection{ glm::normalize(dir) }, length{ _length }{}
+	glm::dvec3 position(double pathPercentage) const;
+	glm::dvec3 tangent(double pathPercentage) const;
+protected:
+	glm::dvec3 pathDirection;
+	double length = 1.0;
+};
+
 class PathSine : public Path {
 public:
 	PathSine(const glm::dvec3& dirX, const glm::dvec3& dirY, double _length, double amplitude, double waveLength) 
