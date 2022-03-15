@@ -2265,6 +2265,11 @@ int pathToPath3Dmesher(const std::string& fileName) {
 	PathToPath3Dmesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3, sineZY);
 	PathToPath3Dmesher::writeElements(meshDens);
 
+	pos.x += 4.0;
+
+	PathCircular circlePath4(3., glm::dvec3(1.), X_DIR);
+	PathToPath3Dmesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3, circlePath4);
+	PathToPath3Dmesher::writeElements(meshDens);
 	
 	TEST_END
 }

@@ -95,10 +95,11 @@ protected:
 
 class PathCircular : public Path {
 public:
-	PathCircular(double _radius, const glm::dvec3& normal, const glm::dvec3& dirX)
-		: radius{ _radius }, directionX{ dirX }
+	PathCircular(double _radius, const glm::dvec3& normal, const glm::dvec3& pXZ)
+		: radius{ _radius }
 	{	
-		directionY = glm::normalize(glm::cross(normal, directionX));
+		glm::dvec3 directionZ = glm::normalize(normal);
+		directionY = glm::normalize(glm::cross(normal, glm::normalize(pXZ)));
 		directionX = glm::normalize(glm::cross(normal, directionY));
 	}
 	glm::dvec3 position(double pathPercentage) const;
