@@ -2,7 +2,9 @@
 #include "math_utilities.h"
 #include "ParaMeshGenCommon.h"
 #include "general_utilities.h"
+#include "Shapes.h"
 #include <vector>
+
 
 class Path;
 bool calculateNodeSpacing(
@@ -22,10 +24,12 @@ public:
 	glm::dvec3 tangent(int i, int imax) const;
 	virtual glm::dvec3 position(double pathPercentage) const = 0;
 	virtual glm::dvec3 tangent(double pathPercentage) const = 0;
+	virtual double length() const = 0;
 
 	double pathFactor(int i, int imax) const;
 	virtual bool hasCornerNodes() const { return false; }
 	virtual VecD getCornerPathFactors() const { return VecD(); }
+
 
 	VecGLM3d getPathCoordinates(
 		int			totalNodes,
@@ -55,55 +59,54 @@ private:
 
 class PathAxis : public Path{
 public:	
-	PathAxis(direction dir, double _length) : pathDirection{ dir }, length{ _length }{}
+	PathAxis(direction dir, double _length) : pathDirection{ dir }, pathLength{ _length }{}
 	glm::dvec3 position(double pathPercentage) const;
 	glm::dvec3 tangent(double pathPercentage) const;
+	double length() const { return pathLength; }
 protected:
 	direction pathDirection;
-	double length = 1.0;
+	double pathLength = 1.0;
 };
 
 class PathLinear : public Path {
 public:
-	PathLinear(const glm::dvec3& dir, double _length) : pathDirection{ glm::normalize(dir) }, length{ _length }{}
+	PathLinear(const glm::dvec3& dir, double _length) : pathDirection{ glm::normalize(dir) }, pathLength{ _length }{}
 	glm::dvec3 position(double pathPercentage) const;
 	glm::dvec3 tangent(double pathPercentage) const;
+	double length() const { return pathLength; }
+
 protected:
 	glm::dvec3 pathDirection;
-	double length = 1.0;
+	double pathLength = 1.0;
 };
 
 class PathSine : public Path {
 public:
-	PathSine(const glm::dvec3& dirX, const glm::dvec3& dirY, double _length, double amplitude, double waveLength) 
-		: directionX{ dirX }, directionY{ dirY }, length{ _length }, amplitude{ amplitude }
-	{
-		omega = GLM2PI / waveLength;
-		glm::dvec3 dirZ = glm::normalize(glm::cross(directionX, directionY));
-		directionY = glm::normalize(glm::cross(dirZ, directionX));
-	}
+	PathSine(const glm::dvec3& dirX, const glm::dvec3& dirY, double _length, double amplitude, double waveLength);
 	glm::dvec3 position(double pathPercentage) const;
 	glm::dvec3 tangent(double pathPercentage) const;
+	double length() const;
 
 protected:
 	glm::dvec3 directionX, directionY;
-	double length = 1.0;
+	double pathLength = 1.0;
 	double amplitude = 1.0;
 	double omega = 1.0;
 };
 
 
-class PathCircular : public Path {
+class PathCircular : public Path, public ArcAngles {
 public:
-	PathCircular(double _radius, const glm::dvec3& normal, const glm::dvec3& pXZ)
-		: radius{ _radius }
-	{	
-		glm::dvec3 directionZ = glm::normalize(normal);
-		directionY = glm::normalize(glm::cross(normal, glm::normalize(pXZ)));
-		directionX = glm::normalize(glm::cross(normal, directionY));
-	}
+	PathCircular(
+		double			  rad,
+		const glm::dvec3& normal,
+		const glm::dvec3& pXZ,
+		double			  startAng = -1.,
+		double			  endAng = -1.);
 	glm::dvec3 position(double pathPercentage) const;
 	glm::dvec3 tangent(double pathPercentage) const;
+	double length() const;
+
 protected:
 	glm::dvec3 directionX, directionY;
 	double radius = 1.0;
@@ -114,6 +117,7 @@ public:
 	PathLineStrip(const std::vector<glm::dvec3>& _points);
 	glm::dvec3 position(double pathPercentage) const;
 	glm::dvec3 tangent(double pathPercentage) const;
+	double length() const;
 
 	bool hasCornerNodes() const { return true; }
 	VecD getCornerPathFactors() const;
@@ -132,3 +136,21 @@ protected:
 	double					totalLength;
 };
 
+
+class PathComposite : public Path {
+public:
+	PathComposite(const std::vector<Path*>& _paths);
+	glm::dvec3 position(double pathPercentage) const;
+	glm::dvec3 tangent(double pathPercentage) const;
+	double length() const;
+
+	bool hasCornerNodes() const { return true; }
+	VecD getCornerPathFactors() const;
+
+protected:
+	std::vector<Path*>   paths;
+	struct PathFactor {
+		double start; double end; double size() const { return end - start; }
+	};
+	std::vector<PathFactor> pathFactors;
+};

@@ -51,6 +51,24 @@ void PathMesher::writeNodes(
 	MESHER_NODE_WRITE_END
 }
 
+void PathMesher::writeNodes(
+	const glm::dvec3& pos,
+	MeshCsys&		  csys,
+	int				  nnodes,
+	const Path&		  path,
+	bool			  setRequiredNodeLocationAtPathCorners,
+	bool			  closedLoop,
+	node_skip		  nskip)
+{
+	if (setRequiredNodeLocationAtPathCorners) {
+		VecD requiredNodeLocatiosn = path.getCornerPathFactors();
+		writeNodes(pos, csys, nnodes, path, requiredNodeLocatiosn, closedLoop, nskip);
+	}
+	else{
+		writeNodes(pos, csys, nnodes, path, nskip);
+	}
+}
+
 void PathMesher::writeElements(int nnodes, bool closedLoop) {
 	LineMesher::writeElementsLine(nnodes, closedLoop);
 }

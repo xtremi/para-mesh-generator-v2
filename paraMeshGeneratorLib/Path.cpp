@@ -49,7 +49,7 @@ bool calculateNodeSpacing(
 
 		/*Switch between rounding and flooring the number of elements based on remainer from previous iteration*/
 		if (remainder <= 0.0) {
-			nElseg = std::round(segmentLength / dpath);				//number of element that fit on segment with dpath size
+			nElseg = (int)std::round(segmentLength / dpath);				//number of element that fit on segment with dpath size
 		}
 		else {
 			nElseg = (int)(segmentLength / dpath);
@@ -226,7 +226,7 @@ glm::dvec3 Path::tangent(int i, int imax) const {
 /*PathAxis*/
 glm::dvec3 PathAxis::position(double percentage) const {
 	glm::dvec3 pos(0.);
-	pos[(size_t)pathDirection] = percentage * length;
+	pos[(size_t)pathDirection] = percentage * pathLength;
 	return pos;
 }
 glm::dvec3 PathAxis::tangent(double pathPercentage) const {
@@ -241,30 +241,67 @@ glm::dvec3 PathAxis::tangent(double pathPercentage) const {
 
 /*PathLinear*/
 glm::dvec3 PathLinear::position(double pathPercentage) const {
-	return pathDirection * length * pathPercentage;
+	return pathDirection * pathLength * pathPercentage;
 }
 glm::dvec3 PathLinear::tangent(double pathPercentage) const {
 	return pathDirection;
 }
 
 /*PathSine*/
+PathSine::PathSine(const glm::dvec3& dirX, const glm::dvec3& dirY, double _length, double amplitude, double waveLength)
+	: directionX{ dirX }, directionY{ dirY }, pathLength{ _length }, amplitude{ amplitude }
+{
+	omega = GLM2PI / waveLength;
+	glm::dvec3 dirZ = glm::normalize(glm::cross(directionX, directionY));
+	directionY = glm::normalize(glm::cross(dirZ, directionX));
+}
+
 glm::dvec3 PathSine::position(double percentage) const {
-	double xValue = percentage * length;
+	double xValue = percentage * pathLength;
 	double sineValue = amplitude * glm::sin(omega * xValue);
 	glm::dvec3 pos(0.);
 	pos = directionX * xValue + directionY * sineValue;
 	return pos;
 }
 glm::dvec3 PathSine::tangent(double percentage) const {
-	double xValue = percentage * length;
+	double xValue = percentage * pathLength;
 	double sineTangentValue = omega * amplitude * glm::cos(omega * xValue);
 
 	glm::dvec3 t(0.);
 	t = glm::normalize(directionX + directionY * sineTangentValue);
 	return t;
 }
+/*really bad approximation*/
+double PathSine::length() const { 
+	double waveLength = GLM2PI / omega;
+	double nWaves = pathLength / waveLength;
+	return 2. * amplitude * nWaves + pathLength;
+}
+
 
 /*PathCircular*/
+PathCircular::PathCircular(
+	double			  rad		/*!Circle radius*/,
+	const glm::dvec3& normal	/*!Circle normal*/,
+	const glm::dvec3& pXZ		/*!Point on XZ plane (Z is the normal)*/,
+	double			  startAng	/*!Start angle (if startAng and endAng is negative, its a full circle)*/,
+	double			  endAng	/*!End angle (if startAng and endAng is negative, its a full circle)*/)
+	: radius{ rad }
+{
+	glm::dvec3 directionZ = glm::normalize(normal);
+	directionY = glm::normalize(glm::cross(normal, glm::normalize(pXZ)));
+	directionX = glm::normalize(glm::cross(normal, directionY));
+
+	start = startAng;
+	end = endAng;
+	m_fullCircle = false;
+	if (start < 0.0 && end < 0.0) {
+		setFullCircle();
+	}
+	if (start < 0.0) start = 0.0;
+	if (end < 0.0) end = GLM2PI;
+}
+
 glm::dvec3 PathCircular::position(double pathPercentage) const {
 	double angle = pathPercentage * GLM2PI;
 	return coordsOnCircleQ(angle, radius, directionX, directionY);
@@ -274,6 +311,10 @@ glm::dvec3 PathCircular::tangent(double pathPercentage) const
 	double angle = pathPercentage * GLM2PI;
 	return tangetOnCircleQ(angle, radius, directionX, directionY);
 }
+double PathCircular::length() const {
+	return radius * std::abs(end - start);
+}
+
 
 /*PathLineStrip*/
 PathLineStrip::PathLineStrip(const std::vector<glm::dvec3>& _points)
@@ -333,6 +374,10 @@ glm::dvec3 PathLineStrip::tangent(double pathPercentage) const
 		pointIndex++;
 	}
 }
+double PathLineStrip::length() const {
+	return totalLength;
+}
+
 
 
 VecD PathLineStrip::getCornerPathFactors() const {
@@ -342,4 +387,72 @@ VecD PathLineStrip::getCornerPathFactors() const {
 	}
 	cornerDist.push_back(1.0);
 	return cornerDist;
+}
+
+
+PathComposite::PathComposite(const std::vector<Path*>& _paths) {
+	paths = _paths;
+	double totalLength = length();
+
+	double currentPathStartFactor = 0.;
+	double currentLength = 0.;
+
+	for (const Path* path : paths) {
+		PathFactor pathPart;
+		pathPart.start = currentPathStartFactor;
+
+		double pathLength = path->length();
+		currentLength += pathLength;
+		currentPathStartFactor = (currentLength / totalLength);
+		pathPart.end = currentPathStartFactor;
+
+		pathFactors.push_back(pathPart);
+	}
+}
+glm::dvec3 PathComposite::position(double pathPercentage) const {
+	if (pathPercentage < 0.0) pathPercentage = 0.0;
+	if (pathPercentage > 1.0) pathPercentage = 1.0;
+
+	int pathIndex = 0;
+	glm::dvec3 currentPosition(0.);
+	for (const PathFactor& pathFactor : pathFactors) {
+		if (pathPercentage <= pathFactor.end) {
+			double factorOfCurrentPath = pathPercentage - pathFactor.start;
+			factorOfCurrentPath /= pathFactor.size();
+			return paths[pathIndex]->position(factorOfCurrentPath) + currentPosition;
+			break;
+		}
+		currentPosition += paths[pathIndex]->position(1.);
+		pathIndex++;
+	}
+}
+glm::dvec3 PathComposite::tangent(double pathPercentage) const {
+	if (pathPercentage < 0.0) pathPercentage = 0.0;
+	if (pathPercentage > 1.0) pathPercentage = 1.0;
+
+	int pathIndex = 0;
+	for (const PathFactor& pathFactor : pathFactors) {
+		if (pathPercentage <= pathFactor.end) {
+			double factorOfCurrentPath = pathPercentage - pathFactor.start;
+			factorOfCurrentPath /= pathFactor.size();
+			return paths[pathIndex]->tangent(factorOfCurrentPath);
+			break;
+		}
+		pathIndex++;
+	}
+}
+
+VecD PathComposite::getCornerPathFactors() const {
+	VecD cornerPathFactors;
+	for (const PathFactor& pathFactor : pathFactors) {
+		cornerPathFactors.push_back(pathFactor.end);
+	}
+	return cornerPathFactors;
+}
+double PathComposite::length() const {
+	double totalLength = 0.;
+	for (const Path* path : paths) {
+		totalLength += path->length();
+	}
+	return totalLength;
 }

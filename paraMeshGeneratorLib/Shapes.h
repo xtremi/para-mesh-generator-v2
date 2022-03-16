@@ -159,7 +159,7 @@ public:
 
 	void setStart(double rad) { start = rad; m_fullCircle = false; }
 	void setEnd(double rad) { end = rad; m_fullCircle = false; }
-private:
+protected:
 	bool m_fullCircle;
 };
 

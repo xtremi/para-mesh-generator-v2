@@ -79,6 +79,7 @@ int ellipseMesher(const std::string& fileName);
 int pathMesher(const std::string& fileName);
 int pathMesher_2(const std::string& fileName);
 int pathMesher_3(const std::string& fileName);
+int pathMesher_4(const std::string& fileName);
 
 int meshCsys1(const std::string& fileName);
 int meshCsys2(const std::string& fileName);
@@ -199,6 +200,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(125, "pathMesher",			"basic meshers 1D", (testFunction)pathMesher),
 	TestDef(126, "pathMesher_2",		"basic meshers 1D", (testFunction)pathMesher_2),
 	TestDef(127, "pathMesher_3",		"basic meshers 1D", (testFunction)pathMesher_3),
+	TestDef(128, "pathMesher_4",		"basic meshers 1D", (testFunction)pathMesher_4),
 
 
 	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
@@ -931,6 +933,23 @@ int pathMesher_3(const std::string& fileName) {
 		PathMesher::writeElements(i, true);
 		totalNodes += i;
 	}
+
+	TEST_END
+}
+
+int pathMesher_4(const std::string& fileName) {
+	TEST_START2
+
+	PathLinear pathX(glm::dvec3(1.0, 0.1, 0.0), 1.0);
+	PathLinear pathY(glm::dvec3(0.2, 1.0, 0.0), 1.0);
+	PathLinear pathZ(glm::dvec3(0.2, 0.2, 1.0), 1.0);
+	PathSine pathSine(glm::dvec3(0.2, 0.2, 1.0), X_DIR, 1.0, 0.2, 0.3);
+	std::vector<Path*> pathXYZ({ &pathX, &pathY, &pathZ, &pathSine });
+	PathComposite pathComp(pathXYZ);
+	
+	int nNodes = 40;
+	PathMesher::writeNodes(pos, glCsys, nNodes, pathComp, true);
+	PathMesher::writeElements(nNodes);
 
 	TEST_END
 }
@@ -2261,7 +2280,7 @@ int pathToPath3Dmesher(const std::string& fileName) {
 	PathMesher::writeNodes(pos, glCsys, 50, sineZY);
 	PathMesher::writeElements(50);
 
-	meshDens.setDir3(90);
+	meshDens.setDir3(45);
 	PathToPath3Dmesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath3, sineZY);
 	PathToPath3Dmesher::writeElements(meshDens);
 
