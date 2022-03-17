@@ -1012,7 +1012,7 @@ int pathMesher_5(const std::string& fileName) {
 	PathMesher::writeElements(nNodes, true);
 
 	MeshDensity2D meshDens(nNodes, 8, true);
-	PathToPathMesher::writeNodes(pos, glCsys, meshDens, holePath, pathCircSection, -holeCenter);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathCircSection, holePath, ??);
 	PathToPathMesher::writeElements(meshDens);
 
 	TEST_END
