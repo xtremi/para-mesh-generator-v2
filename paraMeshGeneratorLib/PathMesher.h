@@ -25,11 +25,12 @@ public:
 		bool			  closedLoop = false,
 		node_skip		  nskip = node_skip::none);
 
-	static void writeNodes(
+	static void writeNodes__(
 		const glm::dvec3& pos,
 		MeshCsys&		  csys,
 		int				  nnodes,
 		const Path&		  path,
+		bool			  closedLoop = false,
 		node_skip		  nskip = node_skip::none);
 
 	static void writeElements(int nnodes, bool closedLoop = false);

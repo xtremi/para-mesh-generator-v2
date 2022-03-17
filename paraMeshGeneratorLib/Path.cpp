@@ -26,6 +26,10 @@ bool calculateNodeSpacing(
 	VecD&		nodeSpacingPerSegemnt	/*!Spacing between nodes for segment*/,
 	bool		closedLoop				/*!Will account for a closed loop*/)
 {
+	if (requiredLocations.size() == 0) {
+		return true;
+	}
+
 	double dpath = 0.;				//estimated spacing between nodes based on rest of path length
 	int	   elCount = 0;				//element counter 
 	double curPathLoc = 0.0;		//the current location (0.0 -> 1.0) at the iteration

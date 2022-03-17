@@ -80,6 +80,7 @@ int pathMesher(const std::string& fileName);
 int pathMesher_2(const std::string& fileName);
 int pathMesher_3(const std::string& fileName);
 int pathMesher_4(const std::string& fileName);
+int pathMesher_5(const std::string& fileName);
 
 int meshCsys1(const std::string& fileName);
 int meshCsys2(const std::string& fileName);
@@ -201,6 +202,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(126, "pathMesher_2",		"basic meshers 1D", (testFunction)pathMesher_2),
 	TestDef(127, "pathMesher_3",		"basic meshers 1D", (testFunction)pathMesher_3),
 	TestDef(128, "pathMesher_4",		"basic meshers 1D", (testFunction)pathMesher_4),
+	TestDef(129, "pathMesher_5",		"basic meshers 1D", (testFunction)pathMesher_5),
 
 
 	TestDef(150, "meshCsys1",			"transformations",  (testFunction)meshCsys1),
@@ -894,7 +896,7 @@ int pathMesher(const std::string& fileName) {
 		});
 
 	for (auto path : paths) {
-		PathMesher::writeNodes(pos, glCsys, nnodes, *path.get());
+		PathMesher::writeNodes__(pos, glCsys, nnodes, *path.get());
 		PathMesher::writeElements(nnodes);
 	}
 	TEST_END
@@ -949,7 +951,7 @@ int pathMesher_4(const std::string& fileName) {
 	PathComposite pathComp(pathXYZ);
 	
 	int nNodes = 40;
-	PathMesher::writeNodes(pos, glCsys, nNodes, pathComp, true);
+	PathMesher::writeNodes__(pos, glCsys, nNodes, pathComp);
 	PathMesher::writeElements(nNodes);
 
 
@@ -972,6 +974,46 @@ int pathMesher_4(const std::string& fileName) {
 
 	PathMesher::writeNodes(pos, glCsys, nNodes, pathCircSection, true, true);
 	PathMesher::writeElements(nNodes, true);
+
+	TEST_END
+}
+
+
+int pathMesher_5(const std::string& fileName) {
+	TEST_START2
+	int nNodes = 60;
+
+	//Create circle arc section:
+	double radOut = 2.0;
+	double radIn = 1.5;
+	double angle0 = 0.;
+	double angle1 = glm::radians(30.);
+	glm::dvec3 c1 = coordsOnCircle(angle0, radIn, direction::z);
+	glm::dvec3 c2 = coordsOnCircle(angle0, radOut, direction::z);
+	glm::dvec3 c3 = coordsOnCircle(angle1, radOut, direction::z);
+	glm::dvec3 c4 = coordsOnCircle(angle1, radIn, direction::z);
+		
+	PathLinear p1(c2 - c1);
+	PathCircular p2(radOut, Z_DIR, c2 - c1, angle0, angle1);
+	PathLinear p3(c4 - c3);
+	PathCircular p4(radIn, -Z_DIR, c3 - c4, angle0, angle1);
+	std::vector<Path*> paths({ &p1, &p2, &p3, &p4 });
+	PathComposite pathCircSection(paths);
+
+	PathMesher::writeNodes(glm::dvec3(radIn, 0., 0.), glCsys, nNodes, pathCircSection, true, true);
+	PathMesher::writeElements(nNodes, true);
+
+	//Create circle (hole) in the section center:
+	glm::dvec3 holeCenter = coordsOnCircle((angle0 + angle1)/2., (radIn + radOut)/2., direction::z);
+	double holeRadius = 0.125;
+	PathCircular holePath(holeRadius, Z_DIR, c1 - holeCenter);
+	
+	PathMesher::writeNodes__(holeCenter, glCsys, nNodes, holePath, true);
+	PathMesher::writeElements(nNodes, true);
+
+	MeshDensity2D meshDens(nNodes, 8, true);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, holePath, pathCircSection, -holeCenter);
+	PathToPathMesher::writeElements(meshDens);
 
 	TEST_END
 }
@@ -2299,7 +2341,7 @@ int pathToPath3Dmesher(const std::string& fileName) {
 	pos.x += 2.0;
 	PathSine sineZY(Z_DIR, Y_DIR, 5.0, 0.5, 3.6);
 
-	PathMesher::writeNodes(pos, glCsys, 50, sineZY);
+	PathMesher::writeNodes__(pos, glCsys, 50, sineZY);
 	PathMesher::writeElements(50);
 
 	meshDens.setDir3(45);

@@ -3,17 +3,18 @@
 
 
 
-void PathMesher::writeNodes(
+void PathMesher::writeNodes__(
 	const glm::dvec3& pos,
 	MeshCsys&		  csys,
 	int				  nnodes,
 	const Path&		  path,
+	bool			  closedLoop,
 	node_skip		  nskip)
 {
 	MESHER_NODE_WRITE_START
 	for (int i = 0; i < nnodes; i++) {
 		if (!skip(i, nnodes, nskip)) {
-			writer->writeNode(pos + path.position(i, nnodes), NULL_POS, nullptr, &csys);
+			writer->writeNode(pos + path.position(i, closedLoop ? nnodes + 1 : nnodes), NULL_POS, nullptr, &csys);
 		}
 	}
 	MESHER_NODE_WRITE_END
@@ -65,7 +66,7 @@ void PathMesher::writeNodes(
 		writeNodes(pos, csys, nnodes, path, requiredNodeLocatiosn, closedLoop, nskip);
 	}
 	else{
-		writeNodes(pos, csys, nnodes, path, nskip);
+		writeNodes__(pos, csys, nnodes, path, closedLoop, nskip);
 	}
 }
 
