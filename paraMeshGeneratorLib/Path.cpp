@@ -240,6 +240,10 @@ glm::dvec3 PathAxis::tangent(double pathPercentage) const {
 }
 
 /*PathLinear*/
+PathLinear::PathLinear(const glm::dvec3& dir, double _length)
+	: pathDirection{ glm::normalize(dir) }, pathLength{ _length }{}
+PathLinear::PathLinear(const glm::dvec3& vector)
+	: pathDirection{ glm::normalize(vector) }, pathLength{glm::length(vector)}{}
 glm::dvec3 PathLinear::position(double pathPercentage) const {
 	return pathDirection * pathLength * pathPercentage;
 }
@@ -288,9 +292,10 @@ PathCircular::PathCircular(
 	double			  endAng	/*!End angle (if startAng and endAng is negative, its a full circle)*/)
 	: radius{ rad }
 {
+	//xyzxyz
 	glm::dvec3 directionZ = glm::normalize(normal);
 	directionY = glm::normalize(glm::cross(normal, glm::normalize(pXZ)));
-	directionX = glm::normalize(glm::cross(normal, directionY));
+	directionX = glm::normalize(glm::cross(directionY, normal));
 
 	start = startAng;
 	end = endAng;
@@ -303,7 +308,7 @@ PathCircular::PathCircular(
 }
 
 glm::dvec3 PathCircular::position(double pathPercentage) const {
-	double angle = pathPercentage * GLM2PI;
+	double angle = pathPercentage * this->angleSize();
 	return coordsOnCircleQ(angle, radius, directionX, directionY);
 }
 glm::dvec3 PathCircular::tangent(double pathPercentage) const
@@ -314,6 +319,7 @@ glm::dvec3 PathCircular::tangent(double pathPercentage) const
 double PathCircular::length() const {
 	return radius * std::abs(end - start);
 }
+
 
 
 /*PathLineStrip*/
@@ -416,6 +422,7 @@ glm::dvec3 PathComposite::position(double pathPercentage) const {
 	int pathIndex = 0;
 	glm::dvec3 currentPosition(0.);
 	for (const PathFactor& pathFactor : pathFactors) {
+		currentPosition -= paths[pathIndex]->position(0.); //For handling circles that have their position defined by center
 		if (pathPercentage <= pathFactor.end) {
 			double factorOfCurrentPath = pathPercentage - pathFactor.start;
 			factorOfCurrentPath /= pathFactor.size();
@@ -423,6 +430,7 @@ glm::dvec3 PathComposite::position(double pathPercentage) const {
 			break;
 		}
 		currentPosition += paths[pathIndex]->position(1.);
+		
 		pathIndex++;
 	}
 }

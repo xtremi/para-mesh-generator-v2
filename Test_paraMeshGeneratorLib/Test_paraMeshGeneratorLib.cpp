@@ -888,6 +888,7 @@ int pathMesher(const std::string& fileName) {
 		std::make_shared<PathAxis>(direction::z, 10.),
 		std::make_shared<PathSine>(X_DIR, Y_DIR, 10., 2., 5.),
 		std::make_shared<PathCircular>(10., glm::dvec3(0.5, 1., 0.), glm::dvec3(1., 0.5, 1.)),
+		std::make_shared<PathCircular>(10., Z_DIR, X_DIR),
 		std::make_shared<PathLineStrip>(
 		std::vector<glm::dvec3>({ glm::dvec3(0.0), glm::dvec3(1., 0., 0.), glm::dvec3(2., 1., 0.), glm::dvec3(2., 2., 0.) }))
 		});
@@ -950,6 +951,27 @@ int pathMesher_4(const std::string& fileName) {
 	int nNodes = 40;
 	PathMesher::writeNodes(pos, glCsys, nNodes, pathComp, true);
 	PathMesher::writeElements(nNodes);
+
+
+	pos.x += 2.0;
+
+	double radOut = 2.0;
+	double radIn = 1.5;
+	double angle0 = 0.;
+	double angle1 = glm::radians(30.);
+	glm::dvec3 c1 = coordsOnCircle(angle0, radIn, direction::z);
+	glm::dvec3 c2 = coordsOnCircle(angle0, radOut, direction::z);
+	glm::dvec3 c3 = coordsOnCircle(angle1, radOut, direction::z);
+	glm::dvec3 c4 = coordsOnCircle(angle1, radIn, direction::z);
+	PathLinear p1(c2 - c1);
+	PathCircular p2(radOut, Z_DIR, c2 - c1, angle0, angle1);
+	PathLinear p3(c4 - c3);
+	PathCircular p4(radIn, -Z_DIR, c3 - c4, angle0, angle1);
+	std::vector<Path*> paths({ &p1, &p2, &p3, &p4 });
+	PathComposite pathCircSection(paths);
+
+	PathMesher::writeNodes(pos, glCsys, nNodes, pathCircSection, true, true);
+	PathMesher::writeElements(nNodes, true);
 
 	TEST_END
 }
@@ -1285,10 +1307,10 @@ int pathToPathMesher(const std::string& fileName) {
 	pos.x += 4.0;
 	double d = 0.5;
 	PathLineStrip pathRec({
-		glm::dvec3(-d, 0.0, 0.0),
-		glm::dvec3(-d, d, 0.0), glm::dvec3(d, d, 0.0),
-		glm::dvec3(d, -d, 0.0), glm::dvec3(-d, -d, 0.0),
-		glm::dvec3(-d, 0.0, 0.0) });
+		glm::dvec3(d, 0.0, 0.0),
+		glm::dvec3(d, d, 0.0), glm::dvec3(-d, d, 0.0),
+		glm::dvec3(-d, -d, 0.0), glm::dvec3(d, -d, 0.0),
+		glm::dvec3(d, 0.0, 0.0) });
 	meshDens.setClosedLoop();
 	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathRec, circlePath2);
 	PathToPathMesher::writeElements(meshDens);

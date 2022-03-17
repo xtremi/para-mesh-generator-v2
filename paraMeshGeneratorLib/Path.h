@@ -70,7 +70,9 @@ protected:
 
 class PathLinear : public Path {
 public:
-	PathLinear(const glm::dvec3& dir, double _length) : pathDirection{ glm::normalize(dir) }, pathLength{ _length }{}
+	PathLinear(const glm::dvec3& dir, double _length);
+	PathLinear(const glm::dvec3& vector);
+
 	glm::dvec3 position(double pathPercentage) const;
 	glm::dvec3 tangent(double pathPercentage) const;
 	double length() const { return pathLength; }
