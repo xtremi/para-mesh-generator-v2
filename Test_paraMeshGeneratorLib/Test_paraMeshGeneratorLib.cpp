@@ -987,7 +987,7 @@ int pathMesher_5(const std::string& fileName) {
 	double radOut = 2.0;
 	double radIn = 1.5;
 	double angle0 = 0.;
-	double angle1 = glm::radians(30.);
+	double angle1 = glm::radians(20.4); //error if 20.0 ??
 	glm::dvec3 c1 = coordsOnCircle(angle0, radIn, direction::z);
 	glm::dvec3 c2 = coordsOnCircle(angle0, radOut, direction::z);
 	glm::dvec3 c3 = coordsOnCircle(angle1, radOut, direction::z);
@@ -1011,8 +1011,9 @@ int pathMesher_5(const std::string& fileName) {
 	PathMesher::writeNodes__(holeCenter, glCsys, nNodes, holePath, true);
 	PathMesher::writeElements(nNodes, true);
 
-	MeshDensity2D meshDens(nNodes, 8, true);
-	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathCircSection, holePath, ??);
+	glm::dvec3 holeCenterRelToCircSectionStart = holeCenter - glm::dvec3(radIn, 0., 0.);
+	MeshDensity2D meshDens(nNodes, 16, true);
+	PathToPathMesher::writeNodes(pos, glCsys, meshDens, pathCircSection, holePath, holeCenterRelToCircSectionStart);
 	PathToPathMesher::writeElements(meshDens);
 
 	TEST_END
