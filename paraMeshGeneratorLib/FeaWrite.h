@@ -150,7 +150,7 @@ public:
 /********************************************************
 	Node line:
 ********************************************************/
-/*	int writeNodesLineQ(
+/*	int writeNodesQ(
 		const glm::dvec3&	spos,
 		double				dx,
 		int					nrows,
@@ -158,27 +158,27 @@ public:
 		direction			dir,
 		glm::dmat3x3*		csys = nullptr);
 
-	int writeNodesLineQ(
+	int writeNodesQ(
 		const glm::dvec3&	spos,
 		const glm::dvec3&	ds,
 		int					nnodes,
 		int					nodeIDstart,
 		glm::dmat3x3*		csys = nullptr);
 
-	int writeNodesLine(const glm::dvec3& spos, double length, int nrows, int nodeIDstart,
+	int writeNodes(const glm::dvec3& spos, double length, int nrows, int nodeIDstart,
 		direction dir = direction::x, glm::dmat3x3* csys = nullptr);
 
-	int writeNodesLine(const glm::dvec3& spos, const glm::dvec3& sposEnd, int nnodes, int nodeIDstart,
+	int writeNodes(const glm::dvec3& spos, const glm::dvec3& sposEnd, int nnodes, int nodeIDstart,
 		glm::dmat3x3* csys = nullptr);
 
-	int writeNodesLineXq(const glm::dvec3& spos, double dx, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
-	int writeNodesLineYq(const glm::dvec3& spos, double dx, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
-	int writeNodesLineZq(const glm::dvec3& spos, double dx, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
-	int writeNodesLineX(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
-	int writeNodesLineY(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
-	int writeNodesLineZ(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesXq(const glm::dvec3& spos, double dx, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesYq(const glm::dvec3& spos, double dx, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesZq(const glm::dvec3& spos, double dx, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesX(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesY(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
+	int writeNodesZ(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys = nullptr);
 
-	int writeNodesLineQ_nth(
+	int writeNodesQ_nth(
 		const glm::dvec3&	spos,
 		double				dx,
 		int					nrows,
@@ -187,7 +187,7 @@ public:
 		direction			dir,
 		glm::dmat3x3*		csys = nullptr);
 
-	int writeNodesLineQ_nth(
+	int writeNodesQ_nth(
 		const glm::dvec3&	spos,
 		const glm::dvec3&	ds,
 		int					nnodes,
@@ -256,7 +256,7 @@ public:
 /********************************************************
 	Elements line:
 ********************************************************/
-/*	int writeElementsLine(
+/*	int writeElements(
 		int		nnodes,
 		int		nodeID1,
 		int		elementID1,

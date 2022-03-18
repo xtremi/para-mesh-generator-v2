@@ -2,6 +2,8 @@
 #include "math_utilities.h"
 #include "NodeIterator.h"
 
+enum class node_skip { none = 0, first = 1, last = -1, first_and_last = -2, every_2 = 2, every_3 = 3, every_4 = 4, every_5 = 5, every_6 = 6 };
+bool skipCheck(int i, int last, node_skip nskip, int skipNth);
 
 /*
 	Wrapper for glm::ivec2 representing number of nodes for a "2D structured mesh"
@@ -76,6 +78,9 @@ struct MeshDensity1D {
 	int nEl() const { return closedLoop ? nnodes : nnodes - 1; }
 	bool closedLoop;
 	int nnodes;
+	int skipNth = 0;
+	node_skip nodeSkip = node_skip::none;
+	bool skip(int node) const;
 };
 
 struct MeshDensity1DlineStrip : public MeshDensity1D{

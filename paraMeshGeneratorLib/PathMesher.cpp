@@ -71,5 +71,5 @@ void PathMesher::writeNodes(
 }
 
 void PathMesher::writeElements(int nnodes, bool closedLoop) {
-	LineMesher::writeElementsLine(nnodes, closedLoop);
+	LineMesher::writeElements(nnodes, closedLoop);
 }

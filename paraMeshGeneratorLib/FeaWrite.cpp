@@ -356,40 +356,40 @@ int FEAwriter::writeElementRow(
 /********************************************************
 	Node line:
 ********************************************************/
-/*int FEAwriter::writeNodesLineXq(const glm::dvec3& spos, double dx, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesLineQ(spos, dx, nnodes, nodeIDstart, direction::x, csys);
+/*int FEAwriter::writeNodesXq(const glm::dvec3& spos, double dx, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodesQ(spos, dx, nnodes, nodeIDstart, direction::x, csys);
 }
-int FEAwriter::writeNodesLineYq(const glm::dvec3& spos, double dy, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesLineQ(spos, dy, nnodes, nodeIDstart, direction::y, csys);
+int FEAwriter::writeNodesYq(const glm::dvec3& spos, double dy, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodesQ(spos, dy, nnodes, nodeIDstart, direction::y, csys);
 }
-int FEAwriter::writeNodesLineZq(const glm::dvec3& spos, double dz, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesLineQ(spos, dz, nnodes, nodeIDstart, direction::z, csys);
+int FEAwriter::writeNodesZq(const glm::dvec3& spos, double dz, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodesQ(spos, dz, nnodes, nodeIDstart, direction::z, csys);
 }
-int FEAwriter::writeNodesLineX(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesLine(spos, length, nnodes, nodeIDstart, direction::x, csys);
+int FEAwriter::writeNodesX(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodes(spos, length, nnodes, nodeIDstart, direction::x, csys);
 }
-int FEAwriter::writeNodesLineY(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesLine(spos, length, nnodes, nodeIDstart, direction::y, csys);
+int FEAwriter::writeNodesY(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodes(spos, length, nnodes, nodeIDstart, direction::y, csys);
 }
-int FEAwriter::writeNodesLineZ(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
-	return writeNodesLine(spos, length, nnodes, nodeIDstart, direction::z, csys);
+int FEAwriter::writeNodesZ(const glm::dvec3&	spos, double length, int nnodes, int nodeIDstart, glm::dmat3x3* csys) {
+	return writeNodes(spos, length, nnodes, nodeIDstart, direction::z, csys);
 }
 
-int FEAwriter::writeNodesLine(const glm::dvec3& spos, double length, int nnodes, int nodeIDstart,
+int FEAwriter::writeNodes(const glm::dvec3& spos, double length, int nnodes, int nodeIDstart,
 	direction dir, glm::dmat3x3* csys)
 {
 	double ds = length / (double)(nnodes - 1);
-	return writeNodesLineQ(spos, ds, nnodes, nodeIDstart, dir, csys);
+	return writeNodesQ(spos, ds, nnodes, nodeIDstart, dir, csys);
 }
 
-int FEAwriter::writeNodesLine(const glm::dvec3& spos, const glm::dvec3& sposEnd, int nnodes, int nodeIDstart,
+int FEAwriter::writeNodes(const glm::dvec3& spos, const glm::dvec3& sposEnd, int nnodes, int nodeIDstart,
 	glm::dmat3x3* csys) 
 {
 	glm::dvec3 ds = (sposEnd - spos) / (double)(nnodes - 1);
-	return writeNodesLineQ(spos, ds, nnodes, nodeIDstart, csys);
+	return writeNodesQ(spos, ds, nnodes, nodeIDstart, csys);
 }
 
-int FEAwriter::writeNodesLineQ(
+int FEAwriter::writeNodesQ(
 	const glm::dvec3&	spos,
 	double				ds, 
 	int					nnodes, 
@@ -406,7 +406,7 @@ int FEAwriter::writeNodesLineQ(
 	return nodeID;
 }
 
-int FEAwriter::writeNodesLineQ(
+int FEAwriter::writeNodesQ(
 	const glm::dvec3&	spos,
 	const glm::dvec3&	ds,			
 	int					nnodes,
@@ -422,7 +422,7 @@ int FEAwriter::writeNodesLineQ(
 	return nodeID;
 }
 
-int FEAwriter::writeNodesLineQ_nth(
+int FEAwriter::writeNodesQ_nth(
 	const glm::dvec3&	spos,
 	double				ds,
 	int					nnodes,
@@ -443,7 +443,7 @@ int FEAwriter::writeNodesLineQ_nth(
 	return nodeID;
 }
 
-int FEAwriter::writeNodesLineQ_nth(
+int FEAwriter::writeNodesQ_nth(
 	const glm::dvec3&	spos,
 	const glm::dvec3&	ds,
 	int					nnodes,
@@ -605,7 +605,7 @@ int FEAwriter::writeNodesCircular_nth(
 /********************************************************
 	Elements line:
 ********************************************************/
-/*int FEAwriter::writeElementsLine(
+/*int FEAwriter::writeElements(
 	int		nnodes,
 	int		nodeID1,
 	int		elementID1,
@@ -647,15 +647,15 @@ int FEAwriter::writeNodesCircular_nth(
 	{
 		switch (pln){
 		case plane::xy:
-			nodeID = writeNodesLineXq(coords, dp.x, nnodes.x, nodeID, csys);
+			nodeID = writeNodesXq(coords, dp.x, nnodes.x, nodeID, csys);
 			coords.y += dp.y;
 			break;
 		case plane::xz:
-			nodeID = writeNodesLineXq(coords, dp.x, nnodes.x, nodeID, csys);
+			nodeID = writeNodesXq(coords, dp.x, nnodes.x, nodeID, csys);
 			coords.z += dp.y;
 			break;
 		case plane::yz:
-			nodeID = writeNodesLineYq(coords, dp.x, nnodes.x, nodeID, csys);
+			nodeID = writeNodesYq(coords, dp.x, nnodes.x, nodeID, csys);
 			coords.z += dp.y;
 			break;
 		default:
@@ -790,13 +790,13 @@ int FEAwriter::writeNodes_ref(
 		currentRefinement++;
 
 		//row b: x--x--x--x--x--x--x--x--x
-		nodeID = writeNodesLineQ(coords, curElSize.y, currentNodesPerRow, nodeID, edgeDirection);
+		nodeID = writeNodesQ(coords, curElSize.y, currentNodesPerRow, nodeID, edgeDirection);
 		coords[(size_t)edgeDirection] = spos.y;
 		coords[(size_t)refinementDirection] += curElSize.x;
 
 
 		//row m:  |  x--x--x  |  x--x--x  |
-		nodeID = writeNodesLineQ_nth(coords, curElSize.y, currentNodesPerRow, nodeID, 4, edgeDirection, csys);
+		nodeID = writeNodesQ_nth(coords, curElSize.y, currentNodesPerRow, nodeID, 4, edgeDirection, csys);
 		coords[(size_t)refinementDirection] += curElSize.x;
 		coords[(size_t)edgeDirection] = spos[(size_t)edgeDirection];
 
@@ -807,7 +807,7 @@ int FEAwriter::writeNodes_ref(
 		curElSize.y *= 2.0;
 
 		//row t:
-		nodeID = writeNodesLineQ(coords, curElSize.y, currentNodesPerRow, nodeID, edgeDirection, csys);
+		nodeID = writeNodesQ(coords, curElSize.y, currentNodesPerRow, nodeID, edgeDirection, csys);
 		curElSize.x *= 2.0;
 		coords[(size_t)refinementDirection] += curElSize.x;
 	}

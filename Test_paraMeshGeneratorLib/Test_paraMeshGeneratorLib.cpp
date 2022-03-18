@@ -71,6 +71,7 @@ int refinementCalc2D(const std::string& fileName);
 int refinementCalc3D(const std::string& fileName);
 
 int lineMesher(const std::string& fileName);
+int lineMesher_2(const std::string& fileName);
 int lineStripMesher(const std::string& fileName);
 int arcMesher(const std::string& fileName);
 int arcMesher2(const std::string& fileName);
@@ -192,9 +193,10 @@ std::vector<TestDef> testFunctions({
 
 
 	TestDef(101, "lineMesher",			"basic meshers 1D", (testFunction)lineMesher),	
-	TestDef(102, "arcMesher",			"basic meshers 1D", (testFunction)arcMesher),
-	TestDef(103, "recEdgeMesher",		"basic meshers 1D", (testFunction)recEdgeMesher),
-	TestDef(104, "ellipseMesher",		"basic meshers 1D", (testFunction)ellipseMesher),
+	TestDef(102, "lineMesher_2",		"basic meshers 1D", (testFunction)lineMesher_2),
+	TestDef(105, "arcMesher",			"basic meshers 1D", (testFunction)arcMesher),
+	TestDef(107, "recEdgeMesher",		"basic meshers 1D", (testFunction)recEdgeMesher),
+	TestDef(109, "ellipseMesher",		"basic meshers 1D", (testFunction)ellipseMesher),
 	TestDef(110, "lineStripMesher",		"basic meshers 1D", (testFunction)lineStripMesher),
 	
 	TestDef(120, "arcMesher2",			"basic meshers 1D", (testFunction)arcMesher2),
@@ -330,22 +332,23 @@ std::vector<int> linearlyOrderedVector(int iStart, int iEnd, int iStep = 1);
 */
 /*************************************************************************/
 #define TEST_START std::ofstream file; \
-				   file.open(fileName); \
-				   if (!file.is_open()) return 1; \
-				   NastranFEAwriter writer(&file); \
-				   Mesher::setFEAwriter(&writer); \
-				   MeshCsys pos(glm::dvec3(0.0));
+file.open(fileName); \
+if (!file.is_open()) return 1; \
+NastranFEAwriter writer(&file); \
+Mesher::setFEAwriter(&writer); \
+MeshCsys pos(glm::dvec3(0.0));
 
 #define TEST_START2 std::ofstream file; \
-					file.open(fileName); \
-					if (!file.is_open()) return 1; \
-					NastranFEAwriter writer(&file); \
-					Mesher::setFEAwriter(&writer); \
-					MeshCsys glCsys(glm::dvec3(0.0)); \
-					glm::dvec3 pos(NULL_POS);
+file.open(fileName); \
+if (!file.is_open()) return 1; \
+NastranFEAwriter writer(&file); \
+Mesher::setFEAwriter(&writer); \
+MeshCsys glCsys(glm::dvec3(0.0)); \
+glm::dvec3 pos(NULL_POS);
 
 #define TEST_END writer.close(); \
-				 return 0;
+return 0;
+
 /*************************************************************************/
 #ifdef _DEBUG
 #define SPEED_TEST_AMOUNT 1e5
@@ -353,6 +356,9 @@ std::vector<int> linearlyOrderedVector(int iStart, int iEnd, int iStep = 1);
 #define SPEED_TEST_AMOUNT 1e8
 #endif
 
+/*!
+Not real test. Intended for checking time of multiple addition operations.
+*/
 int speedTestAddition(const std::string& fileName) {
 	double numbers[10] = { 1, 2., 232.,2342., 1231., 434., 345345., 234., 454., 4. };
 
@@ -365,6 +371,9 @@ int speedTestAddition(const std::string& fileName) {
 	}
 	return 0;
 }
+/*!
+Not real test. Intended for checking time of multiple multiplication operations.
+*/
 int speedTestMultiplication(const std::string& fileName) {
 	double numbers[10] = { 1, 2., 232.,2342., 1231., 434., 345345., 234., 454., 4. };
 
@@ -377,6 +386,9 @@ int speedTestMultiplication(const std::string& fileName) {
 	}
 	return 0;
 }
+/*!
+Not real test. Intended for checking time of multiple glm::vec3 addition operations.
+*/
 int speedTestVec3addition(const std::string& fileName) {
 	glm::dvec3 vecs[10] = { 
 		glm::dvec3(223.,311.,345.), glm::dvec3(24.,3343.,523423.), glm::dvec3(2334.,2343.,576.), 
@@ -394,6 +406,9 @@ int speedTestVec3addition(const std::string& fileName) {
 	}
 	return 0;
 }
+/*!
+Not real test. Intended for checking time of multiple glm::dvec3 x glm::dmat3x3 operations.
+*/
 int speedTestMat3Vec3multiplication(const std::string& fileName) {
 	glm::dvec3 vecs[10] = {
 		glm::dvec3(223.,311.,345.), glm::dvec3(24.,3343.,523423.), glm::dvec3(2334.,2343.,576.),
@@ -420,15 +435,21 @@ int speedTestMat3Vec3multiplication(const std::string& fileName) {
 
 }
 
+/*!
+Writes lines in X, Y, Z
+*/
 void writeXYZlines(MeshCsys& csys, double length, int nNodes) {
-	LineMesher::writeNodesLineX(NULL_POS, csys, nNodes, length);
-	LineMesher::writeElementsLine(nNodes);
-	LineMesher::writeNodesLineY(NULL_POS, csys, nNodes, length);
-	LineMesher::writeElementsLine(nNodes);
-	LineMesher::writeNodesLineZ(NULL_POS, csys, nNodes, length);
-	LineMesher::writeElementsLine(nNodes);
+	LineMesher::writeNodesX(NULL_POS, csys, nNodes, length);
+	LineMesher::writeElements(nNodes);
+	LineMesher::writeNodesY(NULL_POS, csys, nNodes, length);
+	LineMesher::writeElements(nNodes);
+	LineMesher::writeNodesZ(NULL_POS, csys, nNodes, length);
+	LineMesher::writeElements(nNodes);
 }
 
+/*!
+Writes 2d elements in XY, XZ, YZ planes
+*/
 void writeXYZplanes(MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dvec2& size) {
 	PlaneMesher::writeNodesXY(NULL_POS, csys, meshDens, size);
 	PlaneMesher::writeElements(meshDens);
@@ -440,6 +461,10 @@ void writeXYZplanes(MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dv
 
 static const int nCubesSpeedTest = 50;
 static const int nNodesCubeSpeedTest = 30;
+/*!
+Speed test for writing mulitple cubes.
+ \p nCubesSpeedTest number of cubes, \p nNodesCubeSpeedTest number of nodes per cube edge.
+*/
 int speedTestWriteCubes(const std::string& fileName) {
 	TEST_START
 
@@ -492,8 +517,8 @@ int speedTestWriteLines(const std::string& fileName) {
 	TEST_START2
 		
 	for (int i = 0; i < nLines; i++) {
-		LineMesher::writeNodesLineX(pos, glCsys, nNodesPerLine, 10.);
-		LineMesher::writeElementsLine(nNodesPerLine);
+		LineMesher::writeNodesX(pos, glCsys, nNodesPerLine, 10.);
+		LineMesher::writeElements(nNodesPerLine);
 		pos.z += 1.0;
 	}
 
@@ -579,7 +604,7 @@ int meshCsys1(const std::string& fileName) {
 	int nnodes = 64;
 	MeshCsys csysE1(-10.*Y_DIR);
 	ArcMesher::writeNodesCircular(NULL_POS, csysE1, nnodes, 4.0, ArcAngles(), direction::z);
-	ArcMesher::writeElementsLine(nnodes, true);
+	ArcMesher::writeElements(nnodes, true);
 
 	glm::dmat3x3 rotME2;
 	MeshCsys csysE2(10.0*X_DIR, &rotME2);
@@ -593,7 +618,7 @@ int meshCsys1(const std::string& fileName) {
 		csysE1.pos.y += 0.25;
 		csysE3.updateParents();
 		ArcMesher::writeNodesCircular(NULL_POS, csysE3, nnodes, 4.0, ArcAngles(), direction::z);
-		ArcMesher::writeElementsLine(nnodes, true);
+		ArcMesher::writeElements(nnodes, true);
 
 		DiskMesher::writeNodes(NULL_POS, csysE3, MeshDensity2D(24, 6), Cone2Dradius(1.0, 3.25), ArcAngles(), direction::z);
 		DiskMesher::writeElements(MeshDensity2D(24, 6, true));
@@ -714,45 +739,47 @@ int meshCsys3(const std::string& fileName) {
 
 	TEST_END
 }
-
+/*!
+101
+*/
 int lineMesher(const std::string& fileName) {
 	TEST_START2
 
 	int		nnodes = 20;
 	double  length = 10.0;
 
-	LineMesher::writeNodesLine(pos, glCsys, nnodes, length, direction::x);
-	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLine(pos, glCsys, nnodes, length, direction::y);
-	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLine(pos, glCsys, nnodes, length, direction::z);
-	LineMesher::writeElementsLine(nnodes);
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x);
+	LineMesher::writeElements(nnodes);
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::y);
+	LineMesher::writeElements(nnodes);
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::z);
+	LineMesher::writeElements(nnodes);
 
 	pos.x += 1.2*length;
-	LineMesher::writeNodesLineX(pos, glCsys, nnodes, length);
-	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLineY(pos, glCsys, nnodes, length);
-	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLineZ(pos, glCsys, nnodes, length);
-	LineMesher::writeElementsLine(nnodes);
+	LineMesher::writeNodesX(pos, glCsys, nnodes, length);
+	LineMesher::writeElements(nnodes);
+	LineMesher::writeNodesY(pos, glCsys, nnodes, length);
+	LineMesher::writeElements(nnodes);
+	LineMesher::writeNodesZ(pos, glCsys, nnodes, length);
+	LineMesher::writeElements(nnodes);
 	
 	nnodes = 10;	
 	glm::dvec3 dsvec = glm::dvec3(1.0, 0.35, 0.15);
 
 	pos.y += 1.2*length;
-	LineMesher::writeNodesLineQ(pos, glCsys, nnodes, dsvec);
-	LineMesher::writeElementsLine(nnodes);
+	LineMesher::writeNodesQ(pos, glCsys, nnodes, dsvec);
+	LineMesher::writeElements(nnodes);
 	
 	double ds = 0.746;
 
 	pos.x = 0.0;
 	pos.y += 1.2*length;
-	LineMesher::writeNodesLineXq(pos, glCsys, nnodes, ds);
-	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLineYq(pos, glCsys, nnodes, ds);
-	LineMesher::writeElementsLine(nnodes);
-	LineMesher::writeNodesLineZq(pos, glCsys, nnodes, ds);
-	LineMesher::writeElementsLine(nnodes);
+	LineMesher::writeNodesXq(pos, glCsys, nnodes, ds);
+	LineMesher::writeElements(nnodes);
+	LineMesher::writeNodesYq(pos, glCsys, nnodes, ds);
+	LineMesher::writeElements(nnodes);
+	LineMesher::writeNodesZq(pos, glCsys, nnodes, ds);
+	LineMesher::writeElements(nnodes);
 
 	
 	pos.y += 1.2*length;
@@ -766,8 +793,8 @@ int lineMesher(const std::string& fileName) {
 		posStart = coordsOnCircle(ang, rad1, direction::z) + pos;
 		posEnd = coordsOnCircle(ang, rad2, direction::z) + pos + glm::dvec3(0, 0, 1.0);
 		
-		LineMesher::writeNodesLine(posStart, glCsys, nnodes, posEnd);
-		LineMesher::writeElementsLine(nnodes);
+		LineMesher::writeNodes(posStart, glCsys, nnodes, posEnd);
+		LineMesher::writeElements(nnodes);
 		ang += dang;
 	}
 
@@ -775,12 +802,46 @@ int lineMesher(const std::string& fileName) {
 	TEST_END
 }
 
+int nNodesWithSkip(int nnodes, int nskip) {
+	int e = (int)!!(nnodes % nskip);
+	return nnodes - nnodes / nskip - e;
+}
+
+int lineMesher_2(const std::string& fileName) {
+	TEST_START2
+	
+	int		nnodes = 21;
+	double  length = 10.0;
+
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x);
+	LineMesher::writeElements(nnodes);
+	pos.y += 2.0;
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::every_2);
+	LineMesher::writeElements(nNodesWithSkip(nnodes, 2));
+	pos.y += 2.0;
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::every_3);
+	LineMesher::writeElements(nNodesWithSkip(nnodes, 3));
+	pos.y += 2.0;
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::every_4);
+	LineMesher::writeElements(nNodesWithSkip(nnodes, 4));
+	pos.y += 2.0;
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::first);
+	LineMesher::writeElements(nnodes - 1);
+	pos.y += 2.0;
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::last);
+	LineMesher::writeElements(nnodes - 1);
+	pos.y += 2.0;
+	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::first_and_last);
+	LineMesher::writeElements(nnodes - 2);
+
+	TEST_END
+}
 int lineStripMesher(const std::string& fileName) {
 	TEST_START2
 	LineStrip lineStrip({ {0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {1.5, 0.5, 0.0}, {0.0, 1.0, -0.6} });
 	std::vector<int> nNodes({ 5,10, 12 });
 	MeshDensity1DlineStrip meshDens({ 5,10, 12 });
-	LineStripMesher::writeNodesLine(pos, glCsys, lineStrip, meshDens);
+	LineStripMesher::writeNodes(pos, glCsys, lineStrip, meshDens);
 	LineStripMesher::writeElements(meshDens);
 	TEST_END
 }
@@ -793,50 +854,50 @@ int arcMesher(const std::string& fileName) {
 	double radius = 5.0;
 
 	ArcMesher::writeNodesCircular(pos, glCsys, nnodes, radius, ArcAngles(0.0, GLMPI), direction::x);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 	ArcMesher::writeNodesCircular(pos, glCsys, nnodes, radius, ArcAngles(GLMPI, 0.0), direction::y);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 	ArcMesher::writeNodesCircular(pos, glCsys, nnodes, radius, ArcAngles(), direction::z);
-	ArcMesher::writeElementsLine(nnodes, true);
+	ArcMesher::writeElements(nnodes, true);
 
 	pos.x += radius*2.5;
 	ArcMesher::writeNodesCircularX(pos, glCsys, nnodes, radius, ArcAngles(0.0, 3.0*GLM2PI/4.0));
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 	ArcMesher::writeNodesCircularY(pos, glCsys, nnodes, radius, ArcAngles(0.0, GLM2PI/3.0));
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 	ArcMesher::writeNodesCircularZ(pos, glCsys, nnodes, radius, ArcAngles(0.0, GLM2PI*0.95));
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 
 	pos.x += radius * 2.5;
 	double dang = 0.7*GLM2PI / nnodes;
 	ArcMesher::writeNodesCircularQ(pos, glCsys, nnodes, radius, 0.0, dang, direction::x);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 	ArcMesher::writeNodesCircularQ(pos, glCsys, nnodes, radius, 0.0, -dang, direction::y);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 	ArcMesher::writeNodesCircularQ(pos, glCsys, nnodes, radius, GLMPI, 0.6*dang, direction::z);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 
 	pos.x = 0.0;
 	pos.y += radius * 2.5;
 	ArcMesher::writeNodesCircularXq(pos, glCsys, nnodes, radius, GLMPI/2.0, dang);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 	ArcMesher::writeNodesCircularYq(pos, glCsys, nnodes, radius, GLMPI, dang);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 	ArcMesher::writeNodesCircularZq(pos, glCsys, nnodes, radius, GLMPI, -dang);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 
 
 	pos.x += radius * 2.5;
 	ArcMesher::writeNodesCircular_nth(pos, glCsys, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 5, direction::x);
-	ArcMesher::writeElementsLine(nnodes - 2-1);
+	ArcMesher::writeElements(nnodes - 2-1);
 
 	pos.x += radius * 2.5;
 	ArcMesher::writeNodesCircular_nth(pos, glCsys, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 3, direction::x);
-	ArcMesher::writeElementsLine(nnodes - 3-1);
+	ArcMesher::writeElements(nnodes - 3-1);
 
 	pos.x += radius * 2.5;
 	ArcMesher::writeNodesCircular_nth(pos, glCsys, nnodes, radius, ArcAngles(GLMPI, GLM2PI), 7, direction::x);
-	ArcMesher::writeElementsLine(nnodes - 1-1);
+	ArcMesher::writeElements(nnodes - 1-1);
 	
 	TEST_END
 }
@@ -851,31 +912,31 @@ int arcMesher2(const std::string& fileName) {
 
 	//From X- and Y- dir specifying the plane of the circle:
 	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, angles, dirX, dirY);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 
 	pos.z += radius / 2.0;
 	//From two points on on arc + radius:
 	glm::dvec3 p1(10., 0., 0.);
 	glm::dvec3 p2(0., 10., 0.);
 	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2, Z_DIR);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 
 	pos.z += radius / 2.0;
 	//From two points on on arc + radius:
 	p1 = glm::dvec3(0., 10., 0.);
 	p2 = glm::dvec3(10., 0., 0.);
 	ArcMesher::writeNodes(pos, glCsys, nnodes, radius, p1, p2, Z_DIR);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 
 	pos.z += radius / 2.0;
 	//From enum direction of circle normal:
 	ArcMesher::writeNodesCircular(pos, glCsys, nnodes, radius, angles, direction::z);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 
 	pos.z += radius / 2.0;
 	//From enum direction of circle normal:
 	ArcMesher::writeNodesCircularQ(pos, glCsys, nnodes, radius, angles.start, angles.angStep(nnodes), direction::z);
-	ArcMesher::writeElementsLine(nnodes);
+	ArcMesher::writeElements(nnodes);
 
 	TEST_END
 }
@@ -1120,7 +1181,7 @@ int recEdgeMesher(const std::string& fileName) {
 	std::vector<glm::dvec2> xycoords(nnodes);
 	RecEdgeMesher::getLocalCoords(xycoords, nnodes, glm::dvec2(60.0, 35.0));
 	LineMesher::writeNodes(xycoords, 10.0);
-	LineMesher::writeElementsLine(nnodes, true);
+	LineMesher::writeElements(nnodes, true);
 
 	TEST_END
 }
@@ -1146,7 +1207,7 @@ int ellipseMesher(const std::string& fileName) {
 	std::vector<glm::dvec2> localCoords(1500);
 	EllipseMesher::getLocalCoords(localCoords, 1500, EllipseRadius(100.0, 50.0), ArcAngles());
 	LineMesher::writeNodes(localCoords, 4.0);
-	LineMesher::writeElementsLine(1500, true);
+	LineMesher::writeElements(1500, true);
 
 	TEST_END
 }
@@ -2387,12 +2448,12 @@ int refinement2dHeight(const std::string& fileName) {
 
 		//Lower limit Plane1:
 		glm::dvec3 linePos = pos;
-		LineMesher::writeNodesLine(pos, glCsys, 2, lengthLineC1, direction::y);
-		LineMesher::writeElementsLine(2);
+		LineMesher::writeNodes(pos, glCsys, 2, lengthLineC1, direction::y);
+		LineMesher::writeElements(2);
 		//Upper limit Plane1:
 		linePos = pos + glm::dvec3(heightC1, 0., 0.);
-		LineMesher::writeNodesLine(linePos, glCsys, 2, lengthLineC1, direction::y);
-		LineMesher::writeElementsLine(2);
+		LineMesher::writeNodes(linePos, glCsys, 2, lengthLineC1, direction::y);
+		LineMesher::writeElements(2);
 
 		pos.x += 1.2*sizeC1.x;
 		//Plane 2:
@@ -2401,12 +2462,12 @@ int refinement2dHeight(const std::string& fileName) {
 
 		//Lower limit Plane1:
 		linePos = pos;
-		LineMesher::writeNodesLine(linePos, glCsys, 2, lengthLineC2, direction::y);
-		LineMesher::writeElementsLine(2);
+		LineMesher::writeNodes(linePos, glCsys, 2, lengthLineC2, direction::y);
+		LineMesher::writeElements(2);
 		//Upper limit Plane1:
 		linePos = pos + glm::dvec3(heightC2, 0., 0.);
-		LineMesher::writeNodesLine(linePos, glCsys, 2, lengthLineC2, direction::y);
-		LineMesher::writeElementsLine(2);
+		LineMesher::writeNodes(linePos, glCsys, 2, lengthLineC2, direction::y);
+		LineMesher::writeElements(2);
 
 		pos.z += 10.0;
 		pos.x = 0.0;

@@ -3,6 +3,7 @@
 /output/x64
 /output/x86
 /output/intermediate/x64
+/doxygen
 
 # Prerequisites
 *.d

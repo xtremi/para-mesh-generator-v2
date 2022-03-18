@@ -3,6 +3,30 @@
 #include "RefinementCalculations.h"
 #include "general_utilities.h"
 
+bool skipCheck(int i, int last, node_skip nskip, int skipNth) {
+	if (nskip == node_skip::none) {
+		return false;
+	}
+	if (i == 0) {
+		return nskip == node_skip::first || nskip == node_skip::first_and_last || (skipNth >= 2);
+	}
+	else if (i == (last - 1) && (skipNth < 2)) {
+		return nskip == node_skip::last || nskip == node_skip::first_and_last;
+	}
+	else if (skipNth >= 2) {
+		return !(bool)(i % (int)nskip);
+	}
+	else {
+		return false;
+	}
+}
+
+
+bool MeshDensity1D::skip(int node) const {
+	return skipCheck(node, nnodes, nodeSkip, skipNth);
+}
+
+
 /*
 
      nnodes[0]  nnodes[1] nnodes[2]

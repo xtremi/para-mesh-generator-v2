@@ -69,6 +69,6 @@ public:
 		const glm::dvec3&   normal,
 		node_skip			nskip = node_skip::none);
 
-	static void writeElementsLine(int nnodes, bool closedLoop = false);
+	static void writeElements(int nnodes, bool closedLoop = false);
 };
 

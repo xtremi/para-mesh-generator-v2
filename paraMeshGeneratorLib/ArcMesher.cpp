@@ -132,9 +132,9 @@ void ArcMesher::writeNodes(
 	//MESHER_NODE_WRITE_END
 }
 
-void ArcMesher::writeElementsLine(
+void ArcMesher::writeElements(
 	int			nnodes,
 	bool		closedLoop)
 {
-	return LineMesher::writeElementsLine(nnodes, closedLoop);
+	return LineMesher::writeElements(nnodes, closedLoop);
 }

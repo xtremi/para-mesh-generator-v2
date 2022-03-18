@@ -27,7 +27,7 @@ void QuadStripMesher::writeNodes(
 	}
 
 	for (int i = 0; i < meshDens.dir2(); i++) {
-		LineStripMesher::writeNodesLine(pos, csys, current, meshDensLine);
+		LineStripMesher::writeNodes(pos, csys, current, meshDensLine);
 		for (int i = 0; i < current.nPoints(); i++) {
 			current.points[i] += lineDispl[i];
 		}

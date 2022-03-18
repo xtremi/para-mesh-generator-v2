@@ -2,78 +2,46 @@
 #include "Mesher.h"
 #include "FeaWrite.h"
 
-/*#include "MeshPart.h"
-class Line : public MeshPart1D
-{
-public:
-	Line(double length, glm::dvec3& pos, MeshCsys& csys) : MeshPart1D(){}
-
-private:
-	direction dir;
-};*/
-
-
 
 class LineMesher : private Mesher {
 
 public:
 
-	static void writeNodesLineQ(
+	static void writeNodesQ(
 		const glm::dvec3&		pos,
 		MeshCsys&				spos,
-		int						nnodes,
+		const MeshDensity1D&    meshDens,
 		double					ds,		
-		direction				dir,
-		node_skip				nskip = node_skip::none);
+		direction				dir);
 
-	static void writeNodesLineQ(
+	static void writeNodesQ(
 		const glm::dvec3&		pos,
 		MeshCsys&				spos,
-		int						nnodes,
-		const glm::dvec3&		ds,
-		node_skip				nskip = node_skip::none);
-
-	static void writeNodesLineQ_nth(
-		const glm::dvec3&		pos,
-		MeshCsys&				spos,
-		int						nnodes,
-		double					ds,		
-		//int					skipNth,
-		direction				dir,
-		node_skip				nskip = node_skip::none);
-
-	static void writeNodesLineQ_nth(
-		const glm::dvec3&		pos,
-		MeshCsys&				spos,
-		int						nnodes,
-		const glm::dvec3&		ds,
-		//int					skipNth,
-		node_skip				nskip = node_skip::none);
-
-
-
-	static void writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length,  direction dir, node_skip nskip = node_skip::none);
-	static void writeNodesLine(const glm::dvec3& pos, MeshCsys& csys, int nnodes, const glm::dvec3& sposEnd, node_skip nskip = node_skip::none);
-	static void writeNodesLineXq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dx, node_skip nskip = node_skip::none);
-	static void writeNodesLineYq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dy, node_skip nskip = node_skip::none);
-	static void writeNodesLineZq(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double dz, node_skip nskip = node_skip::none);
-	static void writeNodesLineX(const glm::dvec3& pos, MeshCsys& csys,  int nnodes, double length, node_skip nskip = node_skip::none);
-	static void writeNodesLineY(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, node_skip nskip = node_skip::none);
-	static void writeNodesLineZ(const glm::dvec3& pos, MeshCsys& csys, int nnodes, double length, node_skip nskip = node_skip::none);
-
-	static void writeElementsLine(int nnodes, bool closedLoop = false);
+		const MeshDensity1D&    meshDens,
+		const glm::dvec3&		ds);
 
 	static void writeNodes(const std::vector<glm::dvec2>& xycoords, double zcoord);
 
-	static NodeIterator1D nodeIterator(int nnodes);
 
+	static void writeNodes(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity1D& meshDens, double length, direction dir);
+	static void writeNodes(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity1D& meshDens, const glm::dvec3& sposEnd);
+	static void writeNodesXq(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity1D& meshDens, double dx);
+	static void writeNodesYq(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity1D& meshDens, double dy);
+	static void writeNodesZq(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity1D& meshDens, double dz);
+	static void writeNodesX(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity1D& meshDens, double length);
+	static void writeNodesY(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity1D& meshDens, double length);
+	static void writeNodesZ(const glm::dvec3& pos, MeshCsys& csys, const MeshDensity1D& meshDens, double length);
+
+	static void writeElements(const MeshDensity1D& meshDens);
+
+	static NodeIterator1D nodeIterator(int nnodes);
 };
 
 class LineStripMesher : private Mesher {
 
 public:
 
-	static void writeNodesLine(
+	static void writeNodes(
 		const glm::dvec3&			  pos,
 		MeshCsys&					  csys,
 		const LineStrip&			  lineStrip,

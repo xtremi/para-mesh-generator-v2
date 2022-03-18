@@ -95,5 +95,5 @@ void EllipseMesher::getOrWriteCoordsQ(
 }
 
 void EllipseMesher::writeElements(int nnodes, bool closedLoop) {
-	LineMesher::writeElementsLine(nnodes, closedLoop);
+	LineMesher::writeElements(nnodes, closedLoop);
 }

@@ -160,5 +160,5 @@ void RecEdgeMesher::getOrWriteCoords_nth(
 }
 
 void RecEdgeMesher::writeElements(int nnodes, bool closedLoop) {
-	LineMesher::writeElementsLine(nnodes, closedLoop);
+	LineMesher::writeElements(nnodes, closedLoop);
 }

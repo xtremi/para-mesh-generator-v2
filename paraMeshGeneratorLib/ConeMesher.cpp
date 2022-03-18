@@ -99,7 +99,7 @@ void ConeMesher::writeNodes_nthLine(
 		endPos = coordsOnCircle(currentAng, radius.end(), rotaxis) + pos;
 
 		if (i % skipNth) {
-			LineMesher::writeNodesLine(curPos.pos, csys, meshDens.dir2(), endPos);
+			LineMesher::writeNodes(curPos.pos, csys, meshDens.dir2(), endPos);
 		}
 		currentAng += dang;
 	}
@@ -292,16 +292,16 @@ void ConeMesherRef2::updateLayerData(const RefShapeData& rsData, RefLayerData& r
 }
 void ConeMesherRef2::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	updateLayerData(rsData, rlData, refLayer);
-	LineMesher::writeNodesLineQ(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curConeLineStep);
+	LineMesher::writeNodesQ(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curConeLineStep);
 }
 void ConeMesherRef2::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	updateLayerData(rsData, rlData, refLayer);
-	LineMesher::writeNodesLineQ_nth(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curConeLineStep, node_skip::every_4);
+	LineMesher::writeNodesQ_nth(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curConeLineStep, node_skip::every_4);
 	rlData.curAngleStep *= 2.0;
 }
 void ConeMesherRef2::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer){
 	updateLayerData(rsData, rlData, refLayer + 1);
-	LineMesher::writeNodesLineQ(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowT(refLayer), rlData.curConeLineStep);
+	LineMesher::writeNodesQ(rlData.curLineStartPos, *rsData.csys, rsData.meshDens->nNodesRowT(refLayer), rlData.curConeLineStep);
 }
 
 void ConeMesherRef2::writeElements(const MeshDensity2Dref& meshDens) {
