@@ -37,17 +37,3 @@ public:
 	static NodeIterator1D nodeIterator(int nnodes);
 };
 
-class LineStripMesher : private Mesher {
-
-public:
-
-	static void writeNodes(
-		const glm::dvec3&			  pos,
-		MeshCsys&					  csys,
-		const LineStrip&			  lineStrip,
-		const MeshDensity1DlineStrip& meshDens,
-		node_skip				      skipFirst = node_skip::none);
-
-	static void writeElements(const MeshDensity1DlineStrip& meshDens);
-
-};

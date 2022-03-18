@@ -37,8 +37,21 @@ bool MeshDensity1D::skip(int node) const {
 MeshDensity1DlineStrip::MeshDensity1DlineStrip(const std::vector<int>& nodeDistr, bool _closedLoop)
 	: MeshDensity1D(0, _closedLoop)
 {
-	nodesDistribution = nodeDistr;
-	nnodes = stdVecSum(nodesDistribution) - (nodesDistribution.size() - 1);
+	for (int i = 0; i < segmentMeshDens.size(); i++) {
+		int nNodesSegment = nodeDistr[i];
+		segmentMeshDens.push_back(MeshDensity1D(nNodesSegment, false));
+		if (i == 0) {
+			segmentMeshDens[i].nodeSkip = node_skip::last;
+		}
+		else if (i == (segmentMeshDens.size() - 1)) {
+			segmentMeshDens[i].nodeSkip = node_skip::first;
+		}
+		else {
+			segmentMeshDens[i].nodeSkip = node_skip::first_and_last;
+		}
+	}
+
+	nnodes = stdVecSum(nodeDistr) - (segmentMeshDens.size() - 1);
 }
 
 

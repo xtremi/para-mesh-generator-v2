@@ -139,31 +139,3 @@ NodeIterator1D LineMesher::nodeIterator(int nnodes) {
 }
 
 
-void LineStripMesher::writeNodes(
-	const glm::dvec3& pos,
-	MeshCsys& csys,
-	const LineStrip& lineStrip,
-	const MeshDensity1DlineStrip& meshDens,
-	node_skip					  nskip)
-{
-	MESHER_NODE_WRITE_START
-		int nLineStrips = lineStrip.nLines();
-	node_skip nskipNode = nskip;
-	glm::dvec3 p1, p2;
-
-	for (int i = 0; i < nLineStrips; i++) {
-		lineStrip.getLineEndPoints(i, p1, p2);
-		if (meshDens.closedLoop) {
-			if (i == (nLineStrips - 1)) {
-				nskipNode = node_skip::first_and_last;
-			}
-		}
-		LineMesher::writeNodes(pos + p1, csys, meshDens.nodesDistribution[i], pos + p2, nskipNode);
-		nskipNode = node_skip::first;
-	}
-	MESHER_NODE_WRITE_END
-}
-
-void LineStripMesher::writeElements(const MeshDensity1DlineStrip& meshDens) {
-	LineMesher::writeElements(meshDens.nnodes, meshDens.closedLoop);
-}

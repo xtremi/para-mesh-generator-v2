@@ -85,7 +85,7 @@ struct MeshDensity1D {
 
 struct MeshDensity1DlineStrip : public MeshDensity1D{
 	MeshDensity1DlineStrip(const std::vector<int>& nodeDistr, bool _closedLoop = false);
-	std::vector<int> nodesDistribution;
+	std::vector<MeshDensity1D> segmentMeshDens;
 };
 
 /*
