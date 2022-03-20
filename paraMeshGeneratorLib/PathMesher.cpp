@@ -4,36 +4,34 @@
 
 
 void PathMesher::writeNodes__(
-	const glm::dvec3& pos,
-	MeshCsys&		  csys,
-	int				  nnodes,
-	const Path&		  path,
-	bool			  closedLoop,
-	node_skip		  nskip)
+	const glm::dvec3&    pos,
+	MeshCsys&		     csys,
+	const MeshDensity1D& meshDens,
+	const Path&		     path)
 {
 	MESHER_NODE_WRITE_START
-	for (int i = 0; i < nnodes; i++) {
-		if (!skip(i, nnodes, nskip)) {
-			writer->writeNode(pos + path.position(i, closedLoop ? nnodes + 1 : nnodes), NULL_POS, nullptr, &csys);
+	for (int i = 0; i < meshDens.nnodes; i++) {
+		if (!meshDens.skip(i)) {
+			writer->writeNode(
+				pos + path.position(i, meshDens.closedLoop ? meshDens.nnodes + 1 : meshDens.nnodes), 
+				NULL_POS, nullptr, &csys);
 		}
 	}
 	MESHER_NODE_WRITE_END
 }
 
 void PathMesher::writeNodes(
-	const glm::dvec3& pos,
-	MeshCsys&		  csys,
-	int				  nnodes,
-	const Path&		  path,
-	const VecD&		  requiredNodeLocations,
-	bool			  closedLoop,
-	node_skip		  nskip)
+	const glm::dvec3&    pos,
+	MeshCsys&		     csys,
+	const MeshDensity1D& meshDens,
+	const Path&		     path,
+	const VecD&		     requiredNodeLocations)
 {
 	MESHER_NODE_WRITE_START
 
 	VecI nNodesPerSegment;
 	VecD nodeSpacingPerSegment;
-	if (!calculateNodeSpacing(nnodes, requiredNodeLocations, nNodesPerSegment, nodeSpacingPerSegment, closedLoop)) {
+	if (!calculateNodeSpacing(meshDens.nnodes, requiredNodeLocations, nNodesPerSegment, nodeSpacingPerSegment, meshDens.closedLoop)) {
 		throw("calculateNodeSpacing - failed");
 	}
 
@@ -42,7 +40,7 @@ void PathMesher::writeNodes(
 	for (int j = 0; j < nNodesPerSegment.size(); j++) {
 
 		for(int i = 0; i < nNodesPerSegment[j]; i++){
-			if (!skip(node_i, nnodes, nskip)) {
+			if (!meshDens.skip(i)) {
 				writer->writeNode(pos + path.position(curPathLoc), glm::dvec3(0.), nullptr, &csys);
 			}
 			curPathLoc += nodeSpacingPerSegment[j];
@@ -53,23 +51,21 @@ void PathMesher::writeNodes(
 }
 
 void PathMesher::writeNodes(
-	const glm::dvec3& pos,
-	MeshCsys&		  csys,
-	int				  nnodes,
-	const Path&		  path,
-	bool			  setRequiredNodeLocationAtPathCorners,
-	bool			  closedLoop,
-	node_skip		  nskip)
+	const glm::dvec3&    pos,
+	MeshCsys&		     csys,
+	const MeshDensity1D& meshDens,
+	const Path&			 path,
+	bool				 setRequiredNodeLocationAtPathCorners)
 {
 	if (setRequiredNodeLocationAtPathCorners) {
 		VecD requiredNodeLocatiosn = path.getCornerPathFactors();
-		writeNodes(pos, csys, nnodes, path, requiredNodeLocatiosn, closedLoop, nskip);
+		writeNodes(pos, csys, meshDens, path, requiredNodeLocatiosn);
 	}
 	else{
-		writeNodes__(pos, csys, nnodes, path, closedLoop, nskip);
+		writeNodes__(pos, csys, meshDens, path);
 	}
 }
 
-void PathMesher::writeElements(int nnodes, bool closedLoop) {
-	LineMesher::writeElements(nnodes, closedLoop);
+void PathMesher::writeElements(const MeshDensity1D& meshDens) {
+	LineMesher::writeElements(meshDens);
 }

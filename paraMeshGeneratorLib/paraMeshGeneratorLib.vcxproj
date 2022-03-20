@@ -32,6 +32,7 @@
     <ClInclude Include="general_utilities.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="LineMesher.h" />
+    <ClInclude Include="LineStripMesher.h" />
     <ClInclude Include="math_utilities.h" />
     <ClInclude Include="MeshHbeam3D.h" />
     <ClInclude Include="MeshPart.h" />
@@ -70,6 +71,7 @@
     <ClCompile Include="general_utilities.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="LineMesher.cpp" />
+    <ClCompile Include="LineStripMesher.cpp" />
     <ClCompile Include="math_utilities.cpp" />
     <ClCompile Include="MeshHbeam3D.cpp" />
     <ClCompile Include="MeshPart.cpp">

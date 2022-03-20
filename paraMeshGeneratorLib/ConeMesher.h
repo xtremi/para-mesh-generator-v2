@@ -75,6 +75,7 @@ private:
 		double					curConeLength;
 		double					curRadius;
 		glm::dvec2				curElSize;
+		MeshDensity1D			meshDensB, meshDensM, meshDensT;
 	};
 
 	static void incrementConeStep(const RefShapeData& rsData, RefLayerData& rlData);
@@ -115,6 +116,7 @@ private:
 		double					curAngleStep;
 		glm::dvec3				curConeLineStep;
 		glm::dvec3				curLineStartPos;
+		MeshDensity1D			meshDensB, meshDensM, meshDensT;
 	};
 
 	static void updateLayerData(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);

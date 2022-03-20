@@ -6,6 +6,7 @@
 
 //1d elements
 #include "LineMesher.h"
+#include "LineStripMesher.h"
 #include "ArcMesher.h"
 #include "RecEdgeMesher.h"
 #include "EllipseMesher.h"
@@ -813,26 +814,39 @@ int lineMesher_2(const std::string& fileName) {
 	int		nnodes = 21;
 	double  length = 10.0;
 
-	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x);
+	MeshDensity1D meshDens(nnodes);
+
+	LineMesher::writeNodes(pos, glCsys, meshDens, length, direction::x);
 	LineMesher::writeElements(nnodes);
 	pos.y += 2.0;
-	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::every_2);
+	meshDens.skipNth = 2;
+	LineMesher::writeNodes(pos, glCsys, meshDens, length, direction::x);
 	LineMesher::writeElements(nNodesWithSkip(nnodes, 2));
+	
+	meshDens.skipNth = 3;
 	pos.y += 2.0;
-	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::every_3);
-	LineMesher::writeElements(nNodesWithSkip(nnodes, 3));
+	LineMesher::writeNodes(pos, glCsys, meshDens, length, direction::x);
+	LineMesher::writeElements(meshDens);
+
+	meshDens.skipNth = 4;
 	pos.y += 2.0;
-	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::every_4);
-	LineMesher::writeElements(nNodesWithSkip(nnodes, 4));
+	LineMesher::writeNodes(pos, glCsys, meshDens, length, direction::x);
+	LineMesher::writeElements(meshDens);
+	
+	meshDens.nodeSkip = node_skip::first;
 	pos.y += 2.0;
-	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::first);
-	LineMesher::writeElements(nnodes - 1);
+	LineMesher::writeNodes(pos, glCsys, meshDens, length, direction::x);
+	LineMesher::writeElements(meshDens);
+	
+	meshDens.nodeSkip = node_skip::last;
 	pos.y += 2.0;
-	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::last);
-	LineMesher::writeElements(nnodes - 1);
+	LineMesher::writeNodes(pos, glCsys, meshDens, length, direction::x);
+	LineMesher::writeElements(meshDens);
+	
+	meshDens.nodeSkip = node_skip::first_and_last;
 	pos.y += 2.0;
-	LineMesher::writeNodes(pos, glCsys, nnodes, length, direction::x, node_skip::first_and_last);
-	LineMesher::writeElements(nnodes - 2);
+	LineMesher::writeNodes(pos, glCsys, meshDens, length, direction::x);
+	LineMesher::writeElements(meshDens);
 
 	TEST_END
 }
@@ -1181,7 +1195,7 @@ int recEdgeMesher(const std::string& fileName) {
 	std::vector<glm::dvec2> xycoords(nnodes);
 	RecEdgeMesher::getLocalCoords(xycoords, nnodes, glm::dvec2(60.0, 35.0));
 	LineMesher::writeNodes(xycoords, 10.0);
-	LineMesher::writeElements(nnodes, true);
+	LineMesher::writeElements(MeshDensity1D(nnodes));
 
 	TEST_END
 }
@@ -1207,7 +1221,7 @@ int ellipseMesher(const std::string& fileName) {
 	std::vector<glm::dvec2> localCoords(1500);
 	EllipseMesher::getLocalCoords(localCoords, 1500, EllipseRadius(100.0, 50.0), ArcAngles());
 	LineMesher::writeNodes(localCoords, 4.0);
-	LineMesher::writeElements(1500, true);
+	LineMesher::writeElements(MeshDensity1D(1500));
 
 	TEST_END
 }

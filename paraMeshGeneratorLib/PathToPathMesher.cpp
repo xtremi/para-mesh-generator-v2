@@ -77,18 +77,18 @@ void PathToPathMesher::writeNodes(
 	away from the node in the direction \p directions[i]
 */
 void PathToPathMesher::writeNodesPerimeter(
-	const glm::dvec3&			   pos,
-	MeshCsys&					   csys,
-	const VecGLM3d&				   startCoords 		/*!original coordinates*/,
-	const VecGLM3d&				   directions 		/*!direction from orginal coordinates and out*/,
-	const VecD&					   distances 		/*!max distances from original coordinates and out*/,
-	double						   distanceFactor	/*!the factor to multiply the distances with*/,
-	node_skip					   nskip)
+	const glm::dvec3& pos,
+	MeshCsys&		  csys,
+	const VecGLM3d&	  startCoords 		/*!original coordinates*/,
+	const VecGLM3d&	  directions 		/*!direction from orginal coordinates and out*/,
+	const VecD&		  distances 		/*!max distances from original coordinates and out*/,
+	double			  distanceFactor	/*!the factor to multiply the distances with*/,
+	node_skip		  nskip)
 {
 	int nNodes = startCoords.size();
 	glm::dvec3 curCoord, curStep;
 	for (int i = 0; i < nNodes; i++) {
-		if (!skip(i, nNodes, nskip)) {
+		if (!skipCheck(i, nNodes, node_skip::none, (int)nskip)) {
 			curCoord = startCoords[i] + distanceFactor * distances[i] * directions[i];
 			Mesher::writer->writeNode(pos + curCoord, NULL_POS, nullptr, &csys);
 		}

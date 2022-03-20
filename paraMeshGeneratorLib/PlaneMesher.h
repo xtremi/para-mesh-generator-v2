@@ -95,6 +95,9 @@ private:
 	struct RefLayerData {
 		glm::dvec3				curPos;
 		glm::dvec2				curElSize;
+		MeshDensity1D			meshDensB;
+		MeshDensity1D			meshDensM;
+		MeshDensity1D			meshDensT;
 	};
 
 	static void writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer);

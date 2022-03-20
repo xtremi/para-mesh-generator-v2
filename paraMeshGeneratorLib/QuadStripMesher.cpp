@@ -1,6 +1,7 @@
 #include "QuadStripMesher.h"
 #include "PlaneMesher.h"
 #include "LineMesher.h"
+#include "LineStripMesher.h"
 
 /*!
 	Writes nodes along line strips

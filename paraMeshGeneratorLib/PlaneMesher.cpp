@@ -16,8 +16,9 @@ MESHER_NODE_WRITE_START
 	direction dir1, dir2;
 	getPlaneDirections(pln, dir1, dir2);
 
+	MeshDensity1D meshDens1D(meshDens.dir1());
 	for (int i2 = 0; i2 < meshDens.dir2(); i2++){
-		LineMesher::writeNodesQ(curPos, csys, meshDens.dir1(), dsize.x, dir1);
+		LineMesher::writeNodesQ(curPos, csys, meshDens1D, dsize.x, dir1);
 		curPos[(size_t)dir2] += dsize.y;
 	}
 MESHER_NODE_WRITE_END
@@ -91,10 +92,11 @@ MESHER_NODE_WRITE_START
 	//The index of dsize that holds the step size between nodes in the nonSkipDir:
 	int local_y			= skipAlongDir1 ? 1 : 0;
 
+	MeshDensity1D meshDens1D(nRowNotSkip);
 	for (int i = 0; i < nRowSkip; i++) {
 		curPos[(int)skipDir] = pos[(int)skipDir] + (double)i*dsize[local_x];
 		if (i % skipNth) {
-			LineMesher::writeNodesQ(curPos, csys, nRowNotSkip, dsize[local_y], nonSkipDir);
+			LineMesher::writeNodesQ(curPos, csys, meshDens1D, dsize[local_y], nonSkipDir);
 		}
 	}
 MESHER_NODE_WRITE_END
@@ -342,7 +344,11 @@ void PlaneMesherRef::writeNodes(
 		rlData.curPos[(size_t)rsData.refDir] += rlData.curElSize.x;
 	}
 
+	rlData.meshDensM.skipNth = 4;
 	for(int refLayer = 0; refLayer < meshDens.nRefs(); refLayer++){
+		rlData.meshDensB.nnodes = rsData.meshDens->nNodesRowB(refLayer);
+		rlData.meshDensM.nnodes = rsData.meshDens->nNodesRowB(refLayer);
+		rlData.meshDensT.nnodes = rsData.meshDens->nNodesRowT(refLayer);
 		writeNodes_layerB(rsData, rlData, refLayer);
 		writeNodes_layerM(rsData, rlData, refLayer);
 		writeNodes_layerT(rsData, rlData, refLayer);
@@ -353,18 +359,18 @@ void PlaneMesherRef::writeNodes(
 
 //row b: x--x--x--x--x--x--x--x--x
 void PlaneMesherRef::writeNodes_layerB(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
-	LineMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curElSize.y, rsData.edgeDir);
+	LineMesher::writeNodesQ(rlData.curPos, *rsData.csys, rlData.meshDensB, rlData.curElSize.y, rsData.edgeDir);
 	rlData.curPos[(size_t)rsData.refDir] += rlData.curElSize.x;
 }
 //row m:  |  x--x--x  |  x--x--x  |
 void PlaneMesherRef::writeNodes_layerM(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
-	LineMesher::writeNodesQ_nth(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowB(refLayer), rlData.curElSize.y, rsData.edgeDir, node_skip::every_4);
+	LineMesher::writeNodesQ(rlData.curPos, *rsData.csys, rlData.meshDensM, rlData.curElSize.y, rsData.edgeDir);
 	rlData.curPos[(size_t)rsData.refDir] += rlData.curElSize.x;
 }
 //row t: x----x----x----x----x
 void PlaneMesherRef::writeNodes_layerT(const RefShapeData& rsData, RefLayerData& rlData, int refLayer) {
 	rlData.curElSize.y *= 2.0;
-	LineMesher::writeNodesQ(rlData.curPos, *rsData.csys, rsData.meshDens->nNodesRowT(refLayer), rlData.curElSize.y, rsData.edgeDir);
+	LineMesher::writeNodesQ(rlData.curPos, *rsData.csys, rlData.meshDensT, rlData.curElSize.y, rsData.edgeDir);
 	rlData.curElSize.x *= 2.0;
 	rlData.curPos[(size_t)rsData.refDir] += rlData.curElSize.x;
 }

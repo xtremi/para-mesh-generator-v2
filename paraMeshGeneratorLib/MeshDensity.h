@@ -74,10 +74,11 @@ NOT USED
 	Mesh density for 1D structured mesh with element number function and closed loop definition
 */
 struct MeshDensity1D {
+	MeshDensity1D(){}
 	MeshDensity1D(int _nnodes, bool _closedLoop = false) : nnodes{ _nnodes }, closedLoop{ _closedLoop }{}
 	int nEl() const { return closedLoop ? nnodes : nnodes - 1; }
-	bool closedLoop;
-	int nnodes;
+	bool closedLoop = false;
+	int nnodes = 2;
 	int skipNth = 0;
 	node_skip nodeSkip = node_skip::none;
 	bool skip(int node) const;

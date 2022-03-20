@@ -3,35 +3,27 @@
 #include "FeaWrite.h"
 #include "Path.h"
 
-
-
 class PathMesher : private Mesher {
 public:
 	static void writeNodes(
-		const glm::dvec3& pos,
-		MeshCsys&		  csys,
-		int				  nnodes,
-		const Path&		  path,
-		const VecD&		  requiredNodeLocation,
-		bool			  closedLoop = false,
-		node_skip		  nskip = node_skip::none);
+		const glm::dvec3&	 pos,
+		MeshCsys&			 csys,
+		const MeshDensity1D& meshDens,
+		const Path&		     path,
+		const VecD&		     requiredNodeLocation);
 
 	static void writeNodes(
-		const glm::dvec3& pos,
-		MeshCsys&		  csys,
-		int				  nnodes,
-		const Path&		  path,
-		bool			  setRequiredNodeLocationAtPathCorners,
-		bool			  closedLoop = false,
-		node_skip		  nskip = node_skip::none);
+		const glm::dvec3&    pos,
+		MeshCsys&		     csys,
+		const MeshDensity1D& meshDens,
+		const Path&		     path,
+		bool			     setRequiredNodeLocationAtPathCorners);
 
 	static void writeNodes__(
-		const glm::dvec3& pos,
-		MeshCsys&		  csys,
-		int				  nnodes,
-		const Path&		  path,
-		bool			  closedLoop = false,
-		node_skip		  nskip = node_skip::none);
+		const glm::dvec3&    pos,
+		MeshCsys&		     csys,
+		const MeshDensity1D& meshDens,
+		const Path&		     path);
 
-	static void writeElements(int nnodes, bool closedLoop = false);
+	static void writeElements(const MeshDensity1D& meshDens);
 };

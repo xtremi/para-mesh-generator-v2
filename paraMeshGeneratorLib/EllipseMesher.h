@@ -6,36 +6,36 @@ class EllipseMesher :	public Mesher
 {
 public:
 	static void writeNodes(
-		const glm::dvec3&		pos,
-		MeshCsys&				csys,
-		int						nnodes,
-		const EllipseRadius&	radius,
-		const ArcAngles& 		arcAngles,
-		direction				rotAxis);
+		const glm::dvec3&	 pos,
+		MeshCsys&			 csys,
+		const MeshDensity1D& meshDens,
+		const EllipseRadius& radius,
+		const ArcAngles& 	 arcAngles,
+		direction			 rotAxis);
 	
 	static void writeNodesQ(
-		const glm::dvec3&		pos,
-		MeshCsys&				csys,
-		int						nnodes,
-		const EllipseRadius&	radius,
-		double					startAng,
-		double					dAng,
-		direction				rotAxis);
+		const glm::dvec3&	 pos,
+		MeshCsys&			 csys,
+		const MeshDensity1D& meshDens,
+		const EllipseRadius& radius,
+		double				 startAng,
+		double				 dAng,
+		direction			 rotAxis);
 
 	static void getLocalCoords(
 		std::vector<glm::dvec2>& coords,
-		int						 nnodes,
+		const MeshDensity1D&	 meshDens,
 		const EllipseRadius&	 radius,
 		const ArcAngles& 		 arcAngles);
 
 	static void getLocalCoordsQ(
 		std::vector<glm::dvec2>& coords,
-		int						 nnodes,
+		const MeshDensity1D&	 meshDens,
 		const EllipseRadius&	 radius,
 		double					 startAng,
 		double					 dAng);
 
-	static void writeElements(int nnodes, bool closedLoop = true);
+	static void writeElements(const MeshDensity1D& meshDens);
 
 private:
 	static void getOrWriteCoords(
@@ -43,7 +43,7 @@ private:
 		const glm::dvec3&		 pos,
 		MeshCsys&				 csys,
 		std::vector<glm::dvec2>& coords,
-		int						 nnodes,
+		const MeshDensity1D&	 meshDens,
 		const EllipseRadius&	 radius,
 		const ArcAngles& 		 arcAngles,
 		direction				 rotAxis);
@@ -53,7 +53,7 @@ private:
 		const glm::dvec3&		 pos,
 		MeshCsys&				 csys,
 		std::vector<glm::dvec2>& coords,
-		int						 nnodes,
+		const MeshDensity1D&	 meshDens,
 		const EllipseRadius&	 radius,
 		double					 startAng,
 		double					 dAng,

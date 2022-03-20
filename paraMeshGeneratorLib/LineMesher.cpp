@@ -34,7 +34,7 @@ void LineMesher::writeNodes(const glm::dvec3& pos, MeshCsys& csys, const MeshDen
 
 void LineMesher::writeNodesQ(
 	const glm::dvec3&	 pos,
-	MeshCsys&			 spos,
+	MeshCsys&			 csys,
 	const MeshDensity1D& meshDens,
 	double			     ds,	
 	direction		     dir)
@@ -42,7 +42,7 @@ void LineMesher::writeNodesQ(
 MESHER_NODE_WRITE_START
 	for (int i = 0; i < meshDens.nnodes; i++) {
 		if(!meshDens.skip(i)){
-			writer->writeNode(curPos, glm::dvec3(0.), nullptr, &spos);
+			writer->writeNode(curPos, glm::dvec3(0.), nullptr, &csys);
 		}
 		curPos[(size_t)dir] += ds;
 	}
