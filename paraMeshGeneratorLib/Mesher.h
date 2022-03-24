@@ -4,10 +4,6 @@
 #include "MeshDensity.h"
 #include "Shapes.h"
 
-
-
-
-
 #define MESHER_NODE_WRITE_START int firstNode = writer->getNextNodeID(); glm::dvec3 curPos(pos);
 #define MESHER_NODE_WRITE_END Mesher::nodeID1 = firstNode;
 
