@@ -438,8 +438,8 @@ void writeXYZplanes(MeshCsys& csys, const MeshDensity2D& meshDens, const glm::dv
 	PlaneMesher::writeElements(meshDens);
 }
 
-static const int nCubesSpeedTest = 50;
-static const int nNodesCubeSpeedTest = 30;
+static const int nCubesSpeedTest = 20;
+static const int nNodesCubeSpeedTest = 10;
 int speedTestWriteCubes(const std::string& fileName) {
 	TEST_START
 

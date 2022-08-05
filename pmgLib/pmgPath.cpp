@@ -1,5 +1,7 @@
-#include "Path.h"
+#include "pmgPath.h"
 #include <algorithm> // std::min_element
+
+using namespace pmg;
 
 /*!
 	This is currently used for PathLineStrip (but could have more use later. TBD.)
@@ -19,7 +21,7 @@
 	The returned size of \p nodesPerSegment and \p nodeSpacingPerSegment vectors
 	are the same size as \p requiredLocations
 */
-bool calculateNodeSpacing(
+bool pmg::calculateNodeSpacing(
 	int			totalNodes				/*!Total number of nodes*/,
 	const VecD& requiredLocations		/*!Required locations [0.0 -> 1.0] where a nodes is required*/,
 	VecI&		nodesPerSegment			/*!Calculated number of nodes between each req. locations (segment)*/,
@@ -97,7 +99,10 @@ bool calculateNodeSpacing(
 	return true;
 }
 
-
+/*!
+	Returns a vector of the coordinates or tangents of each
+	node along a path.
+*/
 VecGLM3d Path::getPathCoordsOrTangents(
 	pos_or_tangent	posOrTangent,
 	int				totalNodes,
@@ -129,7 +134,7 @@ VecGLM3d Path::getPathCoordsOrTangents(
 	}
 	else {
 		for (int i = 0; i < totalNodes; i++) {
-			if(posOrTangent == pos_or_tangent::position){
+			if (posOrTangent == pos_or_tangent::position) {
 				result.push_back(position(i, closedLoop ? totalNodes + 1 : totalNodes));
 			}
 			else {
@@ -208,7 +213,7 @@ VecGLM3d Path::getPathCoordinates(
 			totalNodes = numberOfNodes;
 		}
 		for (int i = 0; i < totalNodes; i++) {
-			coordinates.push_back(position(i, closedLoop ? totalNodes + 1: totalNodes));
+			coordinates.push_back(position(i, closedLoop ? totalNodes + 1 : totalNodes));
 		}
 	}
 
@@ -247,7 +252,7 @@ glm::dvec3 PathAxis::tangent(double pathPercentage) const {
 PathLinear::PathLinear(const glm::dvec3& dir, double _length)
 	: pathDirection{ glm::normalize(dir) }, pathLength{ _length }{}
 PathLinear::PathLinear(const glm::dvec3& vector)
-	: pathDirection{ glm::normalize(vector) }, pathLength{glm::length(vector)}{}
+	: pathDirection{ glm::normalize(vector) }, pathLength{ glm::length(vector) }{}
 glm::dvec3 PathLinear::position(double pathPercentage) const {
 	return pathDirection * pathLength * pathPercentage;
 }
@@ -280,7 +285,7 @@ glm::dvec3 PathSine::tangent(double percentage) const {
 	return t;
 }
 /*really bad approximation*/
-double PathSine::length() const { 
+double PathSine::length() const {
 	double waveLength = GLM2PI / omega;
 	double nWaves = pathLength / waveLength;
 	return 2. * amplitude * nWaves + pathLength;
@@ -288,7 +293,7 @@ double PathSine::length() const {
 
 
 /*PathCircular*/
-PathCircular::PathCircular(
+PathArc::PathArc(
 	double			  rad		/*!Circle radius*/,
 	const glm::dvec3& normal	/*!Circle normal*/,
 	const glm::dvec3& pXZ		/*!Point on XZ plane (Z is the normal)*/,
@@ -311,15 +316,15 @@ PathCircular::PathCircular(
 	if (end < 0.0) end = GLM2PI;
 }
 
-glm::dvec3 PathCircular::position(double pathPercentage) const {
+glm::dvec3 PathArc::position(double pathPercentage) const {
 	double angle = pathPercentage * this->angleSize();
 	return coordsOnCircleQ(angle, radius, directionX, directionY);
 }
-glm::dvec3 PathCircular::tangent(double pathPercentage) const {
+glm::dvec3 PathArc::tangent(double pathPercentage) const {
 	double angle = pathPercentage * GLM2PI;
 	return tangentOnCircleQ(angle, radius, directionX, directionY);
 }
-double PathCircular::length() const {
+double PathArc::length() const {
 	return radius * std::abs(end - start);
 }
 
@@ -337,7 +342,7 @@ PathLineStrip::PathLineStrip(const std::vector<glm::dvec3>& _points)
 		totalLength += currentsegment.length;
 		segments.push_back(currentsegment);
 	}
-	
+
 	double lengthAtSegmentStart = 0.;
 	for (Segment& segment : segments) {
 		segment.segmentFactor = segment.length / totalLength;
@@ -345,17 +350,17 @@ PathLineStrip::PathLineStrip(const std::vector<glm::dvec3>& _points)
 		lengthAtSegmentStart += segment.length;
 		segment.endFactor = lengthAtSegmentStart / totalLength;
 	}
-	
+
 }
 
-glm::dvec3 PathLineStrip::position(double pathPercentage) const 
+glm::dvec3 PathLineStrip::position(double pathPercentage) const
 {
 	if (pathPercentage < 0.0) pathPercentage = 0.0;
 	if (pathPercentage > 1.0) pathPercentage = 1.0;
 
 	int pointIndex = 0;
 	for (const Segment& segment : segments) {
-		
+
 		if (pathPercentage <= segment.endFactor) {
 
 			double factorOfCurrentPath = pathPercentage - segment.startFactor;
@@ -433,7 +438,7 @@ glm::dvec3 PathComposite::position(double pathPercentage) const {
 			break;
 		}
 		currentPosition += paths[pathIndex]->position(1.);
-		
+
 		pathIndex++;
 	}
 }

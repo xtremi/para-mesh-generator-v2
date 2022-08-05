@@ -1,25 +1,27 @@
-#include "math_utilities.h"
+#include "pmgMath.h"
 #include "glm/gtc/constants.hpp"
 
-const double GLMPI = glm::pi<double>();
-const double GLM2PI = glm::pi<double>()*2.0;
-const glm::dvec3 X_DIR = glm::dvec3(1.0, 0.0, 0.0);
-const glm::dvec3 Y_DIR = glm::dvec3(0.0, 1.0, 0.0);
-const glm::dvec3 Z_DIR = glm::dvec3(0.0, 0.0, 1.0);
-const glm::dvec3 NULL_DIR = glm::dvec3(0.0, 0.0, 0.0);
-const glm::dvec3 NULL_POS = NULL_DIR;
-const glm::mat3x3 UNIT_MAT_3x3 = glm::dmat3x3(1.0);
+using namespace pmg;
+
+const double pmg::GLMPI = glm::pi<double>();
+const double pmg::GLM2PI = glm::pi<double>()*2.0;
+const glm::dvec3 pmg::X_DIR = glm::dvec3(1.0, 0.0, 0.0);
+const glm::dvec3 pmg::Y_DIR = glm::dvec3(0.0, 1.0, 0.0);
+const glm::dvec3 pmg::Z_DIR = glm::dvec3(0.0, 0.0, 1.0);
+const glm::dvec3 pmg::NULL_DIR = glm::dvec3(0.0, 0.0, 0.0);
+const glm::dvec3 pmg::NULL_POS = pmg::NULL_DIR;
+const glm::mat3x3 pmg::UNIT_MAT_3x3 = glm::dmat3x3(1.0);
 
 /*
 	returns val^2
 */
-double pow2(double val) {
+double pmg::pow2(double val) {
 	return std::pow(val, 2.0);
 }
 /*!
 	returns 2^exponent
 */
-int twoPow(int exponent) {
+int pmg::twoPow(int exponent) {
 	return (int)std::pow((double)2, (double)exponent);
 }
 
@@ -29,7 +31,7 @@ int twoPow(int exponent) {
 
 	Based on: https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
 */
-glm::dmat3x3 makeCsysMatrix(const glm::dvec3& _rotAxis, double angle) {
+glm::dmat3x3 pmg::makeCsysMatrix(const glm::dvec3& _rotAxis, double angle) {
 
 	glm::dvec3 rotAxis = glm::normalize(_rotAxis);
 	
@@ -57,7 +59,7 @@ glm::dmat3x3 makeCsysMatrix(const glm::dvec3& _rotAxis, double angle) {
 	Creates a rotation matrix that defines a coordinate system
 	with x-axis \p dirX and with \p pXY laying on the xy-plane.
 */
-glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
+glm::dmat3x3 pmg::makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
 
 	glm::dvec3 xAxis = glm::normalize(dirX);
 	glm::dvec3 yAxis = glm::normalize(pXY);
@@ -79,7 +81,7 @@ glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
 
 	If \p endAng and \p startAng are negative, the circle is considered full.
 */
-double calcArcIncrement(double startAng, double endAng, int nnodes) {
+double pmg::calcArcIncrement(double startAng, double endAng, int nnodes) {
 	double dang;
 
 	bool fullCircle = false;
@@ -109,7 +111,7 @@ double calcArcIncrement(double startAng, double endAng, int nnodes) {
 /*!
 	??
 */
-bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes) {
+bool pmg::limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes) {
 	bool fullCircle = false;
 	if (endAng < 0.0 && startAng < 0.0)
 		fullCircle = true;
@@ -128,12 +130,12 @@ bool limitArcAngles(double& startAng, double& endAng, double& dang, int nnodes) 
 	return fullCircle;
 }
 
-glm::dvec2 coordsOnEllipseXY(double angle, double rad1, double rad2) {
+glm::dvec2 pmg::coordsOnEllipseXY(double angle, double rad1, double rad2) {
 	//return glm::dvec2(rad1 * glm::sin(angle), rad2 * glm::cos(angle));
 	return glm::dvec2(rad1 * glm::cos(angle), rad2 * glm::sin(angle));
 }
 
-glm::dvec2 coordsOnCircleXY(double angle, double rad) {
+glm::dvec2 pmg::coordsOnCircleXY(double angle, double rad) {
 	//return rad * glm::dvec2(glm::sin(angle), glm::cos(angle));
 	return rad * glm::dvec2(glm::cos(angle), glm::sin(angle));
 }
@@ -166,7 +168,7 @@ glm::dvec2 coordsOnCircleXY(double angle, double rad) {
 
 	Based on https://stackoverflow.com/a/4914148/4572356
 */
-glm::dvec3 circleCenterXY(const glm::dvec3& p1, const glm::dvec3& p2, double radius) {
+glm::dvec3 pmg::circleCenterXY(const glm::dvec3& p1, const glm::dvec3& p2, double radius) {
 
 	double q = glm::distance(p1, p2);
 	glm::dvec3 p3 = (p1 + p2) / 2.0;		//Point in the center of p1 and p2
@@ -175,8 +177,8 @@ glm::dvec3 circleCenterXY(const glm::dvec3& p1, const glm::dvec3& p2, double rad
 	radius = std::abs(radius);
 
 	glm::dvec3 center;
-	center.x = p3.x + d * std::sqrt(pow2(radius) + pow2(q / 2.)) * (p1.y - p2.y) / q;
-	center.y = p3.y + d * std::sqrt(pow2(radius) + pow2(q / 2.)) * (p2.x - p1.x) / q;
+	center.x = p3.x + d * std::sqrt(pmg::pow2(radius) + pmg::pow2(q / 2.)) * (p1.y - p2.y) / q;
+	center.y = p3.y + d * std::sqrt(pmg::pow2(radius) + pmg::pow2(q / 2.)) * (p2.x - p1.x) / q;
 	center.z = 0.0;
 	return center;
 }
@@ -188,7 +190,7 @@ glm::dvec3 circleCenterXY(const glm::dvec3& p1, const glm::dvec3& p2, double rad
 
 	Based on: https://stackoverflow.com/questions/69098266/calculate-circle-center-3d-from-2-point-arc-angle-and-plane-normal
 */
-glm::dvec3 circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, const glm::dvec3 normal, double radius) {
+glm::dvec3 pmg::circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, const glm::dvec3 normal, double radius) {
 
 	/*
 	    P2                
@@ -208,7 +210,7 @@ glm::dvec3 circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, const glm::d
 	dirP1P2	 = glm::normalize(p2 - p1);
 	distP1P2 = glm::distance(p1, p2);
 	dirMC	 = glm::normalize(glm::cross(normal, dirP1P2));
-	distMC	 = std::sqrt(pow2(radius) - pow2(distP1P2 / 2.0));
+	distMC	 = std::sqrt(pmg::pow2(radius) - pmg::pow2(distP1P2 / 2.0));
 
 	glm::dvec3 M = (p1 + p2) / 2.;
 	glm::dvec3 center = M + distMC * dirMC;
@@ -222,7 +224,7 @@ glm::dvec3 circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, const glm::d
 	This assume the x-axis is 0 deg 
 	(Offset passed is added to resulting angle.)
 */
-double angleOfPointOnCircle(const glm::dvec3& p, const glm::dvec3& center, double offset) {
+double pmg::angleOfPointOnCircle(const glm::dvec3& p, const glm::dvec3& center, double offset) {
 	return std::atan2(p.y - center.y, p.x - center.x) + offset;
 }
 
@@ -235,35 +237,35 @@ double angleOfPointOnCircle(const glm::dvec3& p, const glm::dvec3& center, doubl
 
 	Based on: https://math.stackexchange.com/a/73242/464816
 */
-glm::dvec3 coordsOnCircle(double angle, double radius,
+glm::dvec3 pmg::coordsOnCircle(double angle, double radius,
 	const glm::dvec3& normal, const glm::dvec3& dirX)
 {
 	glm::dvec3 dx = glm::normalize(dirX);
 	glm::dvec3 n  = glm::normalize(n);
 	glm::dvec3 dy = glm::cross(n, dx);
 	dy = glm::normalize(dy);
-	return coordsOnCircleQ(angle, radius, dx, dy);
+	return pmg::coordsOnCircleQ(angle, radius, dx, dy);
 }
-glm::dvec3 tangetOnCircle(double angle, double radius,
+glm::dvec3 pmg::tangentOnCircle(double angle, double radius,
 	const glm::dvec3& normal, const glm::dvec3& dirX)
 {
 	glm::dvec3 dx = glm::normalize(dirX);
 	glm::dvec3 n = glm::normalize(n);
 	glm::dvec3 dy = glm::cross(n, dx);
 	dy = glm::normalize(dy);
-	return tangentOnCircleQ(angle, radius, dx, dy);
+	return pmg::tangentOnCircleQ(angle, radius, dx, dy);
 }
 /*!
 	Similar to coordsOnCircle() but can be used when dirX and dirY are known.
 	dirX and dirY are assumed to already be normalized
 
 */
-glm::dvec3 coordsOnCircleQ(double angle, double radius,
+glm::dvec3 pmg::coordsOnCircleQ(double angle, double radius,
 	const glm::dvec3& dirX, const glm::dvec3& dirY)
 {
 	return radius * glm::cos(angle) * dirX + radius * glm::sin(angle) * dirY;
 }
-glm::dvec3 tangentOnCircleQ(double angle, double radius,
+glm::dvec3 pmg::tangentOnCircleQ(double angle, double radius,
 	const glm::dvec3& dirX, const glm::dvec3& dirY)
 {
 	return - glm::sin(angle) * dirX + glm::cos(angle) * dirY;

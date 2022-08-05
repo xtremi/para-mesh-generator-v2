@@ -1,6 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
 
+namespace pmg{
+enum class direction { x, y, z, custom };
+
 extern const double GLMPI;
 extern const double GLM2PI;
 extern const glm::dvec3 X_DIR;
@@ -38,7 +41,7 @@ glm::dvec3 circleCenter(const glm::dvec3& p1, const glm::dvec3& p2, const glm::d
 
 glm::dvec3 coordsOnCircle(double angle, double radius,
 	const glm::dvec3& normal, const glm::dvec3& dirX);
-glm::dvec3 tangetOnCircle(double angle, double radius,
+glm::dvec3 tangentOnCircle(double angle, double radius,
 	const glm::dvec3& normal, const glm::dvec3& dirX);
 glm::dvec3 coordsOnCircleQ(double angle, double radius,
 	const glm::dvec3& dirX, const glm::dvec3& dirY);
@@ -46,3 +49,5 @@ glm::dvec3 tangentOnCircleQ(double angle, double radius,
 	const glm::dvec3& dirX, const glm::dvec3& dirY);
 
 double angleOfPointOnCircle(const glm::dvec3& p, const glm::dvec3& center, double offset = 0.);
+
+}
