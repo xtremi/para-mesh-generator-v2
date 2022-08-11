@@ -55,6 +55,8 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
+#define pmgptr std::shared_ptr
+
 namespace pmg{
 class Surface {
 private:
@@ -68,27 +70,35 @@ private:
 */
 class BoundedSurface : public Surface {
 private:
-	std::shared_ptr<pmg::Path> outer, inner;
+	pmgptr<pmg::Path> outer, inner;
 	bool closedLoop = false;
 };
 
 class ExtrudedSurface {
 private:
 	BoundedSurface surface;
-	std::shared_ptr<pmg::Path> extrudePath;
+	pmgptr<pmg::Path> extrudePath;
 };
 
-class MeshDensity1D{
+class NodeIterator1D{};
+class NodeIterator2D{};
+
+
+class MeshDensity {};
+class MeshDensity1D : public MeshDensity {
 public:
 	int x;
+	NodeIterator1D getNodeIter();
 };
-class MeshDensity2D : public MeshDensity1D {
+class MeshDensity2D : public MeshDensity {
 public:
-	int y;
+	int x, y;
+	NodeIterator1D getNodeIter(int edge);
 };
-class MeshDensity3D : public MeshDensity2D {
+class MeshDensity3D : public MeshDensity {
 public:
-	int z;
+	int x,y,z;
+	NodeIterator2D getNodeIter(int face);
 };
 
 class FEAwriter {};
@@ -96,11 +106,43 @@ class NastranWriter : public FEAwriter {};
 
 class Csys {};
 
+
+class Mesh {
+public:
+	int		  firstNodeID;
+	int		  firstElementID;
+	pmg::Csys csys;
+};
+
+class Mesh1D : public Mesh {
+public:
+	pmg::MeshDensity1D	meshDensity;
+};
+class Mesh2D : public Mesh {
+public:
+	pmg::MeshDensity2D	meshDensity;
+};
+class Mesh3D : public Mesh {
+public:
+	pmg::MeshDensity3D	meshDensity;
+};
+
+
+
 class Mesher {
 public:
-	void write(const pmg::Path&    path, const pmg::MeshDensity1D& meshDensity, const pmg::Csys& csys);
-	void write(const pmg::Surface& path, const pmg::MeshDensity2D& meshDensity, const pmg::Csys& csys);
-	void write(const pmg::Path&    path, const pmg::MeshDensity3D& meshDensity, const pmg::Csys& csys);
+	void setFEAwriter(pmgptr<FEAwriter> _writer);
+
+	void write(Mesh1D& mesh);
+	void write(Mesh2D& mesh);
+	void write(Mesh3D& mesh);
+
+	void write(const Mesh1D& mesh1, const Mesh1D mesh2);
+	void write(const Mesh2D& mesh1, const Mesh2D mesh2, int edge1, int edge2);
+	void write(const Mesh3D& mesh1, const Mesh3D mesh2, int face1, int face2);
+
+private:
+	pmgptr<FEAwriter> writer;
 };
 
 }
