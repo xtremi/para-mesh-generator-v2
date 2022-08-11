@@ -31,6 +31,7 @@
     <ClInclude Include="FeaWrite.h" />
     <ClInclude Include="general_utilities.h" />
     <ClInclude Include="Geometry.h" />
+    <ClInclude Include="Test_refinementCalculation.h" />
     <ClInclude Include="LineMesher.h" />
     <ClInclude Include="LineStripMesher.h" />
     <ClInclude Include="math_utilities.h" />
@@ -56,6 +57,9 @@
     <ClInclude Include="RefinementCalculations.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="string_utilities.h" />
+    <ClInclude Include="Test_convinient_functions.h" />
+    <ClInclude Include="Test_meshDensity.h" />
+    <ClInclude Include="Test_speed.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArcMesher.cpp" />
@@ -100,6 +104,10 @@
     <ClCompile Include="RefinementCalculations.cpp" />
     <ClCompile Include="Shapes.cpp" />
     <ClCompile Include="string_utilities.cpp" />
+    <ClCompile Include="Test_convinient_functions.cpp" />
+    <ClCompile Include="Test_meshDensity.cpp" />
+    <ClCompile Include="Test_refinementCalculation.cpp" />
+    <ClCompile Include="Test_speed.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -31,6 +31,9 @@
     <Filter Include="MeshParts\source">
       <UniqueIdentifier>{3e3ea781-cbc4-41d0-8859-29c349ff82fa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{be809fb8-dbb5-4f58-9b4a-1f098ef8dcc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math_utilities.h">
@@ -144,6 +147,18 @@
     <ClInclude Include="LineStripMesher.h">
       <Filter>Meshers\header</Filter>
     </ClInclude>
+    <ClInclude Include="Test_speed.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Test_convinient_functions.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Test_meshDensity.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Test_refinementCalculation.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeaWrite.cpp">
@@ -256,6 +271,18 @@
     </ClCompile>
     <ClCompile Include="LineStripMesher.cpp">
       <Filter>Meshers\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Test_speed.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Test_convinient_functions.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Test_meshDensity.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Test_refinementCalculation.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
