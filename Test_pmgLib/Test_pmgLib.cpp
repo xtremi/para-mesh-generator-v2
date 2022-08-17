@@ -101,8 +101,7 @@ public:
 	NodeIterator2D getNodeIter(int face);
 };
 
-class FEAwriter {};
-class NastranWriter : public FEAwriter {};
+
 
 class Csys {};
 
@@ -131,7 +130,7 @@ public:
 
 class Mesher {
 public:
-	void setFEAwriter(pmgptr<FEAwriter> _writer);
+	void setFEAwriter(pmgptr<MeshWriter> _writer);
 
 	void write(Mesh1D& mesh);
 	void write(Mesh2D& mesh);
@@ -142,7 +141,7 @@ public:
 	void write(const Mesh3D& mesh1, const Mesh3D mesh2, int face1, int face2);
 
 private:
-	pmgptr<FEAwriter> writer;
+	pmgptr<MeshWriter> writer;
 };
 
 }
