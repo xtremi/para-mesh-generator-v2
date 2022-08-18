@@ -2,12 +2,17 @@
 #include <vector>
 #include <set>
 #include "pmgPath.h"
+#include "pmgMeshWriter.h"
 
 int test_pmgPath01(const std::string& filepath);
+int test_pmgMeshWriter01(const std::string& filepath);
+int test_pmgMesherPath01(const std::string& filepath);
 
 
 std::vector<TestDef> testFunctions({
-	TestDef(10, "test_pmgPath01", "pmgPath", (testFunction)test_pmgPath01),
+	TestDef(1000, "test_pmgPath01", "pmgPath", (testFunction)test_pmgPath01),
+	TestDef(1100, "test_pmgMeshWriter01", "pmgMeshWriter", (testFunction)test_pmgMeshWriter01),
+	TestDef(1200, "test_pmgMesherPath01", "pmgMesherPath", (testFunction)test_pmgMesherPath01),
 });
 
 
@@ -87,6 +92,8 @@ class NodeIterator2D{};
 class MeshDensity {};
 class MeshDensity1D : public MeshDensity {
 public:
+	MeshDensity1D() {}
+	MeshDensity1D(int nx) { x = nx; }
 	int x;
 	NodeIterator1D getNodeIter();
 };
@@ -101,36 +108,39 @@ public:
 	NodeIterator2D getNodeIter(int face);
 };
 
-
-
-class Csys {};
-
+static const pmg::MeshCsys globalCsys;
+static const pmg::MeshTransformer noTransformer;
 
 class Mesh {
 public:
 	int		  firstNodeID;
 	int		  firstElementID;
-	pmg::Csys csys;
+	const pmg::MeshCsys* csys = &globalCsys;
+	const pmg::MeshTransformer* transformer = &noTransformer;
 };
 
 class Mesh1D : public Mesh {
 public:
-	pmg::MeshDensity1D	meshDensity;
+	pmg::MeshDensity1D meshDensity;
+	pmg::Path*		   path;
 };
 class Mesh2D : public Mesh {
 public:
-	pmg::MeshDensity2D	meshDensity;
+	pmg::MeshDensity2D meshDensity;
+	pmg::Surface*	   surface;
 };
 class Mesh3D : public Mesh {
 public:
-	pmg::MeshDensity3D	meshDensity;
+	pmg::MeshDensity3D	  meshDensity;
+	pmg::ExtrudedSurface* volume;
 };
-
 
 
 class Mesher {
 public:
-	void setFEAwriter(pmgptr<MeshWriter> _writer);
+	void setFEAwriter(pmg::MeshWriter* _writer) {
+		writer = _writer;
+	}
 
 	void write(Mesh1D& mesh);
 	void write(Mesh2D& mesh);
@@ -141,24 +151,71 @@ public:
 	void write(const Mesh3D& mesh1, const Mesh3D mesh2, int face1, int face2);
 
 private:
-	pmgptr<MeshWriter> writer;
+	MeshWriter* writer;
 };
+
+
+void Mesher::write(Mesh1D& mesh) {
+	mesh.firstNodeID = writer->nextNodeID();
+	mesh.firstElementID = writer->nextElementID();
+
+	for (int i = 0; i < mesh.meshDensity.x; i++) {
+		glm::dvec3 pos = mesh.path->positionI(i, mesh.meshDensity.x);
+		writer->writeNode(pos, *mesh.csys, *mesh.transformer);
+	}
+}
+
 
 }
 
 int test_pmgPath01(const std::string& filepath) {
 
 	pmg::PathSine sinePath(glm::dvec3(1., 1., 0.), glm::dvec3(0., 0.2, 1.), 5., 2., 2.5);
-	std::shared_ptr<pmg::Path> sinePathP = std::shared_ptr<pmg::Path>(&sinePath);
+	std::ofstream file;
+	file.open(filepath);
+	if (!file.is_open()) return 1;
 
 	int N = 40;
 	for (int i = 0; i < N; i++) {
-		glm::dvec3 p = sinePathP->position(i, N);
-		std::cout << p.x << ", " << p.y << ", " << p.z << std::endl;
+		glm::dvec3 p = sinePath.positionI(i, N);
+		file << p.x << ", " << p.y << ", " << p.z << std::endl;
 	}
+	file.close();
+	return 0;
+}
 
+
+
+int test_pmgMeshWriter01(const std::string& filepath) {
+
+	pmg::NastranWriter nasWriter(filepath);
+	if (!nasWriter.open()) return 1;
+	pmg::MeshWriter* writer = &nasWriter;
+
+	writer->writeNode(glm::dvec3(1., 0., 0.), pmg::globalCsys, pmg::noTransformer);
+	writer->writeNode(glm::dvec3(1., 0., 1.12341123e-2), pmg::globalCsys, pmg::noTransformer);
+	writer->close();
+	return 0;
+}
+
+int test_pmgMesherPath01(const std::string& filepath) {
+	pmg::NastranWriter nasWriter(filepath);
+	if (!nasWriter.open()) return 1;
+
+	pmg::Mesh1D mesh;
+	pmg::PathLinear pathLinear(glm::dvec3(10.));
+	pmg::PathArc pathArc(10., glm::dvec3(1., 1., 0.), glm::dvec3(1.,0.,0.));
 	
+	mesh.meshDensity = pmg::MeshDensity1D(20);
+	mesh.path = &pathLinear;
 
+	pmg::Mesher mesher;
+	mesher.setFEAwriter(&nasWriter);
+	mesher.write(mesh);	//write a line
+	mesher.write(mesh); //write same line
+	mesh.path = &pathArc;
+	mesher.write(mesh); //write circle (full arc)
 
-	return 1;
+	nasWriter.close();
+	return 0;
 }

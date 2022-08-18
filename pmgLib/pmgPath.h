@@ -19,8 +19,8 @@ class Path
 {
 public:
 	Path() {}
-	glm::dvec3 position(int i, int imax) const;
-	glm::dvec3 tangent(int i, int imax) const;
+	glm::dvec3 positionI(int i, int imax) const;
+	glm::dvec3 tangentI(int i, int imax) const;
 	virtual glm::dvec3 position(double pathPercentage) const = 0;
 	virtual glm::dvec3 tangent(double pathPercentage) const = 0;
 	virtual double length() const = 0;

@@ -135,10 +135,10 @@ VecGLM3d Path::getPathCoordsOrTangents(
 	else {
 		for (int i = 0; i < totalNodes; i++) {
 			if (posOrTangent == pos_or_tangent::position) {
-				result.push_back(position(i, closedLoop ? totalNodes + 1 : totalNodes));
+				result.push_back(positionI(i, closedLoop ? totalNodes + 1 : totalNodes));
 			}
 			else {
-				result.push_back(tangent(i, closedLoop ? totalNodes + 1 : totalNodes));
+				result.push_back(tangentI(i, closedLoop ? totalNodes + 1 : totalNodes));
 			}
 		}
 	}
@@ -213,7 +213,7 @@ VecGLM3d Path::getPathCoordinates(
 			totalNodes = numberOfNodes;
 		}
 		for (int i = 0; i < totalNodes; i++) {
-			coordinates.push_back(position(i, closedLoop ? totalNodes + 1 : totalNodes));
+			coordinates.push_back(positionI(i, closedLoop ? totalNodes + 1 : totalNodes));
 		}
 	}
 
@@ -225,10 +225,10 @@ double Path::pathFactor(int i, int imax) const {
 	return (double)i / (double)(imax - 1);
 }
 
-glm::dvec3 Path::position(int i, int imax) const {
+glm::dvec3 Path::positionI(int i, int imax) const {
 	return position(pathFactor(i, imax));
 }
-glm::dvec3 Path::tangent(int i, int imax) const {
+glm::dvec3 Path::tangentI(int i, int imax) const {
 	return tangent(pathFactor(i, imax));
 }
 
