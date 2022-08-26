@@ -225,11 +225,11 @@ double Path::pathFactor(int i, int imax) const {
 	return (double)i / (double)(imax - 1);
 }
 
-glm::dvec3 Path::positionI(int i, int imax) const {
-	return position(pathFactor(i, imax));
+glm::dvec3 Path::positionI(int i, int imax, bool closedLoop) const {
+	return position(pathFactor(i, closedLoop ? imax + 1 : imax));
 }
-glm::dvec3 Path::tangentI(int i, int imax) const {
-	return tangent(pathFactor(i, imax));
+glm::dvec3 Path::tangentI(int i, int imax, bool closedLoop) const {
+	return tangent(pathFactor(i, closedLoop ? imax + 1 : imax));
 }
 
 /*PathAxis*/

@@ -89,11 +89,17 @@ class NodeIterator1D{};
 class NodeIterator2D{};
 
 
-class MeshDensity {};
+class MeshDensity {
+public:
+	MeshDensity(bool isClosedLoop) : closedLoop{isClosedLoop}{}
+	bool closedLoop = false;
+};
 class MeshDensity1D : public MeshDensity {
 public:
-	MeshDensity1D() {}
-	MeshDensity1D(int nx) { x = nx; }
+	MeshDensity1D() : MeshDensity(false) {}
+	MeshDensity1D(int nx, bool isClosedLoop = false) : MeshDensity(isClosedLoop) {
+		x = nx; 
+	}
 	int x;
 	NodeIterator1D getNodeIter();
 };
@@ -160,7 +166,7 @@ void Mesher::write(Mesh1D& mesh) {
 	mesh.firstElementID = writer->nextElementID();
 
 	for (int i = 0; i < mesh.meshDensity.x; i++) {
-		glm::dvec3 pos = mesh.path->positionI(i, mesh.meshDensity.x);
+		glm::dvec3 pos = mesh.path->positionI(i, mesh.meshDensity.x, mesh.meshDensity.closedLoop);
 		writer->writeNode(pos, *mesh.csys, *mesh.transformer);
 	}
 }
@@ -206,7 +212,7 @@ int test_pmgMesherPath01(const std::string& filepath) {
 	pmg::PathLinear pathLinear(glm::dvec3(10.));
 	pmg::PathArc pathArc(10., glm::dvec3(1., 1., 0.), glm::dvec3(1.,0.,0.));
 	
-	mesh.meshDensity = pmg::MeshDensity1D(20);
+	mesh.meshDensity = pmg::MeshDensity1D(20, false);
 	mesh.path = &pathLinear;
 
 	pmg::Mesher mesher;
@@ -214,6 +220,7 @@ int test_pmgMesherPath01(const std::string& filepath) {
 	mesher.write(mesh);	//write a line
 	mesher.write(mesh); //write same line
 	mesh.path = &pathArc;
+	mesh.meshDensity.closedLoop = true;
 	mesher.write(mesh); //write circle (full arc)
 
 	nasWriter.close();
