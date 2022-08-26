@@ -1,40 +1,11 @@
 /.vs
 /fmt/fmt-7.1.3
+/x64
+/win32
 /output/x64
 /output/x86
 /output/intermediate/x64
 
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
+*.sdf
+*.suo
 *.user
