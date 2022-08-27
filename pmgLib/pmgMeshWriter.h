@@ -25,7 +25,15 @@ public:
 	void close();
 
 	void writeNode(const glm::dvec3& localCoords, const MeshCsys& meshCsys, const MeshTransformer& meshTransf);
+	void write2nodedBeam(int n[2]);
+	void write4nodedShell(int n[4]);
+	void write8nodedHexa(int n[8]);
+
 	virtual void writeNode(int nodeID, const glm::dvec3& globalCoords);
+	virtual void write2nodedBeam(int elID, int n[2]);
+	virtual void write4nodedShell(int elID, int n[4]);
+	virtual void write8nodedHexa(int elID, int n[8]);
+
 
 	int nextNodeID() { return nodeID; }
 	int nextElementID() { return elementID; }

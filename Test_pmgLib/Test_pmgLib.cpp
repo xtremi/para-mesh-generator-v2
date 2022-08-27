@@ -94,24 +94,35 @@ public:
 	MeshDensity(bool isClosedLoop) : closedLoop{isClosedLoop}{}
 	bool closedLoop = false;
 };
+
 class MeshDensity1D : public MeshDensity {
 public:
 	MeshDensity1D() : MeshDensity(false) {}
 	MeshDensity1D(int nx, bool isClosedLoop = false) : MeshDensity(isClosedLoop) {
 		x = nx; 
 	}
-	int x;
+
 	NodeIterator1D getNodeIter();
+
+	int nNodes() { return x; }
+	int nElements() { return closedLoop ? x : x - 1; }
+
+protected:
+	int x;
 };
 class MeshDensity2D : public MeshDensity {
 public:
-	int x, y;
 	NodeIterator1D getNodeIter(int edge);
+
+protected:
+	int x, y;
 };
 class MeshDensity3D : public MeshDensity {
 public:
-	int x,y,z;
 	NodeIterator2D getNodeIter(int face);
+
+protected:
+	int x, y, z;
 };
 
 static const pmg::MeshCsys globalCsys;
@@ -165,10 +176,17 @@ void Mesher::write(Mesh1D& mesh) {
 	mesh.firstNodeID = writer->nextNodeID();
 	mesh.firstElementID = writer->nextElementID();
 
-	for (int i = 0; i < mesh.meshDensity.x; i++) {
-		glm::dvec3 pos = mesh.path->positionI(i, mesh.meshDensity.x, mesh.meshDensity.closedLoop);
+	for (int i = 0; i < mesh.meshDensity.nNodes(); i++) {
+		glm::dvec3 pos = mesh.path->positionI(i, mesh.meshDensity.nNodes(), mesh.meshDensity.closedLoop);
 		writer->writeNode(pos, *mesh.csys, *mesh.transformer);
 	}
+
+	int nodeIDs[2] = { mesh.firstNodeID, mesh.firstNodeID + 1 };
+	for (int i = 0; i < mesh.meshDensity.nElements(); i++) {	
+		writer->write2nodedBeam(nodeIDs);
+		nodeIDs[0]++; nodeIDs[1]++;
+	}
+
 }
 
 

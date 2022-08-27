@@ -26,14 +26,45 @@ void MeshWriter::writeNode(
 	writeNode(nodeID++, newCoords);
 }
 
+void MeshWriter::write2nodedBeam(int n[2]){
+	write2nodedBeam(elementID++, n);
+}
 
+void MeshWriter::write4nodedShell(int n[4]) {
+	write4nodedShell(elementID++, n);
+}
+
+void MeshWriter::write8nodedHexa(int n[8]) {
+	write8nodedHexa(elementID++, n);
+}
+
+void MeshWriter::write2nodedBeam(int elID, int n[2]) {
+	static const std::string FMT_FORMAT = "B2 {:d},{:d},{:d}\n";
+	std::string str = fmt::format(FMT_FORMAT, elID, n[0], n[1]);
+	buffer += str;
+	processWriteBuffer();
+}
+
+void MeshWriter::write4nodedShell(int elID, int n[4]) {
+	static const std::string FMT_FORMAT = "S4 {:d},{:d},{:d},{:d},{:d}\n";
+	std::string str = fmt::format(FMT_FORMAT, elID, n[0], n[1], n[2], n[3], n[4]);
+	buffer += str;
+	processWriteBuffer();
+}
+
+void MeshWriter::write8nodedHexa(int elID, int n[8]) {
+	static const std::string FMT_FORMAT = "H8 {:d},{:d},{:d},{:d},{:d},{:d},{:d},{:d},{:d}\n";
+	std::string str = fmt::format(FMT_FORMAT, elID, n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7]);
+	buffer += str;
+	processWriteBuffer();
+}
 
 
 void MeshWriter::writeNode(
 	int				  nodeID,
 	const glm::dvec3& c)
 {
-	static const std::string GRID_FMT_FORMAT = "N {:d},,{:.5f},{:.5f},{:.5f}\n";
+	static const std::string GRID_FMT_FORMAT = "N {:d},{:.5f},{:.5f},{:.5f}\n";
 	std::string str = fmt::format(GRID_FMT_FORMAT, nodeID, c.x, c.y, c.z);
 	buffer += str;
 	processWriteBuffer();
