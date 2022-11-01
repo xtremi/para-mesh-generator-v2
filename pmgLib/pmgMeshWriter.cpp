@@ -26,6 +26,7 @@ void MeshWriter::writeNode(
 	writeNode(nodeID++, newCoords);
 }
 
+
 void MeshWriter::write2nodedBeam(int n[2]){
 	write2nodedBeam(elementID++, n);
 }
@@ -78,6 +79,24 @@ void NastranWriter::writeNode(
 	std::string str = fmt::format(GRID_FMT_FORMAT, nodeID, c.x, c.y, c.z);
 	buffer += str;
 	processWriteBuffer();
+}
+
+
+void NastranWriter::write2nodedBeam(int elID, int n[2]) {
+	static const std::string FMT_FORMAT = "CBAR, {:d}, 1, {:d}, {:d}\n";
+	std::string str = fmt::format(FMT_FORMAT, elID, n[0], n[1]);
+	buffer += str;
+	processWriteBuffer();
+}
+
+void NastranWriter::write4nodedShell(int elID, int n[4]) {
+
+
+}
+
+void NastranWriter::write8nodedHexa(int elID, int n[8]) {
+
+
 }
 
 void MeshWriter::processWriteBuffer() {

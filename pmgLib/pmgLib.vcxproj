@@ -192,6 +192,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="pmgMath.cpp" />
+    <ClCompile Include="pmgMeshCsys.cpp" />
+    <ClCompile Include="pmgMesher.cpp" />
     <ClCompile Include="pmgMeshWriter.cpp" />
     <ClCompile Include="pmgPath.cpp" />
     <ClCompile Include="pmgShapes.cpp" />
@@ -199,10 +201,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pmgMath.h" />
+    <ClInclude Include="pmgMeshCsys.h" />
+    <ClInclude Include="pmgMeshDensity.h" />
+    <ClInclude Include="pmgMesher.h" />
+    <ClInclude Include="pmgMeshTransformer.h" />
     <ClInclude Include="pmgMeshWriter.h" />
     <ClInclude Include="pmgPath.h" />
     <ClInclude Include="pmgLib.h" />
     <ClInclude Include="pmgShapes.h" />
+    <ClInclude Include="pmgSurface.h" />
     <ClInclude Include="pmgUtilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

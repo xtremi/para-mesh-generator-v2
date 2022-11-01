@@ -1,22 +1,9 @@
 #pragma once
 #include <fstream>
-#include <glm/glm.hpp>
+#include "pmgMeshCsys.h"
+#include "pmgMeshTransformer.h"
 
 namespace pmg{
-
-class MeshTransformer {
-public:
-	glm::dvec3 getTransformedCoords(const glm::dvec3& coords) const {
-		return coords;
-	}
-};
-
-class MeshCsys {
-public:
-	glm::vec3 getGlobalCoords(const glm::dvec3& localCoords) const {
-		return localCoords;
-	}
-};
 
 class MeshWriter {
 public:
@@ -33,7 +20,6 @@ public:
 	virtual void write2nodedBeam(int elID, int n[2]);
 	virtual void write4nodedShell(int elID, int n[4]);
 	virtual void write8nodedHexa(int elID, int n[8]);
-
 
 	int nextNodeID() { return nodeID; }
 	int nextElementID() { return elementID; }
@@ -62,6 +48,9 @@ public:
 
 protected:
 	void writeNode(int nodeID, const glm::dvec3& globalCoords);
+	void write2nodedBeam(int elID, int n[2]);
+	void write4nodedShell(int elID, int n[4]);
+	void write8nodedHexa(int elID, int n[8]);
 };
 
 }

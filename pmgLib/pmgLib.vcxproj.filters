@@ -30,6 +30,12 @@
     <ClCompile Include="pmgMeshWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pmgMesher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pmgMeshCsys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pmgLib.h">
@@ -48,6 +54,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pmgMeshWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pmgMesher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pmgMeshCsys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pmgMeshTransformer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pmgMeshDensity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pmgSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

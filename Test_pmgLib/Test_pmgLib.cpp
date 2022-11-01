@@ -3,6 +3,7 @@
 #include <set>
 #include "pmgPath.h"
 #include "pmgMeshWriter.h"
+#include "pmgMesher.h"
 
 int test_pmgPath01(const std::string& filepath);
 int test_pmgMeshWriter01(const std::string& filepath);
@@ -60,137 +61,7 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-#define pmgptr std::shared_ptr
 
-namespace pmg{
-class Surface {
-private:
-};
-
-/*!
-	Defines a surface either:
-	1) Between two non-closed paths
-		- Each end points of the paths are then connected by straight lines
-	2) Between two closed loops
-*/
-class BoundedSurface : public Surface {
-private:
-	pmgptr<pmg::Path> outer, inner;
-	bool closedLoop = false;
-};
-
-class ExtrudedSurface {
-private:
-	BoundedSurface surface;
-	pmgptr<pmg::Path> extrudePath;
-};
-
-class NodeIterator1D{};
-class NodeIterator2D{};
-
-
-class MeshDensity {
-public:
-	MeshDensity(bool isClosedLoop) : closedLoop{isClosedLoop}{}
-	bool closedLoop = false;
-};
-
-class MeshDensity1D : public MeshDensity {
-public:
-	MeshDensity1D() : MeshDensity(false) {}
-	MeshDensity1D(int nx, bool isClosedLoop = false) : MeshDensity(isClosedLoop) {
-		x = nx; 
-	}
-
-	NodeIterator1D getNodeIter();
-
-	int nNodes() { return x; }
-	int nElements() { return closedLoop ? x : x - 1; }
-
-protected:
-	int x;
-};
-class MeshDensity2D : public MeshDensity {
-public:
-	NodeIterator1D getNodeIter(int edge);
-
-protected:
-	int x, y;
-};
-class MeshDensity3D : public MeshDensity {
-public:
-	NodeIterator2D getNodeIter(int face);
-
-protected:
-	int x, y, z;
-};
-
-static const pmg::MeshCsys globalCsys;
-static const pmg::MeshTransformer noTransformer;
-
-class Mesh {
-public:
-	int		  firstNodeID;
-	int		  firstElementID;
-	const pmg::MeshCsys* csys = &globalCsys;
-	const pmg::MeshTransformer* transformer = &noTransformer;
-};
-
-class Mesh1D : public Mesh {
-public:
-	pmg::MeshDensity1D meshDensity;
-	pmg::Path*		   path;
-};
-class Mesh2D : public Mesh {
-public:
-	pmg::MeshDensity2D meshDensity;
-	pmg::Surface*	   surface;
-};
-class Mesh3D : public Mesh {
-public:
-	pmg::MeshDensity3D	  meshDensity;
-	pmg::ExtrudedSurface* volume;
-};
-
-
-class Mesher {
-public:
-	void setFEAwriter(pmg::MeshWriter* _writer) {
-		writer = _writer;
-	}
-
-	void write(Mesh1D& mesh);
-	void write(Mesh2D& mesh);
-	void write(Mesh3D& mesh);
-
-	void write(const Mesh1D& mesh1, const Mesh1D mesh2);
-	void write(const Mesh2D& mesh1, const Mesh2D mesh2, int edge1, int edge2);
-	void write(const Mesh3D& mesh1, const Mesh3D mesh2, int face1, int face2);
-
-private:
-	MeshWriter* writer;
-};
-
-
-void Mesher::write(Mesh1D& mesh) {
-	mesh.firstNodeID = writer->nextNodeID();
-	mesh.firstElementID = writer->nextElementID();
-
-	for (int i = 0; i < mesh.meshDensity.nNodes(); i++) {
-		glm::dvec3 pos = mesh.path->positionI(i, mesh.meshDensity.nNodes(), mesh.meshDensity.closedLoop);
-		writer->writeNode(pos, *mesh.csys, *mesh.transformer);
-	}
-
-	int nodeIDs[2] = { mesh.firstNodeID, mesh.firstNodeID + 1 };
-	for (int i = 0; i < mesh.meshDensity.nElements(); i++) {	
-		writer->write2nodedBeam(nodeIDs);
-		nodeIDs[0]++; nodeIDs[1]++;
-	}
-
-}
-
-
-}
 
 int test_pmgPath01(const std::string& filepath) {
 
@@ -227,16 +98,20 @@ int test_pmgMesherPath01(const std::string& filepath) {
 	if (!nasWriter.open()) return 1;
 
 	pmg::Mesh1D mesh;
-	pmg::PathLinear pathLinear(glm::dvec3(10.));
-	pmg::PathArc pathArc(10., glm::dvec3(1., 1., 0.), glm::dvec3(1.,0.,0.));
+	glm::dvec3 normal(10., 5., 2.);
+	glm::dvec3 xdir(10., 0., 0.);
+	pmg::PathLinear pathNormal(normal);
+	pmg::PathLinear pathXdir(xdir);
+	pmg::PathArc pathArc(10., normal, xdir);
 	
 	mesh.meshDensity = pmg::MeshDensity1D(20, false);
-	mesh.path = &pathLinear;
+	mesh.path = &pathNormal;
 
 	pmg::Mesher mesher;
 	mesher.setFEAwriter(&nasWriter);
 	mesher.write(mesh);	//write a line
-	mesher.write(mesh); //write same line
+	mesh.path = &pathXdir;
+	mesher.write(mesh); //write another line
 	mesh.path = &pathArc;
 	mesh.meshDensity.closedLoop = true;
 	mesher.write(mesh); //write circle (full arc)
