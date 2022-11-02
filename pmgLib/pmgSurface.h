@@ -7,7 +7,7 @@
 namespace pmg {
 
 	class Surface {
-	private:
+	public:
 	};
 
 	/*!
@@ -17,13 +17,16 @@ namespace pmg {
 		2) Between two closed loops
 	*/
 	class BoundedSurface : public Surface {
-	private:
+	public:
 		pmgptr<pmg::Path> outer, inner;
 		bool closedLoop = false;
 	};
 
+	/*!
+		Defines a volume of an extruded surface along a path 
+	*/
 	class ExtrudedSurface {
-	private:
+	public:
 		BoundedSurface surface;
 		pmgptr<pmg::Path> extrudePath;
 	};

@@ -40,6 +40,6 @@ int pmg::nNonSkippedNodes(int nNodes, node_skip nskip) {
 	}
 }
 
-NodeIterator1D MeshDensity1D::getNodeIter() {
+NodeIterator1D MeshDensity1D::getNodeIter() const {
 	return NodeIterator1D();
 }

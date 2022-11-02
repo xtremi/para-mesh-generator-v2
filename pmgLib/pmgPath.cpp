@@ -472,3 +472,8 @@ double PathComposite::length() const {
 	}
 	return totalLength;
 }
+
+
+
+
+

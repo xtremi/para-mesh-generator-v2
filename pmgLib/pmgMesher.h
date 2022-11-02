@@ -26,5 +26,15 @@ private:
 };
 
 
+void getPathToPathData(
+	const Path& innerPath,
+	const Path& outerPath,
+	const MeshDensity2D& meshDens,
+	VecGLM3d& innerCoords,
+	VecGLM3d& outDirections,
+	VecD& distances,
+	const glm::dvec3& outerPathTranslation = NULL_POS);
+
+
 
 }

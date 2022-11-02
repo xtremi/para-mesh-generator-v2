@@ -28,7 +28,7 @@ public:
 class Mesh2D : public Mesh {
 public:
 	pmg::MeshDensity2D meshDensity;
-	pmg::Surface* surface;
+	pmg::BoundedSurface* surface;
 };
 class Mesh3D : public Mesh {
 public:

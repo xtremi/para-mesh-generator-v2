@@ -27,13 +27,13 @@ public:
 		: MeshDensity(isClosedLoop), x{nx}, nodeSkip{_nodeSkip}
 	{}
 
-	NodeIterator1D getNodeIter();
+	NodeIterator1D getNodeIter() const;
 
-	int nNodes() { return x; }
-	int nNodesNotSkipped() { return nNonSkippedNodes(x, nodeSkip); }
-	int nElements() { return closedLoop ? nNodesNotSkipped() : nNodesNotSkipped() - 1; }
+	int nNodes() const { return x; }
+	int nNodesNotSkipped() const { return nNonSkippedNodes(x, nodeSkip); }
+	int nElements() const { return closedLoop ? nNodesNotSkipped() : nNodesNotSkipped() - 1; }
 
-	int x;
+	int x = 0;
 	node_skip nodeSkip = node_skip::none;
 };
 
@@ -41,11 +41,23 @@ public:
 
 class MeshDensity2D : public MeshDensity {
 public:
-	NodeIterator1D getNodeIter(int edge);
+	MeshDensity2D() : MeshDensity(false) {}
+	MeshDensity2D(
+		int			nx, 
+		int			ny, 
+		node_skip   _nodeSkipX = node_skip::none, 
+		node_skip   _nodeSkipY = node_skip::none, 
+		bool		isClosedLoopX = false)
+		: MeshDensity(isClosedLoopX), x{ nx }, y{ ny }, nodeSkipX{ _nodeSkipX }, nodeSkipY{ _nodeSkipY }
+	{}
 
-protected:
+	NodeIterator1D getNodeIter(int edge) const;
+
 	int x, y;
+	node_skip nodeSkipX = node_skip::none;
+	node_skip nodeSkipY = node_skip::none;
 };
+
 class MeshDensity3D : public MeshDensity {
 public:
 	NodeIterator2D getNodeIter(int face);

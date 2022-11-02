@@ -9,11 +9,13 @@ int test_pmgPath01(const std::string& filepath);
 int test_pmgMeshWriter01(const std::string& filepath);
 int test_pmgMesherPath01(const std::string& filepath);
 int test_pmgMeshCsys01(const std::string& filepath);
+int test_pmgMeshToMesh1D(const std::string& filepath);
 
 
 std::vector<TestDef> testFunctions({
 	TestDef(1000, "test_pmgPath01", "pmgPath", (testFunction)test_pmgPath01),
 	TestDef(1100, "test_pmgMeshWriter01", "pmgMeshWriter", (testFunction)test_pmgMeshWriter01),
+	TestDef(1110, "test_pmgMeshToMesh1D", "pmgMeshWriter", (testFunction)test_pmgMeshToMesh1D),
 	TestDef(1200, "test_pmgMesherPath01", "pmgMesherPath", (testFunction)test_pmgMesherPath01),
 	TestDef(1250, "test_pmgMeshCsys01", "pmgMeshCsys", (testFunction)test_pmgMeshCsys01),
 });
@@ -122,23 +124,47 @@ int test_pmgMesherPath01(const std::string& filepath) {
 	return 0;
 }
 
+int test_pmgMeshToMesh1D(const std::string& filepath) {
+	pmg::NastranWriter nasWriter(filepath);
+	if (!nasWriter.open()) return 1;
+
+	glm::dvec3 xdir(10., 0., 0.);
+	pmg::PathLinear pathXdir(xdir);
+	pmg::MeshCsys csys = pmg::MeshCsys();
+
+	pmg::Mesh1D mesh1;
+	mesh1.meshDensity = pmg::MeshDensity1D(20, pmg::node_skip::none);
+	mesh1.path = &pathXdir;
+	mesh1.csys = &csys;
+
+	pmg::Mesher mesher;
+	mesher.setFEAwriter(&nasWriter);
+	mesher.write(mesh1);	//write a line
+
+	pmg::Mesh1D mesh2 = mesh1;
+	csys.pos.x += 11.;
+	csys.update();
+	mesher.write(mesh2); //write another line
+
+	mesher.write(mesh1, mesh2); //write connecting element
+
+	nasWriter.close();
+	return 0;
+}
+
 
 int test_pmgMeshCsys01(const std::string& filepath) {
 	pmg::NastranWriter nasWriter(filepath);
 	if (!nasWriter.open()) return 1;
-
-	pmg::Mesh1D mesh;
-	glm::dvec3 normal(10., 5., 2.);
+	
 	glm::dvec3 xdir(10., 0., 0.);
-	pmg::PathLinear pathNormal(normal);
 	pmg::PathLinear pathXdir(xdir);
-
 	pmg::MeshCsys csys = pmg::MeshCsys();
 
+	pmg::Mesh1D mesh;
 	mesh.meshDensity = pmg::MeshDensity1D(20, pmg::node_skip::none);
-	mesh.path = &pathNormal;
+	mesh.path = &pathXdir;
 	mesh.csys = &csys;
-
 
 	pmg::Mesher mesher;
 	mesher.setFEAwriter(&nasWriter);
@@ -146,9 +172,15 @@ int test_pmgMeshCsys01(const std::string& filepath) {
 
 	csys.pos.x += 10.;
 	csys.update();
-	mesh.path = &pathXdir;
 	mesher.write(mesh); //write another line
 
+	pmg::MeshCsys csys2 = pmg::MeshCsys(&csys, glm::dvec3(10., 0., 0.), pmg::makeRotatationMatrix(glm::dvec3(0., 1., 0.), 0.2));
+	mesh.csys = &csys2;
+	mesher.write(mesh);
+
+	pmg::MeshCsys csys3 = pmg::MeshCsys(&csys2, glm::dvec3(10., 2., 0.), pmg::makeRotatationMatrix(glm::dvec3(0., 1., 0.), 0.2));
+	mesh.csys = &csys3;
+	mesher.write(mesh);
 
 	nasWriter.close();
 	return 0;
