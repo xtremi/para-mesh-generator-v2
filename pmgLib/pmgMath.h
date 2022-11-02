@@ -15,8 +15,8 @@ extern const glm::mat3x3 UNIT_MAT_3x3;
 
 
 
-glm::dmat3x3 makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY);
-glm::dmat3x3 makeCsysMatrix(const glm::dvec3& rotAxis, double angle);
+glm::dmat3x3 makeRotatationMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY);
+glm::dmat3x3 makeRotatationMatrix(const glm::dvec3& rotAxis, double angle);
 
 
 double pow2(double val);

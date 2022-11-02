@@ -31,7 +31,7 @@ int pmg::twoPow(int exponent) {
 
 	Based on: https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
 */
-glm::dmat3x3 pmg::makeCsysMatrix(const glm::dvec3& _rotAxis, double angle) {
+glm::dmat3x3 pmg::makeRotatationMatrix(const glm::dvec3& _rotAxis, double angle) {
 
 	glm::dvec3 rotAxis = glm::normalize(_rotAxis);
 	
@@ -59,7 +59,7 @@ glm::dmat3x3 pmg::makeCsysMatrix(const glm::dvec3& _rotAxis, double angle) {
 	Creates a rotation matrix that defines a coordinate system
 	with x-axis \p dirX and with \p pXY laying on the xy-plane.
 */
-glm::dmat3x3 pmg::makeCsysMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
+glm::dmat3x3 pmg::makeRotatationMatrix(const glm::dvec3& dirX, const glm::dvec3& pXY) {
 
 	glm::dvec3 xAxis = glm::normalize(dirX);
 	glm::dvec3 yAxis = glm::normalize(pXY);

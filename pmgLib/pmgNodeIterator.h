@@ -3,22 +3,24 @@
 #include "glm/glm.hpp"
 
 
+namespace pmg{
+
 /*
 	Base class for node iterators
 	in any shape, direction or dimensions
-	
+
 */
 class NodeIterator {
 public:
-	int first();	
-	virtual int last() {return -1;};
+	int first();
+	virtual int last() { return -1; };
 	virtual int next() = 0;
 	virtual void reset() = 0;
 
 	int firstNodeID = 0;
 	int nodeIDoffset = 0;
 
-	virtual int numberOfNodes() { return -1; }	
+	virtual int numberOfNodes() { return -1; }
 };
 
 
@@ -44,7 +46,7 @@ public:
 class NodeIterator1D : public NodeIterator {
 public:
 
-	NodeIterator1D() {}
+	NodeIterator1D() = default;
 	NodeIterator1D(int _firstNode, int _nNodes, int _nodeIncr = 1, int _preNode = 0);
 	virtual int next();
 	virtual int last();
@@ -85,29 +87,29 @@ private:
 
 
 /*
-    x_______________x_______________x
-    |               |               |
-    |			    |			    |
-    |			    |			    |
-    |			    |			    |
-    |			    |			    |
-    x_______________x_______________x
-    |\              |              /|
-    |  \        	|		    /   |
-    |	 \  x_______x_______x /     |
-    |       |       |       |	    |
-    |	    |       |       |       |
-    x_______x_______x_______x_______x
-    |       |       |       |       |
+	x_______________x_______________x
+	|               |               |
+	|			    |			    |
+	|			    |			    |
+	|			    |			    |
+	|			    |			    |
+	x_______________x_______________x
+	|\              |              /|
+	|  \        	|		    /   |
+	|	 \  x_______x_______x /     |
+	|       |       |       |	    |
+	|	    |       |       |       |
+	x_______x_______x_______x_______x
+	|       |       |       |       |
   ^ |       |       |       |       |   ^
   | x_______x_______x_______x_______x   |
   | | \     |     / |  \    |     / |   |
   | |   x___x___x/  |   x___x___x   |   |
   | |   |   |   |   |   |   |   |   |	|
-  | x___x___x___x___x___x___x___x___x	| 
+  | x___x___x___x___x___x___x___x___x	|
   |										|
-edge3    	  --edge0-->			  edge 1	
-			
+edge3    	  --edge0-->			  edge 1
+
 */
 class NodeIterator1Dref : public NodeIterator1D {
 public:
@@ -178,8 +180,8 @@ incrY = 12
 dirY   (102)x---13x---14x---15x
   |	        |     |     |     |
   |    (101)x--- 1x----2x----3x
-    preNodes
-    ----> dirX incrX = 1
+	preNodes
+	----> dirX incrX = 1
 
 Iteration result = 101,1,2,3, 102,13,14,15, 103,25,26,27
 
@@ -189,9 +191,9 @@ class NodeIterator2D : public NodeIterator {
 public:
 	NodeIterator2D() {}
 	NodeIterator2D(
-		int _firstNode, 
-		int _nNodesX, int _nNodesY, 
-		int _nodeIncrX, int _nodeIncrY, 
+		int _firstNode,
+		int _nNodesX, int _nNodesY,
+		int _nodeIncrX, int _nodeIncrY,
 		const NodeIterator1D& _preNodes = NodeIterator1D());
 	virtual int next();
 	virtual int last();
@@ -202,7 +204,7 @@ public:
 	virtual bool first4(int& n1, int& n2, int& n3, int& n4);
 	virtual bool next4(int& n1, int& n2, int& n3, int& n4);
 
-protected:	
+protected:
 	glm::ivec2 currentIterIndices;
 	//std::vector<glm::ivec2> currentIterIndices4;
 	glm::ivec2 nNodes;
@@ -216,10 +218,10 @@ public:
 	enum class Type { face1, face3, face4, face5 };
 	NodeIterator2Dref() {}
 	NodeIterator2Dref(
-		int _firstNode, 
+		int _firstNode,
 		int _nNodesX,
 		int _nNodesY,
-		int _nRef, 
+		int _nRef,
 		Type _type,
 		const NodeIterator1D& _preNodes = NodeIterator1D());
 	virtual int next();
@@ -237,9 +239,10 @@ public:
 	virtual bool next4(int& n1, int& n2, int& n3, int& n4);
 
 protected:
-	enum class RowType{
-		b0m2,   m2m3t0, t0b0, 
-		b0m1m2, m2t0};
+	enum class RowType {
+		b0m2, m2m3t0, t0b0,
+		b0m1m2, m2t0
+	};
 
 	Type	type;
 	RowType curRowType;
@@ -272,7 +275,7 @@ protected:
 		Face 1 and 3: b0m2   -> m2m3t0 -> t0b0 -> repeat
 	*/
 	bool next4_b0m2(int& n1, int& n2, int& n3, int& n4);
-	bool next4_m2m3t0(int& n1, int& n2, int& n3, int& n4);	
+	bool next4_m2m3t0(int& n1, int& n2, int& n3, int& n4);
 	/*
 		Face 4 and 5: b0m1m2 -> m2t0   -> t0b0 -> repeat
 	*/
@@ -289,10 +292,10 @@ protected:
 
 
 	/*
-		
+
 	   4x---------x10
 		|  e6   / |
-	   3x-----x7  | 
+	   3x-----x7  |
 		|  e4 | e5|
 	   2x-----x6--x8
 		|  e3 | e2|
@@ -316,3 +319,5 @@ class NodeIterator3D : public NodeIterator {
 public:
 	NodeIterator3D();
 };
+
+}

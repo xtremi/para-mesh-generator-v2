@@ -8,12 +8,14 @@
 int test_pmgPath01(const std::string& filepath);
 int test_pmgMeshWriter01(const std::string& filepath);
 int test_pmgMesherPath01(const std::string& filepath);
+int test_pmgMeshCsys01(const std::string& filepath);
 
 
 std::vector<TestDef> testFunctions({
 	TestDef(1000, "test_pmgPath01", "pmgPath", (testFunction)test_pmgPath01),
 	TestDef(1100, "test_pmgMeshWriter01", "pmgMeshWriter", (testFunction)test_pmgMeshWriter01),
 	TestDef(1200, "test_pmgMesherPath01", "pmgMesherPath", (testFunction)test_pmgMesherPath01),
+	TestDef(1250, "test_pmgMeshCsys01", "pmgMeshCsys", (testFunction)test_pmgMeshCsys01),
 });
 
 
@@ -104,7 +106,7 @@ int test_pmgMesherPath01(const std::string& filepath) {
 	pmg::PathLinear pathXdir(xdir);
 	pmg::PathArc pathArc(10., normal, xdir);
 	
-	mesh.meshDensity = pmg::MeshDensity1D(20, false);
+	mesh.meshDensity = pmg::MeshDensity1D(20, pmg::node_skip::none);
 	mesh.path = &pathNormal;
 
 	pmg::Mesher mesher;
@@ -115,6 +117,38 @@ int test_pmgMesherPath01(const std::string& filepath) {
 	mesh.path = &pathArc;
 	mesh.meshDensity.closedLoop = true;
 	mesher.write(mesh); //write circle (full arc)
+
+	nasWriter.close();
+	return 0;
+}
+
+
+int test_pmgMeshCsys01(const std::string& filepath) {
+	pmg::NastranWriter nasWriter(filepath);
+	if (!nasWriter.open()) return 1;
+
+	pmg::Mesh1D mesh;
+	glm::dvec3 normal(10., 5., 2.);
+	glm::dvec3 xdir(10., 0., 0.);
+	pmg::PathLinear pathNormal(normal);
+	pmg::PathLinear pathXdir(xdir);
+
+	pmg::MeshCsys csys = pmg::MeshCsys();
+
+	mesh.meshDensity = pmg::MeshDensity1D(20, pmg::node_skip::none);
+	mesh.path = &pathNormal;
+	mesh.csys = &csys;
+
+
+	pmg::Mesher mesher;
+	mesher.setFEAwriter(&nasWriter);
+	mesher.write(mesh);	//write a line
+
+	csys.pos.x += 10.;
+	csys.update();
+	mesh.path = &pathXdir;
+	mesher.write(mesh); //write another line
+
 
 	nasWriter.close();
 	return 0;

@@ -1,19 +1,27 @@
 #include "pmgMesher.h"
+using namespace pmg;
 
-bool pmg::skip(int i, int last, node_skip nskip) {
-	if (nskip == node_skip::none) {
-		return false;
+
+
+void Mesher::write(Mesh1D& mesh) {
+	mesh.firstNodeID = writer->nextNodeID();
+	mesh.firstElementID = writer->nextElementID();
+
+	for (int i = 0; i < mesh.meshDensity.nNodes(); i++) {
+		if(!pmg::skip(i, mesh.meshDensity.nNodes(), mesh.meshDensity.nodeSkip)){
+			glm::dvec3 pos = mesh.path->positionI(i, mesh.meshDensity.nNodes(), mesh.meshDensity.closedLoop);
+			writer->writeNode(pos, *mesh.csys, *mesh.transformer);
+		}
 	}
-	if (i == 0) {
-		return nskip == node_skip::first || nskip == node_skip::first_and_last || ((int)nskip >= 2);
+
+	int nodeIDs[2] = { mesh.firstNodeID, mesh.firstNodeID + 1 };
+	for (int i = 0; i < mesh.meshDensity.nElements(); i++) {
+		writer->write2nodedBeam(nodeIDs);
+		nodeIDs[0]++; nodeIDs[1]++;
+
+		if (mesh.meshDensity.closedLoop && i == mesh.meshDensity.nElements() - 2) {
+			nodeIDs[1] = mesh.firstNodeID;
+		}
 	}
-	else if (i == (last - 1) && ((int)nskip < 2)) {
-		return nskip == node_skip::last || nskip == node_skip::first_and_last;
-	}
-	else if ((int)nskip >= 2) {
-		return !(bool)(i % (int)nskip);
-	}
-	else {
-		return false;
-	}
+
 }
