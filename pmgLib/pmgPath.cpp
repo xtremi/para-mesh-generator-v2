@@ -221,7 +221,7 @@ VecGLM3d Path::getPathCoordinates(
 }
 
 
-double Path::pathFactor(int i, int imax) const {
+double Path::pathFactor(int i, int imax) {
 	return (double)i / (double)(imax - 1);
 }
 

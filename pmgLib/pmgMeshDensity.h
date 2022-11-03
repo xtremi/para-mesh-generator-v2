@@ -53,6 +53,19 @@ public:
 
 	NodeIterator1D getNodeIter(int edge) const;
 
+	int nNodesX() const { return x; }
+	int nNodesY() const { return y; }
+	virtual int circ() const { return nNodesX(); }	//Circular direction, around cicumference
+	virtual int norm() const { return nNodesY(); }  //Radial/normal direction, out of circle
+
+	int nNodes() const { return nNodesX() * nNodesY(); }
+	int nNodesNotSkipped() const { return nNodesNotSkippedX() * nNodesNotSkippedY(); }
+	int nNodesNotSkippedX() const { return nNonSkippedNodes(x, nodeSkipX); }
+	int nNodesNotSkippedY() const { return nNonSkippedNodes(y, nodeSkipY); }
+	int nElementsX() const { return closedLoop ? nNodesNotSkippedX() : nNodesNotSkippedX() - 1; }
+	int nElementsY() const { return nNodesNotSkippedY() - 1; }
+	int nElements() const { return nElementsX() * nElementsY(); }
+
 	int x, y;
 	node_skip nodeSkipX = node_skip::none;
 	node_skip nodeSkipY = node_skip::none;

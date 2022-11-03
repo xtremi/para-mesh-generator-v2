@@ -25,7 +25,7 @@ public:
 	virtual glm::dvec3 tangent(double pathPercentage) const = 0;
 	virtual double length() const = 0;
 
-	double pathFactor(int i, int imax) const;
+	static double pathFactor(int i, int imax);
 	virtual bool hasCornerNodes() const { return false; }
 	virtual VecD getCornerPathFactors() const { return VecD(); }
 
