@@ -5,22 +5,40 @@
 
 
 namespace pmg {
+	class Surface;
+
+	class SurfaceData {
+	protected:
+		SurfaceData(int _ixmax, int _iymax, bool _closedLoop) 
+			: ixmax{_ixmax}, iymax{_iymax}, closedLoop{_closedLoop}	{}
+		friend class Surface;
+		int ixmax, iymax;
+		bool closedLoop;
+	};
 
 	class Surface {
 	public:
-		virtual glm::dvec3 positionI(int ix, int iy, int ixmax, int iymax, bool closedLoop = false) const;
-		virtual glm::dvec3 position(double pathPercentageX, double pathPercentageY) const {
+		virtual glm::dvec3 positionI(int ix, int iy, SurfaceData* surfaceData) const;
+		virtual glm::dvec3 position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const {
 			return glm::dvec3(0.);
 		};
 
-		virtual void cleanUp() {};
+		SurfaceData* init(int ixmax, int iymax, bool closedLoop = false) { 
+			return new SurfaceData(ixmax, iymax, closedLoop);
+		}
+		virtual void cleanUp(SurfaceData* surfaceData) {};
 	};
 
-	glm::dvec3 Surface::positionI(int ix, int iy, int ixmax, int iymax, bool closedLoop = false) const 
-	{
-		return position(Path::pathFactor(ix, closedLoop ? ixmax + 1 : ixmax), Path::pathFactor(iy, iymax));
-	}
 
+
+	class BoundedSurface;
+	class BoundedSurfaceData : private SurfaceData {
+	protected:
+		BoundedSurfaceData(int _ixmax, int _iymax, bool _closedLoop) : SurfaceData(_ixmax, _iymax, _closedLoop){}
+		friend class BoundedSurface;
+		VecGLM3d innerCoords, outDirs;
+		VecD distances;
+	};
 
 	/*!
 		Defines a surface either:
@@ -31,28 +49,16 @@ namespace pmg {
 	class BoundedSurface : public Surface {
 	public:
 		pmgptr<pmg::Path> outer, inner;
+		glm::dvec3 outerTranslation;
 		bool closedLoop = false;
 
-		void cleanUp();
+		SurfaceData* init(int ixmax, int iymax, bool closedLoop = false);
+		virtual void cleanUp(SurfaceData* surfaceData);
 
-		virtual glm::dvec3 positionI(int ix, int iy, int ixmax, int iymax, bool closedLoop = false) const;
-
-	protected:
-		VecGLM3d innerCoords, outDirs;
-		VecD distances;
+		virtual glm::dvec3 positionI(int ix, int iy, SurfaceData* surfaceData) const;
 	};
 
-	void BoundedSurface::cleanUp() {
-		innerCoords.clear();
-		outDirs.clear();
-		distances.clear();
-	}
 
-	glm::dvec3 BoundedSurface::positionI(int ix, int iy, int ixmax, int iymax, bool closedLoop) const {
-		
-		getPathToPathData(inner, outer, meshDens, innerCoords, outDirs, distances, outerPathTranslation);
-
-	}
 
 
 	/*!
@@ -63,5 +69,16 @@ namespace pmg {
 		BoundedSurface surface;
 		pmgptr<pmg::Path> extrudePath;
 	};
+
+
+	void getPathToPathData(
+		const Path& innerPath,
+		const Path& outerPath,
+		int	  nNodesPathDir,
+		bool  closedLoopPathDir,
+		VecGLM3d& innerCoords,
+		VecGLM3d& outDirections,
+		VecD& distances,
+		const glm::dvec3& outerPathTranslation = NULL_POS);
 
 }

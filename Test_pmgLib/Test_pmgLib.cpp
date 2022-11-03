@@ -10,6 +10,7 @@ int test_pmgMeshWriter01(const std::string& filepath);
 int test_pmgMesherPath01(const std::string& filepath);
 int test_pmgMeshCsys01(const std::string& filepath);
 int test_pmgMeshToMesh1D(const std::string& filepath);
+int test_pmgSurface_pathToPath01(const std::string& filepath);
 
 
 std::vector<TestDef> testFunctions({
@@ -18,6 +19,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(1110, "test_pmgMeshToMesh1D", "pmgMeshWriter", (testFunction)test_pmgMeshToMesh1D),
 	TestDef(1200, "test_pmgMesherPath01", "pmgMesherPath", (testFunction)test_pmgMesherPath01),
 	TestDef(1250, "test_pmgMeshCsys01", "pmgMeshCsys", (testFunction)test_pmgMeshCsys01),
+	TestDef(1300, "test_pmgSurface_pathToPath01", "pmgMesherSurface", (testFunction)test_pmgSurface_pathToPath01),
 });
 
 
@@ -181,6 +183,32 @@ int test_pmgMeshCsys01(const std::string& filepath) {
 	pmg::MeshCsys csys3 = pmg::MeshCsys(&csys2, glm::dvec3(10., 2., 0.), pmg::makeRotatationMatrix(glm::dvec3(0., 1., 0.), 0.2));
 	mesh.csys = &csys3;
 	mesher.write(mesh);
+
+	nasWriter.close();
+	return 0;
+}
+
+int test_pmgSurface_pathToPath01(const std::string& filepath) {
+	pmg::NastranWriter nasWriter(filepath);
+	if (!nasWriter.open()) return 1;
+
+	pmg::MeshCsys csys = pmg::MeshCsys();
+
+	glm::dvec3 offset(0., 0., 5.);
+	
+	pmg::BoundedSurface surface;
+	surface.inner = std::make_shared<pmg::PathLinear>(glm::dvec3(10., 0., 0.));
+	surface.outer = std::make_shared<pmg::PathLinear>(glm::dvec3(10., 5., 0.));
+	surface.outerTranslation = offset;
+
+	pmg::Mesh2D mesh;
+	mesh.meshDensity = pmg::MeshDensity2D(20, 10);
+	mesh.surface = &surface;
+	mesh.csys = &csys;
+
+	pmg::Mesher mesher;
+	mesher.setFEAwriter(&nasWriter);
+	mesher.write(mesh);	//write a surface
 
 	nasWriter.close();
 	return 0;

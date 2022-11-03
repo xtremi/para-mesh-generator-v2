@@ -38,27 +38,48 @@ void Mesher::write(const Mesh1D& mesh1, const Mesh1D mesh2) {
 
 void Mesher::write(Mesh2D& mesh) {
 
+	mesh.firstNodeID = writer->nextNodeID();
+	mesh.firstElementID = writer->nextElementID();
 
-}
+	SurfaceData* surfaceData = mesh.surface->init(mesh.meshDensity.nNodesX(), mesh.meshDensity.nNodesY(), mesh.meshDensity.closedLoop);
 
 
-void pmg::getPathToPathData(
-	const Path& innerPath				/*!The inner path*/,
-	const Path& outerPath				/*!The outer path*/,
-	const MeshDensity2D& meshDens				/*!dir1 is along the paths, dir2 between the paths*/,
-	VecGLM3d& innerCoords			/*![out] The coordinates along innerPath*/,
-	VecGLM3d& outDirections			/*![out] The directions from innerPath to outerPath*/,
-	VecD& distances				/*![out] The distances between the coords on innerPath and outerPath*/,
-	const glm::dvec3& outerPathTranslation	/*![in][optional] Is added to the coordinates of outerPath*/)
-{
-	VecI nodesPerSegmentInner;
-	VecGLM3d outerCoords;
-	innerCoords = innerPath.getPathCoordinates(meshDens.circ(), meshDens.closedLoop, &nodesPerSegmentInner);
-	outerCoords = outerPath.getPathCoordinates(nodesPerSegmentInner, meshDens.circ(), meshDens.closedLoop);
+	for (int iy = 0; iy < mesh.meshDensity.nNodesY(); iy++) {
+		if (!pmg::skip(iy, mesh.meshDensity.nNodesY(), mesh.meshDensity.nodeSkipY)) {
+			for (int ix= 0; ix< mesh.meshDensity.nNodesX(); ix++) {
+				if (!pmg::skip(ix, mesh.meshDensity.nNodesX(), mesh.meshDensity.nodeSkipX)) {
 
-	for (int i = 0; i < meshDens.circ(); i++) {
-		outerCoords[i] += outerPathTranslation;
-		outDirections.push_back(glm::normalize(outerCoords[i] - innerCoords[i]));
-		distances.push_back(glm::distance(outerCoords[i], innerCoords[i]));
+					glm::dvec3 pos = mesh.surface->positionI(ix, iy, surfaceData);
+					writer->writeNode(pos, *mesh.csys, *mesh.transformer);
+
+				}
+			}
+		}
 	}
+
+	mesh.surface->cleanUp(surfaceData);
+
+	int n[4];
+	int c = mesh.firstNodeID;
+
+	for (int iy = 0; iy < mesh.meshDensity.nElementsY(); iy++) {
+		//writer->setCurrentElementPropertyID(elementProp++);
+		for (int ix = 0; ix < mesh.meshDensity.nElementsX(); ix++) {
+			n[0] = c++;
+			n[1] = n[0] + 1;
+			n[2] = n[1] + mesh.meshDensity.nNodesNotSkippedX();
+			n[3] = n[2] - 1;
+
+			if (mesh.meshDensity.closedLoop && ix == (mesh.meshDensity.nElementsX() - 1)) {
+				n[1] -= mesh.meshDensity.nNodesNotSkippedX();
+				n[2] -= mesh.meshDensity.nNodesNotSkippedX();
+			}
+
+			writer->write4nodedShell(n);
+		}
+		if (!mesh.meshDensity.closedLoop) c++;
+	}
+
 }
+
+

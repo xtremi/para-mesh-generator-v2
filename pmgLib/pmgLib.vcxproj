@@ -201,6 +201,7 @@
     <ClCompile Include="pmgPath.cpp" />
     <ClCompile Include="pmgRefinementCalculations.cpp" />
     <ClCompile Include="pmgShapes.cpp" />
+    <ClCompile Include="pmgSurface.cpp" />
     <ClCompile Include="pmgUtilities.cpp" />
   </ItemGroup>
   <ItemGroup>

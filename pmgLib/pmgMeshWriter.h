@@ -30,7 +30,7 @@ protected:
 	std::string filePath;
 	int nodeID = 1;
 	int elementID = 1;
-	int currentPropertyID = -1;
+	int currentPropertyID = 1;
 
 	int nWritesToBuffer = 0;
 	int maxWritesToBuffer = (int)1e5;

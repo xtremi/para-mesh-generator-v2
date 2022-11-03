@@ -48,6 +48,9 @@
     <ClCompile Include="pmgMeshDensity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pmgSurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pmgLib.h">

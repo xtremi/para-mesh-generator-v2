@@ -90,8 +90,11 @@ void NastranWriter::write2nodedBeam(int elID, int n[2]) {
 }
 
 void NastranWriter::write4nodedShell(int elID, int n[4]) {
-
-
+	static const std::string FMT_FORMAT = "CQUAD4, {:d}, {:d}, {:d}, {:d}, {:d}, {:d}\n";
+	std::string str = fmt::format(FMT_FORMAT, elID, currentPropertyID,
+		n[0], n[1], n[2], n[3]);
+	buffer += str;
+	processWriteBuffer();
 }
 
 void NastranWriter::write8nodedHexa(int elID, int n[8]) {
