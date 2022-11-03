@@ -51,3 +51,27 @@ void pmg::getPathToPathData(
 		distances.push_back(glm::distance(outerCoords[i], innerCoords[i]));
 	}
 }
+
+glm::dvec3 MathFunctionSurface::position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const {
+	//double sineValue = amplitude * glm::sin(omega * xValue);
+	glm::dvec3 coords;
+	coords.x = -5. + 10. * pathPercentageX;
+	coords.y = -5. + 10. * pathPercentageY;
+
+	double waveLength = 2.2;
+	double amplitude = 1.2;
+	double omega = GLM2PI / waveLength;
+	coords.z = amplitude * 0.5 * (
+		glm::sin(omega * coords.x) +
+		glm::cos(omega * coords.y));
+	return coords;
+
+}
+
+//SurfaceData* MathFunctionSurface::init(int ixmax, int iymax, bool closedLoop) {
+//	return Surface::init(ixmax, iymax, closedLoop);
+//}
+//void MathFunctionSurface::cleanUp(SurfaceData* surfaceData) {
+//	Surface::cleanUp(surfaceData);
+//}
+

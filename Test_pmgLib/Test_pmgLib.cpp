@@ -200,7 +200,7 @@ int test_pmgSurface_pathToPath01(const std::string& filepath) {
 	surface.inner = std::make_shared<pmg::PathLinear>(glm::dvec3(10., 0., 0.));
 	surface.outer = std::make_shared<pmg::PathLinear>(glm::dvec3(10., 5., 0.));
 	surface.outerTranslation = offset;
-
+	
 	pmg::Mesh2D mesh;
 	mesh.meshDensity = pmg::MeshDensity2D(20, 10);
 	mesh.surface = &surface;
@@ -209,6 +209,37 @@ int test_pmgSurface_pathToPath01(const std::string& filepath) {
 	pmg::Mesher mesher;
 	mesher.setFEAwriter(&nasWriter);
 	mesher.write(mesh);	//write a surface
+	
+	
+	surface.outer = std::make_shared<pmg::PathSine>(pmg::X_DIR, pmg::Z_DIR, 10., 0.5, 2.5);
+	csys.pos.y += 5.0;
+	csys.update();
+	mesher.write(mesh);	//write a surface
+
+	for(int i = 0; i < 3; i++){
+		mesh.meshDensity.x *= 2;
+		csys.pos.y += 2.0;
+		csys.update();
+		mesher.write(mesh);	//write a surface
+	}
+
+	mesh.meshDensity.closedLoop = true;
+	mesh.meshDensity.x = 10;
+	mesh.meshDensity.y = 5;
+	surface.inner = std::make_shared<pmg::PathArc>(2.5, pmg::Z_DIR, pmg::X_DIR);
+	surface.outer = std::make_shared<pmg::PathArc>(1., pmg::Z_DIR, pmg::X_DIR);
+	csys.pos.y += 5.0;
+	csys.update();
+	mesher.write(mesh);	//write a surface
+
+	mesh.meshDensity.closedLoop = false;
+	pmg::MathFunctionSurface mSurface;
+	mesh.surface = &mSurface;
+
+	csys.pos.y += 5.0;
+	csys.update();
+	mesher.write(mesh);	//write a surface
+
 
 	nasWriter.close();
 	return 0;

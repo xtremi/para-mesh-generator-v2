@@ -59,6 +59,14 @@ namespace pmg {
 	};
 
 
+	class MathFunctionSurface : public Surface {
+		//SurfaceData* init(int ixmax, int iymax, bool closedLoop = false);
+		//virtual void cleanUp(SurfaceData* surfaceData);
+		//
+		//virtual glm::dvec3 positionI(int ix, int iy, SurfaceData* surfaceData) const;
+
+		virtual glm::dvec3 position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const;
+	};
 
 
 	/*!
