@@ -30,6 +30,24 @@ glm::dvec3 BoundedSurface::positionI(int ix, int iy, SurfaceData* sd) const {
 	return bsd->innerCoords[ix] + distanceFactor * bsd->distances[ix] * bsd->outDirs[ix];
 }
 
+
+
+glm::dvec3 MathFunctionSurface::position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const {
+	//double sineValue = amplitude * glm::sin(omega * xValue);
+	glm::dvec3 coords;
+	coords.x = -5. + 10. * pathPercentageX;
+	coords.y = -5. + 10. * pathPercentageY;
+
+	double waveLength = 2.2;
+	double amplitude = 1.2;
+	double omega = GLM2PI / waveLength;
+	coords.z = amplitude * 0.5 * (
+		glm::sin(omega * coords.x) +
+		glm::cos(omega * coords.y));
+	return coords;
+
+}
+
 void pmg::getPathToPathData(
 	const Path& innerPath					/*![in] The inner path*/,
 	const Path& outerPath					/*![in] The outer path*/,
@@ -50,22 +68,6 @@ void pmg::getPathToPathData(
 		outDirections.push_back(glm::normalize(outerCoords[i] - innerCoords[i]));
 		distances.push_back(glm::distance(outerCoords[i], innerCoords[i]));
 	}
-}
-
-glm::dvec3 MathFunctionSurface::position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const {
-	//double sineValue = amplitude * glm::sin(omega * xValue);
-	glm::dvec3 coords;
-	coords.x = -5. + 10. * pathPercentageX;
-	coords.y = -5. + 10. * pathPercentageY;
-
-	double waveLength = 2.2;
-	double amplitude = 1.2;
-	double omega = GLM2PI / waveLength;
-	coords.z = amplitude * 0.5 * (
-		glm::sin(omega * coords.x) +
-		glm::cos(omega * coords.y));
-	return coords;
-
 }
 
 //SurfaceData* MathFunctionSurface::init(int ixmax, int iymax, bool closedLoop) {

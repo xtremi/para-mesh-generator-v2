@@ -23,7 +23,7 @@ namespace pmg {
 			return glm::dvec3(0.);
 		};
 
-		SurfaceData* init(int ixmax, int iymax, bool closedLoop = false) { 
+		virtual SurfaceData* init(int ixmax, int iymax, bool closedLoop = false) { 
 			return new SurfaceData(ixmax, iymax, closedLoop);
 		}
 		virtual void cleanUp(SurfaceData* surfaceData) {};
