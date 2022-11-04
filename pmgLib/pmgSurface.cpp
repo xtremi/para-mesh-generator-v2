@@ -31,21 +31,18 @@ glm::dvec3 BoundedSurface::positionI(int ix, int iy, SurfaceData* sd) const {
 }
 
 
-
-glm::dvec3 MathFunctionSurface::position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const {
-	//double sineValue = amplitude * glm::sin(omega * xValue);
-	glm::dvec3 coords;
-	coords.x = -5. + 10. * pathPercentageX;
-	coords.y = -5. + 10. * pathPercentageY;
-
-	double waveLength = 2.2;
-	double amplitude = 1.2;
-	double omega = GLM2PI / waveLength;
-	coords.z = amplitude * 0.5 * (
-		glm::sin(omega * coords.x) +
-		glm::cos(omega * coords.y));
+glm::dvec3 SinCosWavesSurface::position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const {
+	glm::dvec3 coords(
+		-sizeX / 2. + sizeX * pathPercentageX,
+		-sizeY / 2. + sizeY * pathPercentageY,
+		0.0);
+	
+	double omegaX = GLM2PI / waveLengthX;
+	double omegaY = GLM2PI / waveLengthY;
+	coords.z = 
+		ampX * glm::sin(omegaX * coords.x) +
+		ampY * glm::cos(omegaY * coords.y);
 	return coords;
-
 }
 
 void pmg::getPathToPathData(

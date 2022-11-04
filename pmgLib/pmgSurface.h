@@ -58,16 +58,24 @@ namespace pmg {
 		virtual glm::dvec3 positionI(int ix, int iy, SurfaceData* surfaceData) const;
 	};
 
-
+	/*
+		Base class for function based surfaces
+		Doesn't really need a specialization of SurfaceData
+	*/
 	class MathFunctionSurface : public Surface {
-		//SurfaceData* init(int ixmax, int iymax, bool closedLoop = false);
-		//virtual void cleanUp(SurfaceData* surfaceData);
-		//
-		//virtual glm::dvec3 positionI(int ix, int iy, SurfaceData* surfaceData) const;
-
-		virtual glm::dvec3 position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const;
+		virtual glm::dvec3 position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const = 0;
 	};
 
+	class SinCosWavesSurface : public MathFunctionSurface {
+	public:
+		SinCosWavesSurface(double _ampX, double _ampY, double _waveLengthX, double _waveLengthY, double _sizeX, double _sizeY) :
+			ampX{ _ampX }, ampY{ _ampY }, waveLengthX{ _waveLengthX }, waveLengthY{ _waveLengthY }, sizeX{ _sizeX }, sizeY{ _sizeY }{}
+		glm::dvec3 position(double pathPercentageX, double pathPercentageY, SurfaceData* surfaceData) const;
+	public:
+		double ampX, ampY;
+		double waveLengthX, waveLengthY;
+		double sizeX, sizeY;
+	};
 
 	/*!
 		Defines a volume of an extruded surface along a path 

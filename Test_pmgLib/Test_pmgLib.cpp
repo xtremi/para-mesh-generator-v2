@@ -188,34 +188,37 @@ int test_pmgMeshCsys01(const std::string& filepath) {
 	return 0;
 }
 
+
+
 int test_pmgSurface_pathToPath01(const std::string& filepath) {
 	pmg::NastranWriter nasWriter(filepath);
 	if (!nasWriter.open()) return 1;
 
-	pmg::MeshCsys csys = pmg::MeshCsys();
+	pmg::Mesher mesher;
+	mesher.setFEAwriter(&nasWriter);
 
-	glm::dvec3 offset(0., 0., 5.);
+	pmg::MeshCsys csys = pmg::MeshCsys();
+	pmg::Mesh2D mesh;
+	mesh.meshDensity = pmg::MeshDensity2D(20, 10);
+	mesh.csys = &csys;
 	
+
+	//A bounded surface between two paths (linearly interpolated between paths)
 	pmg::BoundedSurface surface;
 	surface.inner = std::make_shared<pmg::PathLinear>(glm::dvec3(10., 0., 0.));
 	surface.outer = std::make_shared<pmg::PathLinear>(glm::dvec3(10., 5., 0.));
-	surface.outerTranslation = offset;
+	surface.outerTranslation = glm::dvec3(0., 0., 5.);;
 	
-	pmg::Mesh2D mesh;
-	mesh.meshDensity = pmg::MeshDensity2D(20, 10);
 	mesh.surface = &surface;
-	mesh.csys = &csys;
-
-	pmg::Mesher mesher;
-	mesher.setFEAwriter(&nasWriter);
 	mesher.write(mesh);	//write a surface
 	
-	
+	//Another surface, but modifying one of the paths to a Sine curve:
 	surface.outer = std::make_shared<pmg::PathSine>(pmg::X_DIR, pmg::Z_DIR, 10., 0.5, 2.5);
 	csys.pos.y += 5.0;
 	csys.update();
 	mesher.write(mesh);	//write a surface
 
+	//3 more similar surfaces but increasing the mesh density:
 	for(int i = 0; i < 3; i++){
 		mesh.meshDensity.x *= 2;
 		csys.pos.y += 2.0;
@@ -223,22 +226,35 @@ int test_pmgSurface_pathToPath01(const std::string& filepath) {
 		mesher.write(mesh);	//write a surface
 	}
 
+	//Another bounded surface with closed loop - changing paths to circles so this becomes a cone:
+	surface.inner = std::make_shared<pmg::PathArc>(2.5, pmg::Z_DIR, pmg::X_DIR);
+	surface.outer = std::make_shared<pmg::PathArc>(1., pmg::Z_DIR, pmg::X_DIR);
 	mesh.meshDensity.closedLoop = true;
 	mesh.meshDensity.x = 10;
 	mesh.meshDensity.y = 5;
-	surface.inner = std::make_shared<pmg::PathArc>(2.5, pmg::Z_DIR, pmg::X_DIR);
-	surface.outer = std::make_shared<pmg::PathArc>(1., pmg::Z_DIR, pmg::X_DIR);
 	csys.pos.y += 5.0;
 	csys.update();
 	mesher.write(mesh);	//write a surface
 
+	//Changing the surface type to Mathematical surface (here SinCosWavesSurface):
+	pmg::SinCosWavesSurface sinCosSurface1(0.1, 0.2, 1., 1.5, 10., 10.);
+	mesh.surface = &sinCosSurface1;
 	mesh.meshDensity.x = 40;
 	mesh.meshDensity.y = 40;
 	mesh.meshDensity.closedLoop = false;
-	pmg::MathFunctionSurface mSurface;
-	mesh.surface = &mSurface;
 
-	csys.pos.y += 5.0;
+	csys.pos.y += 10.0;
+	csys.update();
+	mesher.write(mesh);	//write a surface
+
+	//Another SinCosWaveSurface but larger:
+	pmg::SinCosWavesSurface sinCosSurface2(2.0, 12., 10., 60., 80., 80.);
+	mesh.surface = &sinCosSurface2;
+	mesh.meshDensity.x = 100;
+	mesh.meshDensity.y = 100;
+	mesh.meshDensity.closedLoop = false;
+
+	csys.pos = glm::dvec3(0., 0., -20.);
 	csys.update();
 	mesher.write(mesh);	//write a surface
 
