@@ -232,6 +232,7 @@ int test_pmgSurface_pathToPath01(const std::string& filepath) {
 	mesh.meshDensity.closedLoop = true;
 	mesh.meshDensity.x = 10;
 	mesh.meshDensity.y = 5;
+	mesh.meshDensity.nodeSkipX = pmg::node_skip::every_2;
 	csys.pos.y += 5.0;
 	csys.update();
 	mesher.write(mesh);	//write a surface
