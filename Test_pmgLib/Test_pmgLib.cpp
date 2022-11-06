@@ -11,6 +11,7 @@ int test_pmgMesherPath01(const std::string& filepath);
 int test_pmgMeshCsys01(const std::string& filepath);
 int test_pmgMeshToMesh1D(const std::string& filepath);
 int test_pmgSurface_pathToPath01(const std::string& filepath);
+int test_pmgSurface_pathToPath02_skip(const std::string& filepath);
 
 
 std::vector<TestDef> testFunctions({
@@ -20,6 +21,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(1200, "test_pmgMesherPath01", "pmgMesherPath", (testFunction)test_pmgMesherPath01),
 	TestDef(1250, "test_pmgMeshCsys01", "pmgMeshCsys", (testFunction)test_pmgMeshCsys01),
 	TestDef(1300, "test_pmgSurface_pathToPath01", "pmgMesherSurface", (testFunction)test_pmgSurface_pathToPath01),
+	TestDef(1305, "test_pmgSurface_pathToPath02_skip", "pmgMesherSurface", (testFunction)test_pmgSurface_pathToPath02_skip),
 });
 
 
@@ -110,7 +112,7 @@ int test_pmgMesherPath01(const std::string& filepath) {
 	pmg::PathLinear pathXdir(xdir);
 	pmg::PathArc pathArc(10., normal, xdir);
 	
-	mesh.meshDensity = pmg::MeshDensity1D(20, pmg::node_skip::none);
+	mesh.meshDensity = pmg::MeshDensity1D(20, pmg::node_skip::every_4);
 	mesh.path = &pathNormal;
 
 	pmg::Mesher mesher;
@@ -259,6 +261,101 @@ int test_pmgSurface_pathToPath01(const std::string& filepath) {
 	csys.update();
 	mesher.write(mesh);	//write a surface
 
+
+	nasWriter.close();
+	return 0;
+}
+
+int test_pmgSurface_pathToPath02_skip(const std::string& filepath) {
+	pmg::NastranWriter nasWriter(filepath);
+	if (!nasWriter.open()) return 1;
+
+	pmg::Mesher mesher;
+	mesher.setFEAwriter(&nasWriter);
+
+	pmg::MeshCsys csys = pmg::MeshCsys();
+	pmg::Mesh2D mesh;
+	mesh.meshDensity = pmg::MeshDensity2D(20, 10);
+	mesh.csys = &csys;
+
+
+	//A bounded surface between two paths (linearly interpolated between paths)
+	pmg::BoundedSurface surface;
+	surface.inner = std::make_shared<pmg::PathLinear>(glm::dvec3(10., 0., 0.));
+	surface.outer = std::make_shared<pmg::PathLinear>(glm::dvec3(10., 5., 0.));
+	surface.outerTranslation = glm::dvec3(0., 0., 5.);;
+
+	mesh.surface = &surface;
+	mesher.write(mesh);	//write a surface
+
+	csys.pos.x += 15.0; csys.update();
+
+	//More surfaces - skip on X rows
+	for(int i = 2; i < 10; i++){
+		mesh.meshDensity.nodeSkipX = pmg::node_skip(i);
+		mesher.write(mesh);	//write a surface
+		csys.pos.y += 5.0;
+		csys.update();
+	}
+
+	csys.pos.x += 15.0;	csys.pos.y = 0.0; csys.update();
+	mesh.meshDensity.nodeSkipX = pmg::node_skip::none;
+
+	//More surfaces - skip on Y rows
+	for (int i = 2; i < 10; i++) {
+		mesh.meshDensity.nodeSkipY = pmg::node_skip(i);
+		mesher.write(mesh);
+		csys.pos.y += 5.0;
+		csys.update();
+	}
+
+	csys.pos.x += 15.0;	csys.pos.y = 0.0; csys.update();
+	mesh.meshDensity.nodeSkipX = pmg::node_skip::none;
+	mesh.meshDensity.nodeSkipY = pmg::node_skip::none;
+
+	//More surfaces - skip on X and Y rows
+	for (int i = 2; i < 10; i++) {
+		mesh.meshDensity.nodeSkipX = pmg::node_skip(i + 1);
+		mesh.meshDensity.nodeSkipY = pmg::node_skip(i);
+		mesher.write(mesh);	
+		csys.pos.y += 5.0;
+		csys.update();
+	}
+
+	csys.pos.x += 15.0;	csys.pos.y = 0.0; csys.update();
+	mesh.meshDensity.nodeSkipX = pmg::node_skip::none;
+	mesh.meshDensity.nodeSkipY = pmg::node_skip::none;
+
+
+	//Skip first/last/first-last on X
+	std::vector<pmg::node_skip> skipTypes({ pmg::node_skip::first,  pmg::node_skip::last,  pmg::node_skip::first_and_last });
+	for (pmg::node_skip skipType : skipTypes) {
+		mesh.meshDensity.nodeSkipX = skipType;
+		mesher.write(mesh);
+		csys.pos.y += 5.0;
+		csys.update();
+	}
+
+	csys.pos.x += 15.0;	csys.pos.y = 0.0; csys.update();
+
+	//Skip first/last/first-last on Y
+	for (pmg::node_skip skipType : skipTypes) {
+		mesh.meshDensity.nodeSkipY = skipType;
+		mesher.write(mesh);
+		csys.pos.y += 5.0;
+		csys.update();
+	}
+
+	csys.pos.x += 15.0;	csys.pos.y = 0.0; csys.update();
+
+	//Skip first/last/first-last on X and Y
+	for (pmg::node_skip skipType : skipTypes) {
+		mesh.meshDensity.nodeSkipX = skipType;
+		mesh.meshDensity.nodeSkipY = skipType;
+		mesher.write(mesh);
+		csys.pos.y += 5.0;
+		csys.update();
+	}
 
 	nasWriter.close();
 	return 0;

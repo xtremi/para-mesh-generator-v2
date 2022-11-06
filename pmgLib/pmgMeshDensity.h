@@ -23,18 +23,13 @@ class MeshDensity {
 public:
 	MeshDensity(bool isClosedLoop) : closedLoop{ isClosedLoop } {}
 	bool closedLoop = false;
-
-	virtual std::shared_ptr<NodeIndexIterator> nodeIndexIterator() = 0;
 };
 
 class NodeIndexIterator {
 protected:
 	MeshDensity* meshDensity = nullptr;
-	int currentIndex = -1;
 public:
 	NodeIndexIterator(MeshDensity* md) : meshDensity{ md } {}
-	virtual bool first(int& id) = 0;
-	virtual bool next(int& id) = 0;
 };
 
 
@@ -42,7 +37,7 @@ public:
 /*
 	1D MeshDensity
 */
-
+class NodeIndexIterator1D;
 class MeshDensity1D : public MeshDensity {
 public:
 	MeshDensity1D() : MeshDensity(false) {}
@@ -59,19 +54,21 @@ public:
 	int x = 0;
 	node_skip nodeSkip = node_skip::none;
 
-	std::shared_ptr<NodeIndexIterator> nodeIndexIterator();
+	virtual std::shared_ptr<NodeIndexIterator1D> nodeIndexIterator();
 };
 
 class NodeIndexIterator1D : public NodeIndexIterator {
+	int currentIndex = -1;
 public:
 	NodeIndexIterator1D(MeshDensity1D* md) : NodeIndexIterator(md) {}
-	bool first(int& id);
-	bool next(int& id);
+	virtual bool first(int& id);
+	virtual bool next(int& id);
 };
 
 /*
 	2D MeshDensity
 */
+class NodeIndexIterator2D;
 class MeshDensity2D : public MeshDensity {
 public:
 	MeshDensity2D() : MeshDensity(false) {}
@@ -103,14 +100,16 @@ public:
 	node_skip nodeSkipX = node_skip::none;
 	node_skip nodeSkipY = node_skip::none;
 
-	std::shared_ptr<NodeIndexIterator> nodeIndexIterator();
+	virtual std::shared_ptr<NodeIndexIterator2D> nodeIndexIterator();
 };
 
 class NodeIndexIterator2D : public NodeIndexIterator {
+	int currentIndexX = -1;
+	int currentIndexY = -1;
 public:
 	NodeIndexIterator2D(MeshDensity2D* md) : NodeIndexIterator(md) {}
-	virtual bool first(int& id);
-	virtual bool next(int& id);
+	virtual bool first(int& idX, int& idY);
+	virtual bool next(int& idX, int& idY);
 };
 
 
@@ -118,12 +117,23 @@ public:
 /*
 	3D MeshDensity
 */
+class NodeIndexIterator3D;
 class MeshDensity3D : public MeshDensity {
 public:
 	NodeIterator2D getNodeIter(int face);
 
 	int x, y, z;
-	std::shared_ptr<NodeIndexIterator> nodeIndexIterator();
+	virtual std::shared_ptr<NodeIndexIterator3D> nodeIndexIterator();
+};
+
+class NodeIndexIterator3D : public NodeIndexIterator {
+	int currentIndexX = -1;
+	int currentIndexY = -1;
+	int currentIndexZ = -1;
+public:
+	NodeIndexIterator3D(MeshDensity3D* md) : NodeIndexIterator(md) {}
+	virtual bool first(int& idX, int& idY, int& idZ);
+	virtual bool next(int& idX, int& idY, int& idZ);
 };
 
 }

@@ -6,7 +6,7 @@ void Mesher::write(Mesh1D& mesh) {
 	mesh.firstElementID = writer->nextElementID();
 
 	int index;
-	std::shared_ptr<NodeIndexIterator> iter = mesh.meshDensity.nodeIndexIterator();	
+	std::shared_ptr<NodeIndexIterator1D> iter = mesh.meshDensity.nodeIndexIterator();	
 	for (bool c = iter->first(index); c; c = iter->next(index)) {
 		glm::dvec3 pos = mesh.path->positionI(index, mesh.meshDensity.nNodes(), mesh.meshDensity.closedLoop);
 		writer->writeNode(pos, *mesh.csys, *mesh.transformer);
@@ -67,6 +67,7 @@ void Mesher::write(Mesh2D& mesh) {
 		for (int ix = 0; ix < mesh.meshDensity.nElementsX(); ix++) {
 			n[0] = c++;
 			n[1] = n[0] + 1;
+
 			n[2] = n[1] + mesh.meshDensity.nNodesNotSkippedX();
 			n[3] = n[2] - 1;
 

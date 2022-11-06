@@ -19,6 +19,44 @@ bool pmg::skip(int i, int last, node_skip nskip) {
 	}
 }
 
+/*
+(
+N - N/m - max(1,N%m)
+
+
+1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20
+x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x
+----x-------x-------x-------x-------x-------x-------x-------x-------x-------x (10)
+N - N/m = 20 - 10 = 10
+
+1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20 
+x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x
+----x---x-------x---x-------x---x-------x---x-------x---x-------x---x-------x (13)
+N - N/m = 20 - 20/3 = 20 - 6 = 14
+
+1   2   3   4   5   6   7   8   9  10  
+x---x---x---x---x---x---x---x---x---x
+----x-------x-------x-------x-------x (5)
+N - N/m = 10 - 10/2 = 10 - 5 = 5
+
+1   2   3   4   5   6   7   8   9  10  11  12  13  14
+x---x---x---x---x---x---x---x---x---x---x---x---x---x
+----x---x-------x---x-------x---x-------x---x-------x (9)
+N - N/m = 14 - 14/3 = 14 - 4 = 10
+
+1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
+x---x---x---x---x---x---x---x---x---x---x---x---x---x---x
+----x---x-------x---x-------x---x-------x---x-------x---x (10)
+N - N/m = 15 - 15/3 = 15 - 5 = 10
+
+1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
+x---x---x---x---x---x---x---x---x---x---x---x---x---x---x---x
+----x---x-------x---x-------x---x-------x---x-------x---x---- (10)
+N - N/m = 16 - 16/3 = 16 - 5 = 11
+
+
+*/
+
 int pmg::nNonSkippedNodes(int nNodes, node_skip nskip) {
 	switch (nskip)
 	{
@@ -35,7 +73,8 @@ int pmg::nNonSkippedNodes(int nNodes, node_skip nskip) {
 	case pmg::node_skip::every_5:
 	case pmg::node_skip::every_6:
 	default:
-		return (nNodes - 1) - (int)(nNodes / (int)nskip);
+		//N - N / m - max(1, N % m)
+		return nNodes - (int)(nNodes / (int)nskip) - (int)(nNodes%(int)nskip > 0);
 		break;
 	}
 }
@@ -63,18 +102,20 @@ bool NodeIndexIterator1D::next(int& id) {
 	return true;
 }
 
-bool NodeIndexIterator2D::first(int& id) {
-	return false;
+bool NodeIndexIterator2D::first(int& idX, int& idY) {
+	currentIndexX = 0;
+	currentIndexY = 0;
+	return next(idX, idY);
 }
 
-bool NodeIndexIterator2D::next(int& id) {
+bool NodeIndexIterator2D::next(int& idX, int& idY) {
 	return false;
 
 }
 
-std::shared_ptr<NodeIndexIterator> MeshDensity1D::nodeIndexIterator() {
+std::shared_ptr<NodeIndexIterator1D> MeshDensity1D::nodeIndexIterator() {
 	return std::make_shared<NodeIndexIterator1D>(this);
 }
-std::shared_ptr<NodeIndexIterator> MeshDensity2D::nodeIndexIterator() {
+std::shared_ptr<NodeIndexIterator2D> MeshDensity2D::nodeIndexIterator() {
 	return std::make_shared<NodeIndexIterator2D>(this);
 }
