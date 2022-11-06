@@ -43,3 +43,38 @@ int pmg::nNonSkippedNodes(int nNodes, node_skip nskip) {
 NodeIterator1D MeshDensity1D::getNodeIter() const {
 	return NodeIterator1D();
 }
+
+
+bool NodeIndexIterator1D::first(int& id) {
+	currentIndex = 0;
+	return next(id);
+}
+
+bool NodeIndexIterator1D::next(int& id) {
+	if (currentIndex == ((MeshDensity1D*)meshDensity)->nNodes()) {
+		return false;
+	}
+
+	while (pmg::skip(currentIndex, ((MeshDensity1D*)meshDensity)->nNodes(), ((MeshDensity1D*)meshDensity)->nodeSkip)) {
+		currentIndex++;
+		return next(id);
+	}
+	id = currentIndex++;
+	return true;
+}
+
+bool NodeIndexIterator2D::first(int& id) {
+	return false;
+}
+
+bool NodeIndexIterator2D::next(int& id) {
+	return false;
+
+}
+
+std::shared_ptr<NodeIndexIterator> MeshDensity1D::nodeIndexIterator() {
+	return std::make_shared<NodeIndexIterator1D>(this);
+}
+std::shared_ptr<NodeIndexIterator> MeshDensity2D::nodeIndexIterator() {
+	return std::make_shared<NodeIndexIterator2D>(this);
+}

@@ -5,11 +5,11 @@ void Mesher::write(Mesh1D& mesh) {
 	mesh.firstNodeID = writer->nextNodeID();
 	mesh.firstElementID = writer->nextElementID();
 
-	for (int i = 0; i < mesh.meshDensity.nNodes(); i++) {
-		if(!pmg::skip(i, mesh.meshDensity.nNodes(), mesh.meshDensity.nodeSkip)){
-			glm::dvec3 pos = mesh.path->positionI(i, mesh.meshDensity.nNodes(), mesh.meshDensity.closedLoop);
-			writer->writeNode(pos, *mesh.csys, *mesh.transformer);
-		}
+	int index;
+	std::shared_ptr<NodeIndexIterator> iter = mesh.meshDensity.nodeIndexIterator();	
+	for (bool c = iter->first(index); c; c = iter->next(index)) {
+		glm::dvec3 pos = mesh.path->positionI(index, mesh.meshDensity.nNodes(), mesh.meshDensity.closedLoop);
+		writer->writeNode(pos, *mesh.csys, *mesh.transformer);
 	}
 
 	int nodeIDs[2] = { mesh.firstNodeID, mesh.firstNodeID + 1 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "pmgNodeIterator.h"
+#include <memory>
 
 namespace pmg{
 
@@ -13,12 +14,34 @@ bool skip(int i, int last, node_skip nskip);
 
 int nNonSkippedNodes(int nNodes, node_skip nskip);
 
+/*
+	Base MeshDensity
+*/
 
+class NodeIndexIterator;
 class MeshDensity {
 public:
 	MeshDensity(bool isClosedLoop) : closedLoop{ isClosedLoop } {}
 	bool closedLoop = false;
+
+	virtual std::shared_ptr<NodeIndexIterator> nodeIndexIterator() = 0;
 };
+
+class NodeIndexIterator {
+protected:
+	MeshDensity* meshDensity = nullptr;
+	int currentIndex = -1;
+public:
+	NodeIndexIterator(MeshDensity* md) : meshDensity{ md } {}
+	virtual bool first(int& id) = 0;
+	virtual bool next(int& id) = 0;
+};
+
+
+
+/*
+	1D MeshDensity
+*/
 
 class MeshDensity1D : public MeshDensity {
 public:
@@ -35,10 +58,20 @@ public:
 
 	int x = 0;
 	node_skip nodeSkip = node_skip::none;
+
+	std::shared_ptr<NodeIndexIterator> nodeIndexIterator();
 };
 
+class NodeIndexIterator1D : public NodeIndexIterator {
+public:
+	NodeIndexIterator1D(MeshDensity1D* md) : NodeIndexIterator(md) {}
+	bool first(int& id);
+	bool next(int& id);
+};
 
-
+/*
+	2D MeshDensity
+*/
 class MeshDensity2D : public MeshDensity {
 public:
 	MeshDensity2D() : MeshDensity(false) {}
@@ -69,14 +102,28 @@ public:
 	int x, y;
 	node_skip nodeSkipX = node_skip::none;
 	node_skip nodeSkipY = node_skip::none;
+
+	std::shared_ptr<NodeIndexIterator> nodeIndexIterator();
 };
 
+class NodeIndexIterator2D : public NodeIndexIterator {
+public:
+	NodeIndexIterator2D(MeshDensity2D* md) : NodeIndexIterator(md) {}
+	virtual bool first(int& id);
+	virtual bool next(int& id);
+};
+
+
+
+/*
+	3D MeshDensity
+*/
 class MeshDensity3D : public MeshDensity {
 public:
 	NodeIterator2D getNodeIter(int face);
 
-protected:
 	int x, y, z;
+	std::shared_ptr<NodeIndexIterator> nodeIndexIterator();
 };
 
 }
