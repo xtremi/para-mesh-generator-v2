@@ -43,19 +43,25 @@ void Mesher::write(Mesh2D& mesh) {
 
 	SurfaceData* surfaceData = mesh.surface->init(mesh.meshDensity.nNodesX(), mesh.meshDensity.nNodesY(), mesh.meshDensity.closedLoop);
 
-
-	for (int iy = 0; iy < mesh.meshDensity.nNodesY(); iy++) {
-		if (!pmg::skip(iy, mesh.meshDensity.nNodesY(), mesh.meshDensity.nodeSkipY)) {
-			for (int ix= 0; ix< mesh.meshDensity.nNodesX(); ix++) {
-				if (!pmg::skip(ix, mesh.meshDensity.nNodesX(), mesh.meshDensity.nodeSkipX)) {
-
-					glm::dvec3 pos = mesh.surface->positionI(ix, iy, surfaceData);
-					writer->writeNode(pos, *mesh.csys, *mesh.transformer);
-
-				}
-			}
-		}
+	int indexX, indexY;
+	std::shared_ptr<NodeIndexIterator2D> iter = mesh.meshDensity.nodeIndexIterator();
+	for (bool c = iter->first(indexX, indexY); c; c = iter->next(indexX, indexY)) {
+		glm::dvec3 pos = mesh.surface->positionI(indexX, indexY, surfaceData);
+		writer->writeNode(pos, *mesh.csys, *mesh.transformer);
 	}
+
+	//for (int iy = 0; iy < mesh.meshDensity.nNodesY(); iy++) {
+	//	if (!pmg::skip(iy, mesh.meshDensity.nNodesY(), mesh.meshDensity.nodeSkipY)) {
+	//		for (int ix= 0; ix< mesh.meshDensity.nNodesX(); ix++) {
+	//			if (!pmg::skip(ix, mesh.meshDensity.nNodesX(), mesh.meshDensity.nodeSkipX)) {
+	//
+	//				glm::dvec3 pos = mesh.surface->positionI(ix, iy, surfaceData);
+	//				writer->writeNode(pos, *mesh.csys, *mesh.transformer);
+	//
+	//			}
+	//		}
+	//	}
+	//}
 
 	mesh.surface->cleanUp(surfaceData);
 

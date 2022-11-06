@@ -105,12 +105,33 @@ bool NodeIndexIterator1D::next(int& id) {
 bool NodeIndexIterator2D::first(int& idX, int& idY) {
 	currentIndexX = 0;
 	currentIndexY = 0;
+	idY = 0;
 	return next(idX, idY);
 }
 
 bool NodeIndexIterator2D::next(int& idX, int& idY) {
-	return false;
 
+	//Reached end:
+	if (currentIndexY == ((MeshDensity2D*)meshDensity)->nNodesY()){
+		return false;
+	}
+
+	while (pmg::skip(currentIndexY, ((MeshDensity2D*)meshDensity)->nNodesY(), ((MeshDensity2D*)meshDensity)->nodeSkipY)) {
+		currentIndexY++;
+	}
+
+	while (pmg::skip(currentIndexX, ((MeshDensity2D*)meshDensity)->nNodesX(), ((MeshDensity2D*)meshDensity)->nodeSkipX)) {
+		currentIndexX++;
+	}
+
+	if (currentIndexX >= ((MeshDensity2D*)meshDensity)->nNodesX()) {
+		currentIndexX = 0;
+		currentIndexY++;
+		idY = currentIndexY;
+		return next(idX, idY);
+	}
+	idX = currentIndexX++;
+	return true;
 }
 
 std::shared_ptr<NodeIndexIterator1D> MeshDensity1D::nodeIndexIterator() {
