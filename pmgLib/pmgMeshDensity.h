@@ -113,6 +113,52 @@ public:
 };
 
 
+/*
+	2D MeshDensity
+*/
+class NodeIndexIterator2Dref;
+class MeshDensity2Dref : public MeshDensity {
+public:
+	MeshDensity2Dref() : MeshDensity(false) {}
+	MeshDensity2Dref(
+		int			_nRefDirX,
+		int			_nNodesDirY,
+		bool		isClosedLoopX = false)
+		: MeshDensity(isClosedLoopX), nRefX{ _nRefDirX }, y{ _nNodesDirY }
+	{}
+
+	NodeIterator1D getNodeIter(int edge) const;
+
+	int nRefs() { return nRefX; }
+
+	//Only for first row:
+	int nNodesDirY() const { return y; }
+	int nElDirY() const { return closedLoop ? nNodesDirY() : nNodesDirY() - 1; }
+
+	//First layer is refLayer = 0
+	int nElRowB(int refLayer) const;
+	int nElRowT(int refLayer) const;
+	int nNodesRowB(int refLayer) const;
+	int nNodesRowM(int refLayer) const;
+	int nNodesRowT(int refLayer) const;
+
+	int nNodes() const;
+	int nElements() const;
+
+	int nRefX, y;
+
+	virtual std::shared_ptr<NodeIndexIterator2Dref> nodeIndexIterator();
+};
+
+class NodeIndexIterator2Dref : public NodeIndexIterator {
+	int currentIndexX = -1;
+	int currentIndexY = -1;
+public:
+	NodeIndexIterator2Dref(MeshDensity2Dref* md) : NodeIndexIterator(md) {}
+	virtual bool first(int& idX, int& idY);
+	virtual bool next(int& idX, int& idY);
+};
+
 
 /*
 	3D MeshDensity

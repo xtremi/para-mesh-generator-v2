@@ -50,19 +50,6 @@ void Mesher::write(Mesh2D& mesh) {
 		writer->writeNode(pos, *mesh.csys, *mesh.transformer);
 	}
 
-	//for (int iy = 0; iy < mesh.meshDensity.nNodesY(); iy++) {
-	//	if (!pmg::skip(iy, mesh.meshDensity.nNodesY(), mesh.meshDensity.nodeSkipY)) {
-	//		for (int ix= 0; ix< mesh.meshDensity.nNodesX(); ix++) {
-	//			if (!pmg::skip(ix, mesh.meshDensity.nNodesX(), mesh.meshDensity.nodeSkipX)) {
-	//
-	//				glm::dvec3 pos = mesh.surface->positionI(ix, iy, surfaceData);
-	//				writer->writeNode(pos, *mesh.csys, *mesh.transformer);
-	//
-	//			}
-	//		}
-	//	}
-	//}
-
 	mesh.surface->cleanUp(surfaceData);
 
 	int n[4];

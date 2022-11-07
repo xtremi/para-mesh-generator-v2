@@ -1,4 +1,5 @@
 #include "pmgMeshDensity.h"
+#include "pmgRefinementCalculations.h"
 using namespace pmg;
 
 bool pmg::skip(int i, int last, node_skip nskip) {
@@ -84,7 +85,8 @@ NodeIterator1D MeshDensity1D::getNodeIter() const {
 }
 
 
-bool NodeIndexIterator1D::first(int& id) {
+bool NodeIndexIterator1D::first(int& id)
+{
 	currentIndex = 0;
 	return next(id);
 }
@@ -134,9 +136,39 @@ bool NodeIndexIterator2D::next(int& idX, int& idY) {
 	return true;
 }
 
+
+
+
 std::shared_ptr<NodeIndexIterator1D> MeshDensity1D::nodeIndexIterator() {
 	return std::make_shared<NodeIndexIterator1D>(this);
 }
 std::shared_ptr<NodeIndexIterator2D> MeshDensity2D::nodeIndexIterator() {
 	return std::make_shared<NodeIndexIterator2D>(this);
 }
+std::shared_ptr<NodeIndexIterator2Dref> MeshDensity2Dref::nodeIndexIterator() {
+	return std::make_shared<NodeIndexIterator2Dref>(this);
+}
+
+int MeshDensity2Dref::nElRowB(int refLayer) const {
+	return refinement::nElementsLayerB_2d(refLayer, nElDirY());
+}
+int MeshDensity2Dref::nElRowT(int refLayer) const {
+	return refinement::nElementsLayerT_2d(refLayer, nElDirY());
+}
+int MeshDensity2Dref::nNodesRowB(int refLayer) const {
+	return closedLoop ? nElRowB(refLayer) : nElRowB(refLayer) + 1;
+}
+int MeshDensity2Dref::nNodesRowM(int refLayer) const {
+	return 3 * nElRowB(refLayer) / 4;
+}
+int MeshDensity2Dref::nNodesRowT(int refLayer) const {
+	return nNodesRowB(refLayer + 1);
+}
+int MeshDensity2Dref::nNodes() const {
+	return refinement::nNodesTot_2d(nRefX, nElDirY()); //is this correct? depends on closed loop?
+}
+int MeshDensity2Dref::nElements() const {
+	throw("MeshDensity2Dref::nElements() - is not implemented");
+}
+
+
