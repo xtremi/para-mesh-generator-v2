@@ -153,6 +153,10 @@ public:
 class NodeIndexIterator2Dref : public NodeIndexIterator {
 	int currentIndexX = -1;
 	int currentIndexY = -1;
+	int currentRef = -1;
+	MeshDensity1D currentRowMeshDens;
+	std::shared_ptr<NodeIndexIterator1D> currentNodeIter1D;
+	int rowType = 1; //1 = B, 2 = M, 3 = T
 public:
 	NodeIndexIterator2Dref(MeshDensity2Dref* md) : NodeIndexIterator(md) {}
 	virtual bool first(int& idX, int& idY);

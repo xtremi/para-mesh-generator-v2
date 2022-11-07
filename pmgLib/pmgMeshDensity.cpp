@@ -136,7 +136,62 @@ bool NodeIndexIterator2D::next(int& idX, int& idY) {
 	return true;
 }
 
+bool NodeIndexIterator2Dref::first(int& idX, int& idY) {
+	
+	currentRowMeshDens = MeshDensity1D(
+		((MeshDensity2Dref*)meshDensity)->nNodesRowB(0),
+		pmg::node_skip::none,
+		((MeshDensity2Dref*)meshDensity)->closedLoop);
+	currentNodeIter1D = currentRowMeshDens.nodeIndexIterator();	
+	
+	currentRef = 0;
+	currentIndexY = idY = 0;
+	if (!currentNodeIter1D->first(currentIndexX)) {
+		idX = currentIndexX;
+		return true;
+	}
+	return false;
+}
+bool NodeIndexIterator2Dref::next(int& idX, int& idY){
+	if (currentRef == ((MeshDensity2Dref*)meshDensity)->nRefs()) {
+		return false;
+	}
 
+	if (!currentNodeIter1D->next(currentIndexX)) {
+		
+		if(rowType == 1){
+			currentRowMeshDens = MeshDensity1D(
+				((MeshDensity2Dref*)meshDensity)->nNodesRowB(currentRef),
+				pmg::node_skip::none,
+				((MeshDensity2Dref*)meshDensity)->closedLoop);
+		}
+		else if (rowType == 2) {
+			currentRowMeshDens = MeshDensity1D(
+				((MeshDensity2Dref*)meshDensity)->nNodesRowM(currentRef),
+				pmg::node_skip::every_4,
+				((MeshDensity2Dref*)meshDensity)->closedLoop);
+		}
+		else {
+			currentRowMeshDens = MeshDensity1D(
+				((MeshDensity2Dref*)meshDensity)->nNodesRowT(currentRef),
+				pmg::node_skip::none,
+				((MeshDensity2Dref*)meshDensity)->closedLoop);
+			currentRef++;
+		}
+		currentNodeIter1D = currentRowMeshDens.nodeIndexIterator();
+		currentIndexY++;
+		idY = currentIndexY;
+		if (currentNodeIter1D->first(currentIndexX)) {
+			idX = currentIndexX * currentRef;
+			return true;
+		}
+		return false;
+	}
+
+
+
+
+}
 
 
 std::shared_ptr<NodeIndexIterator1D> MeshDensity1D::nodeIndexIterator() {
