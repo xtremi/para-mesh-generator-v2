@@ -1,6 +1,7 @@
 #include "TestDef.h"
 #include <vector>
 #include <set>
+#include <utility>
 #include "pmgPath.h"
 #include "pmgMeshWriter.h"
 #include "pmgMesher.h"
@@ -12,7 +13,7 @@ int test_pmgMeshCsys01(const std::string& filepath);
 int test_pmgMeshToMesh1D(const std::string& filepath);
 int test_pmgSurface_pathToPath01(const std::string& filepath);
 int test_pmgSurface_pathToPath02_skip(const std::string& filepath);
-
+int test_NodeIndexIterator2Dref(const std::string& filepath);
 
 std::vector<TestDef> testFunctions({
 	TestDef(1000, "test_pmgPath01", "pmgPath", (testFunction)test_pmgPath01),
@@ -22,6 +23,7 @@ std::vector<TestDef> testFunctions({
 	TestDef(1250, "test_pmgMeshCsys01", "pmgMeshCsys", (testFunction)test_pmgMeshCsys01),
 	TestDef(1300, "test_pmgSurface_pathToPath01", "pmgMesherSurface", (testFunction)test_pmgSurface_pathToPath01),
 	TestDef(1305, "test_pmgSurface_pathToPath02_skip", "pmgMesherSurface", (testFunction)test_pmgSurface_pathToPath02_skip),
+	TestDef(1400, "test_NodeIndexIterator2Dref", "iterator", (testFunction)test_NodeIndexIterator2Dref),
 });
 
 
@@ -360,3 +362,31 @@ int test_pmgSurface_pathToPath02_skip(const std::string& filepath) {
 	nasWriter.close();
 	return 0;
 }
+
+/*
+
+t0   0_______2_______4_______6_______8    3
+	 | \     |     / |  \    |     / | 
+	 |   1___2___3/	 |   5___6___7	 |    1
+	 |   |   |   |   |   |   |   |   |
+  ix=0___1___2___3___4___5___6___7___8    0
+
+ [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0]
+       [1,1],[2,1],[3,1],      [5,1],[6,1],[7,1]
+ [0,2],      [2,2],      [4,2],      [6,2],      [8,2]
+
+*/
+int test_NodeIndexIterator2Dref(const std::string& filepath) {
+	
+	pmg::MeshDensity2Dref meshDens(2, 9, false);
+    std::shared_ptr<pmg::NodeIndexIterator2Dref> iter = meshDens.nodeIndexIterator();
+
+	std::vector<std::pair<int, int>> res;
+	int indexX, indexY;
+	for (bool ok = iter->first(indexX, indexY); ok; ok = iter->next(indexX, indexY)) {
+		res.push_back(std::pair<int, int>(indexX, indexY));
+	}
+
+	return true;
+}
+
