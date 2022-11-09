@@ -364,17 +364,27 @@ int test_pmgSurface_pathToPath02_skip(const std::string& filepath) {
 }
 
 /*
-
-t0   0_______2_______4_______6_______8    3
+	 0_______________4_______________8    8
+	 |\              |              /|
+	 |  \ 			 |		      /	 |
+	 |	   \ 2_______4_______6  / 	 |    6
+	 |       |       |       |		 |
+	 |	     |       |       |       |
+t0   0_______2_______4_______6_______8    4
+     |       |       |       |       |
+	 |		 |		 |		 |		 |
+t0   0_______2_______4_______6_______8    2
 	 | \     |     / |  \    |     / | 
 	 |   1___2___3/	 |   5___6___7	 |    1
 	 |   |   |   |   |   |   |   |   |
   ix=0___1___2___3___4___5___6___7___8    0
 
- [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0]
-       [1,1],[2,1],[3,1],      [5,1],[6,1],[7,1]
- [0,2],      [2,2],      [4,2],      [6,2],      [8,2]
-
+ {0,0},{1,0},{2,0},{3,0},{4,0},{5,0},{6,0},{7,0},{8,0}
+       {1,1},{2,1},{3,1},      {5,1},{6,1},{7,1}
+ {0,2},      {2,2},      {4,2},      {6,2},      {8,2}
+ {0,4},      {2,4},      {4,4},      {6,4},      {8,4}
+             {2,6},      {4,6},      {6,6}
+{0,8},                   {4,8},                  {8,8}
 */
 int test_NodeIndexIterator2Dref(const std::string& filepath) {
 	
@@ -385,6 +395,27 @@ int test_NodeIndexIterator2Dref(const std::string& filepath) {
 	int indexX, indexY;
 	for (bool ok = iter->first(indexX, indexY); ok; ok = iter->next(indexX, indexY)) {
 		res.push_back(std::pair<int, int>(indexX, indexY));
+	}
+
+	std::vector<std::pair<int, int>> expected({
+		{0,0},{1,0},{2,0},{3,0},{4,0},{5,0},{6,0},{7,0},{8,0},
+		{1,1},{2,1},{3,1},{5,1},{6,1},{7,1},
+		{0,2},{2,2},{4,2},{6,2},{8,2},
+		{0,4},{2,4},{4,4},{6,4},{8,4},
+		{2,6},{4,6},{6,6},
+		{0,8},{4,8},{8,8}
+	});
+
+	if(res.size() != expected.size()){
+		return false;
+	}
+
+	for (int i = 0; i < expected.size(); i++) {
+		if ((expected[i].first != res[i].first) ||
+			(expected[i].second != res[i].second)) 
+		{
+			return false;
+		}
 	}
 
 	return true;

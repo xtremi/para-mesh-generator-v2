@@ -1,5 +1,6 @@
 #include "pmgMeshDensity.h"
 #include "pmgRefinementCalculations.h"
+#include "pmgMath.h"
 using namespace pmg;
 
 bool pmg::skip(int i, int last, node_skip nskip) {
@@ -153,11 +154,12 @@ bool NodeIndexIterator2Dref::first(int& idX, int& idY) {
 	return false;
 }
 bool NodeIndexIterator2Dref::next(int& idX, int& idY){
-	if (currentRef == ((MeshDensity2Dref*)meshDensity)->nRefs()) {
-		return false;
-	}
 
 	if (!currentNodeIter1D->next(currentIndexX)) {
+		
+		currentIndexY = currentIndexY + pmg::twoPow(currentRef);
+		idY = currentIndexY;
+		
 		rowType++;
 		if(rowType == 1){
 			currentRowMeshDens = MeshDensity1D(
@@ -179,10 +181,13 @@ bool NodeIndexIterator2Dref::next(int& idX, int& idY){
 			currentRef++;
 			rowType = 0;
 		}
-		
+
+		if (currentRef == ((MeshDensity2Dref*)meshDensity)->nRefs() && rowType == 1) {
+			return false;
+		}
+
 		currentNodeIter1D = currentRowMeshDens.nodeIndexIterator();
-		currentIndexY++;
-		idY = currentIndexY * (currentRef + 1);
+
 		if (currentNodeIter1D->first(currentIndexX)) {
 			idX = currentIndexX * (currentRef + 1);
 			return true;
@@ -191,7 +196,6 @@ bool NodeIndexIterator2Dref::next(int& idX, int& idY){
 	}
 	else {
 		idX = currentIndexX * (currentRef + 1);
-		idY = currentIndexY * (currentRef + 1);
 	}
 
 	return true;
