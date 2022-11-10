@@ -142,16 +142,12 @@ bool NodeIndexIterator2Dref::first(int& idX, int& idY) {
 	currentRowMeshDens = MeshDensity1D(
 		((MeshDensity2Dref*)meshDensity)->nNodesRowB(0),
 		pmg::node_skip::none,
-		((MeshDensity2Dref*)meshDensity)->closedLoop);
+		meshDensity->closedLoop);
 	currentNodeIter1D = currentRowMeshDens.nodeIndexIterator();	
 	
 	currentRef = 0;
 	currentIndexY = idY = 0;
-	if (currentNodeIter1D->first(currentIndexX)) {
-		idX = currentIndexX;
-		return true;
-	}
-	return false;
+	return currentNodeIter1D->first(idX);
 }
 bool NodeIndexIterator2Dref::next(int& idX, int& idY){
 
@@ -161,42 +157,68 @@ bool NodeIndexIterator2Dref::next(int& idX, int& idY){
 		idY = currentIndexY;
 		
 		rowType++;
+		int nNodesRow = ((MeshDensity2Dref*)meshDensity)->nNodesRowB(currentRef);
+		pmg::node_skip nodeSkipRow = pmg::node_skip::none;
+
 		if(rowType == 1){
-			currentRowMeshDens = MeshDensity1D(
-				((MeshDensity2Dref*)meshDensity)->nNodesRowB(currentRef),
-				pmg::node_skip::none,
-				((MeshDensity2Dref*)meshDensity)->closedLoop);
+			if (currentRef == ((MeshDensity2Dref*)meshDensity)->nRefs()) {
+				return false;
+			}
 		}
 		else if (rowType == 2) {
-			currentRowMeshDens = MeshDensity1D(
-				((MeshDensity2Dref*)meshDensity)->nNodesRowB(currentRef),
-				pmg::node_skip::every_4,
-				((MeshDensity2Dref*)meshDensity)->closedLoop);
+			nodeSkipRow = pmg::node_skip::every_4;
 		}
-		else {
-			currentRowMeshDens = MeshDensity1D(
-				((MeshDensity2Dref*)meshDensity)->nNodesRowT(currentRef),
-				pmg::node_skip::none,
-				((MeshDensity2Dref*)meshDensity)->closedLoop);
+		else /*(rowType == 3)*/ {
+			nNodesRow = ((MeshDensity2Dref*)meshDensity)->nNodesRowT(currentRef);
 			currentRef++;
 			rowType = 0;
 		}
 
-		if (currentRef == ((MeshDensity2Dref*)meshDensity)->nRefs() && rowType == 1) {
-			return false;
-		}
-
+		currentRowMeshDens = MeshDensity1D(nNodesRow, nodeSkipRow, meshDensity->closedLoop);
 		currentNodeIter1D = currentRowMeshDens.nodeIndexIterator();
 
-		if (currentNodeIter1D->first(currentIndexX)) {
-			idX = currentIndexX * (currentRef + 1);
-			return true;
+		if (!currentNodeIter1D->first(currentIndexX)) {
+			return false;
 		}
-		return false;
+	}
+
+	idX = currentIndexX * pmg::twoPow(currentRef);
+	return true;
+}
+
+bool NodeIndexIterator2Dref_2::first(int& idX, int& idY) {
+	currentRef = 0;
+	currentIndexX = 0;
+	currentIndexY = 0;
+	return next(idX, idY);
+}
+
+bool NodeIndexIterator2Dref_2::next(int& idX, int& idY) {
+
+	idX = currentIndexX;
+	idY = currentIndexY;
+
+	if (idX == ((MeshDensity2Dref*)meshDensity)->nNodesRowB(currentRef)){
+		currentIndexY += pmg::twoPow(currentRef);
+		currentIndexX = 0;
 	}
 	else {
-		idX = currentIndexX * (currentRef + 1);
+
+		if (rowType == 1) {
+			idX = currentIndexX * pmg::twoPow(currentRef);
+
+		}
+		else if (rowType == 2) {
+
+		}
+		else {
+
+		}
+
+
 	}
+
+
 
 	return true;
 }

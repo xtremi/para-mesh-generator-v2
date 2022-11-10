@@ -164,6 +164,18 @@ public:
 };
 
 
+class NodeIndexIterator2Dref_2 : public NodeIndexIterator {
+	int currentIndexX = -1;
+	int currentIndexY = -1;
+	int currentRef = -1;
+	int rowType = 1; //1 = B, 2 = M, 3 = T
+public:
+	NodeIndexIterator2Dref_2(MeshDensity2Dref* md) : NodeIndexIterator(md) {}
+	virtual bool first(int& idX, int& idY);
+	virtual bool next(int& idX, int& idY);
+};
+
+
 /*
 	3D MeshDensity
 */

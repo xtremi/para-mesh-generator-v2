@@ -407,17 +407,17 @@ int test_NodeIndexIterator2Dref(const std::string& filepath) {
 	});
 
 	if(res.size() != expected.size()){
-		return false;
+		return 1;
 	}
 
 	for (int i = 0; i < expected.size(); i++) {
 		if ((expected[i].first != res[i].first) ||
 			(expected[i].second != res[i].second)) 
 		{
-			return false;
+			return 1;
 		}
 	}
 
-	return true;
+	return 0;
 }
 
